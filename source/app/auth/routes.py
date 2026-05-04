@@ -109,17 +109,15 @@ def register_submit(
 def check_email_page(request: Request) -> HTMLResponse:
     if request.query_params.get("registered"):
         message = (
-            "Аккаунт создан. Письмо с подтверждением отправлено. "
-            "В предпросмотре письмо сохраняется во внутреннем почтовом ящике, "
-            "а внешний почтовый провайдер ещё не подключён. Подтвердите почту перед входом."
+            "Мы отправили письмо подтверждения. Подтвердите почту перед входом."
         )
     elif request.query_params.get("resent"):
         message = (
-            "Новое письмо с подтверждением отправлено. Проверьте почту и подтвердите её перед входом."
+            "Новое письмо подтверждения отправлено. Проверьте почту и подтвердите её перед входом."
         )
     else:
         message = (
-            "Проверьте почту и подтвердите её по ссылке. После подтверждения можно войти в кабинет."
+            "Проверьте почту и подтвердите её по ссылке."
         )
     return _template(
         request,
@@ -139,7 +137,7 @@ def resend_verification_page(request: Request) -> HTMLResponse:
     return _template(
         request,
         "resend_verification.html",
-        title="Повторная отправка письма",
+        title="Повторная отправка письма подтверждения",
         notice=request.query_params.get("notice"),
         error=request.query_params.get("error"),
         email="",
@@ -162,14 +160,14 @@ def resend_verification_submit(
         return _template(
             request,
             "resend_verification.html",
-            title="Повторная отправка письма",
+            title="Повторная отправка письма подтверждения",
             error=str(exc),
             email=email,
         )
     return _template(
         request,
         "resend_verification.html",
-        title="Повторная отправка письма",
+        title="Повторная отправка письма подтверждения",
         notice="Если аккаунт существует и почта ещё не подтверждена, мы отправили новое письмо.",
         email="",
     )
@@ -214,7 +212,7 @@ def login_page(request: Request) -> HTMLResponse:
     return _template(
         request,
         "login.html",
-        title="Вход",
+        title="Вход в аккаунт",
         notice=_login_notice(request),
         error=request.query_params.get("error"),
         email_or_login="",
@@ -240,8 +238,8 @@ def login_submit(
         return _template(
             request,
             "login.html",
-            title="Вход",
-            error="Почта не подтверждена. Проверьте почту или запросите новое письмо.",
+            title="Вход в аккаунт",
+            error="Email не подтверждён.",
             unverified=True,
             email_or_login=email_or_login,
         )
@@ -249,7 +247,7 @@ def login_submit(
         return _template(
             request,
             "login.html",
-            title="Вход",
+            title="Вход в аккаунт",
             error=str(exc),
             email_or_login=email_or_login,
         )
@@ -257,7 +255,7 @@ def login_submit(
         return _template(
             request,
             "login.html",
-            title="Вход",
+            title="Вход в аккаунт",
             error="Неверная почта, логин или пароль.",
             email_or_login=email_or_login,
         )
@@ -265,7 +263,7 @@ def login_submit(
         return _template(
             request,
             "login.html",
-            title="Вход",
+            title="Вход в аккаунт",
             error=str(exc),
             email_or_login=email_or_login,
         )

@@ -302,8 +302,10 @@ def test_route_flow_register_verify_login_cabinet_logout(client, test_settings):
 
     check_email_response = client.get("/check-email?registered=1")
     assert check_email_response.status_code == 200
-    assert "Аккаунт создан" in check_email_response.text
-    assert "Подтвердите почту" in check_email_response.text
+    assert "Проверьте почту" in check_email_response.text
+    assert "Мы отправили письмо подтверждения" in check_email_response.text
+    assert "Не пришло письмо подтверждения?" in check_email_response.text
+    assert "/resend-verification" in check_email_response.text
 
     outbox_row = _fetch_one(
         test_settings,
@@ -376,6 +378,8 @@ def test_route_flow_login_by_login_and_password_reset(client, test_settings):
     forgot_response = client.post("/forgot-password", data={"email": "loginroute@example.com"})
     assert forgot_response.status_code == 200
     assert "Если такой адрес электронной почты зарегистрирован" in forgot_response.text
+    assert "Подтвердить почту" not in forgot_response.text
+    assert "Вернуться ко входу" in forgot_response.text
 
     reset_row = _fetch_one(
         test_settings,
@@ -393,6 +397,7 @@ def test_route_flow_login_by_login_and_password_reset(client, test_settings):
     )
     assert reset_response.status_code == 200
     assert "Теперь можно войти в систему" in reset_response.text
+    assert "Вернуться ко входу" in reset_response.text or "Войти" in reset_response.text
 
     relogin_response = client.post(
         "/login",
@@ -423,8 +428,10 @@ def test_unverified_login_shows_resend_link(client, test_settings):
         data={"email_or_login": "needsverify@example.com", "password": "Secret123"},
     )
     assert login_response.status_code == 200
-    assert "Почта не подтверждена" in login_response.text
+    assert "Email не подтверждён." in login_response.text
+    assert "Не пришло письмо подтверждения?" in login_response.text
     assert "/resend-verification" in login_response.text
+    assert "Подтверждение почты" not in client.get("/login").text
 
 
 def test_login_and_reset_pages_show_clear_rules(client):
@@ -433,10 +440,17 @@ def test_login_and_reset_pages_show_clear_rules(client):
     reset_response = client.get("/reset-password/example-token")
 
     assert "Электронная почта или логин" in login_response.text
-    assert "/resend-verification" in login_response.text
+    assert "Зарегистрироваться" in login_response.text
+    assert "Забыли пароль?" in login_response.text
+    assert "Подтверждение почты" not in login_response.text
+    assert "Не пришло письмо подтверждения?" not in login_response.text
+    assert "/resend-verification" not in login_response.text
     assert "Если такой адрес электронной почты зарегистрирован" in forgot_response.text
+    assert "Подтвердить почту" not in forgot_response.text
+    assert "Вернуться ко входу" in forgot_response.text
     assert "минимум 8 символов" in reset_response.text
     assert "без пробелов внутри" in reset_response.text
+    assert "Вернуться ко входу" in reset_response.text or "Войти" in reset_response.text
     assert "/static/styles.css" in login_response.text
 
 

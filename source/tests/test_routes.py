@@ -29,15 +29,20 @@ def test_login_and_register_pages(client):
     assert "Регистрация" in register_response.text
     assert "Нет аккаунта?" in login_response.text
     assert "Зарегистрироваться" in login_response.text
+    assert "Забыли пароль?" in login_response.text
     assert "Уже есть аккаунт?" in register_response.text
     assert "Войти" in register_response.text
     assert "Проверьте почту" in check_email_response.text
-    assert "Повторная отправка" in resend_response.text
+    assert "Не пришло письмо подтверждения?" in check_email_response.text
+    assert "/resend-verification" in check_email_response.text
+    assert "Повторная отправка письма подтверждения" in resend_response.text
     assert "/static/styles.css" in login_response.text
     assert "/static/styles.css" in register_response.text
     assert "Электронная почта или логин" in login_response.text
     assert "Электронная почта" in register_response.text
-    assert "Подтверждение почты" in login_response.text
+    assert "Подтверждение почты" not in login_response.text
+    assert "Не пришло письмо подтверждения?" not in login_response.text
+    assert "Отправить письмо подтверждения" not in login_response.text
 
 
 def test_auth_utility_pages_use_shared_base_and_styles(client):
@@ -66,6 +71,12 @@ def test_auth_utility_pages_use_shared_base_and_styles(client):
         assert "Личный кабинет" not in response.text
         assert "Работа с ИИ" not in response.text
         assert "Админ-панель" not in response.text
+
+    assert "Не пришло письмо подтверждения?" in check_email_response.text
+    assert "Подтвердить почту" not in forgot_response.text
+    assert "Вернуться ко входу" in forgot_response.text
+    assert "Войти" in reset_response.text or "Вернуться ко входу" in reset_response.text
+    assert "Повторная отправка письма подтверждения" in resend_response.text
 
 
 def test_placeholder_post_routes_redirect(client):

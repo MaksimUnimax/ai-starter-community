@@ -3,9 +3,9 @@
 {% block content %}
   <section class="card stack">
     <div class="stack">
-      <p class="muted">Подтверждение почты</p>
-      <h1 class="section-title">Повторная отправка письма</h1>
-      <p>Если аккаунт существует и почта ещё не подтверждена, мы отправим новое письмо.</p>
+      <p class="muted">Повторная отправка письма подтверждения</p>
+      <h1 class="section-title">Повторная отправка письма подтверждения</h1>
+      <p>Если аккаунт существует и почта ещё не подтверждена, мы отправим новое письмо подтверждения.</p>
     </div>
 
     {% if notice %}
@@ -20,13 +20,11 @@
         <span>Электронная почта</span>
         <input class="input" type="email" name="email" value="{{ email or '' }}" autocomplete="email">
       </label>
-      <button class="button button-primary" type="submit">Отправить ещё раз</button>
+      <button class="button button-primary" type="submit">Отправить письмо подтверждения</button>
     </form>
 
     <div class="actions">
-      <a class="button button-secondary" href="/check-email">Проверка почты</a>
-      <a class="button button-secondary" href="/login">Войти</a>
-      <a class="button button-secondary" href="/register">Регистрация</a>
+      <a class="button button-secondary" href="/login">Вернуться ко входу</a>
     </div>
   </section>
 {% endblock %}

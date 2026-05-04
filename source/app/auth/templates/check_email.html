@@ -3,16 +3,15 @@
 {% block content %}
   <section class="card stack">
     <div class="stack">
-      <p class="muted">Письмо для подтверждения</p>
+      <p class="muted">Письмо подтверждения</p>
       <h1 class="section-title">Проверьте почту</h1>
       <p>{{ message }}</p>
-      <p class="form-help">Если письмо не пришло, можно отправить его ещё раз через форму ниже.</p>
+      <p class="form-help">Не пришло письмо подтверждения? Отправьте его ещё раз.</p>
     </div>
 
     <div class="actions">
       <a class="button button-primary" href="/login">Войти</a>
       <a class="button button-secondary" href="/resend-verification">Отправить письмо ещё раз</a>
-      <a class="button button-secondary" href="/">На главную</a>
     </div>
   </section>
 {% endblock %}

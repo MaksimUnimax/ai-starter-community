@@ -15,8 +15,9 @@
       <div class="alert alert-error">{{ error }}</div>
     {% endif %}
     {% if unverified %}
-      <div class="alert alert-info">
-        <a class="button button-secondary" href="/resend-verification">Отправить письмо для подтверждения ещё раз</a>
+      <div class="alert alert-info stack">
+        <p>Email не подтверждён.</p>
+        <p>Не пришло письмо подтверждения? <a href="/resend-verification">Отправить письмо подтверждения ещё раз</a>.</p>
       </div>
     {% endif %}
 
@@ -32,14 +33,9 @@
       <button class="button button-primary" type="submit">Войти</button>
     </form>
 
-    <div class="stack">
-      <p>Нет аккаунта?</p>
-      <a class="button button-secondary" href="/register">Зарегистрироваться</a>
-    </div>
-
     <div class="actions">
+      <p>Нет аккаунта? <a href="/register">Зарегистрироваться</a></p>
       <a class="button button-secondary" href="/forgot-password">Забыли пароль?</a>
-      <a class="button button-secondary" href="/resend-verification">Подтверждение почты</a>
     </div>
   </section>
 {% endblock %}
