@@ -8,14 +8,22 @@
 <body>
   <main>
     <h1>Кабинет</h1>
-    <p>{{ access_status_label }}</p>
-    <p>Email: {{ user_email }}</p>
-    <p>Логин: {{ user_login }}</p>
-    <p>Платёж, материалы и тарифы появятся позже. Сейчас доступ ещё не активирован.</p>
+
     <section>
-      <h2>Материалы</h2>
-      <p>Материалы будут доступны после оплаты</p>
-      <p><a href="/materials">Открыть материалы</a></p>
+      <h2>Аккаунт</h2>
+      <p>Вы вошли как: {{ user_login }}</p>
+      <p>Электронная почта: {{ user_email }}</p>
+      <p>Статус аккаунта: {{ account_status_label }}</p>
+      <form method="post" action="/logout">
+        <button type="submit">Выйти</button>
+      </form>
+    </section>
+
+    <section>
+      <h2>Доступ</h2>
+      <p>Доступ к материалам: {{ materials_access_label }}</p>
+      <p>{{ materials_access_hint }}</p>
+      <p><a href="/materials">Перейти к материалам</a></p>
     </section>
 
     {% if tariffs %}
@@ -27,13 +35,17 @@
             {% if tariff.description %}
               <p>{{ tariff.description }}</p>
             {% endif %}
-            <p>{{ tariff.price_amount_minor // 100 }} ₽</p>
-            <p>{{ tariff.currency }}</p>
+            <p>Цена: {{ tariff.price_amount_minor // 100 }} ₽</p>
             {% if tariff.options %}
               <h4>Включённые опции</h4>
               <ul>
                 {% for option in tariff.options %}
-                  <li>{{ option.title }}</li>
+                  <li>
+                    <strong>{{ option.title }}</strong>
+                    {% if option.description %}
+                      <span> — {{ option.description }}</span>
+                    {% endif %}
+                  </li>
                 {% endfor %}
               </ul>
             {% endif %}
@@ -43,20 +55,20 @@
     {% else %}
       <section>
         <h2>Доступные тарифы</h2>
-        <p>Каталог будет показан здесь после добавления тарифов.</p>
+        <p>Каталог появится здесь, когда тарифы будут добавлены.</p>
       </section>
     {% endif %}
 
-    <p>Оплата будет подключена следующим этапом.</p>
+    <section>
+      <h2>Оплата</h2>
+      <p>Оплата будет подключена позже.</p>
+      <p>Сейчас можно посмотреть тарифы и будущие материалы.</p>
+    </section>
 
-    <form method="post" action="/logout">
-      <button type="submit">Выйти</button>
-    </form>
-    <p>
-      <a href="/">На главную</a>
-      <a href="/login">Вход</a>
-      <a href="/register">Регистрация</a>
-    </p>
+    <section>
+      <h2>Что дальше</h2>
+      <p>После подключения оплаты здесь появится информация о доступе и продлении опций.</p>
+    </section>
   </main>
 </body>
 </html>

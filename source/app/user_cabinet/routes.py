@@ -29,16 +29,21 @@ def cabinet_page(request: Request):
     if user is None:
         return RedirectResponse(url="/login", status_code=303)
 
-    access_status_label = "Доступ не активирован" if user.access_status == "not_activated" else user.access_status
+    materials_access_active = user.materials_access_granted_at is not None
+    materials_access_label = "активирован" if materials_access_active else "не активирован"
+    materials_access_hint = "Материалы будут доступны после оплаты." if not materials_access_active else "Материалы открыты и доступны в разделе ниже."
+    account_status_label = "активен" if user.is_active else "неактивен"
     tariffs = list_active_tariffs_with_options(settings=settings)
     return _template(
         request,
         "cabinet.html",
-        title=page_title("Кабинет"),
+        title="Кабинет",
         user_email=user.email,
         user_login=user.login,
-        access_status=user.access_status,
-        access_status_label=access_status_label,
+        account_status_label=account_status_label,
+        materials_access_active=materials_access_active,
+        materials_access_label=materials_access_label,
+        materials_access_hint=materials_access_hint,
         tariffs=tariffs,
     )
 

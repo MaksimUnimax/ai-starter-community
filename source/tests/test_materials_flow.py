@@ -85,6 +85,8 @@ def test_cabinet_contains_materials_link_and_locked_hint(client, test_settings):
     response = client.get("/cabinet")
     assert response.status_code == 200
     assert "/materials" in response.text
+    assert "Перейти к материалам" in response.text
+    assert "Доступ к материалам: не активирован" in response.text
     assert "Материалы будут доступны после оплаты" in response.text
 
 

@@ -48,13 +48,35 @@ def test_cabinet_displays_active_tariff_catalog_and_no_payment_action(client, te
 
     cabinet_response = client.get("/cabinet")
     assert cabinet_response.status_code == 200
-    assert "Доступ не активирован" in cabinet_response.text
+    assert "Кабинет" in cabinet_response.text
+    assert "Аккаунт" in cabinet_response.text
+    assert "Вы вошли как:" in cabinet_response.text
+    assert "Электронная почта:" in cabinet_response.text
+    assert "Статус аккаунта: активен" in cabinet_response.text
+    assert "Доступ" in cabinet_response.text
+    assert "Доступ к материалам: не активирован" in cabinet_response.text
+    assert "Материалы будут доступны после оплаты." in cabinet_response.text
+    assert "Перейти к материалам" in cabinet_response.text
+    assert "Доступные тарифы" in cabinet_response.text
     assert "Стартовый доступ" in cabinet_response.text
     assert "4990 ₽" in cabinet_response.text
     assert "AI / GPT-инструмент" in cabinet_response.text
-    assert "Сервер" in cabinet_response.text
-    assert "VPN" in cabinet_response.text
-    assert "Оплата будет подключена следующим этапом" in cabinet_response.text
+    assert "Описание" not in cabinet_response.text  # no raw schema labels beyond user copy
+    assert "ai_gpt_tool" not in cabinet_response.text
+    assert "starter_4990_rub" not in cabinet_response.text
+    assert "/admin" not in cabinet_response.text
+    assert "Оплата будет подключена позже." in cabinet_response.text
+    assert "Сейчас можно посмотреть тарифы и будущие материалы." in cabinet_response.text
+    assert "После подключения оплаты здесь появится информация о доступе и продлении опций." in cabinet_response.text
+    assert "Access" not in cabinet_response.text
+    assert "Status" not in cabinet_response.text
+    assert "Price" not in cabinet_response.text
+    assert "Currency" not in cabinet_response.text
+    assert "Included options" not in cabinet_response.text
+    assert "Logout" not in cabinet_response.text
+    assert "Payment" not in cabinet_response.text
+    assert "Code" not in cabinet_response.text
+    assert "Title" not in cabinet_response.text
     assert "action=\"/checkout\"" not in cabinet_response.text
     assert "checkout" not in cabinet_response.text.lower()
-
+    assert "pay now" not in cabinet_response.text.lower()

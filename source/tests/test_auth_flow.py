@@ -328,7 +328,10 @@ def test_route_flow_register_verify_login_cabinet_logout(client, test_settings):
     assert cabinet_response.status_code == 200
     assert "route@example.com" in cabinet_response.text
     assert "routeuser" in cabinet_response.text
-    assert "Доступ не активирован" in cabinet_response.text
+    assert "Вы вошли как:" in cabinet_response.text
+    assert "Электронная почта:" in cabinet_response.text
+    assert "Статус аккаунта: активен" in cabinet_response.text
+    assert "Доступ к материалам: не активирован" in cabinet_response.text
     assert "Выйти" in cabinet_response.text
 
     logout_response = client.post("/logout", follow_redirects=False)
@@ -463,7 +466,8 @@ def test_cabinet_shows_logout_button_and_access_text(client, test_settings):
     assert cabinet_response.status_code == 200
     assert "cabinetux@example.com" in cabinet_response.text
     assert "cabinetux" in cabinet_response.text
-    assert "Доступ не активирован" in cabinet_response.text
+    assert "Статус аккаунта: активен" in cabinet_response.text
+    assert "Доступ к материалам: не активирован" in cabinet_response.text
     assert "Выйти" in cabinet_response.text
 
 
