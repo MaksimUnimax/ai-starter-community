@@ -74,6 +74,7 @@ def _public_user_from_row(row) -> UserPublic:
         is_active=bool(row["is_active"]),
         access_status=str(row["access_status"]),
         email_verified_at=row["email_verified_at"],
+        materials_access_granted_at=row["materials_access_granted_at"],
     )
 
 

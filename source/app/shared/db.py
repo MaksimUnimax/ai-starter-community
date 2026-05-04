@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS users (
     role TEXT NOT NULL DEFAULT 'user',
     is_active INTEGER NOT NULL DEFAULT 1,
     email_verified_at TEXT NULL,
+    materials_access_granted_at TEXT NULL,
     access_status TEXT NOT NULL DEFAULT 'not_activated',
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL
@@ -119,3 +120,13 @@ def initialize_database(path: Path | str) -> None:
     with sqlite3.connect(str(db_path)) as connection:
         connection.execute("PRAGMA foreign_keys = ON")
         connection.executescript(SCHEMA_SQL)
+        _ensure_users_materials_access_granted_at_column(connection)
+
+
+def _ensure_users_materials_access_granted_at_column(connection: sqlite3.Connection) -> None:
+    columns = {
+        row[1]
+        for row in connection.execute("PRAGMA table_info(users)").fetchall()
+    }
+    if "materials_access_granted_at" not in columns:
+        connection.execute("ALTER TABLE users ADD COLUMN materials_access_granted_at TEXT NULL")
