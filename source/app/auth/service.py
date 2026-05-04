@@ -8,7 +8,13 @@ from collections.abc import Mapping
 
 from app.auth.schemas import UserPublic
 from app.core.config import Settings, get_settings
-from app.notifications.email_service import send_email_verification, send_password_reset
+from app.notifications.email_service import (
+    EmailConfigError,
+    EmailDeliveryError,
+    EmailModeError,
+    send_email_verification,
+    send_password_reset,
+)
 from app.shared.db import get_connection, get_database_path, initialize_database
 from app.shared.security import (
     generate_auth_token,
@@ -37,6 +43,7 @@ ROLE_LABELS_RU = {
     ROLE_MODERATOR: "модератор",
     ROLE_ADMIN: "администратор",
 }
+EMAIL_DELIVERY_FAILURE_MESSAGE_RU = "Не удалось отправить письмо. Попробуйте позже."
 
 
 class AuthError(Exception):
@@ -171,6 +178,10 @@ def _build_public_url(settings: Settings, path: str) -> str:
     if not path.startswith("/"):
         path = f"/{path}"
     return f"{base_url}{path}"
+
+
+def _raise_email_delivery_error(exc: Exception) -> None:
+    raise AuthError(EMAIL_DELIVERY_FAILURE_MESSAGE_RU) from exc
 
 
 def _issue_auth_token(
@@ -409,7 +420,10 @@ def register_user(
         )
 
     verification_link = _build_public_url(resolved, f"/verify-email/{verification_token}")
-    send_email_verification(normalized_email, verification_link, settings=resolved)
+    try:
+        send_email_verification(normalized_email, verification_link, settings=resolved)
+    except (EmailModeError, EmailConfigError, EmailDeliveryError) as exc:
+        _raise_email_delivery_error(exc)
     user = _fetch_user_by_id(user_id, settings=resolved)
     if user is None:
         raise AuthError("registration succeeded but user lookup failed")
@@ -444,7 +458,10 @@ def resend_verification_request(email: str, settings: Settings | None = None) ->
         )
 
     verification_link = _build_public_url(resolved, f"/verify-email/{verification_token}")
-    send_email_verification(normalized_email, verification_link, settings=resolved)
+    try:
+        send_email_verification(normalized_email, verification_link, settings=resolved)
+    except (EmailModeError, EmailConfigError, EmailDeliveryError) as exc:
+        _raise_email_delivery_error(exc)
     return True
 
 
@@ -586,7 +603,10 @@ def create_password_reset_request(email: str, settings: Settings | None = None) 
         )
 
     reset_link = _build_public_url(resolved, f"/reset-password/{reset_token}")
-    send_password_reset(normalized_email, reset_link, settings=resolved)
+    try:
+        send_password_reset(normalized_email, reset_link, settings=resolved)
+    except (EmailModeError, EmailConfigError, EmailDeliveryError) as exc:
+        return False
     return True
 
 

@@ -25,6 +25,21 @@ def _env_bool(name: str, default: bool) -> bool:
     return raw_value.strip().lower() in {"1", "true", "yes", "on"}
 
 
+def _env_optional_str(name: str) -> str | None:
+    raw_value = os.getenv(name)
+    if raw_value is None:
+        return None
+    value = raw_value.strip()
+    return value or None
+
+
+def _env_optional_int(name: str) -> int | None:
+    raw_value = os.getenv(name)
+    if raw_value is None or raw_value == "":
+        return None
+    return int(raw_value)
+
+
 @dataclass(frozen=True)
 class Settings:
     app_name: str = "AI Starter Community"
@@ -37,6 +52,15 @@ class Settings:
     session_expiry_hours: int = 168
     session_cookie_secure: bool = False
     email_mode: str = "outbox"
+    email_from_address: str | None = None
+    email_from_name: str | None = None
+    smtp_host: str | None = None
+    smtp_port: int | None = None
+    smtp_username: str | None = None
+    smtp_password: str | None = None
+    smtp_use_tls: bool = False
+    smtp_use_starttls: bool = True
+    smtp_timeout_seconds: int = 10
     email_verification_token_expiry_hours: int = 24
     password_reset_token_expiry_minutes: int = 30
 
@@ -57,6 +81,15 @@ def get_settings() -> Settings:
         session_expiry_hours=_env_int("SESSION_EXPIRY_HOURS", 168),
         session_cookie_secure=_env_bool("SESSION_COOKIE_SECURE", False),
         email_mode=os.getenv("EMAIL_MODE", "outbox"),
+        email_from_address=_env_optional_str("EMAIL_FROM_ADDRESS"),
+        email_from_name=_env_optional_str("EMAIL_FROM_NAME"),
+        smtp_host=_env_optional_str("SMTP_HOST"),
+        smtp_port=_env_optional_int("SMTP_PORT"),
+        smtp_username=_env_optional_str("SMTP_USERNAME"),
+        smtp_password=_env_optional_str("SMTP_PASSWORD"),
+        smtp_use_tls=_env_bool("SMTP_USE_TLS", False),
+        smtp_use_starttls=_env_bool("SMTP_USE_STARTTLS", True),
+        smtp_timeout_seconds=_env_int("SMTP_TIMEOUT_SECONDS", 10),
         email_verification_token_expiry_hours=_env_int("EMAIL_VERIFICATION_TOKEN_EXPIRY_HOURS", 24),
         password_reset_token_expiry_minutes=_env_int("PASSWORD_RESET_TOKEN_EXPIRY_MINUTES", 30),
     )
