@@ -20,6 +20,7 @@ from app.paid_options.service import (
     archive_paid_option,
     create_paid_option,
     get_paid_option_by_code,
+    list_paid_options,
     list_paid_options_for_admin,
     update_paid_option,
 )
@@ -29,11 +30,14 @@ from app.tariffs.service import (
     ConflictError as TariffConflictError,
     NotFoundError as TariffNotFoundError,
     ValidationError as TariffValidationError,
+    attach_option_to_tariff,
     archive_tariff,
+    detach_option_from_tariff,
     create_tariff,
     get_tariff_by_code,
     list_tariff_options,
     list_tariffs_for_admin,
+    update_tariff_option_link,
     update_tariff,
 )
 
@@ -255,6 +259,91 @@ def _paid_options_for_admin(settings):
     return rows
 
 
+def _empty_tariff_option_attach_form_data() -> dict[str, str]:
+    return {
+        "option_code": "",
+        "included_duration_days": "",
+        "included_quantity": "",
+    }
+
+
+def _tariff_option_form_value(value) -> str:
+    if value is None:
+        return ""
+    return str(value)
+
+
+def _tariff_option_link_rows(settings, tariff_code: str, *, link_overrides: dict[str, dict[str, str]] | None = None) -> list[dict[str, object]]:
+    linked_rows = list_tariff_options(tariff_code, include_hidden=True, include_archived=True, settings=settings)
+    rows: list[dict[str, object]] = []
+    for link in linked_rows:
+        code = str(link["code"])
+        override = (link_overrides or {}).get(code, {})
+        rows.append(
+            {
+                "code": code,
+                "title": str(link["title"]),
+                "status": str(link["status"]),
+                "included_duration_days": _tariff_option_form_value(override.get("included_duration_days", link["included_duration_days"])),
+                "included_quantity": _tariff_option_form_value(override.get("included_quantity", link["included_quantity"])),
+            }
+        )
+    return rows
+
+
+def _tariff_options_page_context(
+    settings,
+    tariff,
+    *,
+    attach_form_data: dict[str, str] | None = None,
+    errors: dict[str, str] | None = None,
+    link_overrides: dict[str, dict[str, str]] | None = None,
+) -> dict[str, object]:
+    linked_options = _tariff_option_link_rows(settings, tariff.code, link_overrides=link_overrides)
+    linked_codes = {option["code"] for option in linked_options}
+    available_paid_options = [
+        {
+            "code": option.code,
+            "title": option.title,
+            "status": option.status,
+        }
+        for option in list_paid_options(settings=settings)
+        if option.code not in linked_codes
+    ]
+    return {
+        "tariff": tariff,
+        "linked_options": linked_options,
+        "available_paid_options": available_paid_options,
+        "attach_form_data": attach_form_data or _empty_tariff_option_attach_form_data(),
+        "errors": errors or {},
+    }
+
+
+def _render_tariff_options_page(
+    request: Request,
+    settings,
+    tariff,
+    *,
+    attach_form_data: dict[str, str] | None = None,
+    errors: dict[str, str] | None = None,
+    link_overrides: dict[str, dict[str, str]] | None = None,
+    status_code: int = 200,
+):
+    return _template(
+        request,
+        "tariff_options.html",
+        status_code=status_code,
+        title=page_title(f"Опции тарифа: {tariff.title}"),
+        **_tariff_options_page_context(
+            settings,
+            tariff,
+            attach_form_data=attach_form_data,
+            errors=errors,
+            link_overrides=link_overrides,
+        ),
+    )
+
+
 def _empty_paid_option_form_data() -> dict[str, object]:
     return {
         "code": "",
@@ -457,6 +546,36 @@ def _render_tariff_form(
     )
 
 
+def _validate_tariff_option_link_form_input(
+    *,
+    raw_option_code: str | None = None,
+    raw_included_duration_days: str | None = None,
+    raw_included_quantity: str | None = None,
+    include_option_code: bool = True,
+) -> tuple[dict[str, str], dict[str, str]]:
+    errors: dict[str, str] = {}
+    option_code = _normalize_text(raw_option_code).lower()
+    duration_days, duration_error = _parse_optional_non_negative_int(raw_included_duration_days, "included_duration_days")
+    quantity, quantity_error = _parse_optional_non_negative_int(raw_included_quantity, "included_quantity")
+
+    if include_option_code:
+        if not option_code:
+            errors["option_code"] = "option_code is required"
+        elif not TARIFF_CODE_RE.fullmatch(option_code):
+            errors["option_code"] = "option_code must be 3-64 chars of lowercase letters, digits, underscore or hyphen"
+    if duration_error:
+        errors["included_duration_days"] = duration_error
+    if quantity_error:
+        errors["included_quantity"] = quantity_error
+
+    payload = {
+        "option_code": option_code,
+        "included_duration_days": "" if duration_days is None else str(duration_days),
+        "included_quantity": "" if quantity is None else str(quantity),
+    }
+    return payload, errors
+
+
 @router.api_route("/admin", methods=["GET", "HEAD"], response_class=HTMLResponse)
 def admin_dashboard(request: Request):
     settings = get_settings()
@@ -647,6 +766,165 @@ def admin_tariffs_archive(request: Request, code: str):
     except TariffNotFoundError:
         raise HTTPException(status_code=404, detail="Not Found")
     return RedirectResponse(url="/admin/tariffs", status_code=303)
+
+
+def _tariff_option_link_errors_from_service(exc: Exception) -> dict[str, str]:
+    message = str(exc)
+    lowered = message.lower()
+    if "archived paid option" in lowered or "paid option" in lowered or "option" in lowered:
+        return {"option_code": message}
+    if "included_duration_days" in lowered:
+        return {"included_duration_days": message}
+    if "included_quantity" in lowered:
+        return {"included_quantity": message}
+    return {"form": message}
+
+
+@router.api_route("/admin/tariffs/{code}/options", methods=["GET", "HEAD"], response_class=HTMLResponse)
+def admin_tariff_options(request: Request, code: str):
+    settings = get_settings()
+    _, response = _admin_user_or_redirect(request, settings=settings)
+    if response is not None:
+        return response
+
+    tariff = get_tariff_by_code(code, settings=settings)
+    if tariff is None:
+        raise HTTPException(status_code=404, detail="Not Found")
+    return _render_tariff_options_page(request, settings, tariff)
+
+
+@router.post("/admin/tariffs/{code}/options/attach", response_class=HTMLResponse)
+async def admin_tariff_options_attach(request: Request, code: str):
+    settings = get_settings()
+    _, response = _admin_user_or_redirect(request, settings=settings)
+    if response is not None:
+        return response
+
+    tariff = get_tariff_by_code(code, settings=settings)
+    if tariff is None:
+        raise HTTPException(status_code=404, detail="Not Found")
+
+    form = await request.form()
+    payload, errors = _validate_tariff_option_link_form_input(
+        raw_option_code=form.get("option_code"),
+        raw_included_duration_days=form.get("included_duration_days"),
+        raw_included_quantity=form.get("included_quantity"),
+        include_option_code=True,
+    )
+    if errors:
+        return _render_tariff_options_page(
+            request,
+            settings,
+            tariff,
+            attach_form_data=payload,
+            errors=errors,
+            status_code=400,
+        )
+
+    try:
+        attach_option_to_tariff(
+            code,
+            payload["option_code"],
+            included_duration_days=None if payload["included_duration_days"] == "" else int(payload["included_duration_days"]),
+            included_quantity=None if payload["included_quantity"] == "" else int(payload["included_quantity"]),
+            settings=settings,
+        )
+    except TariffNotFoundError:
+        raise HTTPException(status_code=404, detail="Not Found")
+    except TariffValidationError as exc:
+        errors = _tariff_option_link_errors_from_service(exc)
+        return _render_tariff_options_page(
+            request,
+            settings,
+            tariff,
+            attach_form_data=payload,
+            errors=errors,
+            status_code=400,
+        )
+
+    return RedirectResponse(url=f"/admin/tariffs/{tariff.code}/options", status_code=303)
+
+
+@router.post("/admin/tariffs/{code}/options/{option_code}/update", response_class=HTMLResponse)
+async def admin_tariff_options_update(request: Request, code: str, option_code: str):
+    settings = get_settings()
+    _, response = _admin_user_or_redirect(request, settings=settings)
+    if response is not None:
+        return response
+
+    tariff = get_tariff_by_code(code, settings=settings)
+    if tariff is None:
+        raise HTTPException(status_code=404, detail="Not Found")
+
+    form = await request.form()
+    payload, errors = _validate_tariff_option_link_form_input(
+        raw_included_duration_days=form.get("included_duration_days"),
+        raw_included_quantity=form.get("included_quantity"),
+        include_option_code=False,
+    )
+    if errors:
+        return _render_tariff_options_page(
+            request,
+            settings,
+            tariff,
+            errors=errors,
+            link_overrides={
+                option_code: {
+                    "included_duration_days": payload["included_duration_days"],
+                    "included_quantity": payload["included_quantity"],
+                }
+            },
+            status_code=400,
+        )
+
+    try:
+        update_tariff_option_link(
+            code,
+            option_code,
+            included_duration_days=None if payload["included_duration_days"] == "" else int(payload["included_duration_days"]),
+            included_quantity=None if payload["included_quantity"] == "" else int(payload["included_quantity"]),
+            settings=settings,
+        )
+    except TariffNotFoundError:
+        raise HTTPException(status_code=404, detail="Not Found")
+    except TariffValidationError as exc:
+        errors = _tariff_option_link_errors_from_service(exc)
+        return _render_tariff_options_page(
+            request,
+            settings,
+            tariff,
+            errors=errors,
+            link_overrides={
+                option_code: {
+                    "included_duration_days": payload["included_duration_days"],
+                    "included_quantity": payload["included_quantity"],
+                }
+            },
+            status_code=400,
+        )
+
+    return RedirectResponse(url=f"/admin/tariffs/{tariff.code}/options", status_code=303)
+
+
+@router.post("/admin/tariffs/{code}/options/{option_code}/detach")
+def admin_tariff_options_detach(request: Request, code: str, option_code: str):
+    settings = get_settings()
+    _, response = _admin_user_or_redirect(request, settings=settings)
+    if response is not None:
+        return response
+
+    tariff = get_tariff_by_code(code, settings=settings)
+    if tariff is None:
+        raise HTTPException(status_code=404, detail="Not Found")
+
+    try:
+        detached = detach_option_from_tariff(code, option_code, settings=settings)
+    except TariffNotFoundError:
+        raise HTTPException(status_code=404, detail="Not Found")
+    if not detached:
+        raise HTTPException(status_code=404, detail="Not Found")
+
+    return RedirectResponse(url=f"/admin/tariffs/{tariff.code}/options", status_code=303)
 
 
 @router.api_route("/admin/paid-options", methods=["GET", "HEAD"], response_class=HTMLResponse)

@@ -33,6 +33,7 @@
           <td>{{ tariff.created_at }}</td>
           <td>{{ tariff.updated_at }}</td>
           <td>
+            <a href="/admin/tariffs/{{ tariff.code }}/options">Опции тарифа</a>
             <a href="/admin/tariffs/{{ tariff.code }}/edit">Редактировать</a>
             <form method="post" action="/admin/tariffs/{{ tariff.code }}/archive">
               <button type="submit">Архивировать</button>

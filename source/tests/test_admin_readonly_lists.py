@@ -142,6 +142,7 @@ def test_admin_tariffs_shows_starter_tariff_and_admin_controls(client, test_sett
     assert "Стартовый доступ" in body
     assert "AI / GPT-инструмент" in body
     assert "/admin/tariffs/new" in body
+    assert f"/admin/tariffs/{STARTER_TARIFF_CODE}/options" in body
     assert f"/admin/tariffs/{STARTER_TARIFF_CODE}/edit" in body
     assert f"/admin/tariffs/{STARTER_TARIFF_CODE}/archive" in body
     assert "/admin/paid-options/new" not in body

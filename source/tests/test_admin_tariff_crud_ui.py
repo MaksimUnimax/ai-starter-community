@@ -300,6 +300,7 @@ def test_admin_tariff_list_shows_controls_without_paid_option_crud_ui(client, te
     assert response.status_code == 200
     body = response.text
     assert "/admin/tariffs/new" in body
+    assert f"/admin/tariffs/{STARTER_TARIFF_CODE}/options" in body
     assert f"/admin/tariffs/{STARTER_TARIFF_CODE}/edit" in body
     assert f"/admin/tariffs/{STARTER_TARIFF_CODE}/archive" in body
     assert "/admin/paid-options/new" not in body
