@@ -303,7 +303,7 @@ def test_route_flow_register_verify_login_cabinet_logout(client, test_settings):
     check_email_response = client.get("/check-email?registered=1")
     assert check_email_response.status_code == 200
     assert "Аккаунт создан" in check_email_response.text
-    assert "Подтвердите email" in check_email_response.text
+    assert "Подтвердите почту" in check_email_response.text
 
     outbox_row = _fetch_one(
         test_settings,
@@ -313,7 +313,7 @@ def test_route_flow_register_verify_login_cabinet_logout(client, test_settings):
     verify_token = _extract_token_from_link(outbox_row["body_text"])
     verify_response = client.get(f"/verify-email/{verify_token}")
     assert verify_response.status_code == 200
-    assert "Email подтверждён" in verify_response.text
+    assert "Почта подтверждена" in verify_response.text
 
     login_email_response = client.post(
         "/login",
@@ -375,7 +375,7 @@ def test_route_flow_login_by_login_and_password_reset(client, test_settings):
 
     forgot_response = client.post("/forgot-password", data={"email": "loginroute@example.com"})
     assert forgot_response.status_code == 200
-    assert "Если такой email зарегистрирован" in forgot_response.text
+    assert "Если такой адрес электронной почты зарегистрирован" in forgot_response.text
 
     reset_row = _fetch_one(
         test_settings,
@@ -434,7 +434,7 @@ def test_login_and_reset_pages_show_clear_rules(client):
 
     assert "Электронная почта или логин" in login_response.text
     assert "/resend-verification" in login_response.text
-    assert "Если такой email зарегистрирован" in forgot_response.text
+    assert "Если такой адрес электронной почты зарегистрирован" in forgot_response.text
     assert "минимум 8 символов" in reset_response.text
     assert "без пробелов внутри" in reset_response.text
     assert "/static/styles.css" in login_response.text

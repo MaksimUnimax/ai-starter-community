@@ -1,23 +1,23 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{ title }}</title>
-</head>
-<body>
-  <main>
-    <h1>Подтверждение email</h1>
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="card stack">
+    <div class="stack">
+      <p class="muted">Проверка подтверждения</p>
+      <h1 class="section-title">Подтверждение почты</h1>
+    </div>
+
     {% if success %}
-      <p>{{ message }}</p>
-      <p><a href="/login">Перейти ко входу</a></p>
+      <div class="alert alert-info">{{ message }}</div>
+      <div class="actions">
+        <a class="button button-primary" href="/login">Перейти ко входу</a>
+      </div>
     {% else %}
-      <p>{{ message }}</p>
-      <p>
-        <a href="/resend-verification">Отправить письмо повторно</a>
-        <a href="/register">Вернуться к регистрации</a>
-      </p>
+      <div class="alert alert-error">{{ message }}</div>
+      <div class="actions">
+        <a class="button button-primary" href="/resend-verification">Отправить письмо ещё раз</a>
+        <a class="button button-secondary" href="/register">Вернуться к регистрации</a>
+      </div>
     {% endif %}
-  </main>
-</body>
-</html>
+  </section>
+{% endblock %}

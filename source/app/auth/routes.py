@@ -24,8 +24,6 @@ from app.auth.service import (
     verify_email,
 )
 from app.core.config import get_settings
-from app.shared.utils import page_title
-
 router = APIRouter()
 templates = Jinja2Templates(directory=str(Path(__file__).resolve().parent / "templates"))
 templates.env.loader = ChoiceLoader(
@@ -103,22 +101,27 @@ def check_email_page(request: Request) -> HTMLResponse:
         message = (
             "Аккаунт создан. Письмо с подтверждением отправлено. "
             "В предпросмотре письмо сохраняется во внутреннем почтовом ящике, "
-            "а внешний email-провайдер ещё не подключён. Подтвердите email перед входом."
+            "а внешний почтовый провайдер ещё не подключён. Подтвердите почту перед входом."
         )
     elif request.query_params.get("resent"):
         message = (
-            "Новое письмо с подтверждением отправлено. Проверьте почту и подтвердите email перед входом."
+            "Новое письмо с подтверждением отправлено. Проверьте почту и подтвердите её перед входом."
         )
     else:
         message = (
-            "Проверьте почту и подтвердите email по ссылке. После подтверждения можно войти в кабинет."
+            "Проверьте почту и подтвердите её по ссылке. После подтверждения можно войти в кабинет."
         )
     return _template(
         request,
         "check_email.html",
-        title=page_title("Подтверждение email"),
+        title="Проверка почты",
         message=message,
     )
+
+
+@router.head("/check-email")
+def check_email_head(request: Request) -> HTMLResponse:
+    return check_email_page(request)
 
 
 @router.get("/resend-verification", response_class=HTMLResponse)
@@ -126,11 +129,16 @@ def resend_verification_page(request: Request) -> HTMLResponse:
     return _template(
         request,
         "resend_verification.html",
-        title=page_title("Повторная отправка"),
+        title="Повторная отправка письма",
         notice=request.query_params.get("notice"),
         error=request.query_params.get("error"),
         email="",
     )
+
+
+@router.head("/resend-verification")
+def resend_verification_head(request: Request) -> HTMLResponse:
+    return resend_verification_page(request)
 
 
 @router.post("/resend-verification", response_class=HTMLResponse)
@@ -144,15 +152,15 @@ def resend_verification_submit(
         return _template(
             request,
             "resend_verification.html",
-            title=page_title("Повторная отправка"),
+            title="Повторная отправка письма",
             error=str(exc),
             email=email,
         )
     return _template(
         request,
         "resend_verification.html",
-        title=page_title("Повторная отправка"),
-        notice="Если аккаунт существует и email ещё не подтверждён, мы отправили новое письмо.",
+        title="Повторная отправка письма",
+        notice="Если аккаунт существует и почта ещё не подтверждена, мы отправили новое письмо.",
         email="",
     )
 
@@ -165,7 +173,7 @@ def verify_email_page(request: Request, token: str) -> HTMLResponse:
         return _template(
             request,
             "verify_email.html",
-            title=page_title("Подтверждение email"),
+            title="Подтверждение почты",
             success=False,
             message="Ссылка недействительна или истекла.",
         )
@@ -173,17 +181,22 @@ def verify_email_page(request: Request, token: str) -> HTMLResponse:
         return _template(
             request,
             "verify_email.html",
-            title=page_title("Подтверждение email"),
+            title="Подтверждение почты",
             success=False,
             message=str(exc),
         )
     return _template(
         request,
         "verify_email.html",
-        title=page_title("Подтверждение email"),
+        title="Подтверждение почты",
         success=True,
-        message=f"Email подтверждён для {user.email}. Теперь можно войти.",
+        message=f"Почта подтверждена для {user.email}. Теперь можно войти.",
     )
+
+
+@router.head("/verify-email/{token}")
+def verify_email_head(request: Request, token: str) -> HTMLResponse:
+    return verify_email_page(request, token)
 
 
 @router.get("/login", response_class=HTMLResponse)
@@ -275,11 +288,16 @@ def forgot_password_page(request: Request) -> HTMLResponse:
     return _template(
         request,
         "forgot_password.html",
-        title=page_title("Сброс пароля"),
+        title="Сброс пароля",
         notice=request.query_params.get("notice"),
         error=request.query_params.get("error"),
         email="",
     )
+
+
+@router.head("/forgot-password")
+def forgot_password_head(request: Request) -> HTMLResponse:
+    return forgot_password_page(request)
 
 
 @router.post("/forgot-password", response_class=HTMLResponse)
@@ -293,15 +311,15 @@ def forgot_password_submit(
         return _template(
             request,
             "forgot_password.html",
-            title=page_title("Сброс пароля"),
+            title="Сброс пароля",
             error=str(exc),
             email=email,
         )
     return _template(
         request,
         "forgot_password.html",
-        title=page_title("Сброс пароля"),
-        notice="Если такой email зарегистрирован, мы отправим ссылку для восстановления.",
+        title="Сброс пароля",
+        notice="Если такой адрес электронной почты зарегистрирован, мы отправим ссылку для восстановления.",
         email="",
     )
 
@@ -311,12 +329,17 @@ def reset_password_page(request: Request, token: str) -> HTMLResponse:
     return _template(
         request,
         "reset_password.html",
-        title=page_title("Новый пароль"),
+        title="Новый пароль",
         token=token,
         error=request.query_params.get("error"),
         notice=request.query_params.get("notice"),
         success=False,
     )
+
+
+@router.head("/reset-password/{token}")
+def reset_password_head(request: Request, token: str) -> HTMLResponse:
+    return reset_password_page(request, token)
 
 
 @router.post("/reset-password", response_class=HTMLResponse)
@@ -332,7 +355,7 @@ def reset_password_submit(
         return _template(
             request,
             "reset_password.html",
-            title=page_title("Новый пароль"),
+            title="Новый пароль",
             token=token,
             error=str(exc),
             success=False,
@@ -340,7 +363,7 @@ def reset_password_submit(
     return _template(
         request,
         "reset_password.html",
-        title=page_title("Новый пароль"),
+        title="Новый пароль",
         token="",
         success=True,
         notice="Пароль изменён. Теперь можно войти в систему.",

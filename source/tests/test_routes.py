@@ -24,7 +24,7 @@ def test_login_and_register_pages(client):
     assert cabinet_response.headers["location"] == "/login"
     assert "Вход" in login_response.text
     assert "Регистрация" in register_response.text
-    assert "Проверьте email" in check_email_response.text
+    assert "Проверьте почту" in check_email_response.text
     assert "Повторная отправка" in resend_response.text
     assert "/static/styles.css" in login_response.text
     assert "/static/styles.css" in register_response.text
@@ -32,6 +32,34 @@ def test_login_and_register_pages(client):
     assert "Электронная почта" in register_response.text
     assert "Проверка почты" in register_response.text
     assert "Подтверждение почты" in login_response.text
+
+
+def test_auth_utility_pages_use_shared_base_and_styles(client):
+    check_email_response = client.get("/check-email")
+    verify_email_response = client.get("/verify-email/example-token")
+    forgot_response = client.get("/forgot-password")
+    reset_response = client.get("/reset-password/example-token")
+    resend_response = client.get("/resend-verification")
+
+    assert check_email_response.status_code == 200
+    assert verify_email_response.status_code == 200
+    assert forgot_response.status_code == 200
+    assert reset_response.status_code == 200
+    assert resend_response.status_code == 200
+
+    for response in (
+        check_email_response,
+        verify_email_response,
+        forgot_response,
+        reset_response,
+        resend_response,
+    ):
+        assert "/static/styles.css" in response.text
+        assert "Главная" in response.text
+        assert "Кабинет" in response.text
+        assert "Материалы" in response.text
+        assert "Войти" in response.text
+        assert "Регистрация" in response.text
 
 
 def test_placeholder_post_routes_redirect(client):

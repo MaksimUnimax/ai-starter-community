@@ -1,31 +1,32 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{ title }}</title>
-</head>
-<body>
-  <main>
-    <h1>Повторная отправка письма</h1>
-    <p>Если аккаунт существует и email ещё не подтверждён, мы отправим новое письмо.</p>
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="card stack">
+    <div class="stack">
+      <p class="muted">Подтверждение почты</p>
+      <h1 class="section-title">Повторная отправка письма</h1>
+      <p>Если аккаунт существует и почта ещё не подтверждена, мы отправим новое письмо.</p>
+    </div>
+
     {% if notice %}
-      <p>{{ notice }}</p>
+      <div class="alert alert-info">{{ notice }}</div>
     {% endif %}
     {% if error %}
-      <p>{{ error }}</p>
+      <div class="alert alert-error">{{ error }}</div>
     {% endif %}
-    <form method="post" action="/resend-verification">
-      <label>Email
-        <input type="email" name="email" value="{{ email or '' }}" autocomplete="email">
-      </label><br>
-      <button type="submit">Отправить повторно</button>
+
+    <form class="form" method="post" action="/resend-verification">
+      <label class="form-row">
+        <span>Электронная почта</span>
+        <input class="input" type="email" name="email" value="{{ email or '' }}" autocomplete="email">
+      </label>
+      <button class="button button-primary" type="submit">Отправить ещё раз</button>
     </form>
-    <p>
-      <a href="/check-email">Проверка email</a>
-      <a href="/login">Вход</a>
-      <a href="/register">Регистрация</a>
-    </p>
-  </main>
-</body>
-</html>
+
+    <div class="actions">
+      <a class="button button-secondary" href="/check-email">Проверка почты</a>
+      <a class="button button-secondary" href="/login">Войти</a>
+      <a class="button button-secondary" href="/register">Регистрация</a>
+    </div>
+  </section>
+{% endblock %}
