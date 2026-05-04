@@ -12,3 +12,7 @@ def test_stylesheet_is_served(client):
     assert ".form-actions" in response.text
     assert ".textarea" in response.text
     assert ".select" in response.text
+    assert ".inline-form" in response.text
+    assert ".compact-form" in response.text
+    assert ".danger-zone" in response.text
+    assert ".empty-state" in response.text

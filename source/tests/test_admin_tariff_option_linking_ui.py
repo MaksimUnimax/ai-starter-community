@@ -110,12 +110,19 @@ def test_admin_tariff_options_page_shows_linked_and_attachable_options(client, t
     response = client.get(f"/admin/tariffs/{STARTER_TARIFF_CODE}/options")
     assert response.status_code == 200
     body = response.text
+    assert "/static/styles.css" in body
     assert "Опции тарифа" in body
     assert "Платная опция" in body
     assert "Включённый срок, дней" in body
     assert "Включённое количество" in body
     assert "Связанные опции" in body
     assert "Действия" in body
+    assert "card" in body
+    assert "form-row" in body
+    assert "table-actions" in body
+    assert "button-primary" in body
+    assert "button-secondary" in body
+    assert "button-danger" in body
     assert "Настроить опции" not in body  # link lives on tariffs list, not page header
     assert STARTER_TARIFF_CODE in body
     assert "Стартовый доступ" in body
@@ -287,10 +294,12 @@ def test_admin_tariff_options_page_shows_empty_state_when_no_active_unlinked_opt
     response = client.get(f"/admin/tariffs/{STARTER_TARIFF_CODE}/options")
     assert response.status_code == 200
     body = response.text
+    assert "/static/styles.css" in body
     assert "Все активные опции уже привязаны к этому тарифу." in body
     assert "Чтобы добавить новую опцию, сначала создайте её в разделе" in body
     assert "Создать новую платную опцию" in body
     assert "/admin/paid-options/new" in body
+    assert "empty-state" in body
     assert 'name="option_code"' not in body
 
 
