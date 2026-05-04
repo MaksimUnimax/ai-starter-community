@@ -100,6 +100,25 @@ def test_authenticated_user_navigation_order_and_labels(client, test_settings):
     assert cabinet_nav.index("Главная") < cabinet_nav.index("Работа с ИИ") < cabinet_nav.index("Личный кабинет") < cabinet_nav.index("Выйти")
 
 
+def test_authenticated_moderator_navigation_has_no_admin_panel(client, test_settings):
+    _make_user(client, test_settings, "nav-moderator@example.com", "navmoderator", role="moderator")
+
+    landing = client.get("/")
+    cabinet = client.get("/cabinet")
+
+    assert landing.status_code == 200
+    assert cabinet.status_code == 200
+
+    for body in (landing.text, cabinet.text):
+        nav = _nav_block(body)
+        assert "Вход / регистрация" not in nav
+        assert "Админ-панель" not in nav
+        assert "Главная" in nav
+        assert "Работа с ИИ" in nav
+        assert "Личный кабинет" in nav
+        assert "Выйти" in nav
+
+
 def test_authenticated_admin_navigation_includes_admin_panel(client, test_settings):
     _make_user(client, test_settings, "nav-admin@example.com", "navadmin", role="admin")
 

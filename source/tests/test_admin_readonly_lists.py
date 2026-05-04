@@ -85,6 +85,22 @@ def test_normal_user_gets_forbidden_on_admin_list_pages(client, test_settings, p
         ("/admin/paid-options",),
     ],
 )
+def test_moderator_gets_forbidden_on_admin_list_pages(client, test_settings, path):
+    _make_user(client, test_settings, "moderator@example.com", "moderatoruser", role="moderator")
+    response = client.get(path)
+    assert response.status_code == 403
+    assert "Доступ запрещён" in response.text
+    assert "прав администратора" in response.text
+
+
+@pytest.mark.parametrize(
+    ("path",),
+    [
+        ("/admin/users",),
+        ("/admin/tariffs",),
+        ("/admin/paid-options",),
+    ],
+)
 def test_admin_user_can_open_admin_list_pages(client, test_settings, path):
     _make_user(client, test_settings, "admin@example.com", "adminuser", role="admin")
     if path != "/admin/users":
@@ -128,12 +144,17 @@ def test_admin_users_shows_safe_fields_and_hides_sensitive_data(client, test_set
     assert "Электронная почта" in body
     assert "Логин" in body
     assert "Роль" in body
+    assert "Изменить роль" in body
     assert "Активен" in body
     assert "Подтверждён email" in body
     assert "Статус доступа" in body
     assert "Доступ к материалам" in body
     assert "администратор" in body
     assert "пользователь" in body
+    assert "модератор" in body
+    assert "Сохранить роль" in body
+    assert "/admin/users/" in body
+    assert "/role" in body
     assert "подтверждён" in body
     assert "не подтверждён" in body
     assert "да" in body

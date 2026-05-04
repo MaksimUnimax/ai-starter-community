@@ -25,6 +25,15 @@ EMAIL_TOKEN_TYPE = "email_verification"
 PASSWORD_RESET_TOKEN_TYPE = "password_reset"
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 LOGIN_RE = re.compile(r"^[a-z0-9_-]{3,32}$")
+ROLE_USER = "user"
+ROLE_MODERATOR = "moderator"
+ROLE_ADMIN = "admin"
+ALLOWED_ROLES = (ROLE_USER, ROLE_MODERATOR, ROLE_ADMIN)
+ROLE_LABELS_RU = {
+    ROLE_USER: "пользователь",
+    ROLE_MODERATOR: "модератор",
+    ROLE_ADMIN: "администратор",
+}
 
 
 class AuthError(Exception):
@@ -125,6 +134,35 @@ def _passwords_match(password: str, repeat_password: str) -> str:
     return normalized_password
 
 
+def normalize_role(value: str) -> str:
+    normalized = (value or "").strip().lower()
+    if normalized not in ALLOWED_ROLES:
+        raise RoleError("unsupported role")
+    return normalized
+
+
+def role_label_ru(role: str) -> str:
+    return ROLE_LABELS_RU.get(role, role)
+
+
+def is_admin_role(role: str) -> bool:
+    return role == ROLE_ADMIN
+
+
+def has_staff_materials_access(role: str) -> bool:
+    return role in {ROLE_ADMIN, ROLE_MODERATOR}
+
+
+def user_can_access_materials(user: UserPublic | None) -> bool:
+    return bool(
+        user
+        and (
+            user.materials_access_granted_at is not None
+            or has_staff_materials_access(user.role)
+        )
+    )
+
+
 def _build_public_url(settings: Settings, path: str) -> str:
     base_url = settings.base_url.rstrip("/")
     if not path.startswith("/"):
@@ -178,11 +216,13 @@ def get_current_user_from_cookies(
 
 
 def _admin_user_from_row(row) -> dict[str, object]:
+    role = str(row["role"])
     return {
         "id": int(row["id"]),
         "email": str(row["email"]),
         "login": str(row["login"]),
-        "role": str(row["role"]),
+        "role": role,
+        "role_label": role_label_ru(role),
         "is_active": bool(row["is_active"]),
         "email_verified": row["email_verified_at"] is not None,
         "materials_access_granted": row["materials_access_granted_at"] is not None,
@@ -235,16 +275,51 @@ def promote_user_to_admin(
         ).fetchone()
         if row is None:
             raise NotFoundError("user not found")
-        if str(row["role"]) not in {"user", "admin"}:
+        if str(row["role"]) not in ALLOWED_ROLES:
             raise RoleError("unsupported role")
-        if str(row["role"]) == "admin":
+        if is_admin_role(str(row["role"])):
             return _public_user_from_row(row)
         now_iso = utc_now_iso()
         connection.execute(
             "UPDATE users SET role = ?, updated_at = ? WHERE id = ?",
-            ("admin", now_iso, int(row["id"])),
+            (ROLE_ADMIN, now_iso, int(row["id"])),
         )
         updated = connection.execute("SELECT * FROM users WHERE id = ?", (int(row["id"]),)).fetchone()
+        if updated is None:
+            raise AuthError("role update failed")
+        return _public_user_from_row(updated)
+
+
+def update_user_role(
+    *,
+    user_id: int,
+    new_role: str,
+    settings: Settings | None = None,
+) -> UserPublic:
+    resolved = _settings(settings)
+    normalized_role = normalize_role(new_role)
+    with _connection(resolved) as connection:
+        row = connection.execute("SELECT * FROM users WHERE id = ?", (int(user_id),)).fetchone()
+        if row is None:
+            raise NotFoundError("user not found")
+
+        current_role = str(row["role"])
+        if is_admin_role(current_role) and not is_admin_role(normalized_role):
+            admin_count = int(
+                connection.execute("SELECT COUNT(*) AS count FROM users WHERE role = ?", (ROLE_ADMIN,)).fetchone()["count"]
+            )
+            if admin_count <= 1:
+                raise RoleError("last admin cannot be demoted")
+
+        if current_role == normalized_role:
+            return _public_user_from_row(row)
+
+        now_iso = utc_now_iso()
+        connection.execute(
+            "UPDATE users SET role = ?, updated_at = ? WHERE id = ?",
+            (normalized_role, now_iso, int(user_id)),
+        )
+        updated = connection.execute("SELECT * FROM users WHERE id = ?", (int(user_id),)).fetchone()
         if updated is None:
             raise AuthError("role update failed")
         return _public_user_from_row(updated)

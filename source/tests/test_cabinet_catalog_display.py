@@ -55,7 +55,7 @@ def test_cabinet_displays_active_tariff_catalog_and_no_payment_action(client, te
     assert "Электронная почта:" in cabinet_response.text
     assert "Статус аккаунта: активен" in cabinet_response.text
     assert "Доступ" in cabinet_response.text
-    assert "Доступ к материалам: не активирован" in cabinet_response.text
+    assert "Доступ к разделу «Работа с ИИ»: не активирован" in cabinet_response.text
     assert "Раздел «Работа с ИИ» будет доступен после оплаты." in cabinet_response.text
     assert "Перейти к разделу Работа с ИИ" in cabinet_response.text
     assert "Доступные тарифы" in cabinet_response.text

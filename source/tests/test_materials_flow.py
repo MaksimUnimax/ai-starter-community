@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import sqlite3
 
-from app.auth.service import register_user, verify_email
+from app.auth.service import authenticate_user, create_session, register_user, verify_email
 from app.shared.db import get_database_path, initialize_database
 
 
@@ -26,7 +26,14 @@ def _extract_token_from_db(settings, email: str) -> str:
     return match.group(1)
 
 
-def _prepare_verified_user(client, test_settings, email: str, login: str, grant_access: bool = False):
+def _prepare_verified_user(
+    client,
+    test_settings,
+    email: str,
+    login: str,
+    grant_access: bool = False,
+    role: str = "user",
+):
     initialize_database(get_database_path(test_settings))
     register_user(
         email=email,
@@ -37,19 +44,34 @@ def _prepare_verified_user(client, test_settings, email: str, login: str, grant_
     )
     token = _extract_token_from_db(test_settings, email)
     verify_email(token, settings=test_settings)
-    if grant_access:
+    if grant_access or role != "user":
         with _connect(test_settings) as conn:
-            conn.execute(
-                "UPDATE users SET materials_access_granted_at = CURRENT_TIMESTAMP WHERE email = ?",
-                (email,),
-            )
+            if role != "user":
+                conn.execute("UPDATE users SET role = ? WHERE email = ?", (role, email))
+            if grant_access:
+                conn.execute(
+                    "UPDATE users SET materials_access_granted_at = CURRENT_TIMESTAMP WHERE email = ?",
+                    (email,),
+                )
             conn.commit()
-    login_response = client.post(
-        "/login",
-        data={"email_or_login": email, "password": "Secret123"},
-        follow_redirects=False,
-    )
-    assert login_response.status_code == 303
+
+
+def _login_verified_user(client, test_settings, email: str):
+    user = authenticate_user(email, "Secret123", settings=test_settings)
+    session_token = create_session(user.id, settings=test_settings)
+    client.cookies.set(test_settings.session_cookie_name, session_token)
+
+
+def _prepare_and_login_verified_user(
+    client,
+    test_settings,
+    email: str,
+    login: str,
+    grant_access: bool = False,
+    role: str = "user",
+):
+    _prepare_verified_user(client, test_settings, email, login, grant_access=grant_access, role=role)
+    _login_verified_user(client, test_settings, email)
 
 
 def test_materials_redirects_unauthenticated_user(client):
@@ -59,7 +81,7 @@ def test_materials_redirects_unauthenticated_user(client):
 
 
 def test_materials_shows_locked_state_without_access(client, test_settings):
-    _prepare_verified_user(client, test_settings, "materials-locked@example.com", "materialslocked")
+    _prepare_and_login_verified_user(client, test_settings, "materials-locked@example.com", "materialslocked")
     response = client.get("/materials")
     assert response.status_code == 200
     assert "/static/styles.css" in response.text
@@ -75,7 +97,7 @@ def test_materials_shows_locked_state_without_access(client, test_settings):
 
 
 def test_materials_shows_placeholder_sections_when_access_granted(client, test_settings):
-    _prepare_verified_user(client, test_settings, "materials-open@example.com", "materialsopen", grant_access=True)
+    _prepare_and_login_verified_user(client, test_settings, "materials-open@example.com", "materialsopen", grant_access=True)
     response = client.get("/materials")
     assert response.status_code == 200
     assert "Раздел «Работа с ИИ» будет доступен после оплаты." not in response.text
@@ -95,13 +117,45 @@ def test_materials_shows_placeholder_sections_when_access_granted(client, test_s
 
 
 def test_cabinet_contains_materials_link_and_locked_hint(client, test_settings):
-    _prepare_verified_user(client, test_settings, "materials-cabinet@example.com", "materialscabinet")
+    _prepare_and_login_verified_user(client, test_settings, "materials-cabinet@example.com", "materialscabinet")
     response = client.get("/cabinet")
     assert response.status_code == 200
     assert "/materials" in response.text
     assert "Перейти к разделу Работа с ИИ" in response.text
-    assert "Доступ к материалам: не активирован" in response.text
+    assert "Доступ к разделу «Работа с ИИ»: не активирован" in response.text
     assert "Раздел «Работа с ИИ» будет доступен после оплаты." in response.text
+
+
+def test_staff_roles_can_open_materials_without_payment_marker(client, test_settings):
+    for role, email, login in [
+        ("admin", "materials-admin@example.com", "materialsadmin"),
+        ("moderator", "materials-moderator@example.com", "materialsmode"),
+    ]:
+        client.cookies.clear()
+        _prepare_and_login_verified_user(client, test_settings, email, login, role=role)
+        response = client.get("/materials")
+        assert response.status_code == 200
+        assert "Быстрый старт" in response.text
+        assert "Раздел «Работа с ИИ» будет доступен после оплаты." not in response.text
+
+
+def test_cabinet_access_labels_for_staff_and_paid_user(client, test_settings):
+    _prepare_and_login_verified_user(client, test_settings, "cabinet-paid@example.com", "cabinetpaid", grant_access=True)
+    paid_response = client.get("/cabinet")
+    assert paid_response.status_code == 200
+    assert "Доступ к разделу «Работа с ИИ»: активирован" in paid_response.text
+
+    client.cookies.clear()
+    _prepare_and_login_verified_user(client, test_settings, "cabinet-moderator@example.com", "cabinetmod", role="moderator")
+    moderator_response = client.get("/cabinet")
+    assert moderator_response.status_code == 200
+    assert "Доступ к разделу «Работа с ИИ»: доступен по роли" in moderator_response.text
+
+    client.cookies.clear()
+    _prepare_and_login_verified_user(client, test_settings, "cabinet-admin@example.com", "cabinetadm", role="admin")
+    admin_response = client.get("/cabinet")
+    assert admin_response.status_code == 200
+    assert "Доступ к разделу «Работа с ИИ»: доступен по роли" in admin_response.text
 
 
 def test_materials_redirects_unauthenticated_user_is_unchanged(client):

@@ -10,7 +10,15 @@ from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import HTMLResponse, PlainTextResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
-from app.auth.service import get_user_by_session_token, list_users_for_admin
+from app.auth.service import (
+    ALLOWED_ROLES,
+    ROLE_LABELS_RU,
+    NotFoundError as AuthNotFoundError,
+    RoleError,
+    get_user_by_session_token,
+    list_users_for_admin,
+    update_user_role,
+)
 from app.core.config import get_settings
 from app.paid_options.schemas import PaidOptionCreateInput, PaidOptionUpdateInput
 from app.paid_options.service import (
@@ -54,6 +62,17 @@ def _status_label(value: str) -> str:
         "hidden": "скрыт",
         "archived": "архив",
     }.get(value, value)
+
+
+def _role_error_response(message: str) -> PlainTextResponse:
+    lowered = message.lower()
+    if "last admin" in lowered:
+        text = "Нельзя изменить роль последнего администратора."
+    elif "unsupported role" in lowered:
+        text = "Выберите допустимую роль."
+    else:
+        text = "Не удалось изменить роль пользователя."
+    return PlainTextResponse(text, status_code=400)
 
 
 def _template(request: Request, template_name: str, **context) -> HTMLResponse:
@@ -634,7 +653,26 @@ def admin_users(request: Request):
         "users.html",
         title=page_title("Пользователи"),
         users=list_users_for_admin(settings=settings),
+        allowed_roles=ALLOWED_ROLES,
+        role_labels=ROLE_LABELS_RU,
     )
+
+
+@router.post("/admin/users/{user_id}/role")
+async def admin_user_role_update(request: Request, user_id: int):
+    settings = get_settings()
+    _, response = _admin_user_or_redirect(request, settings=settings)
+    if response is not None:
+        return response
+    form = await request.form()
+    role = _normalize_text(form.get("role"))
+    try:
+        update_user_role(user_id=user_id, new_role=role, settings=settings)
+    except AuthNotFoundError:
+        raise HTTPException(status_code=404, detail="user not found")
+    except RoleError as exc:
+        return _role_error_response(str(exc))
+    return RedirectResponse(url="/admin/users", status_code=303)
 
 
 @router.api_route("/admin/tariffs", methods=["GET", "HEAD"], response_class=HTMLResponse)

@@ -15,6 +15,7 @@
           <th>Электронная почта</th>
           <th>Логин</th>
           <th>Роль</th>
+          <th>Изменить роль</th>
           <th>Активен</th>
           <th>Подтверждён email</th>
           <th>Статус доступа</th>
@@ -30,13 +31,20 @@
             <td>{{ user.email }}</td>
             <td>{{ user.login }}</td>
             <td>
-              {% if user.role == "admin" %}
-                администратор
-              {% elif user.role == "user" %}
-                пользователь
-              {% else %}
-                {{ user.role }}
-              {% endif %}
+              {{ user.role_label }}
+            </td>
+            <td>
+              <form class="compact-form" method="post" action="/admin/users/{{ user.id }}/role">
+                <label class="form-row">
+                  <span class="muted">Роль</span>
+                  <select class="select" name="role">
+                    {% for role in allowed_roles %}
+                      <option value="{{ role }}" {% if user.role == role %}selected{% endif %}>{{ role_labels[role] }}</option>
+                    {% endfor %}
+                  </select>
+                </label>
+                <button class="button button-secondary" type="submit">Сохранить роль</button>
+              </form>
             </td>
             <td>{{ "да" if user.is_active else "нет" }}</td>
             <td>{{ "подтверждён" if user.email_verified else "не подтверждён" }}</td>
@@ -57,7 +65,7 @@
           </tr>
         {% else %}
           <tr>
-            <td colspan="10">Пользователей пока нет.</td>
+            <td colspan="11">Пользователей пока нет.</td>
           </tr>
         {% endfor %}
       </tbody>
