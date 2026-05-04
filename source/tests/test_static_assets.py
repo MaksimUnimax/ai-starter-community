@@ -9,3 +9,6 @@ def test_stylesheet_is_served(client):
     assert ".top-nav" in response.text
     assert ".table-actions" in response.text
     assert ".button-danger" in response.text
+    assert ".form-actions" in response.text
+    assert ".textarea" in response.text
+    assert ".select" in response.text

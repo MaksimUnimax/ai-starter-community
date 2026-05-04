@@ -83,7 +83,16 @@ def test_admin_can_open_tariff_create_page(client, test_settings):
     response = client.get("/admin/tariffs/new")
     assert response.status_code == 200
     body = response.text
+    assert "/static/styles.css" in body
     assert "Создание тарифа" in body
+    assert "card stack" in body
+    assert 'class="form"' in body
+    assert "form-row" in body
+    assert "form-actions" in body
+    assert "button-primary" in body
+    assert "button-secondary" in body
+    assert "textarea" in body
+    assert "select" in body
     assert "Системный код" in body
     assert "Название" in body
     assert "Описание" in body
@@ -223,7 +232,15 @@ def test_admin_edit_page_shows_code_as_read_only(client, test_settings):
     response = client.get("/admin/tariffs/ui_tariff_edit/edit")
     assert response.status_code == 200
     body = response.text
+    assert "/static/styles.css" in body
     assert "Редактирование тарифа" in body
+    assert "card stack" in body
+    assert "form-row" in body
+    assert "form-actions" in body
+    assert "button-primary" in body
+    assert "button-secondary" in body
+    assert "textarea" in body
+    assert "select" in body
     assert "Системный код" in body
     assert "Название" in body
     assert "Описание" in body
@@ -352,3 +369,11 @@ def test_admin_tariff_list_shows_controls_without_paid_option_crud_ui(client, te
     assert "/admin/paid-options/new" not in body
     assert "/admin/paid-options/" not in body
     assert "/admin/payments" not in body
+
+
+def test_admin_tariff_form_does_not_expose_payment_ui(client, test_settings):
+    _make_admin(client, test_settings)
+    response = client.get("/admin/tariffs/new")
+    body = response.text
+    assert "payment" not in body.lower()
+    assert "оплата" not in body.lower()

@@ -1,117 +1,107 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h1>{% if is_create %}Создание платной опции{% else %}Редактирование платной опции{% endif %}</h1>
-  {% if errors.form %}
-    <p>{{ errors.form }}</p>
-  {% endif %}
-  <form method="post">
-    <p>
-      <label>
-        Системный код
-        {% if is_create %}
-          <input type="text" name="code" value="{{ form_data.code }}">
-          <span>Нужен программе. Можно оставить пустым — система создаст код автоматически.</span>
-        {% else %}
-          <input type="text" name="code" value="{{ option.code }}" readonly>
-          <span>Системный код нельзя изменить после создания.</span>
-        {% endif %}
-      </label>
-      {% if errors.code %}
-        <span>{{ errors.code }}</span>
-      {% endif %}
-    </p>
+  <section class="card stack">
+    <div class="stack">
+      <p class="muted">Каталог платных опций</p>
+      <h1 class="section-title">{% if is_create %}Создание платной опции{% else %}Редактирование платной опции{% endif %}</h1>
+    </div>
 
-    <p>
-      <label>
-        Название
-        <input type="text" name="title" value="{{ form_data.title }}">
-      </label>
-      {% if errors.title %}
-        <span>{{ errors.title }}</span>
-      {% endif %}
-    </p>
-
-    <p>
-      <label>
-        Описание
-        <textarea name="description">{{ form_data.description }}</textarea>
-      </label>
-      {% if errors.description %}
-        <span>{{ errors.description }}</span>
-      {% endif %}
-    </p>
-
-    <p>
-      <label>
-        Цена, ₽
-        <input type="text" name="price_rub" value="{{ form_data.price_rub }}">
-      </label>
-      {% if errors.price_rub %}
-        <span>{{ errors.price_rub }}</span>
-      {% endif %}
-    </p>
-    <p>Если оставить пустым, отдельная цена не задана.</p>
-    {% if not is_create and not form_data.price_rub %}
-      <p>Отдельная цена не задана.</p>
+    {% if errors.form %}
+      <div class="alert alert-error">{{ errors.form }}</div>
     {% endif %}
 
-    <p>
-      <label>
-        Валюта
-        <input type="text" name="currency" value="{{ form_data.currency }}">
+    <form class="form" method="post">
+      <label class="form-row">
+        <span>Системный код</span>
+        {% if is_create %}
+          <input class="input" type="text" name="code" value="{{ form_data.code }}">
+          <span class="form-help">Нужен программе. Можно оставить пустым — система создаст код автоматически.</span>
+        {% else %}
+          <input class="input" type="text" name="code" value="{{ option.code }}" readonly>
+          <span class="form-help">Системный код нельзя изменить после создания.</span>
+        {% endif %}
+        {% if errors.code %}
+          <span class="alert alert-error">{{ errors.code }}</span>
+        {% endif %}
       </label>
-      {% if errors.currency %}
-        <span>{{ errors.currency }}</span>
-      {% endif %}
-    </p>
 
-    <p>
-      <label>
-        Срок по умолчанию, дней
-        <input type="number" name="default_duration_days" min="0" step="1" value="{{ form_data.default_duration_days }}">
+      <label class="form-row">
+        <span>Название</span>
+        <input class="input" type="text" name="title" value="{{ form_data.title }}">
+        {% if errors.title %}
+          <span class="alert alert-error">{{ errors.title }}</span>
+        {% endif %}
       </label>
-      {% if errors.default_duration_days %}
-        <span>{{ errors.default_duration_days }}</span>
-      {% endif %}
-    </p>
 
-    <p>
-      <label>
-        Статус
-        <select name="status">
+      <label class="form-row">
+        <span>Описание</span>
+        <textarea class="textarea" name="description">{{ form_data.description }}</textarea>
+        {% if errors.description %}
+          <span class="alert alert-error">{{ errors.description }}</span>
+        {% endif %}
+      </label>
+
+      <label class="form-row">
+        <span>Цена, ₽</span>
+        <input class="input" type="text" name="price_rub" value="{{ form_data.price_rub }}">
+        <span class="form-help">Если оставить пустым, отдельная цена не задана.</span>
+        {% if not is_create and not form_data.price_rub %}
+          <span class="form-help">Отдельная цена не задана.</span>
+        {% endif %}
+        {% if errors.price_rub %}
+          <span class="alert alert-error">{{ errors.price_rub }}</span>
+        {% endif %}
+      </label>
+
+      <label class="form-row">
+        <span>Валюта</span>
+        <input class="input" type="text" name="currency" value="{{ form_data.currency }}">
+        {% if errors.currency %}
+          <span class="alert alert-error">{{ errors.currency }}</span>
+        {% endif %}
+      </label>
+
+      <label class="form-row">
+        <span>Срок по умолчанию, дней</span>
+        <input class="input" type="number" name="default_duration_days" min="0" step="1" value="{{ form_data.default_duration_days }}">
+        {% if errors.default_duration_days %}
+          <span class="alert alert-error">{{ errors.default_duration_days }}</span>
+        {% endif %}
+      </label>
+
+      <label class="form-row">
+        <span>Статус</span>
+        <select class="select" name="status">
           <option value="active" {% if form_data.status == "active" %}selected{% endif %}>активен</option>
           <option value="hidden" {% if form_data.status == "hidden" %}selected{% endif %}>скрыт</option>
           <option value="archived" {% if form_data.status == "archived" %}selected{% endif %}>архив</option>
         </select>
+        {% if errors.status %}
+          <span class="alert alert-error">{{ errors.status }}</span>
+        {% endif %}
       </label>
-      {% if errors.status %}
-        <span>{{ errors.status }}</span>
-      {% endif %}
-    </p>
 
-    <p>
-      <label>
-        Можно продлевать
+      <label class="form-row">
+        <span>Можно продлевать</span>
         <input type="checkbox" name="is_renewable" value="1" {% if form_data.is_renewable %}checked{% endif %}>
+        {% if errors.is_renewable %}
+          <span class="alert alert-error">{{ errors.is_renewable }}</span>
+        {% endif %}
       </label>
-      {% if errors.is_renewable %}
-        <span>{{ errors.is_renewable }}</span>
-      {% endif %}
-    </p>
 
-    <p>
-      <label>
-        Порядок сортировки
-        <input type="number" name="sort_order" min="0" step="1" value="{{ form_data.sort_order }}">
+      <label class="form-row">
+        <span>Порядок сортировки</span>
+        <input class="input" type="number" name="sort_order" min="0" step="1" value="{{ form_data.sort_order }}">
+        {% if errors.sort_order %}
+          <span class="alert alert-error">{{ errors.sort_order }}</span>
+        {% endif %}
       </label>
-      {% if errors.sort_order %}
-        <span>{{ errors.sort_order }}</span>
-      {% endif %}
-    </p>
 
-    <button type="submit">{{ submit_label }}</button>
-  </form>
-
-  <p><a href="/admin/paid-options">Назад к списку</a></p>
+      <div class="form-actions">
+        <button class="button button-primary" type="submit">{{ submit_label }}</button>
+        <a class="button button-secondary" href="/admin/paid-options">Назад к списку</a>
+      </div>
+    </form>
+  </section>
 {% endblock %}

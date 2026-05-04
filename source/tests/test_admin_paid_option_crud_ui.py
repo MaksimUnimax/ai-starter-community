@@ -83,7 +83,15 @@ def test_admin_can_open_paid_option_create_page(client, test_settings):
     assert response.status_code == 200
     body = response.text
     assert "Создание платной опции" in body
+    assert "/static/styles.css" in body
     assert "Системный код" in body
+    assert 'class="form"' in body
+    assert "form-row" in body
+    assert "form-actions" in body
+    assert "button-primary" in body
+    assert "button-secondary" in body
+    assert "textarea" in body
+    assert "select" in body
     assert "Название" in body
     assert "Описание" in body
     assert "Цена, ₽" in body
@@ -302,7 +310,15 @@ def test_admin_edit_page_shows_code_as_read_only_and_null_price_label(client, te
     response = client.get("/admin/paid-options/ui_paid_option_edit_null/edit")
     assert response.status_code == 200
     body = response.text
+    assert "/static/styles.css" in body
     assert "Редактирование платной опции" in body
+    assert 'class="form"' in body
+    assert "form-row" in body
+    assert "form-actions" in body
+    assert "button-primary" in body
+    assert "button-secondary" in body
+    assert "textarea" in body
+    assert "select" in body
     assert "Системный код" in body
     assert "Название" in body
     assert "Описание" in body
@@ -452,3 +468,11 @@ def test_admin_paid_option_list_shows_controls_without_tariff_linking_ui(client,
     assert "/admin/paid-options/ai_gpt_tool/archive" in body
     assert "/admin/tariffs/" not in body
     assert "/admin/payments" not in body
+
+
+def test_admin_paid_option_form_does_not_expose_payment_ui(client, test_settings):
+    _make_admin(client, test_settings)
+    response = client.get("/admin/paid-options/new")
+    body = response.text
+    assert "payment" not in body.lower()
+    assert "оплата" not in body.lower()
