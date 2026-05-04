@@ -8,15 +8,20 @@
 <body>
   <main>
     <h1>Вход</h1>
-    <p>Войдите по email или по логину.</p>
+    <p>Войдите по email или login.</p>
     {% if notice %}
       <p>{{ notice }}</p>
     {% endif %}
     {% if error %}
       <p>{{ error }}</p>
     {% endif %}
+    {% if unverified %}
+      <p>
+        <a href="/resend-verification">Отправить письмо для подтверждения ещё раз</a>
+      </p>
+    {% endif %}
     <form method="post" action="/login">
-      <label>Email или логин
+      <label>Email или login
         <input type="text" name="email_or_login" value="{{ email_or_login or '' }}" autocomplete="username">
       </label><br>
       <label>Пароль
@@ -27,6 +32,8 @@
     <p>
       <a href="/register">Регистрация</a>
       <a href="/forgot-password">Забыли пароль?</a>
+      <a href="/resend-verification">Подтверждение email</a>
+      <a href="/">На главную</a>
     </p>
   </main>
 </body>

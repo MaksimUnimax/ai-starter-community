@@ -5,6 +5,8 @@ def test_expected_routes_registered(app):
     assert "/" in paths
     assert "/login" in paths
     assert "/register" in paths
+    assert "/check-email" in paths
+    assert "/resend-verification" in paths
     assert "/logout" in paths
     assert "/forgot-password" in paths
     assert "/reset-password/{token}" in paths

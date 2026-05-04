@@ -9,9 +9,17 @@
   <main>
     <h1>Кабинет</h1>
     <p>{{ access_status_label }}</p>
-    <p>Платёж и тарифы появятся позже.</p>
     <p>Email: {{ user_email }}</p>
     <p>Логин: {{ user_login }}</p>
+    <p>Платёж, материалы и тарифы появятся позже. Сейчас доступ ещё не активирован.</p>
+    <form method="post" action="/logout">
+      <button type="submit">Выйти</button>
+    </form>
+    <p>
+      <a href="/">На главную</a>
+      <a href="/login">Вход</a>
+      <a href="/register">Регистрация</a>
+    </p>
   </main>
 </body>
 </html>

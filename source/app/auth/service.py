@@ -215,6 +215,38 @@ def register_user(
     return user
 
 
+def resend_verification_request(email: str, settings: Settings | None = None) -> bool:
+    resolved = _settings(settings)
+    normalized_email = _normalize_email(email)
+    with _connection(resolved) as connection:
+        user_row = connection.execute(
+            "SELECT * FROM users WHERE email = ?",
+            (normalized_email,),
+        ).fetchone()
+        if user_row is None or not bool(user_row["is_active"]) or user_row["email_verified_at"] is not None:
+            return False
+        now_iso = utc_now_iso()
+        connection.execute(
+            """
+            UPDATE auth_tokens
+            SET revoked_at = ?
+            WHERE user_id = ? AND token_type = ? AND used_at IS NULL AND revoked_at IS NULL
+            """,
+            (now_iso, int(user_row["id"]), EMAIL_TOKEN_TYPE),
+        )
+        verification_token = _issue_auth_token(
+            connection,
+            user_id=int(user_row["id"]),
+            token_type=EMAIL_TOKEN_TYPE,
+            expires_at_iso=(utc_now() + timedelta(hours=resolved.email_verification_token_expiry_hours)).isoformat(),
+            target_email=normalized_email,
+        )
+
+    verification_link = _build_public_url(resolved, f"/verify-email/{verification_token}")
+    send_email_verification(normalized_email, verification_link, settings=resolved)
+    return True
+
+
 def verify_email(token: str, settings: Settings | None = None) -> UserPublic:
     resolved = _settings(settings)
     token_hash = hash_token(token or "")

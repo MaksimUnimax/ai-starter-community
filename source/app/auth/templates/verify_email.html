@@ -13,7 +13,10 @@
       <p><a href="/login">Перейти ко входу</a></p>
     {% else %}
       <p>{{ message }}</p>
-      <p><a href="/register">Вернуться к регистрации</a></p>
+      <p>
+        <a href="/resend-verification">Отправить письмо повторно</a>
+        <a href="/register">Вернуться к регистрации</a>
+      </p>
     {% endif %}
   </main>
 </body>

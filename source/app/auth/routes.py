@@ -19,6 +19,7 @@ from app.auth.service import (
     register_user,
     reset_password,
     revoke_session,
+    resend_verification_request,
     verify_email,
 )
 from app.core.config import get_settings
@@ -86,13 +87,66 @@ def register_submit(
             email=email,
             login=login,
         )
+    return RedirectResponse(url="/check-email?registered=1", status_code=303)
+
+
+@router.get("/check-email", response_class=HTMLResponse)
+def check_email_page(request: Request) -> HTMLResponse:
+    if request.query_params.get("registered"):
+        message = (
+            "Аккаунт создан. Письмо с подтверждением отправлено. "
+            "В предпросмотре письмо сохраняется во внутреннем почтовом ящике, "
+            "а внешний email-провайдер ещё не подключён. Подтвердите email перед входом."
+        )
+    elif request.query_params.get("resent"):
+        message = (
+            "Новое письмо с подтверждением отправлено. Проверьте почту и подтвердите email перед входом."
+        )
+    else:
+        message = (
+            "Проверьте почту и подтвердите email по ссылке. После подтверждения можно войти в кабинет."
+        )
     return _template(
         request,
-        "register.html",
-        title=page_title("Регистрация"),
-        notice="Регистрация завершена. Проверьте почту и подтвердите email по ссылке.",
+        "check_email.html",
+        title=page_title("Подтверждение email"),
+        message=message,
+    )
+
+
+@router.get("/resend-verification", response_class=HTMLResponse)
+def resend_verification_page(request: Request) -> HTMLResponse:
+    return _template(
+        request,
+        "resend_verification.html",
+        title=page_title("Повторная отправка"),
+        notice=request.query_params.get("notice"),
+        error=request.query_params.get("error"),
         email="",
-        login="",
+    )
+
+
+@router.post("/resend-verification", response_class=HTMLResponse)
+def resend_verification_submit(
+    request: Request,
+    email: str = Form(default=""),
+) -> HTMLResponse:
+    try:
+        resend_verification_request(email=email)
+    except ValidationError as exc:
+        return _template(
+            request,
+            "resend_verification.html",
+            title=page_title("Повторная отправка"),
+            error=str(exc),
+            email=email,
+        )
+    return _template(
+        request,
+        "resend_verification.html",
+        title=page_title("Повторная отправка"),
+        notice="Если аккаунт существует и email ещё не подтверждён, мы отправили новое письмо.",
+        email="",
     )
 
 
@@ -152,7 +206,8 @@ def login_submit(
             request,
             "login.html",
             title=page_title("Вход"),
-            error="Email не подтверждён.",
+            error="Email не подтверждён. Проверьте почту или запросите новое письмо.",
+            unverified=True,
             email_or_login=email_or_login,
         )
     except ValidationError as exc:
@@ -234,7 +289,7 @@ def forgot_password_submit(
         request,
         "forgot_password.html",
         title=page_title("Сброс пароля"),
-        notice="Если учётная запись существует, письмо для сброса пароля отправлено.",
+        notice="Если такой email зарегистрирован, мы отправим ссылку для восстановления.",
         email="",
     )
 
@@ -276,5 +331,5 @@ def reset_password_submit(
         title=page_title("Новый пароль"),
         token="",
         success=True,
-        notice="Пароль изменён. Теперь можно войти.",
+        notice="Пароль изменён. Теперь можно войти в систему.",
     )

@@ -9,6 +9,7 @@
   <main>
     <h1>Регистрация</h1>
     <p>Создайте аккаунт, затем подтвердите email по ссылке из письма.</p>
+    <p>После регистрации вы увидите страницу подтверждения email.</p>
     {% if notice %}
       <p>{{ notice }}</p>
     {% endif %}
@@ -30,7 +31,11 @@
       </label><br>
       <button type="submit">Создать аккаунт</button>
     </form>
-    <p><a href="/login">Вход</a></p>
+    <p>
+      <a href="/login">Вход</a>
+      <a href="/check-email">Проверка email</a>
+      <a href="/">На главную</a>
+    </p>
   </main>
 </body>
 </html>

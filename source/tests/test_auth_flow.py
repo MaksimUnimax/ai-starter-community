@@ -16,13 +16,14 @@ from app.auth.service import (
     create_session,
     get_user_by_session_token,
     register_user,
+    resend_verification_request,
     reset_password,
     revoke_session,
     verify_email,
 )
 from app.core.config import Settings, database_path_from_settings
-from app.shared.db import get_connection, get_database_path, initialize_database
-from app.shared.security import generate_auth_token, hash_password, validate_new_password, verify_password
+from app.shared.db import get_database_path
+from app.shared.security import validate_new_password
 
 
 def _db_path(settings: Settings):
@@ -39,18 +40,6 @@ def _fetch_one(settings: Settings, sql: str, params: tuple = ()):
         return conn.execute(sql, params).fetchone()
 
 
-def _fetch_all(settings: Settings, sql: str, params: tuple = ()):
-    with _connect(settings) as conn:
-        conn.row_factory = sqlite3.Row
-        return conn.execute(sql, params).fetchall()
-
-
-def _extract_token(body_text: str, marker: str) -> str:
-    match = re.search(rf"{re.escape(marker)}([A-Za-z0-9_-]+)", body_text)
-    assert match, f"token marker {marker!r} not found"
-    return match.group(1)
-
-
 def _extract_token_from_link(body_text: str) -> str:
     match = re.search(r"/(?:verify-email|reset-password)/([A-Za-z0-9_-]+)", body_text)
     assert match, "token link not found"
@@ -58,14 +47,13 @@ def _extract_token_from_link(body_text: str) -> str:
 
 
 def _make_test_user(settings: Settings):
-    user = register_user(
+    return register_user(
         email="user@example.com",
         login="testuser",
         password="Secret123",
         repeat_password="Secret123",
         settings=settings,
     )
-    return user
 
 
 def test_default_database_path_points_into_state():
@@ -111,6 +99,38 @@ def test_register_creates_unverified_user_and_outbox(test_settings):
     assert outbox_row is not None
     assert outbox_row["template_key"] == "email_verification"
     assert "/verify-email/" in outbox_row["body_text"]
+
+
+def test_resend_verification_request_creates_new_outbox_message(test_settings):
+    user = _make_test_user(test_settings)
+    before_count = _fetch_one(
+        test_settings,
+        "SELECT COUNT(*) AS c FROM email_outbox WHERE recipient_email = ? AND template_key = ?",
+        (user.email, "email_verification"),
+    )["c"]
+
+    assert resend_verification_request("user@example.com", settings=test_settings) is True
+
+    after_count = _fetch_one(
+        test_settings,
+        "SELECT COUNT(*) AS c FROM email_outbox WHERE recipient_email = ? AND template_key = ?",
+        (user.email, "email_verification"),
+    )["c"]
+    assert after_count == before_count + 1
+
+
+def test_resend_verification_request_is_generic_for_missing_or_verified_user(test_settings):
+    assert resend_verification_request("missing@example.com", settings=test_settings) is False
+
+    user = _make_test_user(test_settings)
+    verification_row = _fetch_one(
+        test_settings,
+        "SELECT * FROM email_outbox WHERE recipient_email = ? AND template_key = ? ORDER BY id DESC LIMIT 1",
+        (user.email, "email_verification"),
+    )
+    verify_token = _extract_token_from_link(verification_row["body_text"])
+    verify_email(verify_token, settings=test_settings)
+    assert resend_verification_request("user@example.com", settings=test_settings) is False
 
 
 def test_register_rejects_duplicates_and_password_rules(test_settings):
@@ -275,9 +295,15 @@ def test_route_flow_register_verify_login_cabinet_logout(client, test_settings):
             "password": "Secret123",
             "repeat_password": "Secret123",
         },
+        follow_redirects=False,
     )
-    assert register_response.status_code == 200
-    assert "Проверьте почту" in register_response.text
+    assert register_response.status_code == 303
+    assert register_response.headers["location"] == "/check-email?registered=1"
+
+    check_email_response = client.get("/check-email?registered=1")
+    assert check_email_response.status_code == 200
+    assert "Аккаунт создан" in check_email_response.text
+    assert "Подтвердите email" in check_email_response.text
 
     outbox_row = _fetch_one(
         test_settings,
@@ -303,6 +329,7 @@ def test_route_flow_register_verify_login_cabinet_logout(client, test_settings):
     assert "route@example.com" in cabinet_response.text
     assert "routeuser" in cabinet_response.text
     assert "Доступ не активирован" in cabinet_response.text
+    assert "Выйти" in cabinet_response.text
 
     logout_response = client.post("/logout", follow_redirects=False)
     assert logout_response.status_code == 303
@@ -322,8 +349,9 @@ def test_route_flow_login_by_login_and_password_reset(client, test_settings):
             "password": "Secret123",
             "repeat_password": "Secret123",
         },
+        follow_redirects=False,
     )
-    assert register_response.status_code == 200
+    assert register_response.status_code == 303
 
     verify_row = _fetch_one(
         test_settings,
@@ -340,10 +368,11 @@ def test_route_flow_login_by_login_and_password_reset(client, test_settings):
         follow_redirects=False,
     )
     assert login_response.status_code == 303
+    assert test_settings.session_cookie_name in login_response.headers.get("set-cookie", "")
 
     forgot_response = client.post("/forgot-password", data={"email": "loginroute@example.com"})
     assert forgot_response.status_code == 200
-    assert "Если учётная запись существует" in forgot_response.text
+    assert "Если такой email зарегистрирован" in forgot_response.text
 
     reset_row = _fetch_one(
         test_settings,
@@ -360,7 +389,7 @@ def test_route_flow_login_by_login_and_password_reset(client, test_settings):
         },
     )
     assert reset_response.status_code == 200
-    assert "Пароль изменён" in reset_response.text
+    assert "Теперь можно войти в систему" in reset_response.text
 
     relogin_response = client.post(
         "/login",
@@ -371,6 +400,71 @@ def test_route_flow_login_by_login_and_password_reset(client, test_settings):
     cabinet_response = client.get("/cabinet")
     assert cabinet_response.status_code == 200
     assert "loginroute@example.com" in cabinet_response.text
+
+
+def test_unverified_login_shows_resend_link(client, test_settings):
+    register_response = client.post(
+        "/register",
+        data={
+            "email": "needsverify@example.com",
+            "login": "needsverify",
+            "password": "Secret123",
+            "repeat_password": "Secret123",
+        },
+        follow_redirects=False,
+    )
+    assert register_response.status_code == 303
+
+    login_response = client.post(
+        "/login",
+        data={"email_or_login": "needsverify@example.com", "password": "Secret123"},
+    )
+    assert login_response.status_code == 200
+    assert "Email не подтверждён" in login_response.text
+    assert "/resend-verification" in login_response.text
+
+
+def test_login_and_reset_pages_show_clear_rules(client):
+    login_response = client.get("/login")
+    forgot_response = client.get("/forgot-password")
+    reset_response = client.get("/reset-password/example-token")
+
+    assert "Email или login" in login_response.text
+    assert "/resend-verification" in login_response.text
+    assert "Если такой email зарегистрирован" in forgot_response.text
+    assert "минимум 8 символов" in reset_response.text
+    assert "без пробелов внутри" in reset_response.text
+
+
+def test_cabinet_shows_logout_button_and_access_text(client, test_settings):
+    register_user(
+        email="cabinetux@example.com",
+        login="cabinetux",
+        password="Secret123",
+        repeat_password="Secret123",
+        settings=test_settings,
+    )
+    verification_row = _fetch_one(
+        test_settings,
+        "SELECT * FROM email_outbox WHERE recipient_email = ? AND template_key = ? ORDER BY id DESC LIMIT 1",
+        ("cabinetux@example.com", "email_verification"),
+    )
+    verify_token = _extract_token_from_link(verification_row["body_text"])
+    verify_email(verify_token, settings=test_settings)
+
+    login_response = client.post(
+        "/login",
+        data={"email_or_login": "cabinetux@example.com", "password": "Secret123"},
+        follow_redirects=False,
+    )
+    assert login_response.status_code == 303
+
+    cabinet_response = client.get("/cabinet")
+    assert cabinet_response.status_code == 200
+    assert "cabinetux@example.com" in cabinet_response.text
+    assert "cabinetux" in cabinet_response.text
+    assert "Доступ не активирован" in cabinet_response.text
+    assert "Выйти" in cabinet_response.text
 
 
 def test_password_hash_is_not_plaintext_and_session_revocation(test_settings):
