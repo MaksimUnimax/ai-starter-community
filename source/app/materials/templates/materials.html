@@ -1,47 +1,56 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{ title }}</title>
-</head>
-<body>
-  <main>
-    <h1>Материалы</h1>
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="card stack">
+    <div class="stack">
+      <p class="muted">Раздел материалов</p>
+      <h1 class="section-title">Материалы</h1>
+      {% if has_materials_access %}
+        <p>Доступ открыт. Это пока заглушка структуры будущего раздела.</p>
+      {% else %}
+        <div class="alert alert-info">
+          <p>Материалы будут доступны после оплаты.</p>
+          <p class="muted">После первой оплаты доступ к материалам останется навсегда.</p>
+        </div>
+      {% endif %}
+    </div>
 
     {% if has_materials_access %}
-      <p>Доступ открыт. Это пока заглушка структуры будущего раздела.</p>
-      <section>
-        <h2>Быстрый старт</h2>
-        <p>Содержание появится позже.</p>
-      </section>
-      <section>
-        <h2>Как работать с AI-агентом</h2>
-        <p>Содержание появится позже.</p>
-      </section>
-      <section>
-        <h2>Команды для копирования</h2>
-        <p>Содержание появится позже.</p>
-      </section>
-      <section>
-        <h2>Частые ошибки</h2>
-        <p>Содержание появится позже.</p>
-      </section>
-      <section>
-        <h2>Видеоинструкции</h2>
-        <p>Содержание появится позже.</p>
-      </section>
-      <section>
-        <h2>Ссылки на чаты</h2>
-        <p>Содержание появится позже.</p>
-      </section>
+      <div class="card-grid tight">
+        <section class="card stack">
+          <h2 class="section-title">Быстрый старт</h2>
+          <p class="muted">Содержание появится позже.</p>
+        </section>
+        <section class="card stack">
+          <h2 class="section-title">Как работать с AI-агентом</h2>
+          <p class="muted">Содержание появится позже.</p>
+        </section>
+        <section class="card stack">
+          <h2 class="section-title">Команды для копирования</h2>
+          <p class="muted">Содержание появится позже.</p>
+        </section>
+        <section class="card stack">
+          <h2 class="section-title">Частые ошибки</h2>
+          <p class="muted">Содержание появится позже.</p>
+        </section>
+        <section class="card stack">
+          <h2 class="section-title">Видеоинструкции</h2>
+          <p class="muted">Содержание появится позже.</p>
+        </section>
+        <section class="card stack">
+          <h2 class="section-title">Ссылки на чаты</h2>
+          <p class="muted">Содержание появится позже.</p>
+        </section>
+      </div>
     {% else %}
-      <p>Материалы будут доступны после оплаты</p>
-      <p>После первой оплаты доступ к материалам останется навсегда.</p>
-      <p><a href="/cabinet">Вернуться в кабинет</a></p>
+      <div class="actions">
+        <a class="button button-primary" href="/cabinet">Вернуться в кабинет</a>
+      </div>
     {% endif %}
 
-    <p><a href="/">На главную</a> <a href="/cabinet">В кабинет</a></p>
-  </main>
-</body>
-</html>
+    <div class="actions">
+      <a class="button button-secondary" href="/">На главную</a>
+      <a class="button button-secondary" href="/cabinet">В кабинет</a>
+    </div>
+  </section>
+{% endblock %}

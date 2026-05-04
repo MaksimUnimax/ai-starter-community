@@ -62,9 +62,16 @@ def test_materials_shows_locked_state_without_access(client, test_settings):
     _prepare_verified_user(client, test_settings, "materials-locked@example.com", "materialslocked")
     response = client.get("/materials")
     assert response.status_code == 200
+    assert "/static/styles.css" in response.text
+    assert "Главная" in response.text
+    assert "Кабинет" in response.text
+    assert "Материалы" in response.text
     assert "Материалы будут доступны после оплаты" in response.text
     assert "После первой оплаты доступ к материалам останется навсегда." in response.text
     assert "Быстрый старт" not in response.text
+    assert "/admin" not in response.text
+    assert "Payment" not in response.text
+    assert "Locked" not in response.text
 
 
 def test_materials_shows_placeholder_sections_when_access_granted(client, test_settings):
@@ -78,6 +85,13 @@ def test_materials_shows_placeholder_sections_when_access_granted(client, test_s
     assert "Частые ошибки" in response.text
     assert "Видеоинструкции" in response.text
     assert "Ссылки на чаты" in response.text
+    assert "/static/styles.css" in response.text
+    assert "Главная" in response.text
+    assert "Кабинет" in response.text
+    assert "Материалы" in response.text
+    assert "/admin" not in response.text
+    assert "Payment" not in response.text
+    assert "Content" not in response.text
 
 
 def test_cabinet_contains_materials_link_and_locked_hint(client, test_settings):
@@ -88,6 +102,12 @@ def test_cabinet_contains_materials_link_and_locked_hint(client, test_settings):
     assert "Перейти к материалам" in response.text
     assert "Доступ к материалам: не активирован" in response.text
     assert "Материалы будут доступны после оплаты" in response.text
+
+
+def test_materials_redirects_unauthenticated_user_is_unchanged(client):
+    response = client.get("/materials", follow_redirects=False)
+    assert response.status_code == 303
+    assert response.headers["location"] == "/login"
 
 
 def test_materials_access_column_exists_after_schema_init(test_settings):
