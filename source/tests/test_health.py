@@ -1,0 +1,17 @@
+from fastapi.testclient import TestClient
+
+from app.main import app
+
+
+def test_healthz():
+    client = TestClient(app)
+    response = client.get("/healthz")
+    assert response.status_code == 200
+    assert response.json() == {"ok": True, "service": "ai-starter-community"}
+
+
+def test_readyz():
+    client = TestClient(app)
+    response = client.get("/readyz")
+    assert response.status_code == 200
+    assert response.json() == {"ok": True, "ready": True}

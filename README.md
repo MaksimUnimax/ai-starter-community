@@ -10,5 +10,6 @@
 - `runtime/`, `state/`, `logs/` и `backups/` разделены между собой.
 
 Этот репозиторий предназначен для кода реализации AI Starter Community.
+Код приложения и технические файлы позже будут храниться в `source/`.
 Рабочие TZ, roadmap, module map и handoff остаются в ChatGPT, пока их явно не экспортируют отдельно.
 Каталоги `runtime/`, `state/`, `logs/`, `backups/` и `tmp/` не являются source of truth и игнорируются.

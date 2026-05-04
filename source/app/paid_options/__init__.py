@@ -1,0 +1,1 @@
+"""Paid options module placeholder."""

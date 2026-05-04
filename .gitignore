@@ -17,6 +17,8 @@ node_modules/
 **/node_modules/
 build/
 dist/
+*.egg-info/
+**/*.egg-info/
 tmp/*
 !tmp/.gitkeep
 runtime/*
@@ -29,5 +31,3 @@ backups/*
 !backups/.gitkeep
 docs/*
 !docs/.gitkeep
-source/*
-!source/.gitkeep
