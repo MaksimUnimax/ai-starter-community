@@ -84,20 +84,19 @@ def test_admin_can_open_tariff_create_page(client, test_settings):
     assert response.status_code == 200
     body = response.text
     assert "Создание тарифа" in body
-    assert "Код" in body
+    assert "Системный код" in body
     assert "Название" in body
     assert "Описание" in body
     assert "Цена, ₽" in body
     assert "Валюта" in body
     assert "Статус" in body
     assert "Порядок сортировки" in body
-    assert "Код" in body
     assert "Code" not in body
     assert "Title" not in body
     assert "Description" not in body
     assert "Price, RUB" not in body
     assert 'name="code"' in body
-    assert "Код нельзя изменить после создания." in body
+    assert "Нужен программе. Можно оставить пустым — система создаст код автоматически." in body
 
 
 def test_admin_can_create_tariff_via_ui(client, test_settings):
@@ -128,6 +127,29 @@ def test_admin_can_create_tariff_via_ui(client, test_settings):
     assert tariff.currency == "RUB"
     assert tariff.status == "active"
     assert tariff.sort_order == 7
+
+
+def test_admin_can_create_tariff_without_code_via_ui(client, test_settings):
+    _make_admin(client, test_settings)
+
+    response = client.post(
+        "/admin/tariffs/new",
+        data={
+            "code": "",
+            "title": "UI Tariff Without Code",
+            "description": "Tariff created without manual code",
+            "price_rub": "12.34",
+            "currency": "RUB",
+            "status": "active",
+            "sort_order": "7",
+        },
+        follow_redirects=False,
+    )
+
+    assert response.status_code == 303
+    created = next(item for item in list_tariffs_for_admin(settings=test_settings) if item.title == "UI Tariff Without Code")
+    assert created.code.startswith("tariff_")
+    assert re.fullmatch(r"[a-z0-9_-]{3,64}", created.code)
 
 
 def test_admin_tariff_create_rejects_duplicate_code_safely(client, test_settings):
@@ -202,7 +224,7 @@ def test_admin_edit_page_shows_code_as_read_only(client, test_settings):
     assert response.status_code == 200
     body = response.text
     assert "Редактирование тарифа" in body
-    assert "Код" in body
+    assert "Системный код" in body
     assert "Название" in body
     assert "Описание" in body
     assert "Цена, ₽" in body
@@ -214,7 +236,7 @@ def test_admin_edit_page_shows_code_as_read_only(client, test_settings):
     assert 'name="code"' in body
     assert "readonly" in body
     assert "ui_tariff_edit" in body
-    assert "Код нельзя изменить после создания." in body
+    assert "Системный код нельзя изменить после создания." in body
 
 
 def test_admin_post_edit_updates_allowed_fields_and_keeps_code(client, test_settings):
@@ -283,7 +305,7 @@ def test_admin_post_edit_rejects_code_changes(client, test_settings):
     )
 
     assert response.status_code == 400
-    assert "code" in response.text.lower()
+    assert "системный код" in response.text.lower()
 
     tariff = get_tariff_by_code("ui_tariff_code_lock", settings=test_settings)
     assert tariff is not None

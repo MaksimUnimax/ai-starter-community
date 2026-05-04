@@ -176,7 +176,7 @@ def _tariff_form_errors_from_service(exc: Exception) -> dict[str, str]:
     if "code already exists" in lowered:
         return {"code": "Тариф с таким кодом уже существует."}
     if "code is required" in lowered or lowered.startswith("code "):
-        return {"code": "Укажите код тарифа."}
+        return {"code": "Укажите системный код тарифа."}
     if lowered.startswith("title "):
         return {"title": "Укажите название тарифа."}
     if lowered.startswith("description "):
@@ -217,10 +217,12 @@ def _validate_tariff_form_input(
     sort_order, sort_error = _parse_non_negative_int(raw_sort_order, "sort_order")
 
     if include_code:
-        if not code:
-            errors["code"] = "Укажите код тарифа."
-        elif not TARIFF_CODE_RE.fullmatch(code):
-            errors["code"] = "Код тарифа должен содержать 3-64 символа: строчные латинские буквы, цифры, подчёркивание или дефис."
+        if code and not TARIFF_CODE_RE.fullmatch(code):
+            errors["code"] = "Системный код тарифа должен содержать 3-64 символа: строчные латинские буквы, цифры, подчёркивание или дефис."
+        elif code is None or code == "":
+            code = None
+    elif code == "":
+        code = None
     if not title:
         errors["title"] = "Укажите название тарифа."
     elif len(title) > 200:
@@ -439,7 +441,7 @@ def _paid_option_form_errors_from_service(exc: Exception) -> dict[str, str]:
     if "code already exists" in lowered:
         return {"code": "Платная опция с таким кодом уже существует."}
     if "code is required" in lowered or lowered.startswith("code "):
-        return {"code": "Укажите код платной опции."}
+        return {"code": "Укажите системный код платной опции."}
     if lowered.startswith("title "):
         return {"title": "Укажите название платной опции."}
     if lowered.startswith("description "):
@@ -488,10 +490,12 @@ def _validate_paid_option_form_input(
     sort_order, sort_error = _parse_non_negative_int(raw_sort_order, "sort_order")
 
     if include_code:
-        if not code:
-            errors["code"] = "Укажите код платной опции."
-        elif not TARIFF_CODE_RE.fullmatch(code):
-            errors["code"] = "Код платной опции должен содержать 3-64 символа: строчные латинские буквы, цифры, подчёркивание или дефис."
+        if code and not TARIFF_CODE_RE.fullmatch(code):
+            errors["code"] = "Системный код платной опции должен содержать 3-64 символа: строчные латинские буквы, цифры, подчёркивание или дефис."
+        elif code == "":
+            code = None
+    elif code == "":
+        code = None
     if not title:
         errors["title"] = "Укажите название платной опции."
     elif len(title) > 200:
@@ -590,7 +594,7 @@ def _validate_tariff_option_link_form_input(
         if not option_code:
             errors["option_code"] = "Выберите платную опцию."
         elif not TARIFF_CODE_RE.fullmatch(option_code):
-            errors["option_code"] = "Код платной опции должен содержать 3-64 символа: строчные латинские буквы, цифры, подчёркивание или дефис."
+            errors["option_code"] = "Системный код платной опции должен содержать 3-64 символа: строчные латинские буквы, цифры, подчёркивание или дефис."
     if duration_error:
         errors["included_duration_days"] = "Включённый срок должен быть целым числом не меньше 0."
     if quantity_error:
@@ -743,7 +747,7 @@ async def admin_tariffs_edit_submit(request: Request, code: str):
     )
     posted_code = _normalize_text(form.get("code")).lower()
     if posted_code and posted_code != tariff.code:
-        errors["code"] = "Код нельзя изменить после создания."
+        errors["code"] = "Системный код нельзя изменить после создания."
     if errors:
         return _render_tariff_form(
             request,
@@ -1106,7 +1110,7 @@ async def admin_paid_options_edit_submit(request: Request, code: str):
     )
     posted_code = _normalize_text(form.get("code")).lower()
     if posted_code and posted_code != option.code:
-        errors["code"] = "Код нельзя изменить после создания."
+        errors["code"] = "Системный код нельзя изменить после создания."
     if errors:
         return _template(
             request,

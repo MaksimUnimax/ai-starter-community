@@ -83,7 +83,7 @@ def test_admin_can_open_paid_option_create_page(client, test_settings):
     assert response.status_code == 200
     body = response.text
     assert "Создание платной опции" in body
-    assert "Код" in body
+    assert "Системный код" in body
     assert "Название" in body
     assert "Описание" in body
     assert "Цена, ₽" in body
@@ -99,8 +99,7 @@ def test_admin_can_open_paid_option_create_page(client, test_settings):
     assert "Is renewable" not in body
     assert "Sort order" not in body
     assert 'name="code"' in body
-    assert "Код нельзя изменить после создания." in body
-    assert "Если оставить пустым, отдельная цена не задана." in body
+    assert "Нужен программе. Можно оставить пустым — система создаст код автоматически." in body
 
 
 def test_admin_can_create_paid_option_via_ui(client, test_settings):
@@ -135,6 +134,31 @@ def test_admin_can_create_paid_option_via_ui(client, test_settings):
     assert option.status == "active"
     assert option.is_renewable is True
     assert option.sort_order == 7
+
+
+def test_admin_can_create_paid_option_without_code_via_ui(client, test_settings):
+    _make_admin(client, test_settings)
+
+    response = client.post(
+        "/admin/paid-options/new",
+        data={
+            "code": "",
+            "title": "UI Paid Option Without Code",
+            "description": "Created without manual code",
+            "price_rub": "",
+            "currency": "RUB",
+            "default_duration_days": "",
+            "status": "active",
+            "is_renewable": "1",
+            "sort_order": "7",
+        },
+        follow_redirects=False,
+    )
+
+    assert response.status_code == 303
+    created = next(item for item in list_paid_options_for_admin(settings=test_settings) if item.title == "UI Paid Option Without Code")
+    assert created.code.startswith("option_")
+    assert re.fullmatch(r"[a-z0-9_-]{3,64}", created.code)
 
 
 def test_admin_paid_option_create_rejects_duplicate_code_safely(client, test_settings):
@@ -279,7 +303,7 @@ def test_admin_edit_page_shows_code_as_read_only_and_null_price_label(client, te
     assert response.status_code == 200
     body = response.text
     assert "Редактирование платной опции" in body
-    assert "Код" in body
+    assert "Системный код" in body
     assert "Название" in body
     assert "Описание" in body
     assert "Цена, ₽" in body
@@ -293,7 +317,7 @@ def test_admin_edit_page_shows_code_as_read_only_and_null_price_label(client, te
     assert 'name="code"' in body
     assert "readonly" in body
     assert "ui_paid_option_edit_null" in body
-    assert "Код нельзя изменить после создания." in body
+    assert "Системный код нельзя изменить после создания." in body
     assert "Отдельная цена не задана." in body
     assert 'name="price_rub" value=""' in body
 
@@ -374,7 +398,7 @@ def test_admin_post_edit_rejects_code_changes(client, test_settings):
     )
 
     assert response.status_code == 400
-    assert "код" in response.text.lower()
+    assert "системный код" in response.text.lower()
     option = get_paid_option_by_code("ui_paid_option_code_lock", settings=test_settings)
     assert option is not None
     assert option.title == "UI Paid Option"

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 import sqlite3
+import secrets
 from dataclasses import asdict
 
 from app.core.config import Settings, get_settings
@@ -60,6 +61,22 @@ def _normalize_code(value: str, field_name: str = "code") -> str:
     if not CODE_RE.fullmatch(normalized):
         raise ValidationError(f"{field_name} must be 3-64 chars of lowercase letters, digits, underscore or hyphen")
     return normalized
+
+
+def _generate_unique_code(connection, prefix: str, table_name: str) -> str:
+    for _ in range(100):
+        candidate = f"{prefix}{secrets.token_hex(8)}"
+        row = connection.execute(f"SELECT 1 FROM {table_name} WHERE code = ?", (candidate,)).fetchone()
+        if row is None:
+            return candidate
+    raise CatalogError("failed to generate code")
+
+
+def _resolve_create_code(connection, value, *, prefix: str, table_name: str) -> tuple[str, bool]:
+    raw = "" if value is None else str(value).strip().lower()
+    if raw:
+        return _normalize_code(raw), False
+    return _generate_unique_code(connection, prefix, table_name), True
 
 
 def _normalize_title(value: str) -> str:
@@ -280,7 +297,6 @@ def create_paid_option(
         is_renewable=is_renewable,
         sort_order=sort_order,
     )
-    normalized_code = _normalize_code(payload["code"])
     normalized_title = _normalize_title(payload["title"])
     normalized_description = _normalize_description(payload["description"])
     normalized_price = _normalize_int(payload["price_amount_minor"], "price_amount_minor", allow_none=True, minimum=0)
@@ -298,36 +314,45 @@ def create_paid_option(
     resolved = _settings(settings)
     now_iso = utc_now_iso()
     with _connection(resolved) as connection:
-        existing = connection.execute("SELECT id FROM paid_options WHERE code = ?", (normalized_code,)).fetchone()
-        if existing is not None:
-            raise ConflictError("paid option code already exists")
-        cursor = connection.execute(
-            """
-            INSERT INTO paid_options (
-                code, title, description, price_amount_minor, currency,
-                default_duration_days, status, is_renewable, sort_order,
-                created_at, updated_at
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """,
-            (
-                normalized_code,
-                normalized_title,
-                normalized_description,
-                normalized_price,
-                normalized_currency,
-                normalized_default_duration_days,
-                normalized_status,
-                normalized_is_renewable,
-                normalized_sort_order,
-                now_iso,
-                now_iso,
-            ),
-        )
-        row = connection.execute("SELECT * FROM paid_options WHERE id = ?", (cursor.lastrowid,)).fetchone()
-        if row is None:
-            raise CatalogError("paid option creation failed")
-        return _paid_option_from_row(row)
+        normalized_code, generated = _resolve_create_code(connection, payload["code"], prefix="option_", table_name="paid_options")
+        if not generated:
+            existing = connection.execute("SELECT id FROM paid_options WHERE code = ?", (normalized_code,)).fetchone()
+            if existing is not None:
+                raise ConflictError("paid option code already exists")
+        while True:
+            try:
+                cursor = connection.execute(
+                    """
+                    INSERT INTO paid_options (
+                        code, title, description, price_amount_minor, currency,
+                        default_duration_days, status, is_renewable, sort_order,
+                        created_at, updated_at
+                    )
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        normalized_code,
+                        normalized_title,
+                        normalized_description,
+                        normalized_price,
+                        normalized_currency,
+                        normalized_default_duration_days,
+                        normalized_status,
+                        normalized_is_renewable,
+                        normalized_sort_order,
+                        now_iso,
+                        now_iso,
+                    ),
+                )
+            except sqlite3.IntegrityError as exc:
+                if not generated:
+                    raise ConflictError("paid option code already exists") from exc
+                normalized_code = _generate_unique_code(connection, "option_", "paid_options")
+                continue
+            row = connection.execute("SELECT * FROM paid_options WHERE id = ?", (cursor.lastrowid,)).fetchone()
+            if row is None:
+                raise CatalogError("paid option creation failed")
+            return _paid_option_from_row(row)
 
 
 def update_paid_option(
@@ -440,7 +465,7 @@ def upsert_paid_option(
         if row is not None:
             return _paid_option_from_row(row)
     return create_paid_option(
-        code=normalized_code,
+        code=code,
         title=title,
         description=description,
         price_amount_minor=price_amount_minor,

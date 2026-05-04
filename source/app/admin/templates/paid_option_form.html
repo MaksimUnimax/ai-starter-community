@@ -8,18 +8,19 @@
   <form method="post">
     <p>
       <label>
-        Код
+        Системный код
         {% if is_create %}
           <input type="text" name="code" value="{{ form_data.code }}">
+          <span>Нужен программе. Можно оставить пустым — система создаст код автоматически.</span>
         {% else %}
           <input type="text" name="code" value="{{ option.code }}" readonly>
+          <span>Системный код нельзя изменить после создания.</span>
         {% endif %}
       </label>
       {% if errors.code %}
         <span>{{ errors.code }}</span>
       {% endif %}
     </p>
-    <p>Код нельзя изменить после создания.</p>
 
     <p>
       <label>

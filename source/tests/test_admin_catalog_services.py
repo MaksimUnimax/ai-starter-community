@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import sqlite3
 
 import pytest
@@ -60,6 +61,27 @@ def test_create_tariff_accepts_dataclass_input_and_persists(test_settings):
     assert tariff.currency == "RUB"
     assert tariff.status == "hidden"
     assert tariff.sort_order == 5
+
+
+def test_create_tariff_generates_safe_unique_code_when_blank(test_settings):
+    first = tariff_service.create_tariff(
+        title="Auto tariff one",
+        price_amount_minor=1000,
+        code=None,
+        settings=test_settings,
+    )
+    second = tariff_service.create_tariff(
+        title="Auto tariff two",
+        price_amount_minor=2000,
+        code="",
+        settings=test_settings,
+    )
+
+    assert first.code.startswith("tariff_")
+    assert second.code.startswith("tariff_")
+    assert re.fullmatch(r"[a-z0-9_-]{3,64}", first.code)
+    assert re.fullmatch(r"[a-z0-9_-]{3,64}", second.code)
+    assert first.code != second.code
 
 
 @pytest.mark.parametrize(
@@ -357,6 +379,27 @@ def test_create_paid_option_accepts_dataclass_input_and_null_price(test_settings
     assert option.currency == "RUB"
     assert option.default_duration_days is None
     assert option.is_renewable is True
+
+
+def test_create_paid_option_generates_safe_unique_code_when_blank(test_settings):
+    first = paid_option_service.create_paid_option(
+        title="Auto option one",
+        price_amount_minor=None,
+        code=None,
+        settings=test_settings,
+    )
+    second = paid_option_service.create_paid_option(
+        title="Auto option two",
+        price_amount_minor=100,
+        code="",
+        settings=test_settings,
+    )
+
+    assert first.code.startswith("option_")
+    assert second.code.startswith("option_")
+    assert re.fullmatch(r"[a-z0-9_-]{3,64}", first.code)
+    assert re.fullmatch(r"[a-z0-9_-]{3,64}", second.code)
+    assert first.code != second.code
 
 
 @pytest.mark.parametrize(

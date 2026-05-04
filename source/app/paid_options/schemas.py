@@ -26,7 +26,6 @@ PaidOptionView = PaidOptionPublic
 
 @dataclass(frozen=True, slots=True)
 class PaidOptionCreateInput:
-    code: str
     title: str
     description: str | None = None
     price_amount_minor: int | None = None
@@ -35,6 +34,7 @@ class PaidOptionCreateInput:
     status: str = "active"
     is_renewable: bool = True
     sort_order: int = 0
+    code: str | None = None
 
 
 @dataclass(frozen=True, slots=True)

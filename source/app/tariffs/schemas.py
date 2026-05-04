@@ -24,13 +24,13 @@ TariffView = TariffPublic
 
 @dataclass(frozen=True, slots=True)
 class TariffCreateInput:
-    code: str
     title: str
     description: str | None = None
     price_amount_minor: int = 0
     currency: str = "RUB"
     status: str = "active"
     sort_order: int = 0
+    code: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
