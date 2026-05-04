@@ -17,7 +17,7 @@ def test_public_pages_still_work(client):
     forgot_response = client.get("/forgot-password")
 
     assert root_response.status_code == 200
-    assert "AI Starter Community" in root_response.text
+    assert "Главная" in root_response.text
     assert login_response.status_code == 200
     assert register_response.status_code == 200
     assert forgot_response.status_code == 200

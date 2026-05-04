@@ -423,7 +423,7 @@ def test_unverified_login_shows_resend_link(client, test_settings):
         data={"email_or_login": "needsverify@example.com", "password": "Secret123"},
     )
     assert login_response.status_code == 200
-    assert "Email не подтверждён" in login_response.text
+    assert "Почта не подтверждена" in login_response.text
     assert "/resend-verification" in login_response.text
 
 
@@ -432,11 +432,12 @@ def test_login_and_reset_pages_show_clear_rules(client):
     forgot_response = client.get("/forgot-password")
     reset_response = client.get("/reset-password/example-token")
 
-    assert "Email или login" in login_response.text
+    assert "Электронная почта или логин" in login_response.text
     assert "/resend-verification" in login_response.text
     assert "Если такой email зарегистрирован" in forgot_response.text
     assert "минимум 8 символов" in reset_response.text
     assert "без пробелов внутри" in reset_response.text
+    assert "/static/styles.css" in login_response.text
 
 
 def test_cabinet_shows_logout_button_and_access_text(client, test_settings):
@@ -469,6 +470,9 @@ def test_cabinet_shows_logout_button_and_access_text(client, test_settings):
     assert "Статус аккаунта: активен" in cabinet_response.text
     assert "Доступ к материалам: не активирован" in cabinet_response.text
     assert "Выйти" in cabinet_response.text
+    assert "/static/styles.css" in cabinet_response.text
+    assert "Главная" in cabinet_response.text
+    assert "Материалы" in cabinet_response.text
 
 
 def test_password_hash_is_not_plaintext_and_session_revocation(test_settings):

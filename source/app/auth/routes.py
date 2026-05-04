@@ -5,6 +5,7 @@ from pathlib import Path
 from fastapi import APIRouter, Form, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
+from jinja2 import ChoiceLoader, FileSystemLoader
 
 from app.auth.service import (
     AuthError,
@@ -27,10 +28,16 @@ from app.shared.utils import page_title
 
 router = APIRouter()
 templates = Jinja2Templates(directory=str(Path(__file__).resolve().parent / "templates"))
+templates.env.loader = ChoiceLoader(
+    [
+        templates.env.loader,
+        FileSystemLoader(str(Path(__file__).resolve().parents[1] / "shared" / "templates")),
+    ]
+)
 
 
 def _template(request: Request, template_name: str, **context) -> HTMLResponse:
-    payload = {"request": request, "title": context.pop("title", page_title("AI Starter Community"))}
+    payload = {"request": request, "title": context.pop("title", "Страница")}
     payload.update(context)
     return templates.TemplateResponse(request, template_name, payload)
 
@@ -38,9 +45,9 @@ def _template(request: Request, template_name: str, **context) -> HTMLResponse:
 def _login_notice(request: Request) -> str | None:
     query = request.query_params
     if query.get("registered"):
-        return "Проверьте почту и подтвердите email по ссылке."
+        return "Проверьте почту и подтвердите её по ссылке."
     if query.get("verified"):
-        return "Email подтверждён. Теперь можно войти."
+        return "Почта подтверждена. Теперь можно войти."
     if query.get("reset"):
         return "Пароль изменён. Войдите с новым паролем."
     return None
@@ -51,7 +58,7 @@ def register_page(request: Request) -> HTMLResponse:
     return _template(
         request,
         "register.html",
-        title=page_title("Регистрация"),
+        title="Регистрация",
         notice=request.query_params.get("notice"),
         error=request.query_params.get("error"),
         email="",
@@ -73,7 +80,7 @@ def register_submit(
         return _template(
             request,
             "register.html",
-            title=page_title("Регистрация"),
+            title="Регистрация",
             error=str(exc),
             email=email,
             login=login,
@@ -82,7 +89,7 @@ def register_submit(
         return _template(
             request,
             "register.html",
-            title=page_title("Регистрация"),
+            title="Регистрация",
             error=str(exc),
             email=email,
             login=login,
@@ -184,11 +191,16 @@ def login_page(request: Request) -> HTMLResponse:
     return _template(
         request,
         "login.html",
-        title=page_title("Вход"),
+        title="Вход",
         notice=_login_notice(request),
         error=request.query_params.get("error"),
         email_or_login="",
     )
+
+
+@router.head("/login")
+def login_head(request: Request) -> HTMLResponse:
+    return login_page(request)
 
 
 @router.post("/login")
@@ -205,8 +217,8 @@ def login_submit(
         return _template(
             request,
             "login.html",
-            title=page_title("Вход"),
-            error="Email не подтверждён. Проверьте почту или запросите новое письмо.",
+            title="Вход",
+            error="Почта не подтверждена. Проверьте почту или запросите новое письмо.",
             unverified=True,
             email_or_login=email_or_login,
         )
@@ -214,7 +226,7 @@ def login_submit(
         return _template(
             request,
             "login.html",
-            title=page_title("Вход"),
+            title="Вход",
             error=str(exc),
             email_or_login=email_or_login,
         )
@@ -222,15 +234,15 @@ def login_submit(
         return _template(
             request,
             "login.html",
-            title=page_title("Вход"),
-            error="Неверный email/login или пароль.",
+            title="Вход",
+            error="Неверная почта, логин или пароль.",
             email_or_login=email_or_login,
         )
     except AuthError as exc:
         return _template(
             request,
             "login.html",
-            title=page_title("Вход"),
+            title="Вход",
             error=str(exc),
             email_or_login=email_or_login,
         )

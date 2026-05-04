@@ -1,19 +1,22 @@
 def test_landing_page(client):
     response = client.get("/")
     assert response.status_code == 200
-    assert "AI Starter Community" in response.text
+    assert "Главная" in response.text
     assert "Начните делать программы без знания кода" in response.text
     assert "/register" in response.text
     assert "/login" in response.text
+    assert "/static/styles.css" in response.text
 
 
 def test_login_and_register_pages(client):
     login_response = client.get("/login")
+    login_head_response = client.head("/login")
     register_response = client.get("/register")
     check_email_response = client.get("/check-email")
     resend_response = client.get("/resend-verification")
     cabinet_response = client.get("/cabinet", follow_redirects=False)
     assert login_response.status_code == 200
+    assert login_head_response.status_code == 200
     assert register_response.status_code == 200
     assert check_email_response.status_code == 200
     assert resend_response.status_code == 200
@@ -23,6 +26,12 @@ def test_login_and_register_pages(client):
     assert "Регистрация" in register_response.text
     assert "Проверьте email" in check_email_response.text
     assert "Повторная отправка" in resend_response.text
+    assert "/static/styles.css" in login_response.text
+    assert "/static/styles.css" in register_response.text
+    assert "Электронная почта или логин" in login_response.text
+    assert "Электронная почта" in register_response.text
+    assert "Проверка почты" in register_response.text
+    assert "Подтверждение почты" in login_response.text
 
 
 def test_placeholder_post_routes_redirect(client):

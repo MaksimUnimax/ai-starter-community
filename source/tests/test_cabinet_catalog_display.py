@@ -48,6 +48,7 @@ def test_cabinet_displays_active_tariff_catalog_and_no_payment_action(client, te
 
     cabinet_response = client.get("/cabinet")
     assert cabinet_response.status_code == 200
+    assert "/static/styles.css" in cabinet_response.text
     assert "Кабинет" in cabinet_response.text
     assert "Аккаунт" in cabinet_response.text
     assert "Вы вошли как:" in cabinet_response.text
@@ -68,6 +69,11 @@ def test_cabinet_displays_active_tariff_catalog_and_no_payment_action(client, te
     assert "Оплата будет подключена позже." in cabinet_response.text
     assert "Сейчас можно посмотреть тарифы и будущие материалы." in cabinet_response.text
     assert "После подключения оплаты здесь появится информация о доступе и продлении опций." in cabinet_response.text
+    assert "Главная" in cabinet_response.text
+    assert "Кабинет" in cabinet_response.text
+    assert "Материалы" in cabinet_response.text
+    assert "Войти" in cabinet_response.text
+    assert "Регистрация" in cabinet_response.text
     assert "Access" not in cabinet_response.text
     assert "Status" not in cabinet_response.text
     assert "Price" not in cabinet_response.text

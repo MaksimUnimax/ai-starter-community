@@ -1,40 +1,42 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{ title }}</title>
-</head>
-<body>
-  <main>
-    <h1>Вход</h1>
-    <p>Войдите по email или login.</p>
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="card stack">
+    <div class="stack">
+      <p class="muted">Вход в аккаунт</p>
+      <h1 class="section-title">Вход</h1>
+      <p>Войдите по электронной почте или логину.</p>
+    </div>
+
     {% if notice %}
-      <p>{{ notice }}</p>
+      <div class="alert alert-info">{{ notice }}</div>
     {% endif %}
     {% if error %}
-      <p>{{ error }}</p>
+      <div class="alert alert-error">{{ error }}</div>
     {% endif %}
     {% if unverified %}
-      <p>
-        <a href="/resend-verification">Отправить письмо для подтверждения ещё раз</a>
-      </p>
+      <div class="alert alert-info">
+        <a class="button button-secondary" href="/resend-verification">Отправить письмо для подтверждения ещё раз</a>
+      </div>
     {% endif %}
-    <form method="post" action="/login">
-      <label>Email или login
-        <input type="text" name="email_or_login" value="{{ email_or_login or '' }}" autocomplete="username">
-      </label><br>
-      <label>Пароль
-        <input type="password" name="password" autocomplete="current-password">
-      </label><br>
-      <button type="submit">Войти</button>
+
+    <form class="form" method="post" action="/login">
+      <label class="form-row">
+        <span>Электронная почта или логин</span>
+        <input class="input" type="text" name="email_or_login" value="{{ email_or_login or '' }}" autocomplete="username">
+      </label>
+      <label class="form-row">
+        <span>Пароль</span>
+        <input class="input" type="password" name="password" autocomplete="current-password">
+      </label>
+      <button class="button button-primary" type="submit">Войти</button>
     </form>
-    <p>
-      <a href="/register">Регистрация</a>
-      <a href="/forgot-password">Забыли пароль?</a>
-      <a href="/resend-verification">Подтверждение email</a>
-      <a href="/">На главную</a>
-    </p>
-  </main>
-</body>
-</html>
+
+    <div class="actions">
+      <a class="button button-secondary" href="/register">Регистрация</a>
+      <a class="button button-secondary" href="/forgot-password">Забыли пароль?</a>
+      <a class="button button-secondary" href="/resend-verification">Подтверждение почты</a>
+      <a class="button button-secondary" href="/">На главную</a>
+    </div>
+  </section>
+{% endblock %}

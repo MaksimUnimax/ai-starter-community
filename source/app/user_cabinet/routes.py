@@ -5,18 +5,24 @@ from pathlib import Path
 from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
+from jinja2 import ChoiceLoader, FileSystemLoader
 
 from app.auth.service import get_user_by_session_token
 from app.core.config import get_settings
 from app.tariffs.service import list_active_tariffs_with_options
-from app.shared.utils import page_title
 
 router = APIRouter()
 templates = Jinja2Templates(directory=str(Path(__file__).resolve().parent / "templates"))
+templates.env.loader = ChoiceLoader(
+    [
+        templates.env.loader,
+        FileSystemLoader(str(Path(__file__).resolve().parents[1] / "shared" / "templates")),
+    ]
+)
 
 
 def _template(request: Request, template_name: str, **context) -> HTMLResponse:
-    payload = {"request": request, "title": context.pop("title", page_title("AI Starter Community"))}
+    payload = {"request": request, "title": context.pop("title", "Страница")}
     payload.update(context)
     return templates.TemplateResponse(request, template_name, payload)
 
