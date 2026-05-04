@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>{% if is_create %}Создание тарифа{% else %}Редактирование тарифа{% endif %}</h1>
+  {% if errors.form %}
+    <p>{{ errors.form }}</p>
+  {% endif %}
+  <form method="post">
+    <p>
+      <label>
+        Code
+        {% if is_create %}
+          <input type="text" name="code" value="{{ form_data.code }}">
+        {% else %}
+          <input type="text" name="code" value="{{ tariff.code }}" readonly>
+        {% endif %}
+      </label>
+      {% if errors.code %}
+        <span>{{ errors.code }}</span>
+      {% endif %}
+    </p>
+    <p>Код нельзя изменить после создания.</p>
+
+    <p>
+      <label>
+        Title
+        <input type="text" name="title" value="{{ form_data.title }}">
+      </label>
+      {% if errors.title %}
+        <span>{{ errors.title }}</span>
+      {% endif %}
+    </p>
+
+    <p>
+      <label>
+        Description
+        <textarea name="description">{{ form_data.description }}</textarea>
+      </label>
+      {% if errors.description %}
+        <span>{{ errors.description }}</span>
+      {% endif %}
+    </p>
+
+    <p>
+      <label>
+        Price, RUB
+        <input type="text" name="price_rub" value="{{ form_data.price_rub }}">
+      </label>
+      {% if errors.price_rub %}
+        <span>{{ errors.price_rub }}</span>
+      {% endif %}
+    </p>
+
+    <p>
+      <label>
+        Currency
+        <input type="text" name="currency" value="{{ form_data.currency }}">
+      </label>
+      {% if errors.currency %}
+        <span>{{ errors.currency }}</span>
+      {% endif %}
+    </p>
+
+    <p>
+      <label>
+        Status
+        <select name="status">
+          <option value="active" {% if form_data.status == "active" %}selected{% endif %}>active</option>
+          <option value="hidden" {% if form_data.status == "hidden" %}selected{% endif %}>hidden</option>
+          <option value="archived" {% if form_data.status == "archived" %}selected{% endif %}>archived</option>
+        </select>
+      </label>
+      {% if errors.status %}
+        <span>{{ errors.status }}</span>
+      {% endif %}
+    </p>
+
+    <p>
+      <label>
+        Sort order
+        <input type="number" name="sort_order" min="0" step="1" value="{{ form_data.sort_order }}">
+      </label>
+      {% if errors.sort_order %}
+        <span>{{ errors.sort_order }}</span>
+      {% endif %}
+    </p>
+
+    <button type="submit">{{ submit_label }}</button>
+  </form>
+
+  <p><a href="/admin/tariffs">Назад к списку</a></p>
+{% endblock %}

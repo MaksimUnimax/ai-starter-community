@@ -131,7 +131,7 @@ def test_admin_users_shows_safe_fields_and_hides_sensitive_data(client, test_set
     assert "email_outbox" not in body.lower()
 
 
-def test_admin_tariffs_shows_starter_tariff_and_is_read_only(client, test_settings):
+def test_admin_tariffs_shows_starter_tariff_and_admin_controls(client, test_settings):
     _make_user(client, test_settings, "admin@example.com", "adminuser", role="admin")
     seed_initial_catalog(settings=test_settings)
 
@@ -141,10 +141,11 @@ def test_admin_tariffs_shows_starter_tariff_and_is_read_only(client, test_settin
     assert STARTER_TARIFF_CODE in body
     assert "Стартовый доступ" in body
     assert "AI / GPT-инструмент" in body
-    assert "<form" not in body.lower()
-    assert "создать" not in body.lower()
-    assert "редактировать" not in body.lower()
-    assert "архивировать" not in body.lower()
+    assert "/admin/tariffs/new" in body
+    assert f"/admin/tariffs/{STARTER_TARIFF_CODE}/edit" in body
+    assert f"/admin/tariffs/{STARTER_TARIFF_CODE}/archive" in body
+    assert "/admin/paid-options/new" not in body
+    assert "/admin/payments" not in body
 
 
 def test_admin_paid_options_shows_catalog_and_null_price_is_safe(client, test_settings):

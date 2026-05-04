@@ -2,6 +2,7 @@
 
 {% block content %}
   <h1>Тарифы</h1>
+  <p><a href="/admin/tariffs/new">Создать тариф</a></p>
   <table>
     <thead>
       <tr>
@@ -15,6 +16,7 @@
         <th>Included options</th>
         <th>Created at</th>
         <th>Updated at</th>
+        <th>Actions</th>
       </tr>
     </thead>
     <tbody>
@@ -30,10 +32,16 @@
           <td>{{ tariff.included_options_summary }}</td>
           <td>{{ tariff.created_at }}</td>
           <td>{{ tariff.updated_at }}</td>
+          <td>
+            <a href="/admin/tariffs/{{ tariff.code }}/edit">Редактировать</a>
+            <form method="post" action="/admin/tariffs/{{ tariff.code }}/archive">
+              <button type="submit">Архивировать</button>
+            </form>
+          </td>
         </tr>
       {% else %}
         <tr>
-          <td colspan="10">Нет тарифов.</td>
+          <td colspan="11">Нет тарифов.</td>
         </tr>
       {% endfor %}
     </tbody>
