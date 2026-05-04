@@ -12,7 +12,17 @@ from fastapi.templating import Jinja2Templates
 
 from app.auth.service import get_user_by_session_token, list_users_for_admin
 from app.core.config import get_settings
-from app.paid_options.service import list_paid_options
+from app.paid_options.schemas import PaidOptionCreateInput, PaidOptionUpdateInput
+from app.paid_options.service import (
+    ConflictError as PaidOptionConflictError,
+    NotFoundError as PaidOptionNotFoundError,
+    ValidationError as PaidOptionValidationError,
+    archive_paid_option,
+    create_paid_option,
+    get_paid_option_by_code,
+    list_paid_options_for_admin,
+    update_paid_option,
+)
 from app.shared.utils import page_title
 from app.tariffs.schemas import TariffCreateInput, TariffUpdateInput
 from app.tariffs.service import (
@@ -131,6 +141,19 @@ def _parse_non_negative_int(value: str | None, field_name: str, default: int = 0
     return parsed, None
 
 
+def _parse_optional_non_negative_int(value: str | None, field_name: str) -> tuple[int | None, str | None]:
+    raw = (value or "").strip()
+    if not raw:
+        return None, None
+    try:
+        parsed = int(raw)
+    except ValueError:
+        return None, f"{field_name} must be an integer"
+    if parsed < 0:
+        return None, f"{field_name} must be greater than or equal to 0"
+    return parsed, None
+
+
 def _normalize_text(value: str | None) -> str:
     return (value or "").strip()
 
@@ -211,7 +234,7 @@ def _validate_tariff_form_input(
 
 def _paid_options_for_admin(settings):
     rows = []
-    for option in list_paid_options(include_hidden=True, include_archived=True, settings=settings):
+    for option in list_paid_options_for_admin(settings=settings):
         rows.append(
             {
                 "code": option.code,
@@ -230,6 +253,162 @@ def _paid_options_for_admin(settings):
             }
         )
     return rows
+
+
+def _empty_paid_option_form_data() -> dict[str, object]:
+    return {
+        "code": "",
+        "title": "",
+        "description": "",
+        "price_rub": "",
+        "currency": "RUB",
+        "default_duration_days": "",
+        "status": "active",
+        "is_renewable": True,
+        "sort_order": "0",
+    }
+
+
+def _paid_option_form_data_from_option(option) -> dict[str, object]:
+    return {
+        "code": option.code,
+        "title": option.title,
+        "description": option.description or "",
+        "price_rub": "" if option.price_amount_minor is None else _format_price_input(option.price_amount_minor),
+        "currency": option.currency,
+        "default_duration_days": "" if option.default_duration_days is None else str(option.default_duration_days),
+        "status": option.status,
+        "is_renewable": bool(option.is_renewable),
+        "sort_order": str(option.sort_order),
+    }
+
+
+def _paid_option_form_data_from_form(form) -> dict[str, object]:
+    return {
+        "code": _normalize_text(form.get("code")),
+        "title": _normalize_text(form.get("title")),
+        "description": _normalize_text(form.get("description")),
+        "price_rub": _normalize_text(form.get("price_rub")),
+        "currency": _normalize_text(form.get("currency")) or "RUB",
+        "default_duration_days": _normalize_text(form.get("default_duration_days")),
+        "status": _normalize_text(form.get("status")) or "active",
+        "is_renewable": _checkbox_is_true(form.get("is_renewable")),
+        "sort_order": _normalize_text(form.get("sort_order")) or "0",
+    }
+
+
+def _checkbox_is_true(value) -> bool:
+    if value is None:
+        return False
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, int):
+        return value != 0
+    raw = str(value).strip().lower()
+    return raw not in {"", "0", "false", "off", "no"}
+
+
+def _parse_optional_money_to_minor(value: str | None) -> tuple[int | None, str | None]:
+    raw = (value or "").strip()
+    if not raw:
+        return None, None
+    raw = raw.replace(",", ".")
+    try:
+        amount = Decimal(raw)
+    except InvalidOperation:
+        return None, "price must be a valid ruble amount"
+    if not amount.is_finite() or amount < 0:
+        return None, "price must be a non-negative amount"
+    minor = amount * Decimal(100)
+    if minor != minor.to_integral_value():
+        return None, "price must have at most 2 decimal places"
+    return int(minor), None
+
+
+def _paid_option_form_errors_from_service(exc: Exception) -> dict[str, str]:
+    message = str(exc)
+    lowered = message.lower()
+    if "code already exists" in lowered:
+        return {"code": message}
+    if "code is required" in lowered or lowered.startswith("code "):
+        return {"code": message}
+    if lowered.startswith("title "):
+        return {"title": message}
+    if lowered.startswith("description "):
+        return {"description": message}
+    if "price_amount_minor" in lowered:
+        return {"price_rub": message}
+    if lowered.startswith("currency "):
+        return {"currency": message}
+    if lowered.startswith("default_duration_days "):
+        return {"default_duration_days": message}
+    if lowered.startswith("status "):
+        return {"status": message}
+    if lowered.startswith("is_renewable "):
+        return {"is_renewable": message}
+    if lowered.startswith("sort_order "):
+        return {"sort_order": message}
+    return {"form": message}
+
+
+def _validate_paid_option_form_input(
+    *,
+    raw_code: str | None = None,
+    raw_title: str | None = None,
+    raw_description: str | None = None,
+    raw_price_rub: str | None = None,
+    raw_currency: str | None = None,
+    raw_default_duration_days: str | None = None,
+    raw_status: str | None = None,
+    raw_is_renewable=None,
+    raw_sort_order: str | None = None,
+    include_code: bool = True,
+) -> tuple[dict[str, object], dict[str, str]]:
+    errors: dict[str, str] = {}
+    code = _normalize_text(raw_code).lower()
+    title = _normalize_text(raw_title)
+    description = _normalize_text(raw_description) or None
+    price_minor, price_error = _parse_optional_money_to_minor(raw_price_rub)
+    currency = (_normalize_text(raw_currency) or "RUB").upper()
+    default_duration_days, duration_error = _parse_optional_non_negative_int(raw_default_duration_days, "default_duration_days")
+    status = (_normalize_text(raw_status) or "active").lower()
+    is_renewable = _checkbox_is_true(raw_is_renewable)
+    sort_order, sort_error = _parse_non_negative_int(raw_sort_order, "sort_order")
+
+    if include_code:
+        if not code:
+            errors["code"] = "code is required"
+        elif not TARIFF_CODE_RE.fullmatch(code):
+            errors["code"] = "code must be 3-64 chars of lowercase letters, digits, underscore or hyphen"
+    if not title:
+        errors["title"] = "title is required"
+    elif len(title) > 200:
+        errors["title"] = "title must be at most 200 characters"
+    if description is not None and len(description) > 4000:
+        errors["description"] = "description must be at most 4000 characters"
+    if price_error:
+        errors["price_rub"] = price_error
+    if not re.fullmatch(r"^[A-Z]{3}$", currency):
+        errors["currency"] = "currency must be a 3-letter uppercase code"
+    if duration_error:
+        errors["default_duration_days"] = duration_error
+    if status not in ALLOWED_TARIFF_STATUSES:
+        errors["status"] = "status must be active, hidden, or archived"
+    if sort_error:
+        errors["sort_order"] = sort_error
+
+    payload = {
+        "code": code,
+        "title": title,
+        "description": description,
+        "price_amount_minor": price_minor,
+        "currency": currency,
+        "default_duration_days": default_duration_days,
+        "status": status,
+        "is_renewable": is_renewable,
+        "sort_order": sort_order if sort_order is not None else 0,
+    }
+    return payload, errors
 
 
 def _tariffs_for_admin(settings):
@@ -482,3 +661,201 @@ def admin_paid_options(request: Request):
         title=page_title("Платные опции"),
         paid_options=_paid_options_for_admin(settings=settings),
     )
+
+
+@router.api_route("/admin/paid-options/new", methods=["GET", "HEAD"], response_class=HTMLResponse)
+def admin_paid_options_new(request: Request):
+    settings = get_settings()
+    _, response = _admin_user_or_redirect(request, settings=settings)
+    if response is not None:
+        return response
+    return _template(
+        request,
+        "paid_option_form.html",
+        title=page_title("Создать платную опцию"),
+        mode="create",
+        is_create=True,
+        option=None,
+        form_data=_empty_paid_option_form_data(),
+        errors={},
+        submit_label="Создать платную опцию",
+    )
+
+
+@router.post("/admin/paid-options/new", response_class=HTMLResponse)
+async def admin_paid_options_new_submit(request: Request):
+    settings = get_settings()
+    _, response = _admin_user_or_redirect(request, settings=settings)
+    if response is not None:
+        return response
+
+    form = await request.form()
+    payload, errors = _validate_paid_option_form_input(
+        raw_code=form.get("code"),
+        raw_title=form.get("title"),
+        raw_description=form.get("description"),
+        raw_price_rub=form.get("price_rub"),
+        raw_currency=form.get("currency"),
+        raw_default_duration_days=form.get("default_duration_days"),
+        raw_status=form.get("status"),
+        raw_is_renewable=form.get("is_renewable"),
+        raw_sort_order=form.get("sort_order"),
+        include_code=True,
+    )
+    if errors:
+        return _template(
+            request,
+            "paid_option_form.html",
+            status_code=400,
+            title=page_title("Создать платную опцию"),
+            mode="create",
+            is_create=True,
+            option=None,
+            form_data=_paid_option_form_data_from_form(form),
+            errors=errors,
+            submit_label="Создать платную опцию",
+        )
+
+    try:
+        create_paid_option(data=PaidOptionCreateInput(**payload), settings=settings)
+    except PaidOptionConflictError as exc:
+        errors = _paid_option_form_errors_from_service(exc)
+        return _template(
+            request,
+            "paid_option_form.html",
+            status_code=400,
+            title=page_title("Создать платную опцию"),
+            mode="create",
+            is_create=True,
+            option=None,
+            form_data=_paid_option_form_data_from_form(form),
+            errors=errors,
+            submit_label="Создать платную опцию",
+        )
+    except PaidOptionValidationError as exc:
+        errors = _paid_option_form_errors_from_service(exc)
+        return _template(
+            request,
+            "paid_option_form.html",
+            status_code=400,
+            title=page_title("Создать платную опцию"),
+            mode="create",
+            is_create=True,
+            option=None,
+            form_data=_paid_option_form_data_from_form(form),
+            errors=errors,
+            submit_label="Создать платную опцию",
+        )
+
+    return RedirectResponse(url="/admin/paid-options", status_code=303)
+
+
+@router.api_route("/admin/paid-options/{code}/edit", methods=["GET", "HEAD"], response_class=HTMLResponse)
+def admin_paid_options_edit(request: Request, code: str):
+    settings = get_settings()
+    _, response = _admin_user_or_redirect(request, settings=settings)
+    if response is not None:
+        return response
+
+    option = get_paid_option_by_code(code, settings=settings)
+    if option is None:
+        raise HTTPException(status_code=404, detail="Not Found")
+    return _template(
+        request,
+        "paid_option_form.html",
+        title=page_title("Редактировать платную опцию"),
+        mode="edit",
+        is_create=False,
+        option=option,
+        form_data=_paid_option_form_data_from_option(option),
+        errors={},
+        submit_label="Сохранить изменения",
+    )
+
+
+@router.post("/admin/paid-options/{code}/edit", response_class=HTMLResponse)
+async def admin_paid_options_edit_submit(request: Request, code: str):
+    settings = get_settings()
+    _, response = _admin_user_or_redirect(request, settings=settings)
+    if response is not None:
+        return response
+
+    option = get_paid_option_by_code(code, settings=settings)
+    if option is None:
+        raise HTTPException(status_code=404, detail="Not Found")
+
+    form = await request.form()
+    payload, errors = _validate_paid_option_form_input(
+        raw_title=form.get("title"),
+        raw_description=form.get("description"),
+        raw_price_rub=form.get("price_rub"),
+        raw_currency=form.get("currency"),
+        raw_default_duration_days=form.get("default_duration_days"),
+        raw_status=form.get("status"),
+        raw_is_renewable=form.get("is_renewable"),
+        raw_sort_order=form.get("sort_order"),
+        include_code=False,
+    )
+    posted_code = _normalize_text(form.get("code")).lower()
+    if posted_code and posted_code != option.code:
+        errors["code"] = "code cannot be changed after creation"
+    if errors:
+        return _template(
+            request,
+            "paid_option_form.html",
+            status_code=400,
+            title=page_title("Редактировать платную опцию"),
+            mode="edit",
+            is_create=False,
+            option=option,
+            form_data={**_paid_option_form_data_from_option(option), **_paid_option_form_data_from_form(form)},
+            errors=errors,
+            submit_label="Сохранить изменения",
+        )
+
+    try:
+        update_paid_option(
+            code=option.code,
+            data=PaidOptionUpdateInput(
+                title=payload["title"],
+                description=payload["description"],
+                price_amount_minor=payload["price_amount_minor"],
+                currency=payload["currency"],
+                default_duration_days=payload["default_duration_days"],
+                status=payload["status"],
+                is_renewable=payload["is_renewable"],
+                sort_order=payload["sort_order"],
+            ),
+            settings=settings,
+        )
+    except PaidOptionNotFoundError:
+        raise HTTPException(status_code=404, detail="Not Found")
+    except (PaidOptionConflictError, PaidOptionValidationError) as exc:
+        errors = _paid_option_form_errors_from_service(exc)
+        return _template(
+            request,
+            "paid_option_form.html",
+            status_code=400,
+            title=page_title("Редактировать платную опцию"),
+            mode="edit",
+            is_create=False,
+            option=option,
+            form_data={**_paid_option_form_data_from_option(option), **_paid_option_form_data_from_form(form)},
+            errors=errors,
+            submit_label="Сохранить изменения",
+        )
+
+    return RedirectResponse(url="/admin/paid-options", status_code=303)
+
+
+@router.post("/admin/paid-options/{code}/archive")
+def admin_paid_options_archive(request: Request, code: str):
+    settings = get_settings()
+    _, response = _admin_user_or_redirect(request, settings=settings)
+    if response is not None:
+        return response
+    try:
+        archive_paid_option(code, settings=settings)
+    except PaidOptionNotFoundError:
+        raise HTTPException(status_code=404, detail="Not Found")
+    return RedirectResponse(url="/admin/paid-options", status_code=303)

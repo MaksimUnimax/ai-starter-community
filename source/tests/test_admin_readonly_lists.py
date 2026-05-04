@@ -148,7 +148,7 @@ def test_admin_tariffs_shows_starter_tariff_and_admin_controls(client, test_sett
     assert "/admin/payments" not in body
 
 
-def test_admin_paid_options_shows_catalog_and_null_price_is_safe(client, test_settings):
+def test_admin_paid_options_shows_catalog_and_admin_controls(client, test_settings):
     _make_user(client, test_settings, "admin@example.com", "adminuser", role="admin")
     seed_initial_catalog(settings=test_settings)
 
@@ -159,10 +159,11 @@ def test_admin_paid_options_shows_catalog_and_null_price_is_safe(client, test_se
     assert "Сервер" in body
     assert "VPN" in body
     assert "отдельная цена не задана" in body
-    assert "<form" not in body.lower()
-    assert "создать" not in body.lower()
-    assert "редактировать" not in body.lower()
-    assert "архивировать" not in body.lower()
+    assert "/admin/paid-options/new" in body
+    assert "/admin/paid-options/ai_gpt_tool/edit" in body
+    assert "/admin/paid-options/ai_gpt_tool/archive" in body
+    assert "/admin/tariffs/" not in body
+    assert "/admin/payments" not in body
 
 
 def test_admin_dashboard_links_to_read_only_list_pages(client, test_settings):
