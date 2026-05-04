@@ -8,6 +8,48 @@
       <p class="form-help">Показаны только безопасные поля учётных записей.</p>
     </div>
 
+    <form class="stack" method="get" action="/admin/users">
+      <div class="card-grid tight">
+        <label class="form-row">
+          <span>Дата регистрации с</span>
+          <input class="input" type="date" name="created_from" value="{{ created_from_value or '' }}">
+        </label>
+        <label class="form-row">
+          <span>Дата регистрации по</span>
+          <input class="input" type="date" name="created_to" value="{{ created_to_value or '' }}">
+        </label>
+        <label class="form-row">
+          <span>Роль</span>
+          <select class="select" name="role">
+            <option value="all" {% if filter_role == "all" %}selected{% endif %}>Все роли</option>
+            <option value="user" {% if filter_role == "user" %}selected{% endif %}>Пользователь</option>
+            <option value="moderator" {% if filter_role == "moderator" %}selected{% endif %}>Модератор</option>
+            <option value="admin" {% if filter_role == "admin" %}selected{% endif %}>Администратор</option>
+          </select>
+        </label>
+        <label class="form-row">
+          <span>Статус доступа</span>
+          <select class="select" name="access_status">
+            <option value="all" {% if filter_access_status == "all" %}selected{% endif %}>Все статусы</option>
+            <option value="not_activated" {% if filter_access_status == "not_activated" %}selected{% endif %}>Не активирован</option>
+            <option value="activated" {% if filter_access_status == "activated" %}selected{% endif %}>Активирован</option>
+          </select>
+        </label>
+        <label class="form-row">
+          <span>Сортировка по дате регистрации</span>
+          <select class="select" name="created_sort">
+            <option value="desc" {% if created_sort == "desc" %}selected{% endif %}>Сначала новые</option>
+            <option value="asc" {% if created_sort == "asc" %}selected{% endif %}>Сначала старые</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="actions">
+        <button class="button button-primary" type="submit">Применить фильтр</button>
+        <a class="button button-secondary" href="/admin/users">Сбросить</a>
+      </div>
+    </form>
+
     <table class="table">
       <thead>
         <tr>
@@ -34,7 +76,7 @@
               {{ user.role_label }}
             </td>
             <td>
-              <form class="compact-form" method="post" action="/admin/users/{{ user.id }}/role">
+              <form class="compact-form" method="post" action="/admin/users/{{ user.id }}/role{% if query_string %}?{{ query_string }}{% endif %}">
                 <label class="form-row">
                   <span class="muted">Роль</span>
                   <select class="select" name="role">

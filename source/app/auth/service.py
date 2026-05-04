@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-from datetime import timedelta
+from datetime import date, datetime, time, timedelta, timezone
 from collections.abc import Mapping
 
 from app.auth.schemas import UserPublic
@@ -29,6 +29,9 @@ ROLE_USER = "user"
 ROLE_MODERATOR = "moderator"
 ROLE_ADMIN = "admin"
 ALLOWED_ROLES = (ROLE_USER, ROLE_MODERATOR, ROLE_ADMIN)
+ALLOWED_ADMIN_USER_ACCESS_STATUSES = ("not_activated", "activated")
+ALLOWED_ADMIN_USER_SORT_ORDERS = ("desc", "asc")
+ADMIN_USER_DEFAULT_SORT = "desc"
 ROLE_LABELS_RU = {
     ROLE_USER: "пользователь",
     ROLE_MODERATOR: "модератор",
@@ -232,8 +235,45 @@ def _admin_user_from_row(row) -> dict[str, object]:
     }
 
 
-def list_users_for_admin(settings: Settings | None = None) -> list[dict[str, object]]:
+def _admin_user_created_bound(value: date, *, upper: bool = False) -> str:
+    target_date = value + timedelta(days=1) if upper else value
+    return datetime.combine(target_date, time.min, tzinfo=timezone.utc).isoformat()
+
+
+def list_users_for_admin(
+    settings: Settings | None = None,
+    *,
+    role: str | None = None,
+    access_status: str | None = None,
+    created_from: date | None = None,
+    created_to: date | None = None,
+    created_sort: str = ADMIN_USER_DEFAULT_SORT,
+) -> list[dict[str, object]]:
     """Return a safe summary of users for admin read-only lists."""
+    if role is not None and role not in ALLOWED_ROLES:
+        raise RoleError("unsupported role")
+    if access_status is not None and access_status not in ALLOWED_ADMIN_USER_ACCESS_STATUSES:
+        raise ValidationError("unsupported access status")
+    if created_sort not in ALLOWED_ADMIN_USER_SORT_ORDERS:
+        raise ValidationError("unsupported created sort")
+
+    where_clauses: list[str] = []
+    params: list[object] = []
+    if role is not None:
+        where_clauses.append("role = ?")
+        params.append(role)
+    if access_status is not None:
+        where_clauses.append("access_status = ?")
+        params.append(access_status)
+    if created_from is not None:
+        where_clauses.append("julianday(created_at) >= julianday(?)")
+        params.append(_admin_user_created_bound(created_from))
+    if created_to is not None:
+        where_clauses.append("julianday(created_at) < julianday(?)")
+        params.append(_admin_user_created_bound(created_to, upper=True))
+
+    where_sql = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
+    sort_sql = "DESC" if created_sort == "desc" else "ASC"
     with _connection(settings) as connection:
         rows = connection.execute(
             """
@@ -242,8 +282,10 @@ def list_users_for_admin(settings: Settings | None = None) -> list[dict[str, obj
                 email_verified_at, materials_access_granted_at,
                 access_status, created_at, updated_at
             FROM users
-            ORDER BY id ASC
-            """
+            {where_sql}
+            ORDER BY julianday(created_at) {sort_sql}, id {sort_sql}
+            """.format(where_sql=where_sql, sort_sql=sort_sql),
+            params,
         ).fetchall()
         return [_admin_user_from_row(row) for row in rows]
 

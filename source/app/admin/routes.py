@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from datetime import date
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
@@ -11,6 +12,8 @@ from fastapi.responses import HTMLResponse, PlainTextResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
 from app.auth.service import (
+    ADMIN_USER_DEFAULT_SORT,
+    ALLOWED_ADMIN_USER_ACCESS_STATUSES,
     ALLOWED_ROLES,
     ROLE_LABELS_RU,
     NotFoundError as AuthNotFoundError,
@@ -54,6 +57,75 @@ templates = Jinja2Templates(directory=str(Path(__file__).resolve().parent / "tem
 
 TARIFF_CODE_RE = re.compile(r"^[a-z0-9_-]{3,64}$")
 ALLOWED_TARIFF_STATUSES = {"active", "hidden", "archived"}
+ADMIN_USER_SORT_OPTIONS = {"desc": "Сначала новые", "asc": "Сначала старые"}
+
+
+def _admin_user_filter_error(message: str) -> PlainTextResponse:
+    lowered = message.lower()
+    if "role" in lowered and "unsupported" in lowered:
+        text = "Выберите допустимую роль."
+    elif "access status" in lowered or "status" in lowered:
+        text = "Выберите допустимый статус доступа."
+    elif "created sort" in lowered:
+        text = "Выберите допустимый порядок сортировки."
+    elif "date" in lowered:
+        text = "Укажите корректную дату регистрации."
+    else:
+        text = "Не удалось применить фильтр."
+    return PlainTextResponse(text, status_code=400)
+
+
+def _parse_admin_user_date(value: str | None) -> date | None:
+    raw = (value or "").strip()
+    if not raw:
+        return None
+    return date.fromisoformat(raw)
+
+
+def _parse_admin_user_filters(request: Request) -> tuple[dict[str, object], str | None]:
+    query = request.query_params
+    raw_role = (query.get("role") or "all").strip().lower()
+    if raw_role in {"", "all"}:
+        role = None
+        role_value = "all"
+    elif raw_role in ALLOWED_ROLES:
+        role = raw_role
+        role_value = raw_role
+    else:
+        return {}, "unsupported role"
+
+    raw_access_status = (query.get("access_status") or "all").strip().lower()
+    if raw_access_status in {"", "all"}:
+        access_status = None
+        access_status_value = "all"
+    elif raw_access_status in ALLOWED_ADMIN_USER_ACCESS_STATUSES:
+        access_status = raw_access_status
+        access_status_value = raw_access_status
+    else:
+        return {}, "unsupported access status"
+
+    raw_created_sort = (query.get("created_sort") or ADMIN_USER_DEFAULT_SORT).strip().lower() or ADMIN_USER_DEFAULT_SORT
+    if raw_created_sort not in ADMIN_USER_SORT_OPTIONS:
+        return {}, "unsupported created sort"
+
+    try:
+        created_from = _parse_admin_user_date(query.get("created_from"))
+        created_to = _parse_admin_user_date(query.get("created_to"))
+    except ValueError:
+        return {}, "invalid date"
+
+    return {
+        "role": role,
+        "access_status": access_status,
+        "created_from": created_from,
+        "created_to": created_to,
+        "created_sort": raw_created_sort,
+        "filter_role": role_value,
+        "filter_access_status": access_status_value,
+        "created_from_value": (query.get("created_from") or "").strip(),
+        "created_to_value": (query.get("created_to") or "").strip(),
+        "query_string": request.url.query,
+    }, None
 
 
 def _status_label(value: str) -> str:
@@ -648,13 +720,29 @@ def admin_users(request: Request):
     _, response = _admin_user_or_redirect(request, settings=settings)
     if response is not None:
         return response
+    filters, error = _parse_admin_user_filters(request)
+    if error is not None:
+        return _admin_user_filter_error(error)
     return _template(
         request,
         "users.html",
         title=page_title("Пользователи"),
-        users=list_users_for_admin(settings=settings),
+        users=list_users_for_admin(
+            settings=settings,
+            role=filters["role"],
+            access_status=filters["access_status"],
+            created_from=filters["created_from"],
+            created_to=filters["created_to"],
+            created_sort=filters["created_sort"],
+        ),
         allowed_roles=ALLOWED_ROLES,
         role_labels=ROLE_LABELS_RU,
+        filter_role=filters["filter_role"],
+        filter_access_status=filters["filter_access_status"],
+        created_from_value=filters["created_from_value"],
+        created_to_value=filters["created_to_value"],
+        created_sort=filters["created_sort"],
+        query_string=filters["query_string"],
     )
 
 
@@ -672,7 +760,10 @@ async def admin_user_role_update(request: Request, user_id: int):
         raise HTTPException(status_code=404, detail="user not found")
     except RoleError as exc:
         return _role_error_response(str(exc))
-    return RedirectResponse(url="/admin/users", status_code=303)
+    redirect_url = "/admin/users"
+    if request.url.query:
+        redirect_url = f"{redirect_url}?{request.url.query}"
+    return RedirectResponse(url=redirect_url, status_code=303)
 
 
 @router.api_route("/admin/tariffs", methods=["GET", "HEAD"], response_class=HTMLResponse)
