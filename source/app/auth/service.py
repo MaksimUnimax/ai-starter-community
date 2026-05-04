@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 from datetime import timedelta
+from collections.abc import Mapping
 
 from app.auth.schemas import UserPublic
 from app.core.config import Settings, get_settings
@@ -163,6 +164,17 @@ def _fetch_user_by_id(user_id: int, settings: Settings | None = None) -> UserPub
     with _connection(settings) as connection:
         row = connection.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
         return _public_user_from_row(row) if row else None
+
+
+def get_current_user_from_cookies(
+    cookies: Mapping[str, str],
+    settings: Settings | None = None,
+) -> UserPublic | None:
+    resolved = _settings(settings)
+    session_token = cookies.get(resolved.session_cookie_name)
+    if not session_token:
+        return None
+    return get_user_by_session_token(session_token, settings=resolved)
 
 
 def _admin_user_from_row(row) -> dict[str, object]:

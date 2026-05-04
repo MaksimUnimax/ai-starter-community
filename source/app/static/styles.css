@@ -69,6 +69,10 @@ a:hover {
   box-shadow: var(--shadow);
 }
 
+.nav-form {
+  margin: 0;
+}
+
 .nav-link {
   display: inline-flex;
   align-items: center;
@@ -81,6 +85,20 @@ a:hover {
 }
 
 .nav-link:hover {
+  background: var(--secondary);
+  color: var(--text);
+}
+
+button.nav-button {
+  min-height: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+}
+
+button.nav-button:hover {
   background: var(--secondary);
   color: var(--text);
 }

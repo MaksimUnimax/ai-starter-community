@@ -224,10 +224,12 @@ def test_admin_dashboard_links_to_read_only_list_pages(client, test_settings):
     assert "Пользователи" in body
     assert "Тарифы" in body
     assert "Платные опции" in body
-    assert "В кабинет" in body
+    assert "Работа с ИИ" in body
+    assert "Личный кабинет" in body
+    assert "Выйти" in body
     assert "На главную" in body
     assert '/admin/users' in body
     assert '/admin/tariffs' in body
     assert '/admin/paid-options' in body
-    assert 'Материалы' in body
+    assert '/materials' in body
     assert 'Платежи' in body

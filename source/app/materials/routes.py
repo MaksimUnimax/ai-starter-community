@@ -9,7 +9,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from jinja2 import ChoiceLoader, FileSystemLoader
 
-from app.auth.service import get_user_by_session_token
+from app.auth.service import get_current_user_from_cookies
 from app.core.config import get_settings
 from app.materials.service import user_has_materials_access
 
@@ -24,7 +24,11 @@ templates.env.loader = ChoiceLoader(
 
 
 def _template(request: Request, template_name: str, **context) -> HTMLResponse:
-    payload = {"request": request, "title": context.pop("title", "Материалы")}
+    payload = {
+        "request": request,
+        "title": context.pop("title", "Работа с ИИ"),
+        "current_user": get_current_user_from_cookies(request.cookies, settings=get_settings()),
+    }
     payload.update(context)
     return templates.TemplateResponse(request, template_name, payload)
 
@@ -32,8 +36,7 @@ def _template(request: Request, template_name: str, **context) -> HTMLResponse:
 @router.get("/materials", response_class=HTMLResponse)
 def materials_page(request: Request):
     settings = get_settings()
-    session_token = request.cookies.get(settings.session_cookie_name)
-    user = get_user_by_session_token(session_token, settings=settings)
+    user = get_current_user_from_cookies(request.cookies, settings=settings)
     if user is None:
         return RedirectResponse(url="/login", status_code=303)
 
@@ -41,7 +44,7 @@ def materials_page(request: Request):
     return _template(
         request,
         "materials.html",
-        title="Материалы",
+        title="Работа с ИИ",
         user_email=user.email,
         user_login=user.login,
         has_materials_access=has_access,
@@ -51,8 +54,7 @@ def materials_page(request: Request):
 @router.head("/materials")
 def materials_head(request: Request):
     settings = get_settings()
-    session_token = request.cookies.get(settings.session_cookie_name)
-    user = get_user_by_session_token(session_token, settings=settings)
+    user = get_current_user_from_cookies(request.cookies, settings=settings)
     if user is None:
         return RedirectResponse(url="/login", status_code=303)
     return materials_page(request)

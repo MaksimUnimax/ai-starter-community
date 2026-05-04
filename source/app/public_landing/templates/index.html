@@ -6,8 +6,15 @@
     <h1 class="section-title">Главная</h1>
     <p>Начните делать программы без знания кода.</p>
     <div class="actions">
-      <a class="button button-primary" href="/register">Регистрация</a>
-      <a class="button button-secondary" href="/login">Вход</a>
+      {% if current_user %}
+        <a class="button button-primary" href="/materials">Работа с ИИ</a>
+        <a class="button button-secondary" href="/cabinet">Личный кабинет</a>
+        {% if current_user.role == "admin" %}
+          <a class="button button-secondary" href="/admin">Админ-панель</a>
+        {% endif %}
+      {% else %}
+        <a class="button button-primary" href="/login">Вход / регистрация</a>
+      {% endif %}
     </div>
   </section>
 {% endblock %}

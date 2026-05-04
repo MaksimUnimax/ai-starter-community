@@ -64,10 +64,10 @@ def test_materials_shows_locked_state_without_access(client, test_settings):
     assert response.status_code == 200
     assert "/static/styles.css" in response.text
     assert "Главная" in response.text
-    assert "Кабинет" in response.text
-    assert "Материалы" in response.text
-    assert "Материалы будут доступны после оплаты" in response.text
-    assert "После первой оплаты доступ к материалам останется навсегда." in response.text
+    assert "Личный кабинет" in response.text
+    assert "Работа с ИИ" in response.text
+    assert "Раздел «Работа с ИИ» будет доступен после оплаты." in response.text
+    assert "После первой оплаты доступ к разделу останется навсегда." in response.text
     assert "Быстрый старт" not in response.text
     assert "/admin" not in response.text
     assert "Payment" not in response.text
@@ -78,7 +78,7 @@ def test_materials_shows_placeholder_sections_when_access_granted(client, test_s
     _prepare_verified_user(client, test_settings, "materials-open@example.com", "materialsopen", grant_access=True)
     response = client.get("/materials")
     assert response.status_code == 200
-    assert "Материалы будут доступны после оплаты" not in response.text
+    assert "Раздел «Работа с ИИ» будет доступен после оплаты." not in response.text
     assert "Быстрый старт" in response.text
     assert "Как работать с AI-агентом" in response.text
     assert "Команды для копирования" in response.text
@@ -87,8 +87,8 @@ def test_materials_shows_placeholder_sections_when_access_granted(client, test_s
     assert "Ссылки на чаты" in response.text
     assert "/static/styles.css" in response.text
     assert "Главная" in response.text
-    assert "Кабинет" in response.text
-    assert "Материалы" in response.text
+    assert "Личный кабинет" in response.text
+    assert "Работа с ИИ" in response.text
     assert "/admin" not in response.text
     assert "Payment" not in response.text
     assert "Content" not in response.text
@@ -99,9 +99,9 @@ def test_cabinet_contains_materials_link_and_locked_hint(client, test_settings):
     response = client.get("/cabinet")
     assert response.status_code == 200
     assert "/materials" in response.text
-    assert "Перейти к материалам" in response.text
+    assert "Перейти к разделу Работа с ИИ" in response.text
     assert "Доступ к материалам: не активирован" in response.text
-    assert "Материалы будут доступны после оплаты" in response.text
+    assert "Раздел «Работа с ИИ» будет доступен после оплаты." in response.text
 
 
 def test_materials_redirects_unauthenticated_user_is_unchanged(client):

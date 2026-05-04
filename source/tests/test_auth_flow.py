@@ -472,7 +472,7 @@ def test_cabinet_shows_logout_button_and_access_text(client, test_settings):
     assert "Выйти" in cabinet_response.text
     assert "/static/styles.css" in cabinet_response.text
     assert "Главная" in cabinet_response.text
-    assert "Материалы" in cabinet_response.text
+    assert "Работа с ИИ" in cabinet_response.text
 
 
 def test_password_hash_is_not_plaintext_and_session_revocation(test_settings):

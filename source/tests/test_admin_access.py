@@ -74,11 +74,14 @@ def test_admin_user_can_open_admin_dashboard(client, test_settings):
     assert "Пользователи" in response.text
     assert "Тарифы" in response.text
     assert "Платные опции" in response.text
-    assert "В кабинет" in response.text
+    assert "Работа с ИИ" in response.text
+    assert "Личный кабинет" in response.text
+    assert "Выйти" in response.text
     assert "На главную" in response.text
     assert '/admin/users' in response.text
     assert '/admin/tariffs' in response.text
     assert '/admin/paid-options' in response.text
+    assert '/materials' in response.text
     assert "CRUD" not in response.text
     assert "password_hash" not in response.text
     assert "token_hash" not in response.text

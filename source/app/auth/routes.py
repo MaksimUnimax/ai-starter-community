@@ -21,6 +21,7 @@ from app.auth.service import (
     reset_password,
     revoke_session,
     resend_verification_request,
+    get_current_user_from_cookies,
     verify_email,
 )
 from app.core.config import get_settings
@@ -35,7 +36,11 @@ templates.env.loader = ChoiceLoader(
 
 
 def _template(request: Request, template_name: str, **context) -> HTMLResponse:
-    payload = {"request": request, "title": context.pop("title", "Страница")}
+    payload = {
+        "request": request,
+        "title": context.pop("title", "Страница"),
+        "current_user": get_current_user_from_cookies(request.cookies),
+    }
     payload.update(context)
     return templates.TemplateResponse(request, template_name, payload)
 
@@ -62,6 +67,11 @@ def register_page(request: Request) -> HTMLResponse:
         email="",
         login="",
     )
+
+
+@router.head("/register")
+def register_head(request: Request) -> HTMLResponse:
+    return register_page(request)
 
 
 @router.post("/register", response_class=HTMLResponse)

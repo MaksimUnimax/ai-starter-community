@@ -3,14 +3,14 @@
 {% block content %}
   <section class="card stack">
     <div class="stack">
-      <p class="muted">Раздел материалов</p>
-      <h1 class="section-title">Материалы</h1>
+      <p class="muted">Раздел «Работа с ИИ»</p>
+      <h1 class="section-title">Работа с ИИ</h1>
       {% if has_materials_access %}
         <p>Доступ открыт. Это пока заглушка структуры будущего раздела.</p>
       {% else %}
         <div class="alert alert-info">
-          <p>Материалы будут доступны после оплаты.</p>
-          <p class="muted">После первой оплаты доступ к материалам останется навсегда.</p>
+          <p>Раздел «Работа с ИИ» будет доступен после оплаты.</p>
+          <p class="muted">После первой оплаты доступ к разделу останется навсегда.</p>
         </div>
       {% endif %}
     </div>
@@ -44,13 +44,13 @@
       </div>
     {% else %}
       <div class="actions">
-        <a class="button button-primary" href="/cabinet">Вернуться в кабинет</a>
+        <a class="button button-primary" href="/cabinet">Вернуться в личный кабинет</a>
       </div>
     {% endif %}
 
     <div class="actions">
       <a class="button button-secondary" href="/">На главную</a>
-      <a class="button button-secondary" href="/cabinet">В кабинет</a>
+      <a class="button button-secondary" href="/cabinet">Личный кабинет</a>
     </div>
   </section>
 {% endblock %}

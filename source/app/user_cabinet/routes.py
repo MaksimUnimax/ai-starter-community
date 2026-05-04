@@ -7,7 +7,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from jinja2 import ChoiceLoader, FileSystemLoader
 
-from app.auth.service import get_user_by_session_token
+from app.auth.service import get_current_user_from_cookies
 from app.core.config import get_settings
 from app.tariffs.service import list_active_tariffs_with_options
 
@@ -22,7 +22,11 @@ templates.env.loader = ChoiceLoader(
 
 
 def _template(request: Request, template_name: str, **context) -> HTMLResponse:
-    payload = {"request": request, "title": context.pop("title", "Страница")}
+    payload = {
+        "request": request,
+        "title": context.pop("title", "Страница"),
+        "current_user": get_current_user_from_cookies(request.cookies, settings=get_settings()),
+    }
     payload.update(context)
     return templates.TemplateResponse(request, template_name, payload)
 
@@ -30,20 +34,23 @@ def _template(request: Request, template_name: str, **context) -> HTMLResponse:
 @router.get("/cabinet", response_class=HTMLResponse)
 def cabinet_page(request: Request):
     settings = get_settings()
-    session_token = request.cookies.get(settings.session_cookie_name)
-    user = get_user_by_session_token(session_token, settings=settings)
+    user = get_current_user_from_cookies(request.cookies, settings=settings)
     if user is None:
         return RedirectResponse(url="/login", status_code=303)
 
     materials_access_active = user.materials_access_granted_at is not None
     materials_access_label = "активирован" if materials_access_active else "не активирован"
-    materials_access_hint = "Материалы будут доступны после оплаты." if not materials_access_active else "Материалы открыты и доступны в разделе ниже."
+    materials_access_hint = (
+        "Раздел «Работа с ИИ» будет доступен после оплаты."
+        if not materials_access_active
+        else "Раздел «Работа с ИИ» открыт и доступен ниже."
+    )
     account_status_label = "активен" if user.is_active else "неактивен"
     tariffs = list_active_tariffs_with_options(settings=settings)
     return _template(
         request,
         "cabinet.html",
-        title="Кабинет",
+        title="Личный кабинет",
         user_email=user.email,
         user_login=user.login,
         account_status_label=account_status_label,
