@@ -1,4 +1,4 @@
-"""Authentication placeholder routes."""
+"""Authentication routes for registration, verification, login, logout, and reset."""
 
 from pathlib import Path
 
@@ -6,42 +6,275 @@ from fastapi import APIRouter, Form, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
+from app.auth.service import (
+    AuthError,
+    ConflictError,
+    NotFoundError,
+    NotVerifiedError,
+    UnauthorizedError,
+    ValidationError,
+    authenticate_user,
+    create_password_reset_request,
+    create_session,
+    register_user,
+    reset_password,
+    revoke_session,
+    verify_email,
+)
+from app.core.config import get_settings
 from app.shared.utils import page_title
 
 router = APIRouter()
 templates = Jinja2Templates(directory=str(Path(__file__).resolve().parent / "templates"))
 
 
-@router.get("/login", response_class=HTMLResponse)
-def login_page(request: Request) -> HTMLResponse:
-    return templates.TemplateResponse(
-        request,
-        "login.html",
-        {"request": request, "title": page_title("Вход")},
-    )
+def _template(request: Request, template_name: str, **context) -> HTMLResponse:
+    payload = {"request": request, "title": context.pop("title", page_title("AI Starter Community"))}
+    payload.update(context)
+    return templates.TemplateResponse(request, template_name, payload)
+
+
+def _login_notice(request: Request) -> str | None:
+    query = request.query_params
+    if query.get("registered"):
+        return "Проверьте почту и подтвердите email по ссылке."
+    if query.get("verified"):
+        return "Email подтверждён. Теперь можно войти."
+    if query.get("reset"):
+        return "Пароль изменён. Войдите с новым паролем."
+    return None
 
 
 @router.get("/register", response_class=HTMLResponse)
 def register_page(request: Request) -> HTMLResponse:
-    return templates.TemplateResponse(
+    return _template(
         request,
         "register.html",
-        {"request": request, "title": page_title("Регистрация")},
+        title=page_title("Регистрация"),
+        notice=request.query_params.get("notice"),
+        error=request.query_params.get("error"),
+        email="",
+        login="",
+    )
+
+
+@router.post("/register", response_class=HTMLResponse)
+def register_submit(
+    request: Request,
+    email: str = Form(default=""),
+    login: str = Form(default=""),
+    password: str = Form(default=""),
+    repeat_password: str = Form(default=""),
+) -> HTMLResponse:
+    try:
+        register_user(email=email, login=login, password=password, repeat_password=repeat_password)
+    except (ValidationError, ConflictError) as exc:
+        return _template(
+            request,
+            "register.html",
+            title=page_title("Регистрация"),
+            error=str(exc),
+            email=email,
+            login=login,
+        )
+    except AuthError as exc:
+        return _template(
+            request,
+            "register.html",
+            title=page_title("Регистрация"),
+            error=str(exc),
+            email=email,
+            login=login,
+        )
+    return _template(
+        request,
+        "register.html",
+        title=page_title("Регистрация"),
+        notice="Регистрация завершена. Проверьте почту и подтвердите email по ссылке.",
+        email="",
+        login="",
+    )
+
+
+@router.get("/verify-email/{token}", response_class=HTMLResponse)
+def verify_email_page(request: Request, token: str) -> HTMLResponse:
+    try:
+        user = verify_email(token)
+    except NotFoundError:
+        return _template(
+            request,
+            "verify_email.html",
+            title=page_title("Подтверждение email"),
+            success=False,
+            message="Ссылка недействительна или истекла.",
+        )
+    except AuthError as exc:
+        return _template(
+            request,
+            "verify_email.html",
+            title=page_title("Подтверждение email"),
+            success=False,
+            message=str(exc),
+        )
+    return _template(
+        request,
+        "verify_email.html",
+        title=page_title("Подтверждение email"),
+        success=True,
+        message=f"Email подтверждён для {user.email}. Теперь можно войти.",
+    )
+
+
+@router.get("/login", response_class=HTMLResponse)
+def login_page(request: Request) -> HTMLResponse:
+    return _template(
+        request,
+        "login.html",
+        title=page_title("Вход"),
+        notice=_login_notice(request),
+        error=request.query_params.get("error"),
+        email_or_login="",
     )
 
 
 @router.post("/login")
-def login_submit(email: str = Form(default=""), password: str = Form(default="")) -> RedirectResponse:
-    _ = (email, password)
-    return RedirectResponse(url="/login?status=placeholder", status_code=303)
-
-
-@router.post("/register")
-def register_submit(email: str = Form(default=""), password: str = Form(default="")) -> RedirectResponse:
-    _ = (email, password)
-    return RedirectResponse(url="/register?status=placeholder", status_code=303)
+def login_submit(
+    request: Request,
+    email_or_login: str = Form(default=""),
+    password: str = Form(default=""),
+):
+    settings = get_settings()
+    try:
+        user = authenticate_user(email_or_login=email_or_login, password=password, settings=settings)
+        session_token = create_session(user.id, settings=settings)
+    except NotVerifiedError:
+        return _template(
+            request,
+            "login.html",
+            title=page_title("Вход"),
+            error="Email не подтверждён.",
+            email_or_login=email_or_login,
+        )
+    except ValidationError as exc:
+        return _template(
+            request,
+            "login.html",
+            title=page_title("Вход"),
+            error=str(exc),
+            email_or_login=email_or_login,
+        )
+    except UnauthorizedError:
+        return _template(
+            request,
+            "login.html",
+            title=page_title("Вход"),
+            error="Неверный email/login или пароль.",
+            email_or_login=email_or_login,
+        )
+    except AuthError as exc:
+        return _template(
+            request,
+            "login.html",
+            title=page_title("Вход"),
+            error=str(exc),
+            email_or_login=email_or_login,
+        )
+    response = RedirectResponse(url="/cabinet", status_code=303)
+    response.set_cookie(
+        key=settings.session_cookie_name,
+        value=session_token,
+        max_age=settings.session_expiry_hours * 3600,
+        httponly=True,
+        secure=settings.session_cookie_secure,
+        samesite="lax",
+        path="/",
+    )
+    return response
 
 
 @router.post("/logout")
-def logout() -> RedirectResponse:
-    return RedirectResponse(url="/login", status_code=303)
+def logout(request: Request) -> RedirectResponse:
+    settings = get_settings()
+    session_token = request.cookies.get(settings.session_cookie_name)
+    if session_token:
+        revoke_session(session_token, settings=settings)
+    response = RedirectResponse(url="/login", status_code=303)
+    response.delete_cookie(key=settings.session_cookie_name, path="/")
+    return response
+
+
+@router.get("/forgot-password", response_class=HTMLResponse)
+def forgot_password_page(request: Request) -> HTMLResponse:
+    return _template(
+        request,
+        "forgot_password.html",
+        title=page_title("Сброс пароля"),
+        notice=request.query_params.get("notice"),
+        error=request.query_params.get("error"),
+        email="",
+    )
+
+
+@router.post("/forgot-password", response_class=HTMLResponse)
+def forgot_password_submit(
+    request: Request,
+    email: str = Form(default=""),
+) -> HTMLResponse:
+    try:
+        create_password_reset_request(email=email)
+    except ValidationError as exc:
+        return _template(
+            request,
+            "forgot_password.html",
+            title=page_title("Сброс пароля"),
+            error=str(exc),
+            email=email,
+        )
+    return _template(
+        request,
+        "forgot_password.html",
+        title=page_title("Сброс пароля"),
+        notice="Если учётная запись существует, письмо для сброса пароля отправлено.",
+        email="",
+    )
+
+
+@router.get("/reset-password/{token}", response_class=HTMLResponse)
+def reset_password_page(request: Request, token: str) -> HTMLResponse:
+    return _template(
+        request,
+        "reset_password.html",
+        title=page_title("Новый пароль"),
+        token=token,
+        error=request.query_params.get("error"),
+        notice=request.query_params.get("notice"),
+        success=False,
+    )
+
+
+@router.post("/reset-password", response_class=HTMLResponse)
+def reset_password_submit(
+    request: Request,
+    token: str = Form(default=""),
+    password: str = Form(default=""),
+    repeat_password: str = Form(default=""),
+) -> HTMLResponse:
+    try:
+        reset_password(token=token, new_password=password, repeat_password=repeat_password)
+    except (ValidationError, NotFoundError, AuthError) as exc:
+        return _template(
+            request,
+            "reset_password.html",
+            title=page_title("Новый пароль"),
+            token=token,
+            error=str(exc),
+            success=False,
+        )
+    return _template(
+        request,
+        "reset_password.html",
+        title=page_title("Новый пароль"),
+        token="",
+        success=True,
+        notice="Пароль изменён. Теперь можно войти.",
+    )

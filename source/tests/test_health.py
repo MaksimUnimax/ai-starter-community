@@ -1,17 +1,23 @@
-from fastapi.testclient import TestClient
-
-from app.main import app
-
-
-def test_healthz():
-    client = TestClient(app)
+def test_healthz(client):
     response = client.get("/healthz")
     assert response.status_code == 200
     assert response.json() == {"ok": True, "service": "ai-starter-community"}
 
 
-def test_readyz():
-    client = TestClient(app)
+def test_readyz(client):
     response = client.get("/readyz")
     assert response.status_code == 200
     assert response.json() == {"ok": True, "ready": True}
+
+
+def test_public_pages_still_work(client):
+    root_response = client.get("/")
+    login_response = client.get("/login")
+    register_response = client.get("/register")
+    forgot_response = client.get("/forgot-password")
+
+    assert root_response.status_code == 200
+    assert "AI Starter Community" in root_response.text
+    assert login_response.status_code == 200
+    assert register_response.status_code == 200
+    assert forgot_response.status_code == 200

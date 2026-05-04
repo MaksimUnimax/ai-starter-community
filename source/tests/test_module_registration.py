@@ -1,7 +1,4 @@
-from app.main import app
-
-
-def test_expected_routes_registered():
+def test_expected_routes_registered(app):
     paths = {route.path for route in app.routes}
     assert "/healthz" in paths
     assert "/readyz" in paths
@@ -9,6 +6,9 @@ def test_expected_routes_registered():
     assert "/login" in paths
     assert "/register" in paths
     assert "/logout" in paths
+    assert "/forgot-password" in paths
+    assert "/reset-password/{token}" in paths
+    assert "/verify-email/{token}" in paths
     assert "/cabinet" in paths
 
 

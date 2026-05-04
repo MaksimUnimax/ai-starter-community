@@ -1,4 +1,83 @@
-"""Placeholder for future database adapters.
+"""SQLite persistence helpers for the AI Starter Community MVP."""
 
-The first scaffold intentionally avoids a real database implementation.
+from __future__ import annotations
+
+import sqlite3
+from pathlib import Path
+
+from app.core.config import Settings, database_path_from_settings
+
+SCHEMA_SQL = """
+PRAGMA foreign_keys = ON;
+
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email TEXT UNIQUE NOT NULL,
+    login TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    role TEXT NOT NULL DEFAULT 'user',
+    is_active INTEGER NOT NULL DEFAULT 1,
+    email_verified_at TEXT NULL,
+    access_status TEXT NOT NULL DEFAULT 'not_activated',
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS sessions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token_hash TEXT UNIQUE NOT NULL,
+    created_at TEXT NOT NULL,
+    expires_at TEXT NOT NULL,
+    revoked_at TEXT NULL
+);
+
+CREATE TABLE IF NOT EXISTS auth_tokens (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token_hash TEXT UNIQUE NOT NULL,
+    token_type TEXT NOT NULL,
+    target_email TEXT NULL,
+    created_at TEXT NOT NULL,
+    expires_at TEXT NOT NULL,
+    used_at TEXT NULL,
+    revoked_at TEXT NULL
+);
+
+CREATE TABLE IF NOT EXISTS email_outbox (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    recipient_email TEXT NOT NULL,
+    subject TEXT NOT NULL,
+    body_text TEXT NOT NULL,
+    template_key TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'queued',
+    created_at TEXT NOT NULL,
+    sent_at TEXT NULL,
+    error TEXT NULL
+);
 """
+
+
+def get_database_path(settings: Settings | None = None) -> Path:
+    return database_path_from_settings(settings)
+
+
+def ensure_database_parent_exists(path: Path | str) -> Path:
+    db_path = Path(path)
+    db_path.parent.mkdir(parents=True, exist_ok=True)
+    return db_path
+
+
+def get_connection(path: Path | str) -> sqlite3.Connection:
+    db_path = Path(path)
+    connection = sqlite3.connect(str(db_path))
+    connection.row_factory = sqlite3.Row
+    connection.execute("PRAGMA foreign_keys = ON")
+    return connection
+
+
+def initialize_database(path: Path | str) -> None:
+    db_path = ensure_database_parent_exists(path)
+    with sqlite3.connect(str(db_path)) as connection:
+        connection.execute("PRAGMA foreign_keys = ON")
+        connection.executescript(SCHEMA_SQL)

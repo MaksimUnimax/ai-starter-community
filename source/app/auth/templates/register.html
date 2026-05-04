@@ -8,10 +8,26 @@
 <body>
   <main>
     <h1>Регистрация</h1>
-    <p>Регистрация для AI Starter Community находится в подготовке.</p>
+    <p>Создайте аккаунт, затем подтвердите email по ссылке из письма.</p>
+    {% if notice %}
+      <p>{{ notice }}</p>
+    {% endif %}
+    {% if error %}
+      <p>{{ error }}</p>
+    {% endif %}
     <form method="post" action="/register">
-      <label>Email <input type="email" name="email" autocomplete="email"></label><br>
-      <label>Пароль <input type="password" name="password" autocomplete="new-password"></label><br>
+      <label>Email
+        <input type="email" name="email" value="{{ email or '' }}" autocomplete="email">
+      </label><br>
+      <label>Логин
+        <input type="text" name="login" value="{{ login or '' }}" autocomplete="username">
+      </label><br>
+      <label>Пароль
+        <input type="password" name="password" autocomplete="new-password">
+      </label><br>
+      <label>Повтор пароля
+        <input type="password" name="repeat_password" autocomplete="new-password">
+      </label><br>
       <button type="submit">Создать аккаунт</button>
     </form>
     <p><a href="/login">Вход</a></p>

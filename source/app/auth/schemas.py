@@ -1,1 +1,20 @@
-"""Placeholder schemas for future auth forms and API payloads."""
+"""Auth-related data structures."""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True, slots=True)
+class UserPublic:
+    id: int
+    email: str
+    login: str
+    role: str
+    is_active: bool
+    access_status: str
+    email_verified_at: str | None
+
+    @property
+    def email_verified(self) -> bool:
+        return self.email_verified_at is not None

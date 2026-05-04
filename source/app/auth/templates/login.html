@@ -8,13 +8,26 @@
 <body>
   <main>
     <h1>Вход</h1>
-    <p>Страница входа в AI Starter Community находится в подготовке.</p>
+    <p>Войдите по email или по логину.</p>
+    {% if notice %}
+      <p>{{ notice }}</p>
+    {% endif %}
+    {% if error %}
+      <p>{{ error }}</p>
+    {% endif %}
     <form method="post" action="/login">
-      <label>Email <input type="email" name="email" autocomplete="email"></label><br>
-      <label>Пароль <input type="password" name="password" autocomplete="current-password"></label><br>
+      <label>Email или логин
+        <input type="text" name="email_or_login" value="{{ email_or_login or '' }}" autocomplete="username">
+      </label><br>
+      <label>Пароль
+        <input type="password" name="password" autocomplete="current-password">
+      </label><br>
       <button type="submit">Войти</button>
     </form>
-    <p><a href="/register">Регистрация</a></p>
+    <p>
+      <a href="/register">Регистрация</a>
+      <a href="/forgot-password">Забыли пароль?</a>
+    </p>
   </main>
 </body>
 </html>
