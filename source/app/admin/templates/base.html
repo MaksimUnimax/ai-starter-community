@@ -4,22 +4,21 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{ title }}</title>
+  <link rel="stylesheet" href="/static/styles.css">
 </head>
-<body>
-  <header>
-    <nav aria-label="Админ-навигация">
-      <ul>
-        <li><a href="/admin">Панель</a></li>
-        <li><a href="/admin/users">Пользователи</a></li>
-        <li><a href="/admin/tariffs">Тарифы</a></li>
-        <li><a href="/admin/paid-options">Платные опции</a></li>
-        <li>Материалы - позже</li>
-        <li>Платежи - позже</li>
-      </ul>
-    </nav>
-  </header>
-  <main>
-    {% block content %}{% endblock %}
-  </main>
+<body class="page admin-area">
+  <div class="page-shell admin-shell">
+    <header class="top-nav" aria-label="Админ-навигация">
+      <a class="nav-link" href="/admin">Админ-панель</a>
+      <a class="nav-link" href="/admin/users">Пользователи</a>
+      <a class="nav-link" href="/admin/tariffs">Тарифы</a>
+      <a class="nav-link" href="/admin/paid-options">Платные опции</a>
+      <a class="nav-link" href="/cabinet">В кабинет</a>
+      <a class="nav-link" href="/">На главную</a>
+    </header>
+    <main class="page-content admin-area">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
 </body>
 </html>

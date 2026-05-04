@@ -1,59 +1,66 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h1>Пользователи</h1>
-  <table>
-    <thead>
-      <tr>
-        <th>Идентификатор</th>
-        <th>Электронная почта</th>
-        <th>Логин</th>
-        <th>Роль</th>
-        <th>Активен</th>
-        <th>Подтверждён email</th>
-        <th>Статус доступа</th>
-        <th>Доступ к материалам</th>
-        <th>Создан</th>
-        <th>Обновлён</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for user in users %}
+  <section class="card stack">
+    <div class="stack">
+      <p class="muted">Просмотр безопасных данных</p>
+      <h1 class="section-title">Пользователи</h1>
+      <p class="form-help">Показаны только безопасные поля учётных записей.</p>
+    </div>
+
+    <table class="table">
+      <thead>
         <tr>
-          <td>{{ user.id }}</td>
-          <td>{{ user.email }}</td>
-          <td>{{ user.login }}</td>
-          <td>
-            {% if user.role == "admin" %}
-              администратор
-            {% elif user.role == "user" %}
-              пользователь
-            {% else %}
-              {{ user.role }}
-            {% endif %}
-          </td>
-          <td>{{ "да" if user.is_active else "нет" }}</td>
-          <td>{{ "подтверждён" if user.email_verified else "не подтверждён" }}</td>
-          <td>
-            {% if user.access_status == "not_activated" %}
-              не активирован
-            {% elif user.access_status == "activated" %}
-              активирован
-            {% elif user.access_status == "blocked" %}
-              заблокирован
-            {% else %}
-              {{ user.access_status }}
-            {% endif %}
-          </td>
-          <td>{{ "да" if user.materials_access_granted else "нет" }}</td>
-          <td>{{ user.created_at }}</td>
-          <td>{{ user.updated_at }}</td>
+          <th>Идентификатор</th>
+          <th>Электронная почта</th>
+          <th>Логин</th>
+          <th>Роль</th>
+          <th>Активен</th>
+          <th>Подтверждён email</th>
+          <th>Статус доступа</th>
+          <th>Доступ к материалам</th>
+          <th>Создан</th>
+          <th>Обновлён</th>
         </tr>
-      {% else %}
-        <tr>
-          <td colspan="10">Пользователей пока нет.</td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        {% for user in users %}
+          <tr>
+            <td>{{ user.id }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.login }}</td>
+            <td>
+              {% if user.role == "admin" %}
+                администратор
+              {% elif user.role == "user" %}
+                пользователь
+              {% else %}
+                {{ user.role }}
+              {% endif %}
+            </td>
+            <td>{{ "да" if user.is_active else "нет" }}</td>
+            <td>{{ "подтверждён" if user.email_verified else "не подтверждён" }}</td>
+            <td>
+              {% if user.access_status == "not_activated" %}
+                не активирован
+              {% elif user.access_status == "activated" %}
+                активирован
+              {% elif user.access_status == "blocked" %}
+                заблокирован
+              {% else %}
+                {{ user.access_status }}
+              {% endif %}
+            </td>
+            <td>{{ "да" if user.materials_access_granted else "нет" }}</td>
+            <td>{{ user.created_at }}</td>
+            <td>{{ user.updated_at }}</td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="10">Пользователей пока нет.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
 {% endblock %}

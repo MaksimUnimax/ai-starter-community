@@ -118,6 +118,8 @@ def test_admin_users_shows_safe_fields_and_hides_sensitive_data(client, test_set
     response = client.get("/admin/users")
     assert response.status_code == 200
     body = response.text
+    assert "/static/styles.css" in body
+    assert "Пользователи" in body
     assert "admin@example.com" in body
     assert "viewer@example.com" in body
     assert "adminuser" in body
@@ -152,6 +154,8 @@ def test_admin_tariffs_shows_starter_tariff_and_admin_controls(client, test_sett
     response = client.get("/admin/tariffs")
     assert response.status_code == 200
     body = response.text
+    assert "/static/styles.css" in body
+    assert "Тарифы" in body
     assert "Код" in body
     assert "Название" in body
     assert "Описание" in body
@@ -183,6 +187,8 @@ def test_admin_paid_options_shows_catalog_and_admin_controls(client, test_settin
     response = client.get("/admin/paid-options")
     assert response.status_code == 200
     body = response.text
+    assert "/static/styles.css" in body
+    assert "Платные опции" in body
     assert "Код" in body
     assert "Название" in body
     assert "Описание" in body
@@ -213,8 +219,15 @@ def test_admin_dashboard_links_to_read_only_list_pages(client, test_settings):
     response = client.get("/admin")
     assert response.status_code == 200
     body = response.text
+    assert "/static/styles.css" in body
+    assert "Админ-панель" in body
+    assert "Пользователи" in body
+    assert "Тарифы" in body
+    assert "Платные опции" in body
+    assert "В кабинет" in body
+    assert "На главную" in body
     assert '/admin/users' in body
     assert '/admin/tariffs' in body
     assert '/admin/paid-options' in body
-    assert 'Материалы - позже' in body
-    assert 'Платежи - позже' in body
+    assert 'Материалы' in body
+    assert 'Платежи' in body

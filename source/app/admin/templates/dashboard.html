@@ -1,9 +1,39 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h1>Админ-панель</h1>
-  <p>Логин администратора: {{ admin_login }}</p>
-  <p>Электронная почта: {{ admin_email }}</p>
-  <p>Это только каркас админ-раздела. Создание, редактирование и архивирование появятся следующим этапом.</p>
-  <p><a href="/cabinet">В кабинет</a> <a href="/">На главную</a></p>
+  <section class="card stack">
+    <div class="stack">
+      <p class="muted">Административный раздел</p>
+      <h1 class="section-title">Админ-панель</h1>
+      <p>Логин администратора: <strong>{{ admin_login }}</strong></p>
+      <p>Электронная почта: {{ admin_email }}</p>
+      <p class="form-help">Создание, редактирование и архивирование уже доступны в списках тарифов и платных опций.</p>
+    </div>
+  </section>
+
+  <div class="card-grid tight">
+    <section class="card stack">
+      <h2 class="section-title">Пользователи</h2>
+      <p class="muted">Просмотр списка пользователей и их статусов.</p>
+      <a class="button button-secondary" href="/admin/users">Открыть список</a>
+    </section>
+    <section class="card stack">
+      <h2 class="section-title">Тарифы</h2>
+      <p class="muted">Просмотр и управление тарифами, опциями и архивом.</p>
+      <a class="button button-secondary" href="/admin/tariffs">Открыть список</a>
+    </section>
+    <section class="card stack">
+      <h2 class="section-title">Платные опции</h2>
+      <p class="muted">Просмотр и управление платными опциями каталога.</p>
+      <a class="button button-secondary" href="/admin/paid-options">Открыть список</a>
+    </section>
+    <section class="card stack">
+      <h2 class="section-title">Материалы</h2>
+      <p class="muted">Структура раздела материалов появится позже.</p>
+    </section>
+    <section class="card stack">
+      <h2 class="section-title">Платежи</h2>
+      <p class="muted">Платежный контур подключится следующим этапом.</p>
+    </section>
+  </div>
 {% endblock %}

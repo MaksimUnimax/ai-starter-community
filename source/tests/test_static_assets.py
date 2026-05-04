@@ -7,3 +7,5 @@ def test_stylesheet_is_served(client):
     assert ".card" in response.text
     assert ".button-primary" in response.text
     assert ".top-nav" in response.text
+    assert ".table-actions" in response.text
+    assert ".button-danger" in response.text

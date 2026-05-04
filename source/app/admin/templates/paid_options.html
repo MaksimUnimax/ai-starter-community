@@ -1,51 +1,62 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h1>Платные опции</h1>
-  <p><a href="/admin/paid-options/new">Создать платную опцию</a></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Код</th>
-        <th>Название</th>
-        <th>Описание</th>
-        <th>Цена, ₽</th>
-        <th>Валюта</th>
-        <th>Срок по умолчанию, дней</th>
-        <th>Статус</th>
-        <th>Можно продлевать</th>
-        <th>Порядок сортировки</th>
-        <th>Создан</th>
-        <th>Обновлён</th>
-        <th>Действия</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for option in paid_options %}
+  <section class="card stack">
+    <div class="stack">
+      <p class="muted">Каталог платных опций</p>
+      <h1 class="section-title">Платные опции</h1>
+    </div>
+
+    <div class="actions">
+      <a class="button button-primary" href="/admin/paid-options/new">Создать платную опцию</a>
+    </div>
+
+    <table class="table">
+      <thead>
         <tr>
-          <td>{{ option.code }}</td>
-          <td>{{ option.title }}</td>
-          <td>{{ option.description }}</td>
-          <td>{{ option.price_display }}</td>
-          <td>{{ option.currency }}</td>
-          <td>{{ option.default_duration_days }}</td>
-          <td>{{ option.status_label }}</td>
-          <td>{{ "да" if option.is_renewable else "нет" }}</td>
-          <td>{{ option.sort_order }}</td>
-          <td>{{ option.created_at }}</td>
-          <td>{{ option.updated_at }}</td>
-          <td>
-            <a href="/admin/paid-options/{{ option.code }}/edit">Редактировать</a>
-            <form method="post" action="/admin/paid-options/{{ option.code }}/archive">
-              <button type="submit">Архивировать</button>
-            </form>
-          </td>
+          <th>Код</th>
+          <th>Название</th>
+          <th>Описание</th>
+          <th>Цена, ₽</th>
+          <th>Валюта</th>
+          <th>Срок по умолчанию, дней</th>
+          <th>Статус</th>
+          <th>Можно продлевать</th>
+          <th>Порядок сортировки</th>
+          <th>Создан</th>
+          <th>Обновлён</th>
+          <th>Действия</th>
         </tr>
-      {% else %}
-        <tr>
-          <td colspan="12">Платных опций пока нет.</td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        {% for option in paid_options %}
+          <tr>
+            <td>{{ option.code }}</td>
+            <td>{{ option.title }}</td>
+            <td>{{ option.description }}</td>
+            <td>{{ option.price_display }}</td>
+            <td>{{ option.currency }}</td>
+            <td>{{ option.default_duration_days }}</td>
+            <td>{{ option.status_label }}</td>
+            <td>{{ "да" if option.is_renewable else "нет" }}</td>
+            <td>{{ option.sort_order }}</td>
+            <td>{{ option.created_at }}</td>
+            <td>{{ option.updated_at }}</td>
+            <td>
+              <div class="table-actions">
+                <a class="button button-secondary" href="/admin/paid-options/{{ option.code }}/edit">Редактировать</a>
+                <form method="post" action="/admin/paid-options/{{ option.code }}/archive">
+                  <button class="button button-danger" type="submit">Архивировать</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="12">Платных опций пока нет.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
 {% endblock %}

@@ -193,6 +193,16 @@ button:hover {
   background: var(--secondary-hover);
 }
 
+.button-danger {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+
+.button-danger:hover {
+  background: #f7dada;
+  color: var(--danger);
+}
+
 .alert {
   padding: 12px 14px;
   border-radius: var(--radius-sm);
@@ -236,6 +246,17 @@ button:hover {
   border-bottom: none;
 }
 
+.table-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.table-actions form {
+  margin: 0;
+}
+
 .badge {
   display: inline-flex;
   align-items: center;
@@ -246,6 +267,16 @@ button:hover {
   color: var(--text);
   font-size: 0.92rem;
   font-weight: 600;
+}
+
+.badge-muted {
+  background: #eef2f7;
+  color: var(--muted);
+}
+
+.badge-success {
+  background: #e6f5ea;
+  color: #21613b;
 }
 
 .stack {
