@@ -50,6 +50,10 @@ class NotFoundError(AuthError):
     pass
 
 
+class RoleError(AuthError):
+    pass
+
+
 def _settings(settings: Settings | None = None) -> Settings:
     return settings or get_settings()
 
@@ -161,10 +165,46 @@ def _fetch_user_by_id(user_id: int, settings: Settings | None = None) -> UserPub
         return _public_user_from_row(row) if row else None
 
 
-def _fetch_user_by_identifier(identifier_kind: str, identifier_value: str, settings: Settings | None = None):
+def _fetch_user_by_role_identifier(identifier_kind: str, identifier_value: str, settings: Settings | None = None):
     with _connection(settings) as connection:
         query = "SELECT * FROM users WHERE email = ?" if identifier_kind == "email" else "SELECT * FROM users WHERE login = ?"
         return connection.execute(query, (identifier_value,)).fetchone()
+
+
+def _fetch_user_by_identifier(identifier_kind: str, identifier_value: str, settings: Settings | None = None):
+    return _fetch_user_by_role_identifier(identifier_kind, identifier_value, settings=settings)
+
+
+def promote_user_to_admin(
+    *,
+    identifier_kind: str,
+    identifier_value: str,
+    settings: Settings | None = None,
+) -> UserPublic:
+    resolved = _settings(settings)
+    if identifier_kind not in {"email", "login"}:
+        raise ValidationError("identifier_kind must be email or login")
+    normalized_value = _normalize_email(identifier_value) if identifier_kind == "email" else _normalize_login(identifier_value)
+    with _connection(resolved) as connection:
+        row = connection.execute(
+            "SELECT * FROM users WHERE email = ?" if identifier_kind == "email" else "SELECT * FROM users WHERE login = ?",
+            (normalized_value,),
+        ).fetchone()
+        if row is None:
+            raise NotFoundError("user not found")
+        if str(row["role"]) not in {"user", "admin"}:
+            raise RoleError("unsupported role")
+        if str(row["role"]) == "admin":
+            return _public_user_from_row(row)
+        now_iso = utc_now_iso()
+        connection.execute(
+            "UPDATE users SET role = ?, updated_at = ? WHERE id = ?",
+            ("admin", now_iso, int(row["id"])),
+        )
+        updated = connection.execute("SELECT * FROM users WHERE id = ?", (int(row["id"]),)).fetchone()
+        if updated is None:
+            raise AuthError("role update failed")
+        return _public_user_from_row(updated)
 
 
 def register_user(
