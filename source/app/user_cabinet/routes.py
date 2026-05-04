@@ -38,3 +38,9 @@ def cabinet_page(request: Request):
         access_status=user.access_status,
         access_status_label=access_status_label,
     )
+
+
+@router.head("/cabinet")
+def cabinet_head(request: Request):
+    response = cabinet_page(request)
+    return response
