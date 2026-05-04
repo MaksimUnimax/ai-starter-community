@@ -81,9 +81,24 @@ def test_admin_can_open_paid_option_create_page(client, test_settings):
     assert response.status_code == 200
     body = response.text
     assert "Создание платной опции" in body
+    assert "Код" in body
+    assert "Название" in body
+    assert "Описание" in body
+    assert "Цена, ₽" in body
+    assert "Валюта" in body
+    assert "Срок по умолчанию, дней" in body
+    assert "Статус" in body
+    assert "Можно продлевать" in body
+    assert "Порядок сортировки" in body
+    assert "Code" not in body
+    assert "Title" not in body
+    assert "Description" not in body
+    assert "Status" not in body
+    assert "Is renewable" not in body
+    assert "Sort order" not in body
     assert 'name="code"' in body
     assert "Код нельзя изменить после создания." in body
-    assert "Пустое значение означает: отдельно цена не задана." in body
+    assert "Если оставить пустым, отдельная цена не задана." in body
 
 
 def test_admin_can_create_paid_option_via_ui(client, test_settings):
@@ -138,7 +153,7 @@ def test_admin_paid_option_create_rejects_duplicate_code_safely(client, test_set
     assert first.status_code == 303
     second = client.post("/admin/paid-options/new", data=payload)
     assert second.status_code == 400
-    assert "already exists" in second.text.lower()
+    assert "существует" in second.text.lower()
     assert get_paid_option_by_code("ui_paid_option_duplicate", settings=test_settings) is not None
 
 
@@ -157,7 +172,7 @@ def test_admin_paid_option_create_rejects_duplicate_code_safely(client, test_set
                 "is_renewable": "1",
                 "sort_order": "0",
             },
-            "code",
+            "код",
         ),
         (
             {
@@ -171,7 +186,7 @@ def test_admin_paid_option_create_rejects_duplicate_code_safely(client, test_set
                 "is_renewable": "1",
                 "sort_order": "0",
             },
-            "price",
+            "цен",
         ),
         (
             {
@@ -185,7 +200,7 @@ def test_admin_paid_option_create_rejects_duplicate_code_safely(client, test_set
                 "is_renewable": "1",
                 "sort_order": "0",
             },
-            "default_duration_days",
+            "срок",
         ),
     ],
 )
@@ -262,11 +277,22 @@ def test_admin_edit_page_shows_code_as_read_only_and_null_price_label(client, te
     assert response.status_code == 200
     body = response.text
     assert "Редактирование платной опции" in body
+    assert "Код" in body
+    assert "Название" in body
+    assert "Описание" in body
+    assert "Цена, ₽" in body
+    assert "Валюта" in body
+    assert "Срок по умолчанию, дней" in body
+    assert "Статус" in body
+    assert "Можно продлевать" in body
+    assert "Порядок сортировки" in body
+    assert "Code" not in body
+    assert "Title" not in body
     assert 'name="code"' in body
     assert "readonly" in body
     assert "ui_paid_option_edit_null" in body
     assert "Код нельзя изменить после создания." in body
-    assert "отдельная цена не задана" in body
+    assert "Отдельная цена не задана." in body
     assert 'name="price_rub" value=""' in body
 
 
@@ -346,7 +372,7 @@ def test_admin_post_edit_rejects_code_changes(client, test_settings):
     )
 
     assert response.status_code == 400
-    assert "code" in response.text.lower()
+    assert "код" in response.text.lower()
     option = get_paid_option_by_code("ui_paid_option_code_lock", settings=test_settings)
     assert option is not None
     assert option.title == "UI Paid Option"
@@ -386,6 +412,15 @@ def test_admin_paid_option_list_shows_controls_without_tariff_linking_ui(client,
     response = client.get("/admin/paid-options")
     assert response.status_code == 200
     body = response.text
+    assert "Код" in body
+    assert "Название" in body
+    assert "Описание" in body
+    assert "Цена, ₽" in body
+    assert "Валюта" in body
+    assert "Срок по умолчанию, дней" in body
+    assert "Статус" in body
+    assert "Можно продлевать" in body
+    assert "Порядок сортировки" in body
     assert "/admin/paid-options/new" in body
     assert "/admin/paid-options/ai_gpt_tool/edit" in body
     assert "/admin/paid-options/ai_gpt_tool/archive" in body

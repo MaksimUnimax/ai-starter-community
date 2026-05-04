@@ -120,10 +120,22 @@ def test_admin_users_shows_safe_fields_and_hides_sensitive_data(client, test_set
     assert "viewer@example.com" in body
     assert "adminuser" in body
     assert "vieweruser" in body
-    assert "verified" in body
-    assert "unverified" in body
-    assert "yes" in body
-    assert "no" in body
+    assert "Идентификатор" in body
+    assert "Электронная почта" in body
+    assert "Логин" in body
+    assert "Роль" in body
+    assert "Активен" in body
+    assert "Подтверждён email" in body
+    assert "Статус доступа" in body
+    assert "Доступ к материалам" in body
+    assert "администратор" in body
+    assert "пользователь" in body
+    assert "подтверждён" in body
+    assert "не подтверждён" in body
+    assert "да" in body
+    assert "нет" in body
+    assert "verified" not in body.lower()
+    assert "unverified" not in body.lower()
     assert "password_hash" not in body.lower()
     assert "token_hash" not in body.lower()
     assert "raw token" not in body.lower()
@@ -138,9 +150,22 @@ def test_admin_tariffs_shows_starter_tariff_and_admin_controls(client, test_sett
     response = client.get("/admin/tariffs")
     assert response.status_code == 200
     body = response.text
+    assert "Код" in body
+    assert "Название" in body
+    assert "Описание" in body
+    assert "Цена, ₽" in body
+    assert "Валюта" in body
+    assert "Статус" in body
+    assert "Порядок сортировки" in body
+    assert "Включённые опции" in body
+    assert "Действия" in body
+    assert "Code" not in body
+    assert "Title" not in body
+    assert "Price" not in body
     assert STARTER_TARIFF_CODE in body
     assert "Стартовый доступ" in body
     assert "AI / GPT-инструмент" in body
+    assert "активен" in body
     assert "/admin/tariffs/new" in body
     assert f"/admin/tariffs/{STARTER_TARIFF_CODE}/options" in body
     assert f"/admin/tariffs/{STARTER_TARIFF_CODE}/edit" in body
@@ -156,10 +181,24 @@ def test_admin_paid_options_shows_catalog_and_admin_controls(client, test_settin
     response = client.get("/admin/paid-options")
     assert response.status_code == 200
     body = response.text
+    assert "Код" in body
+    assert "Название" in body
+    assert "Описание" in body
+    assert "Цена, ₽" in body
+    assert "Валюта" in body
+    assert "Срок по умолчанию, дней" in body
+    assert "Статус" in body
+    assert "Можно продлевать" in body
+    assert "Порядок сортировки" in body
+    assert "Действия" in body
+    assert "Code" not in body
+    assert "Title" not in body
+    assert "Default duration days" not in body
     assert "AI / GPT-инструмент" in body
     assert "Сервер" in body
     assert "VPN" in body
     assert "отдельная цена не задана" in body
+    assert "активен" in body
     assert "/admin/paid-options/new" in body
     assert "/admin/paid-options/ai_gpt_tool/edit" in body
     assert "/admin/paid-options/ai_gpt_tool/archive" in body

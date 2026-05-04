@@ -65,11 +65,15 @@ def test_admin_user_can_open_admin_dashboard(client, test_settings):
     response = client.get("/admin")
     assert response.status_code == 200
     assert "Админ-панель" in response.text
+    assert "Логин администратора" in response.text
+    assert "Электронная почта" in response.text
+    assert "Создание, редактирование и архивирование появятся следующим этапом." in response.text
     assert '/admin/users' in response.text
     assert '/admin/tariffs' in response.text
     assert '/admin/paid-options' in response.text
     assert "Материалы - позже" in response.text
     assert "Платежи - позже" in response.text
+    assert "CRUD" not in response.text
     assert "password_hash" not in response.text
     assert "token_hash" not in response.text
 

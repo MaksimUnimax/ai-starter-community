@@ -48,6 +48,14 @@ TARIFF_CODE_RE = re.compile(r"^[a-z0-9_-]{3,64}$")
 ALLOWED_TARIFF_STATUSES = {"active", "hidden", "archived"}
 
 
+def _status_label(value: str) -> str:
+    return {
+        "active": "активен",
+        "hidden": "скрыт",
+        "archived": "архив",
+    }.get(value, value)
+
+
 def _template(request: Request, template_name: str, **context) -> HTMLResponse:
     status_code = context.pop("status_code", 200)
     payload = {"request": request, "title": context.pop("title", page_title("AI Starter Community"))}
@@ -166,22 +174,26 @@ def _tariff_form_errors_from_service(exc: Exception) -> dict[str, str]:
     message = str(exc)
     lowered = message.lower()
     if "code already exists" in lowered:
-        return {"code": message}
+        return {"code": "Тариф с таким кодом уже существует."}
     if "code is required" in lowered or lowered.startswith("code "):
-        return {"code": message}
+        return {"code": "Укажите код тарифа."}
     if lowered.startswith("title "):
-        return {"title": message}
+        return {"title": "Укажите название тарифа."}
     if lowered.startswith("description "):
-        return {"description": message}
+        return {"description": "Описание тарифа слишком длинное."}
     if "price_amount_minor" in lowered:
-        return {"price_rub": message}
+        if "at most 2 decimal places" in lowered:
+            return {"price_rub": "Цена может содержать не более 2 знаков после запятой."}
+        if "non-negative" in lowered:
+            return {"price_rub": "Цена не может быть отрицательной."}
+        return {"price_rub": "Введите корректную цену в рублях."}
     if lowered.startswith("currency "):
-        return {"currency": message}
+        return {"currency": "Валюта должна быть кодом из 3 заглавных букв."}
     if lowered.startswith("status "):
-        return {"status": message}
+        return {"status": "Статус должен быть активен, скрыт или архив."}
     if lowered.startswith("sort_order "):
-        return {"sort_order": message}
-    return {"form": message}
+        return {"sort_order": "Порядок сортировки должен быть целым числом не меньше 0."}
+    return {"form": "Не удалось сохранить тариф."}
 
 
 def _validate_tariff_form_input(
@@ -206,23 +218,30 @@ def _validate_tariff_form_input(
 
     if include_code:
         if not code:
-            errors["code"] = "code is required"
+            errors["code"] = "Укажите код тарифа."
         elif not TARIFF_CODE_RE.fullmatch(code):
-            errors["code"] = "code must be 3-64 chars of lowercase letters, digits, underscore or hyphen"
+            errors["code"] = "Код тарифа должен содержать 3-64 символа: строчные латинские буквы, цифры, подчёркивание или дефис."
     if not title:
-        errors["title"] = "title is required"
+        errors["title"] = "Укажите название тарифа."
     elif len(title) > 200:
-        errors["title"] = "title must be at most 200 characters"
+        errors["title"] = "Название тарифа должно быть не длиннее 200 символов."
     if description is not None and len(description) > 4000:
-        errors["description"] = "description must be at most 4000 characters"
+        errors["description"] = "Описание тарифа должно быть не длиннее 4000 символов."
     if price_error:
-        errors["price_rub"] = price_error
+        if price_error == "price is required":
+            errors["price_rub"] = "Укажите цену тарифа."
+        elif price_error == "price must be a valid ruble amount":
+            errors["price_rub"] = "Введите корректную цену в рублях."
+        elif price_error == "price must be a non-negative amount":
+            errors["price_rub"] = "Цена не может быть отрицательной."
+        else:
+            errors["price_rub"] = "Цена может содержать не более 2 знаков после запятой."
     if not re.fullmatch(r"^[A-Z]{3}$", currency):
-        errors["currency"] = "currency must be a 3-letter uppercase code"
+        errors["currency"] = "Валюта должна быть кодом из 3 заглавных букв."
     if status not in ALLOWED_TARIFF_STATUSES:
-        errors["status"] = "status must be active, hidden, or archived"
+        errors["status"] = "Статус должен быть активен, скрыт или архив."
     if sort_error:
-        errors["sort_order"] = sort_error
+        errors["sort_order"] = "Порядок сортировки должен быть целым числом не меньше 0."
 
     payload = {
         "code": code,
@@ -249,7 +268,7 @@ def _paid_options_for_admin(settings):
                 else _format_minor_amount(option.price_amount_minor),
                 "currency": option.currency,
                 "default_duration_days": "—" if option.default_duration_days is None else option.default_duration_days,
-                "status": option.status,
+                "status_label": _status_label(option.status),
                 "is_renewable": option.is_renewable,
                 "sort_order": option.sort_order,
                 "created_at": option.created_at,
@@ -283,7 +302,7 @@ def _tariff_option_link_rows(settings, tariff_code: str, *, link_overrides: dict
             {
                 "code": code,
                 "title": str(link["title"]),
-                "status": str(link["status"]),
+                "status_label": _status_label(str(link["status"])),
                 "included_duration_days": _tariff_option_form_value(override.get("included_duration_days", link["included_duration_days"])),
                 "included_quantity": _tariff_option_form_value(override.get("included_quantity", link["included_quantity"])),
             }
@@ -305,7 +324,7 @@ def _tariff_options_page_context(
         {
             "code": option.code,
             "title": option.title,
-            "status": option.status,
+            "status_label": _status_label(option.status),
         }
         for option in list_paid_options(settings=settings)
         if option.code not in linked_codes
@@ -418,26 +437,30 @@ def _paid_option_form_errors_from_service(exc: Exception) -> dict[str, str]:
     message = str(exc)
     lowered = message.lower()
     if "code already exists" in lowered:
-        return {"code": message}
+        return {"code": "Платная опция с таким кодом уже существует."}
     if "code is required" in lowered or lowered.startswith("code "):
-        return {"code": message}
+        return {"code": "Укажите код платной опции."}
     if lowered.startswith("title "):
-        return {"title": message}
+        return {"title": "Укажите название платной опции."}
     if lowered.startswith("description "):
-        return {"description": message}
+        return {"description": "Описание платной опции слишком длинное."}
     if "price_amount_minor" in lowered:
-        return {"price_rub": message}
+        if "at most 2 decimal places" in lowered:
+            return {"price_rub": "Цена может содержать не более 2 знаков после запятой."}
+        if "non-negative" in lowered:
+            return {"price_rub": "Цена не может быть отрицательной."}
+        return {"price_rub": "Введите корректную цену в рублях."}
     if lowered.startswith("currency "):
-        return {"currency": message}
+        return {"currency": "Валюта должна быть кодом из 3 заглавных букв."}
     if lowered.startswith("default_duration_days "):
-        return {"default_duration_days": message}
+        return {"default_duration_days": "Срок по умолчанию должен быть целым числом не меньше 0."}
     if lowered.startswith("status "):
-        return {"status": message}
+        return {"status": "Статус должен быть активен, скрыт или архив."}
     if lowered.startswith("is_renewable "):
-        return {"is_renewable": message}
+        return {"is_renewable": "Значение поля «Можно продлевать» некорректно."}
     if lowered.startswith("sort_order "):
-        return {"sort_order": message}
-    return {"form": message}
+        return {"sort_order": "Порядок сортировки должен быть целым числом не меньше 0."}
+    return {"form": "Не удалось сохранить платную опцию."}
 
 
 def _validate_paid_option_form_input(
@@ -466,25 +489,30 @@ def _validate_paid_option_form_input(
 
     if include_code:
         if not code:
-            errors["code"] = "code is required"
+            errors["code"] = "Укажите код платной опции."
         elif not TARIFF_CODE_RE.fullmatch(code):
-            errors["code"] = "code must be 3-64 chars of lowercase letters, digits, underscore or hyphen"
+            errors["code"] = "Код платной опции должен содержать 3-64 символа: строчные латинские буквы, цифры, подчёркивание или дефис."
     if not title:
-        errors["title"] = "title is required"
+        errors["title"] = "Укажите название платной опции."
     elif len(title) > 200:
-        errors["title"] = "title must be at most 200 characters"
+        errors["title"] = "Название платной опции должно быть не длиннее 200 символов."
     if description is not None and len(description) > 4000:
-        errors["description"] = "description must be at most 4000 characters"
+        errors["description"] = "Описание платной опции должно быть не длиннее 4000 символов."
     if price_error:
-        errors["price_rub"] = price_error
+        if price_error == "price must be a valid ruble amount":
+            errors["price_rub"] = "Введите корректную цену в рублях."
+        elif price_error == "price must be a non-negative amount":
+            errors["price_rub"] = "Цена не может быть отрицательной."
+        else:
+            errors["price_rub"] = "Цена может содержать не более 2 знаков после запятой."
     if not re.fullmatch(r"^[A-Z]{3}$", currency):
-        errors["currency"] = "currency must be a 3-letter uppercase code"
+        errors["currency"] = "Валюта должна быть кодом из 3 заглавных букв."
     if duration_error:
-        errors["default_duration_days"] = duration_error
+        errors["default_duration_days"] = "Срок по умолчанию должен быть целым числом не меньше 0."
     if status not in ALLOWED_TARIFF_STATUSES:
-        errors["status"] = "status must be active, hidden, or archived"
+        errors["status"] = "Статус должен быть активен, скрыт или архив."
     if sort_error:
-        errors["sort_order"] = sort_error
+        errors["sort_order"] = "Порядок сортировки должен быть целым числом не меньше 0."
 
     payload = {
         "code": code,
@@ -512,7 +540,7 @@ def _tariffs_for_admin(settings):
                 "description": tariff.description or "—",
                 "price_display": _format_minor_amount(tariff.price_amount_minor),
                 "currency": tariff.currency,
-                "status": tariff.status,
+                "status_label": _status_label(tariff.status),
                 "sort_order": tariff.sort_order,
                 "included_options_summary": ", ".join(option["title"] for option in linked_options) if linked_options else "—",
                 "created_at": tariff.created_at,
@@ -560,13 +588,13 @@ def _validate_tariff_option_link_form_input(
 
     if include_option_code:
         if not option_code:
-            errors["option_code"] = "option_code is required"
+            errors["option_code"] = "Выберите платную опцию."
         elif not TARIFF_CODE_RE.fullmatch(option_code):
-            errors["option_code"] = "option_code must be 3-64 chars of lowercase letters, digits, underscore or hyphen"
+            errors["option_code"] = "Код платной опции должен содержать 3-64 символа: строчные латинские буквы, цифры, подчёркивание или дефис."
     if duration_error:
-        errors["included_duration_days"] = duration_error
+        errors["included_duration_days"] = "Включённый срок должен быть целым числом не меньше 0."
     if quantity_error:
-        errors["included_quantity"] = quantity_error
+        errors["included_quantity"] = "Включённое количество должно быть целым числом не меньше 0."
 
     payload = {
         "option_code": option_code,
@@ -715,7 +743,7 @@ async def admin_tariffs_edit_submit(request: Request, code: str):
     )
     posted_code = _normalize_text(form.get("code")).lower()
     if posted_code and posted_code != tariff.code:
-        errors["code"] = "code cannot be changed after creation"
+        errors["code"] = "Код нельзя изменить после создания."
     if errors:
         return _render_tariff_form(
             request,
@@ -771,13 +799,15 @@ def admin_tariffs_archive(request: Request, code: str):
 def _tariff_option_link_errors_from_service(exc: Exception) -> dict[str, str]:
     message = str(exc)
     lowered = message.lower()
-    if "archived paid option" in lowered or "paid option" in lowered or "option" in lowered:
-        return {"option_code": message}
+    if "archived paid option" in lowered:
+        return {"option_code": "Архивные опции нельзя добавлять к тарифу."}
+    if "paid option" in lowered or "option" in lowered:
+        return {"option_code": "Платная опция не найдена или недоступна для добавления."}
     if "included_duration_days" in lowered:
-        return {"included_duration_days": message}
+        return {"included_duration_days": "Включённый срок должен быть целым числом не меньше 0."}
     if "included_quantity" in lowered:
-        return {"included_quantity": message}
-    return {"form": message}
+        return {"included_quantity": "Включённое количество должно быть целым числом не меньше 0."}
+    return {"form": "Не удалось изменить связь тарифа и опции."}
 
 
 @router.api_route("/admin/tariffs/{code}/options", methods=["GET", "HEAD"], response_class=HTMLResponse)
@@ -1076,7 +1106,7 @@ async def admin_paid_options_edit_submit(request: Request, code: str):
     )
     posted_code = _normalize_text(form.get("code")).lower()
     if posted_code and posted_code != option.code:
-        errors["code"] = "code cannot be changed after creation"
+        errors["code"] = "Код нельзя изменить после создания."
     if errors:
         return _template(
             request,

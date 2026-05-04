@@ -82,6 +82,18 @@ def test_admin_can_open_tariff_create_page(client, test_settings):
     assert response.status_code == 200
     body = response.text
     assert "Создание тарифа" in body
+    assert "Код" in body
+    assert "Название" in body
+    assert "Описание" in body
+    assert "Цена, ₽" in body
+    assert "Валюта" in body
+    assert "Статус" in body
+    assert "Порядок сортировки" in body
+    assert "Код" in body
+    assert "Code" not in body
+    assert "Title" not in body
+    assert "Description" not in body
+    assert "Price, RUB" not in body
     assert 'name="code"' in body
     assert "Код нельзя изменить после создания." in body
 
@@ -132,7 +144,7 @@ def test_admin_tariff_create_rejects_duplicate_code_safely(client, test_settings
     assert first.status_code == 303
     second = client.post("/admin/tariffs/new", data=payload)
     assert second.status_code == 400
-    assert "already exists" in second.text.lower()
+    assert "существует" in second.text.lower()
     assert get_tariff_by_code("ui_tariff_duplicate", settings=test_settings) is not None
 
 
@@ -149,7 +161,7 @@ def test_admin_tariff_create_rejects_duplicate_code_safely(client, test_settings
                 "status": "active",
                 "sort_order": "0",
             },
-            "code",
+            "код",
         ),
         (
             {
@@ -161,7 +173,7 @@ def test_admin_tariff_create_rejects_duplicate_code_safely(client, test_settings
                 "status": "active",
                 "sort_order": "0",
             },
-            "price",
+            "цен",
         ),
     ],
 )
@@ -188,6 +200,15 @@ def test_admin_edit_page_shows_code_as_read_only(client, test_settings):
     assert response.status_code == 200
     body = response.text
     assert "Редактирование тарифа" in body
+    assert "Код" in body
+    assert "Название" in body
+    assert "Описание" in body
+    assert "Цена, ₽" in body
+    assert "Валюта" in body
+    assert "Статус" in body
+    assert "Порядок сортировки" in body
+    assert "Code" not in body
+    assert "Title" not in body
     assert 'name="code"' in body
     assert "readonly" in body
     assert "ui_tariff_edit" in body
@@ -301,6 +322,7 @@ def test_admin_tariff_list_shows_controls_without_paid_option_crud_ui(client, te
     body = response.text
     assert "/admin/tariffs/new" in body
     assert f"/admin/tariffs/{STARTER_TARIFF_CODE}/options" in body
+    assert "Настроить опции" in body
     assert f"/admin/tariffs/{STARTER_TARIFF_CODE}/edit" in body
     assert f"/admin/tariffs/{STARTER_TARIFF_CODE}/archive" in body
     assert "/admin/paid-options/new" not in body

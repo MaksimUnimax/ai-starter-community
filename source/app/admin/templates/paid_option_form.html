@@ -8,7 +8,7 @@
   <form method="post">
     <p>
       <label>
-        Code
+        Код
         {% if is_create %}
           <input type="text" name="code" value="{{ form_data.code }}">
         {% else %}
@@ -23,7 +23,7 @@
 
     <p>
       <label>
-        Title
+        Название
         <input type="text" name="title" value="{{ form_data.title }}">
       </label>
       {% if errors.title %}
@@ -33,7 +33,7 @@
 
     <p>
       <label>
-        Description
+        Описание
         <textarea name="description">{{ form_data.description }}</textarea>
       </label>
       {% if errors.description %}
@@ -43,21 +43,21 @@
 
     <p>
       <label>
-        Price, RUB
+        Цена, ₽
         <input type="text" name="price_rub" value="{{ form_data.price_rub }}">
       </label>
       {% if errors.price_rub %}
         <span>{{ errors.price_rub }}</span>
       {% endif %}
     </p>
-    <p>Пустое значение означает: отдельно цена не задана.</p>
+    <p>Если оставить пустым, отдельная цена не задана.</p>
     {% if not is_create and not form_data.price_rub %}
-      <p>отдельная цена не задана</p>
+      <p>Отдельная цена не задана.</p>
     {% endif %}
 
     <p>
       <label>
-        Currency
+        Валюта
         <input type="text" name="currency" value="{{ form_data.currency }}">
       </label>
       {% if errors.currency %}
@@ -67,7 +67,7 @@
 
     <p>
       <label>
-        Default duration days
+        Срок по умолчанию, дней
         <input type="number" name="default_duration_days" min="0" step="1" value="{{ form_data.default_duration_days }}">
       </label>
       {% if errors.default_duration_days %}
@@ -77,11 +77,11 @@
 
     <p>
       <label>
-        Status
+        Статус
         <select name="status">
-          <option value="active" {% if form_data.status == "active" %}selected{% endif %}>active</option>
-          <option value="hidden" {% if form_data.status == "hidden" %}selected{% endif %}>hidden</option>
-          <option value="archived" {% if form_data.status == "archived" %}selected{% endif %}>archived</option>
+          <option value="active" {% if form_data.status == "active" %}selected{% endif %}>активен</option>
+          <option value="hidden" {% if form_data.status == "hidden" %}selected{% endif %}>скрыт</option>
+          <option value="archived" {% if form_data.status == "archived" %}selected{% endif %}>архив</option>
         </select>
       </label>
       {% if errors.status %}
@@ -91,7 +91,7 @@
 
     <p>
       <label>
-        Is renewable
+        Можно продлевать
         <input type="checkbox" name="is_renewable" value="1" {% if form_data.is_renewable %}checked{% endif %}>
       </label>
       {% if errors.is_renewable %}
@@ -101,7 +101,7 @@
 
     <p>
       <label>
-        Sort order
+        Порядок сортировки
         <input type="number" name="sort_order" min="0" step="1" value="{{ form_data.sort_order }}">
       </label>
       {% if errors.sort_order %}

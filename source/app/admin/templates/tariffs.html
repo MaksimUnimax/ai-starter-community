@@ -6,17 +6,17 @@
   <table>
     <thead>
       <tr>
-        <th>Code</th>
-        <th>Title</th>
-        <th>Description</th>
-        <th>Price</th>
-        <th>Currency</th>
-        <th>Status</th>
-        <th>Sort order</th>
-        <th>Included options</th>
-        <th>Created at</th>
-        <th>Updated at</th>
-        <th>Actions</th>
+        <th>Код</th>
+        <th>Название</th>
+        <th>Описание</th>
+        <th>Цена, ₽</th>
+        <th>Валюта</th>
+        <th>Статус</th>
+        <th>Порядок сортировки</th>
+        <th>Включённые опции</th>
+        <th>Создан</th>
+        <th>Обновлён</th>
+        <th>Действия</th>
       </tr>
     </thead>
     <tbody>
@@ -27,13 +27,13 @@
           <td>{{ tariff.description }}</td>
           <td>{{ tariff.price_display }}</td>
           <td>{{ tariff.currency }}</td>
-          <td>{{ tariff.status }}</td>
+          <td>{{ tariff.status_label }}</td>
           <td>{{ tariff.sort_order }}</td>
           <td>{{ tariff.included_options_summary }}</td>
           <td>{{ tariff.created_at }}</td>
           <td>{{ tariff.updated_at }}</td>
           <td>
-            <a href="/admin/tariffs/{{ tariff.code }}/options">Опции тарифа</a>
+            <a href="/admin/tariffs/{{ tariff.code }}/options">Настроить опции</a>
             <a href="/admin/tariffs/{{ tariff.code }}/edit">Редактировать</a>
             <form method="post" action="/admin/tariffs/{{ tariff.code }}/archive">
               <button type="submit">Архивировать</button>
@@ -42,7 +42,7 @@
         </tr>
       {% else %}
         <tr>
-          <td colspan="11">Нет тарифов.</td>
+          <td colspan="11">Тарифов пока нет.</td>
         </tr>
       {% endfor %}
     </tbody>

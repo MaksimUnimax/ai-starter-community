@@ -109,6 +109,12 @@ def test_admin_tariff_options_page_shows_linked_and_attachable_options(client, t
     assert response.status_code == 200
     body = response.text
     assert "Опции тарифа" in body
+    assert "Платная опция" in body
+    assert "Включённый срок, дней" in body
+    assert "Включённое количество" in body
+    assert "Связанные опции" in body
+    assert "Действия" in body
+    assert "Настроить опции" not in body  # link lives on tariffs list, not page header
     assert STARTER_TARIFF_CODE in body
     assert "Стартовый доступ" in body
     assert "AI / GPT-инструмент" in body
@@ -118,6 +124,9 @@ def test_admin_tariff_options_page_shows_linked_and_attachable_options(client, t
     assert archived_code not in body
     assert "/admin/payments" not in body
     assert "/admin/paid-options/new" not in body
+    assert "Paid option" not in body
+    assert "Included duration days" not in body
+    assert "Included quantity" not in body
 
 
 def test_admin_tariff_options_page_has_tariffs_list_link(client, test_settings):
@@ -128,6 +137,7 @@ def test_admin_tariff_options_page_has_tariffs_list_link(client, test_settings):
     assert response.status_code == 200
     body = response.text
     assert f"/admin/tariffs/{STARTER_TARIFF_CODE}/options" in body
+    assert "Настроить опции" in body
 
 
 def test_admin_attach_option_links_active_option_and_updates_metadata_on_repeat_attach(client, test_settings):
@@ -176,7 +186,7 @@ def test_admin_attach_archived_option_is_rejected_safely(client, test_settings):
         },
     )
     assert response.status_code == 400
-    assert "archived" in response.text.lower()
+    assert "архив" in response.text.lower()
 
 
 def test_admin_post_update_changes_link_metadata(client, test_settings):
@@ -259,6 +269,29 @@ def test_admin_missing_link_errors_are_safe(client, test_settings):
     assert attach_response.status_code == 404
 
 
+def test_admin_tariff_options_page_shows_empty_state_when_no_active_unlinked_options(client, test_settings):
+    _make_admin(client, test_settings)
+    active_code, _ = _seed_linking_catalog(test_settings)
+    client.post(
+        f"/admin/tariffs/{STARTER_TARIFF_CODE}/options/attach",
+        data={
+            "option_code": active_code,
+            "included_duration_days": "1",
+            "included_quantity": "1",
+        },
+        follow_redirects=False,
+    )
+
+    response = client.get(f"/admin/tariffs/{STARTER_TARIFF_CODE}/options")
+    assert response.status_code == 200
+    body = response.text
+    assert "Все активные опции уже привязаны к этому тарифу." in body
+    assert "Чтобы добавить новую опцию, сначала создайте её в разделе" in body
+    assert "Создать новую платную опцию" in body
+    assert "/admin/paid-options/new" in body
+    assert 'name="option_code"' not in body
+
+
 def test_admin_tariff_options_page_is_read_safe(client, test_settings):
     _make_admin(client, test_settings)
     _seed_linking_catalog(test_settings)
@@ -266,6 +299,14 @@ def test_admin_tariff_options_page_is_read_safe(client, test_settings):
     response = client.get(f"/admin/tariffs/{STARTER_TARIFF_CODE}/options")
     assert response.status_code == 200
     body = response.text
+    assert "Платная опция" in body or "Все активные опции уже привязаны к этому тарифу." in body
+    assert "Включённый срок, дней" in body or "Все активные опции уже привязаны к этому тарифу." in body
+    assert "Включённое количество" in body or "Все активные опции уже привязаны к этому тарифу." in body
+    assert "Связанные опции" in body
+    assert "Действия" in body
+    assert "Paid option" not in body
+    assert "Included duration days" not in body
+    assert "Included quantity" not in body
     assert "<form" in body
     assert "/admin/payments" not in body
     assert "payment" not in body.lower()

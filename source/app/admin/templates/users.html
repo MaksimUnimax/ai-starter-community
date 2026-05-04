@@ -5,16 +5,16 @@
   <table>
     <thead>
       <tr>
-        <th>ID</th>
-        <th>Email</th>
-        <th>Login</th>
-        <th>Role</th>
-        <th>Active</th>
-        <th>Email verified</th>
-        <th>Access status</th>
-        <th>Materials access</th>
-        <th>Created at</th>
-        <th>Updated at</th>
+        <th>Идентификатор</th>
+        <th>Электронная почта</th>
+        <th>Логин</th>
+        <th>Роль</th>
+        <th>Активен</th>
+        <th>Подтверждён email</th>
+        <th>Статус доступа</th>
+        <th>Доступ к материалам</th>
+        <th>Создан</th>
+        <th>Обновлён</th>
       </tr>
     </thead>
     <tbody>
@@ -23,17 +23,35 @@
           <td>{{ user.id }}</td>
           <td>{{ user.email }}</td>
           <td>{{ user.login }}</td>
-          <td>{{ user.role }}</td>
-          <td>{{ "yes" if user.is_active else "no" }}</td>
-          <td>{{ "verified" if user.email_verified else "unverified" }}</td>
-          <td>{{ user.access_status }}</td>
-          <td>{{ "yes" if user.materials_access_granted else "no" }}</td>
+          <td>
+            {% if user.role == "admin" %}
+              администратор
+            {% elif user.role == "user" %}
+              пользователь
+            {% else %}
+              {{ user.role }}
+            {% endif %}
+          </td>
+          <td>{{ "да" if user.is_active else "нет" }}</td>
+          <td>{{ "подтверждён" if user.email_verified else "не подтверждён" }}</td>
+          <td>
+            {% if user.access_status == "not_activated" %}
+              не активирован
+            {% elif user.access_status == "activated" %}
+              активирован
+            {% elif user.access_status == "blocked" %}
+              заблокирован
+            {% else %}
+              {{ user.access_status }}
+            {% endif %}
+          </td>
+          <td>{{ "да" if user.materials_access_granted else "нет" }}</td>
           <td>{{ user.created_at }}</td>
           <td>{{ user.updated_at }}</td>
         </tr>
       {% else %}
         <tr>
-          <td colspan="10">Нет пользователей.</td>
+          <td colspan="10">Пользователей пока нет.</td>
         </tr>
       {% endfor %}
     </tbody>

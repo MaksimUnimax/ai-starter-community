@@ -6,18 +6,18 @@
   <table>
     <thead>
       <tr>
-        <th>Code</th>
-        <th>Title</th>
-        <th>Description</th>
-        <th>Price</th>
-        <th>Currency</th>
-        <th>Default duration days</th>
-        <th>Status</th>
-        <th>Renewable</th>
-        <th>Sort order</th>
-        <th>Created at</th>
-        <th>Updated at</th>
-        <th>Actions</th>
+        <th>Код</th>
+        <th>Название</th>
+        <th>Описание</th>
+        <th>Цена, ₽</th>
+        <th>Валюта</th>
+        <th>Срок по умолчанию, дней</th>
+        <th>Статус</th>
+        <th>Можно продлевать</th>
+        <th>Порядок сортировки</th>
+        <th>Создан</th>
+        <th>Обновлён</th>
+        <th>Действия</th>
       </tr>
     </thead>
     <tbody>
@@ -29,8 +29,8 @@
           <td>{{ option.price_display }}</td>
           <td>{{ option.currency }}</td>
           <td>{{ option.default_duration_days }}</td>
-          <td>{{ option.status }}</td>
-          <td>{{ "yes" if option.is_renewable else "no" }}</td>
+          <td>{{ option.status_label }}</td>
+          <td>{{ "да" if option.is_renewable else "нет" }}</td>
           <td>{{ option.sort_order }}</td>
           <td>{{ option.created_at }}</td>
           <td>{{ option.updated_at }}</td>
@@ -43,7 +43,7 @@
         </tr>
       {% else %}
         <tr>
-          <td colspan="12">Нет платных опций.</td>
+          <td colspan="12">Платных опций пока нет.</td>
         </tr>
       {% endfor %}
     </tbody>

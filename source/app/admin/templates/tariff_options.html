@@ -3,7 +3,18 @@
 {% block content %}
   <h1>Опции тарифа</h1>
   <p>Тариф: {{ tariff.title }} ({{ tariff.code }})</p>
-  <p>Status: {{ tariff.status }}</p>
+  <p>
+    Статус:
+    {% if tariff.status == "active" %}
+      активен
+    {% elif tariff.status == "hidden" %}
+      скрыт
+    {% elif tariff.status == "archived" %}
+      архив
+    {% else %}
+      {{ tariff.status }}
+    {% endif %}
+  </p>
 
   {% if errors.form %}
     <p>{{ errors.form }}</p>
@@ -12,63 +23,60 @@
   <h2>Добавить опцию</h2>
   <p>Длительность и количество можно оставить пустыми.</p>
   <p>Архивные опции не доступны для добавления.</p>
-  <form method="post" action="/admin/tariffs/{{ tariff.code }}/options/attach">
-    <p>
-      <label>
-        Paid option
-        <select name="option_code">
-          <option value="">-- выбрать --</option>
-          {% for option in available_paid_options %}
-            <option value="{{ option.code }}" {% if attach_form_data.option_code == option.code %}selected{% endif %}>
-              {{ option.title }} ({{ option.code }})
-            </option>
-          {% endfor %}
-        </select>
-      </label>
-      {% if errors.option_code %}
-        <span>{{ errors.option_code }}</span>
-      {% endif %}
-    </p>
-    <p>
-      <label>
-        Included duration days
-        <input type="number" name="included_duration_days" min="0" step="1" value="{{ attach_form_data.included_duration_days }}">
-      </label>
-      {% if errors.included_duration_days %}
-        <span>{{ errors.included_duration_days }}</span>
-      {% endif %}
-    </p>
-    <p>
-      <label>
-        Included quantity
-        <input type="number" name="included_quantity" min="0" step="1" value="{{ attach_form_data.included_quantity }}">
-      </label>
-      {% if errors.included_quantity %}
-        <span>{{ errors.included_quantity }}</span>
-      {% endif %}
-    </p>
-    <button type="submit">Добавить опцию</button>
-  </form>
-
   {% if available_paid_options %}
-    <h2>Доступные опции</h2>
-    <ul>
-      {% for option in available_paid_options %}
-        <li>{{ option.title }} ({{ option.code }}) - {{ option.status }}</li>
-      {% endfor %}
-    </ul>
+    <form method="post" action="/admin/tariffs/{{ tariff.code }}/options/attach">
+      <p>
+        <label>
+          Платная опция
+          <select name="option_code">
+            <option value="">-- выберите опцию --</option>
+            {% for option in available_paid_options %}
+              <option value="{{ option.code }}" {% if attach_form_data.option_code == option.code %}selected{% endif %}>
+                {{ option.title }} ({{ option.code }}) - {{ option.status_label }}
+              </option>
+            {% endfor %}
+          </select>
+        </label>
+        {% if errors.option_code %}
+          <span>{{ errors.option_code }}</span>
+        {% endif %}
+      </p>
+      <p>
+        <label>
+          Включённый срок, дней
+          <input type="number" name="included_duration_days" min="0" step="1" value="{{ attach_form_data.included_duration_days }}">
+        </label>
+        {% if errors.included_duration_days %}
+          <span>{{ errors.included_duration_days }}</span>
+        {% endif %}
+      </p>
+      <p>
+        <label>
+          Включённое количество
+          <input type="number" name="included_quantity" min="0" step="1" value="{{ attach_form_data.included_quantity }}">
+        </label>
+        {% if errors.included_quantity %}
+          <span>{{ errors.included_quantity }}</span>
+        {% endif %}
+      </p>
+      <button type="submit">Добавить опцию</button>
+    </form>
+  {% else %}
+    <p>Все активные опции уже привязаны к этому тарифу.</p>
+    <p>Чтобы добавить новую опцию, сначала создайте её в разделе “Платные опции”.</p>
+    <p><a href="/admin/paid-options/new">Создать новую платную опцию</a></p>
   {% endif %}
 
   <h2>Связанные опции</h2>
   <table>
     <thead>
       <tr>
-        <th>Code</th>
-        <th>Title</th>
-        <th>Status</th>
-        <th>Included duration days</th>
-        <th>Included quantity</th>
-        <th>Actions</th>
+        <th>Код</th>
+        <th>Название</th>
+        <th>Статус</th>
+        <th>Включённый срок, дней</th>
+        <th>Включённое количество</th>
+        <th>Действия</th>
       </tr>
     </thead>
     <tbody>
@@ -76,14 +84,14 @@
         <tr>
           <td>{{ option.code }}</td>
           <td>{{ option.title }}</td>
-          <td>{{ option.status }}</td>
+          <td>{{ option.status_label }}</td>
           <td>{{ option.included_duration_days }}</td>
           <td>{{ option.included_quantity }}</td>
           <td>
             <form method="post" action="/admin/tariffs/{{ tariff.code }}/options/{{ option.code }}/update">
               <p>
                 <label>
-                  Included duration days
+                  Включённый срок, дней
                   <input type="number" name="included_duration_days" min="0" step="1" value="{{ option.included_duration_days }}">
                 </label>
                 {% if errors.included_duration_days %}
@@ -92,7 +100,7 @@
               </p>
               <p>
                 <label>
-                  Included quantity
+                  Включённое количество
                   <input type="number" name="included_quantity" min="0" step="1" value="{{ option.included_quantity }}">
                 </label>
                 {% if errors.included_quantity %}
@@ -108,7 +116,7 @@
         </tr>
       {% else %}
         <tr>
-          <td colspan="6">Опции не связаны.</td>
+          <td colspan="6">Связанных опций пока нет.</td>
         </tr>
       {% endfor %}
     </tbody>
