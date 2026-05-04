@@ -5,6 +5,7 @@ from __future__ import annotations
 from fastapi import FastAPI
 
 from app.auth.routes import router as auth_router
+from app.admin.routes import router as admin_router
 from app.core.config import get_settings
 from app.core.health import router as health_router
 from app.public_landing.routes import router as landing_router
@@ -20,4 +21,5 @@ def create_app() -> FastAPI:
     app.include_router(auth_router)
     app.include_router(cabinet_router)
     app.include_router(materials_router)
+    app.include_router(admin_router)
     return app

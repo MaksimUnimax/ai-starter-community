@@ -1,1 +1,1 @@
-"""Admin module placeholder."""
+"""Admin module."""
