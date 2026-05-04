@@ -55,6 +55,44 @@ CREATE TABLE IF NOT EXISTS email_outbox (
     sent_at TEXT NULL,
     error TEXT NULL
 );
+
+CREATE TABLE IF NOT EXISTS tariffs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    code TEXT UNIQUE NOT NULL,
+    title TEXT NOT NULL,
+    description TEXT NULL,
+    price_amount_minor INTEGER NOT NULL,
+    currency TEXT NOT NULL DEFAULT 'RUB',
+    status TEXT NOT NULL DEFAULT 'active',
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS paid_options (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    code TEXT UNIQUE NOT NULL,
+    title TEXT NOT NULL,
+    description TEXT NULL,
+    price_amount_minor INTEGER NULL,
+    currency TEXT NOT NULL DEFAULT 'RUB',
+    default_duration_days INTEGER NULL,
+    status TEXT NOT NULL DEFAULT 'active',
+    is_renewable INTEGER NOT NULL DEFAULT 1,
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS tariff_options (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    tariff_id INTEGER NOT NULL REFERENCES tariffs(id) ON DELETE CASCADE,
+    option_id INTEGER NOT NULL REFERENCES paid_options(id) ON DELETE CASCADE,
+    included_duration_days INTEGER NULL,
+    included_quantity INTEGER NULL,
+    created_at TEXT NOT NULL,
+    UNIQUE(tariff_id, option_id)
+);
 """
 
 

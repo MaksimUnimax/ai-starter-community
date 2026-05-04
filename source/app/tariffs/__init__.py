@@ -1,1 +1,1 @@
-"""Tariffs module placeholder."""
+"""Tariffs catalog module."""

@@ -1,1 +1,1 @@
-"""Paid options module placeholder."""
+"""Paid options catalog module."""
