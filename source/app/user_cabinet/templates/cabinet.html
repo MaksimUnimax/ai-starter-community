@@ -12,6 +12,38 @@
     <p>Email: {{ user_email }}</p>
     <p>Логин: {{ user_login }}</p>
     <p>Платёж, материалы и тарифы появятся позже. Сейчас доступ ещё не активирован.</p>
+
+    {% if tariffs %}
+      <section>
+        <h2>Доступные тарифы</h2>
+        {% for tariff in tariffs %}
+          <article>
+            <h3>{{ tariff.title }}</h3>
+            {% if tariff.description %}
+              <p>{{ tariff.description }}</p>
+            {% endif %}
+            <p>{{ tariff.price_amount_minor // 100 }} ₽</p>
+            <p>{{ tariff.currency }}</p>
+            {% if tariff.options %}
+              <h4>Включённые опции</h4>
+              <ul>
+                {% for option in tariff.options %}
+                  <li>{{ option.title }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </article>
+        {% endfor %}
+      </section>
+    {% else %}
+      <section>
+        <h2>Доступные тарифы</h2>
+        <p>Каталог будет показан здесь после добавления тарифов.</p>
+      </section>
+    {% endif %}
+
+    <p>Оплата будет подключена следующим этапом.</p>
+
     <form method="post" action="/logout">
       <button type="submit">Выйти</button>
     </form>

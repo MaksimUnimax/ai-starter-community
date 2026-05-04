@@ -8,6 +8,7 @@ from app.tariffs.service import (
     STARTER_TARIFF_CODE,
     archive_tariff,
     get_tariff_by_code,
+    list_active_tariffs_with_options,
     list_tariff_options,
     list_tariffs,
     seed_initial_catalog,
@@ -173,3 +174,50 @@ def test_existing_auth_tests_still_pass(client, test_settings):
     response = client.get("/register")
     assert response.status_code == 200
     assert "Регистрация" in response.text
+
+
+def test_active_tariff_helper_returns_included_active_options(test_settings):
+    seed_initial_catalog(settings=test_settings)
+    tariffs = list_active_tariffs_with_options(settings=test_settings)
+    assert len(tariffs) == 1
+    tariff = tariffs[0]
+    assert tariff["code"] == STARTER_TARIFF_CODE
+    option_titles = [option["title"] for option in tariff["options"]]
+    assert option_titles == ["AI / GPT-инструмент", "Сервер", "VPN"]
+
+
+def test_hidden_and_archived_catalog_items_are_not_shown_by_default(test_settings):
+    seed_initial_catalog(settings=test_settings)
+    upsert_tariff(
+        code="display_hidden_tariff",
+        title="Hidden tariff",
+        price_amount_minor=100,
+        status="hidden",
+        settings=test_settings,
+    )
+    upsert_paid_option(
+        code="display_hidden_option",
+        title="Hidden option",
+        price_amount_minor=0,
+        status="hidden",
+        settings=test_settings,
+    )
+    upsert_tariff(
+        code="display_archived_tariff",
+        title="Archived tariff",
+        price_amount_minor=100,
+        status="archived",
+        settings=test_settings,
+    )
+    upsert_paid_option(
+        code="display_archived_option",
+        title="Archived option",
+        price_amount_minor=0,
+        status="archived",
+        settings=test_settings,
+    )
+
+    tariffs = list_active_tariffs_with_options(settings=test_settings)
+    assert {item["code"] for item in tariffs} == {STARTER_TARIFF_CODE}
+    assert "display_hidden_tariff" not in {item.code for item in list_tariffs(settings=test_settings)}
+    assert "display_hidden_option" not in {item.code for item in list_paid_options(settings=test_settings)}

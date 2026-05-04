@@ -149,6 +149,39 @@ def list_tariff_options(tariff_code: str, settings: Settings | None = None) -> l
         return [dict(row) for row in rows]
 
 
+def list_active_tariffs_with_options(settings: Settings | None = None) -> list[dict]:
+    with _connection(settings) as connection:
+        tariffs = connection.execute(
+            """
+            SELECT *
+            FROM tariffs
+            WHERE status = 'active'
+            ORDER BY sort_order ASC, id ASC, code ASC
+            """
+        ).fetchall()
+        result: list[dict] = []
+        for tariff_row in tariffs:
+            option_rows = connection.execute(
+                """
+                SELECT
+                    po.*,
+                    topt.included_duration_days,
+                    topt.included_quantity,
+                    topt.created_at AS link_created_at
+                FROM tariff_options AS topt
+                JOIN paid_options AS po ON po.id = topt.option_id
+                WHERE topt.tariff_id = ?
+                  AND po.status = 'active'
+                ORDER BY po.sort_order ASC, po.id ASC, po.code ASC
+                """,
+                (int(tariff_row["id"]),),
+            ).fetchall()
+            tariff_payload = dict(tariff_row)
+            tariff_payload["options"] = [dict(option_row) for option_row in option_rows]
+            result.append(tariff_payload)
+        return result
+
+
 def _ensure_tariff_option_link(
     connection,
     tariff_code: str,

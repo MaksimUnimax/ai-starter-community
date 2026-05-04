@@ -8,6 +8,7 @@ from fastapi.templating import Jinja2Templates
 
 from app.auth.service import get_user_by_session_token
 from app.core.config import get_settings
+from app.tariffs.service import list_active_tariffs_with_options
 from app.shared.utils import page_title
 
 router = APIRouter()
@@ -29,6 +30,7 @@ def cabinet_page(request: Request):
         return RedirectResponse(url="/login", status_code=303)
 
     access_status_label = "Доступ не активирован" if user.access_status == "not_activated" else user.access_status
+    tariffs = list_active_tariffs_with_options(settings=settings)
     return _template(
         request,
         "cabinet.html",
@@ -37,6 +39,7 @@ def cabinet_page(request: Request):
         user_login=user.login,
         access_status=user.access_status,
         access_status_label=access_status_label,
+        tariffs=tariffs,
     )
 
 
