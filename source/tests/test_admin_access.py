@@ -57,7 +57,9 @@ def test_normal_user_gets_forbidden_on_admin(client, test_settings):
     _make_user(client, test_settings, "admin-user@example.com", "adminuser", role="user")
     response = client.get("/admin")
     assert response.status_code == 403
-    assert "Forbidden" in response.text
+    assert "Доступ запрещён" in response.text
+    assert "прав администратора" in response.text
+    assert "Forbidden" not in response.text
 
 
 def test_admin_user_can_open_admin_dashboard(client, test_settings):

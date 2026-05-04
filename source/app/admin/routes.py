@@ -70,7 +70,7 @@ def _admin_user_or_redirect(request: Request, settings=None):
     if user is None:
         return None, RedirectResponse(url="/login", status_code=303)
     if user.role != "admin":
-        return user, PlainTextResponse("Forbidden", status_code=403)
+        return user, PlainTextResponse("Доступ запрещён\nУ вашей учётной записи нет прав администратора.", status_code=403)
     return user, None
 
 

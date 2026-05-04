@@ -72,7 +72,9 @@ def test_normal_user_cannot_open_paid_option_create_page(client, test_settings):
 
     response = client.get("/admin/paid-options/new")
     assert response.status_code == 403
-    assert "Forbidden" in response.text
+    assert "Доступ запрещён" in response.text
+    assert "прав администратора" in response.text
+    assert "Forbidden" not in response.text
 
 
 def test_admin_can_open_paid_option_create_page(client, test_settings):

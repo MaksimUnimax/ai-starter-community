@@ -92,7 +92,9 @@ def test_normal_user_gets_forbidden_on_tariff_options_page(client, test_settings
 
     response = client.get(f"/admin/tariffs/{STARTER_TARIFF_CODE}/options")
     assert response.status_code == 403
-    assert "Forbidden" in response.text
+    assert "Доступ запрещён" in response.text
+    assert "прав администратора" in response.text
+    assert "Forbidden" not in response.text
 
 
 def test_admin_tariff_options_page_returns_404_for_missing_tariff(client, test_settings):

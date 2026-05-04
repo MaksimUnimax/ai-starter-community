@@ -72,7 +72,9 @@ def test_normal_user_gets_forbidden_on_admin_list_pages(client, test_settings, p
     _make_user(client, test_settings, "user@example.com", "regularuser", role="user")
     response = client.get(path)
     assert response.status_code == 403
-    assert "Forbidden" in response.text
+    assert "Доступ запрещён" in response.text
+    assert "прав администратора" in response.text
+    assert "Forbidden" not in response.text
 
 
 @pytest.mark.parametrize(
