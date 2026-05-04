@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Пользователи</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Email</th>
+        <th>Login</th>
+        <th>Role</th>
+        <th>Active</th>
+        <th>Email verified</th>
+        <th>Access status</th>
+        <th>Materials access</th>
+        <th>Created at</th>
+        <th>Updated at</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in users %}
+        <tr>
+          <td>{{ user.id }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.login }}</td>
+          <td>{{ user.role }}</td>
+          <td>{{ "yes" if user.is_active else "no" }}</td>
+          <td>{{ "verified" if user.email_verified else "unverified" }}</td>
+          <td>{{ user.access_status }}</td>
+          <td>{{ "yes" if user.materials_access_granted else "no" }}</td>
+          <td>{{ user.created_at }}</td>
+          <td>{{ user.updated_at }}</td>
+        </tr>
+      {% else %}
+        <tr>
+          <td colspan="10">Нет пользователей.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

@@ -165,6 +165,37 @@ def _fetch_user_by_id(user_id: int, settings: Settings | None = None) -> UserPub
         return _public_user_from_row(row) if row else None
 
 
+def _admin_user_from_row(row) -> dict[str, object]:
+    return {
+        "id": int(row["id"]),
+        "email": str(row["email"]),
+        "login": str(row["login"]),
+        "role": str(row["role"]),
+        "is_active": bool(row["is_active"]),
+        "email_verified": row["email_verified_at"] is not None,
+        "materials_access_granted": row["materials_access_granted_at"] is not None,
+        "access_status": str(row["access_status"]),
+        "created_at": str(row["created_at"]),
+        "updated_at": str(row["updated_at"]),
+    }
+
+
+def list_users_for_admin(settings: Settings | None = None) -> list[dict[str, object]]:
+    """Return a safe summary of users for admin read-only lists."""
+    with _connection(settings) as connection:
+        rows = connection.execute(
+            """
+            SELECT
+                id, email, login, role, is_active,
+                email_verified_at, materials_access_granted_at,
+                access_status, created_at, updated_at
+            FROM users
+            ORDER BY id ASC
+            """
+        ).fetchall()
+        return [_admin_user_from_row(row) for row in rows]
+
+
 def _fetch_user_by_role_identifier(identifier_kind: str, identifier_value: str, settings: Settings | None = None):
     with _connection(settings) as connection:
         query = "SELECT * FROM users WHERE email = ?" if identifier_kind == "email" else "SELECT * FROM users WHERE login = ?"

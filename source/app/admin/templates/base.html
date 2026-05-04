@@ -6,6 +6,18 @@
   <title>{{ title }}</title>
 </head>
 <body>
+  <header>
+    <nav aria-label="Админ-навигация">
+      <ul>
+        <li><a href="/admin">Панель</a></li>
+        <li><a href="/admin/users">Пользователи</a></li>
+        <li><a href="/admin/tariffs">Тарифы</a></li>
+        <li><a href="/admin/paid-options">Платные опции</a></li>
+        <li>Материалы - позже</li>
+        <li>Платежи - позже</li>
+      </ul>
+    </nav>
+  </header>
   <main>
     {% block content %}{% endblock %}
   </main>

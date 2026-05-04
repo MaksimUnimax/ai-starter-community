@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Тарифы</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Code</th>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Price</th>
+        <th>Currency</th>
+        <th>Status</th>
+        <th>Sort order</th>
+        <th>Included options</th>
+        <th>Created at</th>
+        <th>Updated at</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for tariff in tariffs %}
+        <tr>
+          <td>{{ tariff.code }}</td>
+          <td>{{ tariff.title }}</td>
+          <td>{{ tariff.description }}</td>
+          <td>{{ tariff.price_display }}</td>
+          <td>{{ tariff.currency }}</td>
+          <td>{{ tariff.status }}</td>
+          <td>{{ tariff.sort_order }}</td>
+          <td>{{ tariff.included_options_summary }}</td>
+          <td>{{ tariff.created_at }}</td>
+          <td>{{ tariff.updated_at }}</td>
+        </tr>
+      {% else %}
+        <tr>
+          <td colspan="10">Нет тарифов.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

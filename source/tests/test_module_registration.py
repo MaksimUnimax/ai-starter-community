@@ -12,6 +12,9 @@ def test_expected_routes_registered(app):
     assert "/reset-password/{token}" in paths
     assert "/verify-email/{token}" in paths
     assert "/cabinet" in paths
+    assert "/admin/users" in paths
+    assert "/admin/tariffs" in paths
+    assert "/admin/paid-options" in paths
 
 
 def test_app_entrypoint_is_composition_only():
