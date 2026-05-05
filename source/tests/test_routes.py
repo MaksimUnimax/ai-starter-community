@@ -13,11 +13,19 @@ def test_landing_page(client):
     assert "Начать работу" in response.text
     assert "Как это работает" in response.text
     assert "Для кого OpenScript" in response.text
+    assert "Для тех, у кого есть идея MVP" in response.text
+    assert "Для малого бизнеса и самозанятых" in response.text
+    assert "Для селлеров и онлайн-продавцов" in response.text
+    assert "Для тех, кто хочет сменить траекторию" in response.text
+    assert "Для тех, кому давно интересно программирование" in response.text
+    assert "Для тех, кто работает с таблицами и отчётами" in response.text
+    assert "собирать данные, считать показатели, находить изменения" in response.text
     assert "Какие задачи можно решать с OpenScript" in response.text
     assert "Полный доступ — 4 990 ₽" in response.text
     assert "Вопросы перед стартом" in response.text
     assert "Создавайте свои первые программы без знаний и опыта" not in response.text
     assert "Вы получаете рабочую среду" not in response.text
+    assert "OpenScript рассчитан на людей, которым нужен понятный способ начать делать свои инструменты без длинного входа в профессию." not in response.text
     assert "/static/styles.css" in response.text
     assert "/register" in response.text
 
