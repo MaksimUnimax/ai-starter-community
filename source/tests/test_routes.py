@@ -11,7 +11,8 @@ def test_landing_page(client):
     assert "видеть потребности людей, замечать тренды" in response.text
     assert "даже если у вас нет технических знаний и опыта" in response.text
     assert "Начать работу" in response.text
-    assert "Как это работает" in response.text
+    assert "Как устроена работа" in response.text
+    assert 'href="#how-it-works"' in response.text
     assert "Для кого OpenScript" in response.text
     assert "Для тех, у кого есть идея MVP" in response.text
     assert "Для малого бизнеса и самозанятых" in response.text
@@ -25,6 +26,12 @@ def test_landing_page(client):
     assert "Вопросы перед стартом" in response.text
     assert "Создавайте свои первые программы без знаний и опыта" not in response.text
     assert "Вы получаете рабочую среду" not in response.text
+    assert "Регистрируетесь" not in response.text
+    assert "Получаете полный доступ" not in response.text
+    assert "Настраиваете рабочую среду" not in response.text
+    assert "Выбираете первую задачу" not in response.text
+    assert "Двигаетесь по инструкции" not in response.text
+    assert "Если застряли — задаёте вопрос" not in response.text
     assert "OpenScript рассчитан на людей, которым нужен понятный способ начать делать свои инструменты без длинного входа в профессию." not in response.text
     assert "/static/styles.css" in response.text
     assert "/register" in response.text
