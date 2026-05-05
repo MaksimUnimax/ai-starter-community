@@ -1,20 +1,285 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <section class="card stack">
-    <p class="muted">Главная страница</p>
-    <h1 class="section-title">Главная</h1>
-    <p>Начните делать программы без знания кода.</p>
+  {% set start_href = "/cabinet" if current_user else "/register" %}
+  <section class="card stack landing-hero">
+    <div class="hero-layout">
+      <div class="stack hero-copy">
+        <p class="muted">OpenScript</p>
+        <h1 class="section-title hero-title">Создавайте свои первые программы без знаний и опыта</h1>
+        <p class="hero-lead">
+          Если у вас есть идея, задача или рутина, которую хочется автоматизировать, OpenScript поможет начать без программиста, долгого обучения и большого бюджета на разработку.
+        </p>
+        <p class="hero-text">
+          Вы получаете рабочую среду, понятные инструкции, помощь на старте и комьюнити, где можно задавать вопросы и разбираться в первых шагах.
+        </p>
+
+        <div class="actions hero-actions">
+          <a class="button button-primary" href="{{ start_href }}">Начать работу</a>
+          <a class="button button-secondary" href="#how-it-works">Как это работает</a>
+        </div>
+
+        <div class="hero-badges" aria-label="Ключевые преимущества">
+          <span class="badge">Полный доступ — 4 990 ₽</span>
+          <span class="badge badge-muted">Доступ к материалам навсегда</span>
+          <span class="badge badge-muted">VK · MAX · Telegram</span>
+        </div>
+      </div>
+
+      <aside class="card stack hero-panel" aria-label="Что вы получите на старте">
+        <p class="muted">Что вы получаете</p>
+        <h2 class="section-title">Первые шаги без перегруза</h2>
+        <ul class="check-list">
+          <li>Понятный порядок действий без ощущения, что нужно разбираться во всём сразу.</li>
+          <li>Материалы, инструкции и готовые примеры для старта.</li>
+          <li>Помощь участников и админов в чатах VK, MAX и Telegram.</li>
+          <li>Стартовый набор рабочей среды: инструмент, сервер и VPN.</li>
+        </ul>
+        <div class="hero-aside-note stack">
+          <h3 class="section-title">Спокойный старт</h3>
+          <p class="muted">
+            Сначала вы собираете простую рабочую версию, проверяете идею и только потом решаете, что улучшать дальше.
+          </p>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="stack">
+    <div class="stack section-copy">
+      <p class="muted">Для кого OpenScript</p>
+      <h2 class="section-title">Для кого OpenScript</h2>
+      <p class="muted">
+        OpenScript рассчитан на людей, которым нужен понятный способ начать делать свои инструменты без длинного входа в профессию.
+      </p>
+    </div>
+
+    <div class="card-grid tight">
+      <article class="card stack value-card">
+        <h3 class="section-title">Для тех, у кого есть идея MVP</h3>
+        <p>Хотите проверить идею, но не готовы сразу платить разработчику. OpenScript помогает собрать простую рабочую версию и понять, стоит ли развивать проект дальше.</p>
+      </article>
+      <article class="card stack value-card">
+        <h3 class="section-title">Для малого бизнеса и самозанятых</h3>
+        <p>Когда нужно принимать заявки, разбирать таблицы, следить за ценами, обрабатывать файлы или автоматизировать повторяющиеся задачи.</p>
+      </article>
+      <article class="card stack value-card">
+        <h3 class="section-title">Для тех, кто ищет новое направление</h3>
+        <p>Если вы ищете работу, переобучаетесь или хотите понять, какие возможности открылись сейчас, OpenScript поможет попробовать новый способ создания программ без старого входа в профессию.</p>
+      </article>
+      <article class="card stack value-card">
+        <h3 class="section-title">Для людей без технического опыта</h3>
+        <p>Если вы не знаете языков программирования и не понимаете, с чего начать, внутри будет понятный порядок действий и помощь на первых шагах.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="stack" id="use-cases">
+    <div class="stack section-copy">
+      <p class="muted">Какие задачи можно решать с OpenScript</p>
+      <h2 class="section-title">Какие задачи можно решать с OpenScript</h2>
+      <p class="muted">
+        OpenScript нужен не для абстрактного «изучения программирования». Он помогает увидеть, какие рабочие инструменты можно собрать под свои задачи, даже если раньше вы не писали код.
+      </p>
+    </div>
+
+    <div class="card-grid tight">
+      <article class="card stack value-card">
+        <h3 class="section-title">Проверить идею</h3>
+        <p>Соберите простую версию идеи и поймите, стоит ли развивать её дальше.</p>
+        <p class="muted">Напишите MVP, чтобы проверить идею перед тем, как платить разработчику: простой сервис, бот, форма, инструмент для клиентов или внутренняя автоматизация.</p>
+      </article>
+      <article class="card stack value-card">
+        <h3 class="section-title">Создать себе помощника</h3>
+        <p>Соберите помощника, который берёт на себя повторяющиеся действия.</p>
+        <p class="muted">Он может разбирать сообщения, готовить черновики ответов, собирать данные, приводить таблицы в порядок, напоминать о задачах или помогать проходить однотипные рабочие процессы.</p>
+      </article>
+      <article class="card stack value-card">
+        <h3 class="section-title">Сделать бота для клиентов или команды</h3>
+        <p>Бот может принимать заявки, задавать вопросы, сохранять ответы и передавать их вам.</p>
+        <p class="muted">Например: клиент пишет в VK, MAX или Telegram, бот уточняет детали, складывает заявку в таблицу и отправляет уведомление.</p>
+      </article>
+      <article class="card stack value-card">
+        <h3 class="section-title">Создать агента для действий</h3>
+        <p>Агент — это не просто чат. Он может выполнять пошаговую задачу: открыть сайт, найти информацию, заполнить форму, сравнить варианты, собрать данные и показать результат.</p>
+        <p class="muted">Такие агенты можно использовать для работы с сайтами, сервисами, кабинетами и повторяющимися процессами.</p>
+      </article>
+      <article class="card stack value-card">
+        <h3 class="section-title">Следить за трендами и данными</h3>
+        <p>Соберите инструмент, который помогает видеть, что происходит в вашей нише.</p>
+        <p class="muted">Например: какие темы обсуждают, какие товары набирают интерес, какие вопросы задают клиенты, как меняются цены конкурентов и какие идеи стоит проверить первыми.</p>
+      </article>
+      <article class="card stack value-card">
+        <h3 class="section-title">Автоматизировать рутину</h3>
+        <p>Уберите ручные действия, которые каждый день забирают время.</p>
+        <p class="muted">Например: обработка файлов, прайсов, таблиц, заявок, описаний, списков, отчётов и других однотипных задач.</p>
+      </article>
+    </div>
+
+    <p class="muted section-note">
+      Это только примеры. Внутри OpenScript вы будете учиться не списку шаблонов, а способу превращать свою задачу в рабочий инструмент.
+    </p>
+  </section>
+
+  <section class="stack" id="how-it-works">
+    <div class="stack section-copy">
+      <p class="muted">Как это работает</p>
+      <h2 class="section-title">Как это работает</h2>
+    </div>
+
+    <div class="card-grid tight">
+      <article class="card stack step-card">
+        <span class="badge badge-muted">1</span>
+        <h3 class="section-title">Регистрируетесь</h3>
+        <p>Создаёте аккаунт и попадаете в личный кабинет.</p>
+      </article>
+      <article class="card stack step-card">
+        <span class="badge badge-muted">2</span>
+        <h3 class="section-title">Получаете полный доступ</h3>
+        <p>После оплаты открываются материалы, инструкции, команды и чаты.</p>
+      </article>
+      <article class="card stack step-card">
+        <span class="badge badge-muted">3</span>
+        <h3 class="section-title">Настраиваете рабочую среду</h3>
+        <p>Мы помогаем пройти первые шаги и подготовить всё к работе.</p>
+      </article>
+      <article class="card stack step-card">
+        <span class="badge badge-muted">4</span>
+        <h3 class="section-title">Выбираете первую задачу</h3>
+        <p>Например: бот для заявок, помощник, обработка таблицы, сбор данных, агент или простой MVP.</p>
+      </article>
+      <article class="card stack step-card">
+        <span class="badge badge-muted">5</span>
+        <h3 class="section-title">Двигаетесь по инструкции</h3>
+        <p>Вы не учите язык программирования с нуля, а идёте по понятному порядку действий.</p>
+      </article>
+      <article class="card stack step-card">
+        <span class="badge badge-muted">6</span>
+        <h3 class="section-title">Если застряли — задаёте вопрос</h3>
+        <p>В чатах VK, MAX и Telegram помогают участники и админы.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="stack">
+    <div class="stack section-copy">
+      <p class="muted">Что входит в полный доступ</p>
+      <h2 class="section-title">Что входит в полный доступ</h2>
+      <p class="muted">
+        После оплаты вы получаете доступ к материалам, инструкциям, помощи на старте и комьюнити. Материалы остаются доступны навсегда.
+      </p>
+    </div>
+
+    <div class="card-grid tight">
+      <article class="card stack value-card">
+        <h3 class="section-title">Доступ к материалам навсегда</h3>
+        <p class="muted">Материалы остаются с вами и не исчезают после первого запуска.</p>
+      </article>
+      <article class="card stack value-card">
+        <h3 class="section-title">Пошаговые инструкции</h3>
+        <p class="muted">Понятные шаги помогают начать без хаотичного поиска решений.</p>
+      </article>
+      <article class="card stack value-card">
+        <h3 class="section-title">Готовые команды и примеры</h3>
+        <p class="muted">Можно копировать рабочие заготовки и адаптировать их под свою задачу.</p>
+      </article>
+      <article class="card stack value-card">
+        <h3 class="section-title">Помощь с настройкой и началом работы</h3>
+        <p class="muted">Мы помогаем пройти первые шаги и не застрять на старте.</p>
+      </article>
+      <article class="card stack value-card">
+        <h3 class="section-title">Ответы на вопросы через чаты</h3>
+        <p class="muted">Поддержка идёт через рабочие чаты, а не через обещания круглосуточной индивидуальной линии.</p>
+      </article>
+      <article class="card stack value-card">
+        <h3 class="section-title">Комьюнити в VK, MAX и Telegram</h3>
+        <p class="muted">В чатах помогают участники и админы.</p>
+      </article>
+      <article class="card stack value-card">
+        <h3 class="section-title">Стартовый набор рабочей среды: инструмент, сервер и VPN</h3>
+        <p class="muted">Базовая среда помогает начать работу без отдельной сборки всего с нуля.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="card stack price-panel">
+    <div class="stack section-copy">
+      <p class="muted">Цена</p>
+      <h2 class="section-title">Полный доступ — 4 990 ₽</h2>
+      <p>
+        После оплаты вы получаете доступ к материалам, инструкциям, помощи на старте и комьюнити. Материалы остаются доступны навсегда.
+      </p>
+      <p class="muted">
+        Отдельные компоненты рабочей среды в будущем можно будет продлевать отдельно, если они вам нужны дальше.
+      </p>
+    </div>
     <div class="actions">
-      {% if current_user %}
-        <a class="button button-primary" href="/materials">Работа с ИИ</a>
-        <a class="button button-secondary" href="/cabinet">Личный кабинет</a>
-        {% if current_user.role == "admin" %}
-          <a class="button button-secondary" href="/admin">Админ-панель</a>
-        {% endif %}
-      {% else %}
-        <a class="button button-primary" href="/login">Вход / регистрация</a>
-      {% endif %}
+      <a class="button button-primary" href="{{ start_href }}">Начать работу</a>
+    </div>
+  </section>
+
+  <section class="stack">
+    <div class="stack section-copy">
+      <p class="muted">Честно о результате</p>
+      <h2 class="section-title">Честно о результате</h2>
+      <p>
+        OpenScript не обещает мгновенных чудес. Сложные продукты всё равно требуют времени, проверки и аккуратной работы.
+      </p>
+      <p>
+        Но если раньше для первого шага почти всегда нужен был программист, сейчас можно начать иначе: собрать простую рабочую версию, проверить идею, автоматизировать рутину и понять, куда двигаться дальше.
+      </p>
+    </div>
+  </section>
+
+  <section class="stack">
+    <div class="stack section-copy">
+      <p class="muted">Вопросы перед стартом</p>
+      <h2 class="section-title">Вопросы перед стартом</h2>
+    </div>
+
+    <div class="faq-list">
+      <details class="card faq-item">
+        <summary>Нужно ли уметь программировать?</summary>
+        <p>Нет. OpenScript рассчитан на людей без технического опыта. Вам не нужно заранее знать языки программирования.</p>
+      </details>
+      <details class="card faq-item">
+        <summary>Нужно ли заранее разбираться в сложных инструментах?</summary>
+        <p>Нет. Идея в том, чтобы дать понятный порядок действий, рабочую среду и помощь на первых шагах.</p>
+      </details>
+      <details class="card faq-item">
+        <summary>Что я смогу сделать?</summary>
+        <p>Начать с простых рабочих вещей: бот для заявок, MVP идеи, помощник для рутины, сбор данных, обработка таблиц, агент для пошаговых действий.</p>
+      </details>
+      <details class="card faq-item">
+        <summary>Мне помогут, если я застряну?</summary>
+        <p>Да. Внутри есть чаты в VK, MAX и Telegram, где можно задавать вопросы. Помогают участники и админы.</p>
+      </details>
+      <details class="card faq-item">
+        <summary>Доступ к материалам останется?</summary>
+        <p>Да. После оплаты доступ к материалам остаётся навсегда.</p>
+      </details>
+      <details class="card faq-item">
+        <summary>Это разработка проекта за меня?</summary>
+        <p>Нет. OpenScript помогает вам начать делать свои инструменты самостоятельно: с инструкциями, средой, примерами и поддержкой на старте.</p>
+      </details>
+      <details class="card faq-item">
+        <summary>Можно ли проверить идею перед дорогой разработкой?</summary>
+        <p>Да. Один из главных сценариев — написать MVP, чтобы понять, стоит ли платить за полноценную разработку.</p>
+      </details>
+    </div>
+  </section>
+
+  <section class="card stack final-cta">
+    <div class="stack section-copy">
+      <p class="muted">Начните с первой простой задачи</p>
+      <h2 class="section-title">Начните с первой простой задачи</h2>
+      <p>
+        Не нужно ждать идеального момента или большого бюджета. Выберите задачу, получите доступ и начните разбираться шаг за шагом.
+      </p>
+    </div>
+    <div class="actions">
+      <a class="button button-primary" href="{{ start_href }}">Начать работу</a>
+      <a class="button button-secondary" href="#how-it-works">Как это работает</a>
     </div>
   </section>
 {% endblock %}

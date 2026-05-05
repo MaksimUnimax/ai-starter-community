@@ -1,14 +1,20 @@
 def test_landing_page(client):
     response = client.get("/")
     assert response.status_code == 200
-    assert "Главная" in response.text
-    assert "Начните делать программы без знания кода" in response.text
-    assert "Вход / регистрация" in response.text
-    assert "/login" in response.text
+    assert "OpenScript — программы, боты и MVP без знаний и опыта" in response.text
+    assert (
+        '<meta name="description" content="OpenScript помогает людям без технического опыта создавать простые программы, боты, MVP, помощников, агентов и автоматизации под свои задачи.">'
+        in response.text
+    )
+    assert "Создавайте свои первые программы без знаний и опыта" in response.text
+    assert "Начать работу" in response.text
+    assert "Как это работает" in response.text
+    assert "Для кого OpenScript" in response.text
+    assert "Какие задачи можно решать с OpenScript" in response.text
+    assert "Полный доступ — 4 990 ₽" in response.text
+    assert "Вопросы перед стартом" in response.text
     assert "/static/styles.css" in response.text
-    assert "/register" not in response.text
-    assert "Войти" not in response.text
-    assert "Регистрация" not in response.text
+    assert "/register" in response.text
 
 
 def test_login_and_register_pages(client):

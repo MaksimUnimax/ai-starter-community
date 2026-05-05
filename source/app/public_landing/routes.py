@@ -11,6 +11,11 @@ from app.auth.service import get_current_user_from_cookies
 from app.core.config import get_settings
 
 router = APIRouter()
+LANDING_TITLE = "OpenScript — программы, боты и MVP без знаний и опыта"
+LANDING_META_DESCRIPTION = (
+    "OpenScript помогает людям без технического опыта создавать простые программы, "
+    "боты, MVP, помощников, агентов и автоматизации под свои задачи."
+)
 templates = Jinja2Templates(directory=str(Path(__file__).resolve().parent / "templates"))
 templates.env.loader = ChoiceLoader(
     [
@@ -32,7 +37,12 @@ def _template(request: Request, template_name: str, **context) -> HTMLResponse:
 
 @router.get("/", response_class=HTMLResponse)
 def landing_page(request: Request) -> HTMLResponse:
-    return _template(request, "index.html", title="Главная")
+    return _template(
+        request,
+        "index.html",
+        title=LANDING_TITLE,
+        meta_description=LANDING_META_DESCRIPTION,
+    )
 
 
 @router.head("/")
