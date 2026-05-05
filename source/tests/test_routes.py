@@ -6,7 +6,6 @@ def test_landing_page(client):
         '<meta name="description" content="OpenScript помогает людям без технического опыта создавать простые программы, боты, MVP, помощников, агентов и автоматизации под свои задачи.">'
         in response.text
     )
-    assert "Создавайте свои первые программы без знаний и опыта" in response.text
     assert "Пришло новое время для тех, кто хочет создавать" in response.text
     assert "Создание программ перестало быть закрытой территорией" in response.text
     assert "видеть потребности людей, замечать тренды" in response.text
@@ -17,9 +16,8 @@ def test_landing_page(client):
     assert "Какие задачи можно решать с OpenScript" in response.text
     assert "Полный доступ — 4 990 ₽" in response.text
     assert "Вопросы перед стартом" in response.text
-    assert "Что вы получаете" not in response.text
-    assert "Первые шаги без перегруза" not in response.text
-    assert "Спокойный старт" not in response.text
+    assert "Создавайте свои первые программы без знаний и опыта" not in response.text
+    assert "Вы получаете рабочую среду" not in response.text
     assert "/static/styles.css" in response.text
     assert "/register" in response.text
 
