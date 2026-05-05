@@ -62,6 +62,12 @@ def test_landing_page(client):
     assert "Если застряли — задаёте вопрос" not in response.text
     assert "OpenScript рассчитан на людей, которым нужен понятный способ начать делать свои инструменты без длинного входа в профессию." not in response.text
     assert "Можно ли проверить идею перед дорогой разработкой?" not in response.text
+    assert "Юридическая информация" in response.text
+    assert "ИП Ягофаров М.Р." in response.text
+    assert "Индивидуальный предприниматель Ягофаров Максим Ринатович" not in response.text
+    assert "ИНН: 741705866660" in response.text
+    assert "ОГРНИП: 320745600093211" in response.text
+    assert "Email: OpenScripts@yandex.com" in response.text
     assert "/static/styles.css" in response.text
     assert "/register" in response.text
 
@@ -123,6 +129,12 @@ def test_auth_utility_pages_use_shared_base_and_styles(client):
         assert "/static/styles.css" in response.text
         assert "Главная" in response.text
         assert "Вход / регистрация" in response.text
+        assert "Юридическая информация" in response.text
+        assert "ИП Ягофаров М.Р." in response.text
+        assert "Индивидуальный предприниматель Ягофаров Максим Ринатович" not in response.text
+        assert "ИНН: 741705866660" in response.text
+        assert "ОГРНИП: 320745600093211" in response.text
+        assert "Email: OpenScripts@yandex.com" in response.text
         assert "Личный кабинет" not in response.text
         assert "Работа с ИИ" not in response.text
         assert "Админ-панель" not in response.text

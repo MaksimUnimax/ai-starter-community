@@ -9,11 +9,11 @@
   {% endif %}
   <link rel="stylesheet" href="/static/styles.css">
 </head>
-<body class="page">
-  <div class="page-shell">
-    <header class="top-nav" aria-label="Основная навигация">
-      <a class="nav-link" href="/">Главная</a>
-      {% if current_user %}
+  <body class="page">
+    <div class="page-shell">
+      <header class="top-nav" aria-label="Основная навигация">
+        <a class="nav-link" href="/">Главная</a>
+        {% if current_user %}
         <a class="nav-link" href="/materials">Работа с ИИ</a>
         <a class="nav-link" href="/cabinet">Личный кабинет</a>
         {% if current_user.role == "admin" %}
@@ -26,9 +26,20 @@
         <a class="nav-link" href="/login">Вход / регистрация</a>
       {% endif %}
     </header>
-    <main class="page-content">
-      {% block content %}{% endblock %}
-    </main>
-  </div>
-</body>
+      <main class="page-content">
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+    <footer class="site-footer" aria-label="Юридическая информация">
+      <div class="site-footer-inner">
+        <p class="site-footer-title">Юридическая информация</p>
+        <address class="site-footer-legal">
+          <p>ИП Ягофаров М.Р.</p>
+          <p>ИНН: 741705866660</p>
+          <p>ОГРНИП: 320745600093211</p>
+          <p>Email: OpenScripts@yandex.com</p>
+        </address>
+      </div>
+    </footer>
+  </body>
 </html>
