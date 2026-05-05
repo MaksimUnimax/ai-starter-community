@@ -395,8 +395,8 @@ button:hover {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.85fr);
-  gap: 24px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
   align-items: start;
 }
 
@@ -438,11 +438,43 @@ button:hover {
   background: rgba(255, 255, 255, 0.96);
 }
 
-.hero-aside-note {
-  padding: 14px 16px;
-  border-radius: var(--radius-sm);
-  background: var(--surface-alt);
-  border: 1px solid var(--border);
+.core-idea-panel {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at top right, rgba(33, 68, 216, 0.12), transparent 32%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(245, 248, 253, 0.98));
+}
+
+.core-idea-panel::after {
+  content: "";
+  position: absolute;
+  inset: auto -60px -60px auto;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(33, 68, 216, 0.16), rgba(33, 68, 216, 0));
+  pointer-events: none;
+}
+
+.core-idea-copy {
+  position: relative;
+  z-index: 1;
+  max-width: 74ch;
+}
+
+.core-idea-title {
+  font-size: clamp(1.7rem, 4vw, 2.5rem);
+  line-height: 1.12;
+}
+
+.core-idea-copy p {
+  margin: 0;
+  font-size: 1.04rem;
+}
+
+.core-idea-copy p + p {
+  color: var(--muted);
 }
 
 .section-copy {

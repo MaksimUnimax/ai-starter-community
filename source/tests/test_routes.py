@@ -7,12 +7,19 @@ def test_landing_page(client):
         in response.text
     )
     assert "Создавайте свои первые программы без знаний и опыта" in response.text
+    assert "Пришло новое время для тех, кто хочет создавать" in response.text
+    assert "Создание программ перестало быть закрытой территорией" in response.text
+    assert "видеть потребности людей, замечать тренды" in response.text
+    assert "даже если у вас нет технических знаний и опыта" in response.text
     assert "Начать работу" in response.text
     assert "Как это работает" in response.text
     assert "Для кого OpenScript" in response.text
     assert "Какие задачи можно решать с OpenScript" in response.text
     assert "Полный доступ — 4 990 ₽" in response.text
     assert "Вопросы перед стартом" in response.text
+    assert "Что вы получаете" not in response.text
+    assert "Первые шаги без перегруза" not in response.text
+    assert "Спокойный старт" not in response.text
     assert "/static/styles.css" in response.text
     assert "/register" in response.text
 

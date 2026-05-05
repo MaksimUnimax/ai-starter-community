@@ -3,45 +3,42 @@
 {% block content %}
   {% set start_href = "/cabinet" if current_user else "/register" %}
   <section class="card stack landing-hero">
-    <div class="hero-layout">
-      <div class="stack hero-copy">
-        <p class="muted">OpenScript</p>
-        <h1 class="section-title hero-title">Создавайте свои первые программы без знаний и опыта</h1>
-        <p class="hero-lead">
-          Если у вас есть идея, задача или рутина, которую хочется автоматизировать, OpenScript поможет начать без программиста, долгого обучения и большого бюджета на разработку.
-        </p>
-        <p class="hero-text">
-          Вы получаете рабочую среду, понятные инструкции, помощь на старте и комьюнити, где можно задавать вопросы и разбираться в первых шагах.
-        </p>
+    <div class="stack hero-copy">
+      <p class="muted">OpenScript</p>
+      <h1 class="section-title hero-title">Создавайте свои первые программы без знаний и опыта</h1>
+      <p class="hero-lead">
+        Если у вас есть идея, задача или рутина, которую хочется автоматизировать, OpenScript поможет начать без программиста, долгого обучения и большого бюджета на разработку.
+      </p>
+      <p class="hero-text">
+        Вы получаете рабочую среду, понятные инструкции, помощь на старте и комьюнити, где можно задавать вопросы и разбираться в первых шагах.
+      </p>
 
-        <div class="actions hero-actions">
-          <a class="button button-primary" href="{{ start_href }}">Начать работу</a>
-          <a class="button button-secondary" href="#how-it-works">Как это работает</a>
-        </div>
-
-        <div class="hero-badges" aria-label="Ключевые преимущества">
-          <span class="badge">Полный доступ — 4 990 ₽</span>
-          <span class="badge badge-muted">Доступ к материалам навсегда</span>
-          <span class="badge badge-muted">VK · MAX · Telegram</span>
-        </div>
+      <div class="actions hero-actions">
+        <a class="button button-primary" href="{{ start_href }}">Начать работу</a>
+        <a class="button button-secondary" href="#how-it-works">Как это работает</a>
       </div>
 
-      <aside class="card stack hero-panel" aria-label="Что вы получите на старте">
-        <p class="muted">Что вы получаете</p>
-        <h2 class="section-title">Первые шаги без перегруза</h2>
-        <ul class="check-list">
-          <li>Понятный порядок действий без ощущения, что нужно разбираться во всём сразу.</li>
-          <li>Материалы, инструкции и готовые примеры для старта.</li>
-          <li>Помощь участников и админов в чатах VK, MAX и Telegram.</li>
-          <li>Стартовый набор рабочей среды: инструмент, сервер и VPN.</li>
-        </ul>
-        <div class="hero-aside-note stack">
-          <h3 class="section-title">Спокойный старт</h3>
-          <p class="muted">
-            Сначала вы собираете простую рабочую версию, проверяете идею и только потом решаете, что улучшать дальше.
-          </p>
-        </div>
-      </aside>
+      <div class="hero-badges" aria-label="Ключевые преимущества">
+        <span class="badge">Полный доступ — 4 990 ₽</span>
+        <span class="badge badge-muted">Доступ к материалам навсегда</span>
+        <span class="badge badge-muted">VK · MAX · Telegram</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="card stack core-idea-panel">
+    <div class="stack core-idea-copy">
+      <p class="muted">OpenScript</p>
+      <h2 class="section-title core-idea-title">Пришло новое время для тех, кто хочет создавать</h2>
+      <p>
+        Создание программ перестало быть закрытой территорией.
+      </p>
+      <p>
+        На первый план выходит не знание языков программирования, а умение видеть потребности людей, замечать тренды и превращать идеи в рабочие инструменты.
+      </p>
+      <p>
+        OpenScript помогает войти в этот новый мир и начать воплощать свои идеи в жизнь — даже если у вас нет технических знаний и опыта.
+      </p>
     </div>
   </section>
 
