@@ -50,7 +50,9 @@
 
     <div class="actions">
       <a class="button button-secondary" href="/">На главную</a>
-      <a class="button button-secondary" href="/cabinet">Личный кабинет</a>
+      {% if has_materials_access %}
+        <a class="button button-secondary" href="/cabinet">Личный кабинет</a>
+      {% endif %}
     </div>
   </section>
 {% endblock %}

@@ -88,6 +88,7 @@ def test_materials_shows_locked_state_without_access(client, test_settings):
     assert "Главная" in response.text
     assert "Личный кабинет" in response.text
     assert "Работа с ИИ" in response.text
+    assert response.text.count('href="/cabinet"') == 2
     assert "Раздел «Работа с ИИ» будет доступен после оплаты." in response.text
     assert "После первой оплаты доступ к разделу останется навсегда." in response.text
     assert "Быстрый старт" not in response.text
