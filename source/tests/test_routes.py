@@ -22,6 +22,10 @@ def test_landing_page(client):
     assert "Для тех, кто работает с таблицами и отчётами" in response.text
     assert "собирать данные, считать показатели, находить изменения" in response.text
     assert "Какие задачи можно решать с OpenScript" in response.text
+    assert "OpenScript нужен не для абстрактного" not in response.text
+    assert "Например:" not in response.text
+    assert "Такие агенты" not in response.text
+    assert "Агентов можно использовать" in response.text
     assert "Полный доступ — 4 990 ₽" in response.text
     assert "Вопросы перед стартом" in response.text
     assert "Создавайте свои первые программы без знаний и опыта" not in response.text
