@@ -36,7 +36,13 @@ def test_landing_page(client):
     assert "Честно о результате" not in response.text
     assert "Начните с первой простой задачи" not in response.text
     assert response.text.count("Что входит в полный доступ") == 1
+    assert "GPT Plus и сервер на 1 месяц" in response.text
+    assert "подписке GPT Plus" in response.text
+    assert "аренду сервера для работы на 1 месяц" in response.text
     assert "Полный доступ — 4 990 ₽" in response.text
+    assert "Продлевать подписку GPT Plus и аренду сервера можно по отдельности в личном кабинете" in response.text
+    assert "Стартовый набор рабочей среды: инструмент и сервер" not in response.text
+    assert "инструмент и сервер" not in response.text
     assert "Цена" not in response.text
     assert response.text.count("Вопросы перед стартом") == 1
     assert "Вопросы перед стартом" in response.text
