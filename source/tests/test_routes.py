@@ -12,6 +12,7 @@ def test_landing_page(client):
     assert "даже если у вас нет технических знаний и опыта" in response.text
     assert "Начать работу" in response.text
     assert "Как устроена работа" in response.text
+    assert "Модель работы OpenScript" not in response.text
     assert 'href="#how-it-works"' in response.text
     assert response.text.count("Для кого OpenScript") == 1
     assert "Для кого OpenScript" in response.text
@@ -36,6 +37,7 @@ def test_landing_page(client):
     assert "Начните с первой простой задачи" not in response.text
     assert response.text.count("Что входит в полный доступ") == 1
     assert "Полный доступ — 4 990 ₽" in response.text
+    assert "Цена" not in response.text
     assert response.text.count("Вопросы перед стартом") == 1
     assert "Вопросы перед стартом" in response.text
     assert "Какие программы и какое железо нужны для работы?" in response.text
