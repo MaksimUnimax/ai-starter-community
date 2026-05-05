@@ -378,6 +378,8 @@ def test_route_flow_login_by_login_and_password_reset(client, test_settings):
     forgot_response = client.post("/forgot-password", data={"email": "loginroute@example.com"})
     assert forgot_response.status_code == 200
     assert "Если такой адрес электронной почты зарегистрирован" in forgot_response.text
+    assert forgot_response.text.count("Если такой адрес электронной почты зарегистрирован") == 1
+    assert forgot_response.text.count("Укажите адрес электронной почты, чтобы мы смогли найти ваш аккаунт.") == 1
     assert "Подтвердить почту" not in forgot_response.text
     assert "Вернуться ко входу" in forgot_response.text
 
@@ -445,7 +447,8 @@ def test_login_and_reset_pages_show_clear_rules(client):
     assert "Подтверждение почты" not in login_response.text
     assert "Не пришло письмо подтверждения?" not in login_response.text
     assert "/resend-verification" not in login_response.text
-    assert "Если такой адрес электронной почты зарегистрирован" in forgot_response.text
+    assert "Укажите адрес электронной почты, чтобы мы смогли найти ваш аккаунт." in forgot_response.text
+    assert "Если такой адрес электронной почты зарегистрирован" not in forgot_response.text
     assert "Подтвердить почту" not in forgot_response.text
     assert "Вернуться ко входу" in forgot_response.text
     assert "минимум 8 символов" in reset_response.text

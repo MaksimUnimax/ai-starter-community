@@ -73,6 +73,8 @@ def test_auth_utility_pages_use_shared_base_and_styles(client):
         assert "Админ-панель" not in response.text
 
     assert "Не пришло письмо подтверждения?" in check_email_response.text
+    assert "Укажите адрес электронной почты, чтобы мы смогли найти ваш аккаунт." in forgot_response.text
+    assert "Если такой адрес электронной почты зарегистрирован" not in forgot_response.text
     assert "Подтвердить почту" not in forgot_response.text
     assert "Вернуться ко входу" in forgot_response.text
     assert "Войти" in reset_response.text or "Вернуться ко входу" in reset_response.text
