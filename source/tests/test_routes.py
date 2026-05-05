@@ -13,6 +13,7 @@ def test_landing_page(client):
     assert "Начать работу" in response.text
     assert "Как устроена работа" in response.text
     assert 'href="#how-it-works"' in response.text
+    assert response.text.count("Для кого OpenScript") == 1
     assert "Для кого OpenScript" in response.text
     assert "Для тех, у кого есть идея MVP" in response.text
     assert "Для малого бизнеса и самозанятых" in response.text
@@ -21,6 +22,7 @@ def test_landing_page(client):
     assert "Для тех, кому давно интересно программирование" in response.text
     assert "Для тех, кто работает с таблицами и отчётами" in response.text
     assert "собирать данные, считать показатели, находить изменения" in response.text
+    assert response.text.count("Какие задачи можно решать с OpenScript") == 1
     assert "Какие задачи можно решать с OpenScript" in response.text
     assert "OpenScript нужен не для абстрактного" not in response.text
     assert "Например:" not in response.text
@@ -32,8 +34,16 @@ def test_landing_page(client):
     assert "ВПН" not in response.text
     assert "Честно о результате" not in response.text
     assert "Начните с первой простой задачи" not in response.text
+    assert response.text.count("Что входит в полный доступ") == 1
     assert "Полный доступ — 4 990 ₽" in response.text
+    assert response.text.count("Вопросы перед стартом") == 1
     assert "Вопросы перед стартом" in response.text
+    assert "Какие программы и какое железо нужны для работы?" in response.text
+    assert "браузера Google Chrome" in response.text
+    assert "стандартного терминала вашей операционной системы" in response.text
+    assert "Мощное железо, отдельная видеокарта и сложная установка программ не нужны" in response.text
+    assert "основная работа проходит через браузер и терминал ОС" in response.text
+    assert "подключённые сервисы" not in response.text
     assert "Создавайте свои первые программы без знаний и опыта" not in response.text
     assert "Вы получаете рабочую среду" not in response.text
     assert "Регистрируетесь" not in response.text
