@@ -61,7 +61,7 @@ def test_landing_page(client):
     assert "Двигаетесь по инструкции" not in response.text
     assert "Если застряли — задаёте вопрос" not in response.text
     assert "OpenScript рассчитан на людей, которым нужен понятный способ начать делать свои инструменты без длинного входа в профессию." not in response.text
-    assert response.text.count("Можно ли проверить идею перед дорогой разработкой?") == 1
+    assert "Можно ли проверить идею перед дорогой разработкой?" not in response.text
     assert "/static/styles.css" in response.text
     assert "/register" in response.text
 
