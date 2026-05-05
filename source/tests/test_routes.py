@@ -26,6 +26,12 @@ def test_landing_page(client):
     assert "Например:" not in response.text
     assert "Такие агенты" not in response.text
     assert "Агентов можно использовать" in response.text
+    assert "Вы не обязаны сами писать код" not in response.text
+    assert "Ответы на вопросы через чаты" not in response.text
+    assert "VPN" not in response.text
+    assert "ВПН" not in response.text
+    assert "Честно о результате" not in response.text
+    assert "Начните с первой простой задачи" not in response.text
     assert "Полный доступ — 4 990 ₽" in response.text
     assert "Вопросы перед стартом" in response.text
     assert "Создавайте свои первые программы без знаний и опыта" not in response.text
@@ -37,6 +43,7 @@ def test_landing_page(client):
     assert "Двигаетесь по инструкции" not in response.text
     assert "Если застряли — задаёте вопрос" not in response.text
     assert "OpenScript рассчитан на людей, которым нужен понятный способ начать делать свои инструменты без длинного входа в профессию." not in response.text
+    assert response.text.count("Можно ли проверить идею перед дорогой разработкой?") == 1
     assert "/static/styles.css" in response.text
     assert "/register" in response.text
 
