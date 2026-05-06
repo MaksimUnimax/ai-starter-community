@@ -2,6 +2,112 @@
 
 {% block content %}
   {% set start_href = "/cabinet" if current_user else "/register" %}
+  {% macro ui_icon(name) -%}
+  <svg class="ui-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+    <use href="#icon-{{ name }}"></use>
+  </svg>
+  {%- endmacro %}
+  {% macro card_head(icon_name, title) -%}
+  <div class="card-head">
+    <span class="icon-badge">{{ ui_icon(icon_name) }}</span>
+    <h3 class="section-title">{{ title }}</h3>
+  </div>
+  {%- endmacro %}
+  <svg class="ui-sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="icon-idea" viewBox="0 0 24 24">
+      <path d="M12 3a6 6 0 0 0-3 11v2h6v-2a6 6 0 0 0-3-11Z"/>
+      <path d="M9.5 19h5"/>
+      <path d="M10.5 22h3"/>
+    </symbol>
+    <symbol id="icon-plan" viewBox="0 0 24 24">
+      <path d="M8 5h8"/>
+      <path d="M7 7h10v12H7z"/>
+      <path d="m9 11 1.2 1.2L13.5 9"/>
+      <path d="M9 15h6"/>
+    </symbol>
+    <symbol id="icon-server" viewBox="0 0 24 24">
+      <rect x="4" y="5" width="16" height="6" rx="2"/>
+      <rect x="4" y="13" width="16" height="6" rx="2"/>
+      <path d="M8 8h.01M8 16h.01"/>
+      <path d="M11 8h5M11 16h5"/>
+    </symbol>
+    <symbol id="icon-result" viewBox="0 0 24 24">
+      <path d="m12 4 1.8 3.6L18 9.4l-4.2 1.8L12 14.8l-1.8-3.6L6 9.4l4.2-1.8Z"/>
+      <path d="m7 18 3 3 7-7"/>
+    </symbol>
+    <symbol id="icon-users" viewBox="0 0 24 24">
+      <path d="M9.5 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/>
+      <path d="M4.5 19a5 5 0 0 1 10 0"/>
+      <path d="M16.5 12a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"/>
+      <path d="M13.8 19a4.3 4.3 0 0 1 6.2 0"/>
+    </symbol>
+    <symbol id="icon-bag" viewBox="0 0 24 24">
+      <path d="M8 8a4 4 0 0 1 8 0"/>
+      <path d="M5.5 8h13L17.5 20h-11L5.5 8Z"/>
+      <path d="M10 11h4"/>
+    </symbol>
+    <symbol id="icon-code" viewBox="0 0 24 24">
+      <path d="m9 8-4 4 4 4"/>
+      <path d="m15 8 4 4-4 4"/>
+      <path d="M13 6 11 18"/>
+    </symbol>
+    <symbol id="icon-table" viewBox="0 0 24 24">
+      <rect x="4" y="5" width="16" height="14" rx="2"/>
+      <path d="M4 10h16"/>
+      <path d="M4 15h16"/>
+      <path d="M9 5v14"/>
+      <path d="M15 5v14"/>
+    </symbol>
+    <symbol id="icon-bot" viewBox="0 0 24 24">
+      <rect x="4" y="6" width="16" height="11" rx="4"/>
+      <path d="M12 3v3"/>
+      <path d="M9 11h.01M15 11h.01"/>
+      <path d="M10 15h4"/>
+    </symbol>
+    <symbol id="icon-agent" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="8"/>
+      <path d="m14.4 9.6-1 3.4-3.4 1 1-3.4Z"/>
+      <path d="M12 6v2"/>
+      <path d="M18 12h-2"/>
+      <path d="M12 18v-2"/>
+      <path d="M6 12h2"/>
+    </symbol>
+    <symbol id="icon-chart" viewBox="0 0 24 24">
+      <path d="M5 19h14"/>
+      <path d="m6 15 4-4 3 2 5-6"/>
+      <path d="M17 7h1v1"/>
+    </symbol>
+    <symbol id="icon-repeat" viewBox="0 0 24 24">
+      <path d="M7 7a7 7 0 0 1 10.5 1.2L19 10"/>
+      <path d="M19 4v6h-6"/>
+      <path d="M17 17a7 7 0 0 1-10.5-1.2L5 14"/>
+      <path d="M5 20v-6h6"/>
+    </symbol>
+    <symbol id="icon-package" viewBox="0 0 24 24">
+      <path d="M12 4 5 8l7 4 7-4-7-4Z"/>
+      <path d="M5 8v8l7 4 7-4V8"/>
+      <path d="M12 12v8"/>
+    </symbol>
+    <symbol id="icon-price" viewBox="0 0 24 24">
+      <path d="M5 12 12 5h7v7l-7 7-7-7Z"/>
+      <path d="M15.5 8.5h.01"/>
+      <path d="M8.5 15.5 15.5 8.5"/>
+    </symbol>
+    <symbol id="icon-faq" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="8"/>
+      <path d="M9.8 9a2.2 2.2 0 1 1 3.2 2c-.9.5-1.5 1.2-1.5 2.5"/>
+      <path d="M12 17h.01"/>
+    </symbol>
+    <symbol id="icon-message" viewBox="0 0 24 24">
+      <path d="M5 6h14a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H12l-4.5 3v-3H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Z"/>
+      <path d="M8 11h8"/>
+      <path d="M8 14h4"/>
+    </symbol>
+    <symbol id="icon-support" viewBox="0 0 24 24">
+      <path d="M12 4a8 8 0 1 0 8 8"/>
+      <path d="M12 8v4l3 2"/>
+    </symbol>
+  </svg>
   <div class="public-landing-page">
     <section class="card story-hero">
       <div class="story-hero-grid">
@@ -20,19 +126,40 @@
           </div>
         </div>
 
-        <aside class="card story-hero-visual" aria-label="Ключевые направления OpenScript">
-          <div class="stack story-hero-visual-inner">
-            <p class="eyebrow">Направления</p>
-            <div class="hero-chip-grid">
-              <span>MVP</span>
-              <span>боты</span>
-              <span>агенты</span>
-              <span>помощники</span>
-              <span>автоматизация</span>
-              <span>сервер</span>
-              <span>комьюнити</span>
-              <span>VK / MAX / Telegram</span>
-            </div>
+        <aside class="card story-path-panel" aria-label="Рабочий путь OpenScript">
+          <div class="stack story-path-panel-inner">
+            <p class="section-kicker">Рабочий путь</p>
+            <h2 class="section-title">Как это работает</h2>
+            <ol class="work-path-list">
+              <li class="work-path-item">
+                <span class="icon-badge">{{ ui_icon('idea') }}</span>
+                <div class="work-path-copy">
+                  <h3>Идея</h3>
+                  <p>Вы формулируете задачу и показываете, что хотите создать.</p>
+                </div>
+              </li>
+              <li class="work-path-item">
+                <span class="icon-badge">{{ ui_icon('plan') }}</span>
+                <div class="work-path-copy">
+                  <h3>План</h3>
+                  <p>Ведущий разработчик превращает задачу в понятный маршрут работ.</p>
+                </div>
+              </li>
+              <li class="work-path-item">
+                <span class="icon-badge">{{ ui_icon('server') }}</span>
+                <div class="work-path-copy">
+                  <h3>Работа на сервере</h3>
+                  <p>Технический исполнитель вносит изменения, запускает проверки и исправляет ошибки.</p>
+                </div>
+              </li>
+              <li class="work-path-item">
+                <span class="icon-badge">{{ ui_icon('result') }}</span>
+                <div class="work-path-copy">
+                  <h3>Готовый результат</h3>
+                  <p>Вы смотрите итог, тестируете и принимаете рабочий вариант.</p>
+                </div>
+              </li>
+            </ol>
           </div>
         </aside>
       </div>
@@ -46,27 +173,27 @@
 
       <div class="audience-grid">
         <article class="card stack audience-card">
-          <h3 class="section-title">Для тех, у кого есть идея MVP</h3>
+          {{ card_head('idea', 'Для тех, у кого есть идея MVP') }}
           <p>Хотите проверить идею, но не готовы сразу платить разработчику. OpenScript помогает собрать простую рабочую версию и понять, стоит ли развивать проект дальше.</p>
         </article>
         <article class="card stack audience-card">
-          <h3 class="section-title">Для малого бизнеса и самозанятых</h3>
+          {{ card_head('users', 'Для малого бизнеса и самозанятых') }}
           <p>Когда заявки, таблицы, файлы, напоминания и ответы клиентам начинают забирать слишком много времени, OpenScript помогает создавать простые инструменты под свои рабочие задачи.</p>
         </article>
         <article class="card stack audience-card">
-          <h3 class="section-title">Для селлеров и онлайн-продавцов</h3>
+          {{ card_head('bag', 'Для селлеров и онлайн-продавцов') }}
           <p>Если нужно следить за ценами, товарами, остатками, описаниями и конкурентами, OpenScript помогает собирать инструменты, которые упрощают ежедневную работу с продажами.</p>
         </article>
         <article class="card stack audience-card">
-          <h3 class="section-title">Для тех, кто хочет сменить траекторию</h3>
+          {{ card_head('repeat', 'Для тех, кто хочет сменить траекторию') }}
           <p>Если вы чувствуете, что пора искать новое направление, OpenScript даёт возможность попробовать себя в создании программ, ботов и инструментов без долгого входа в классическое программирование.</p>
         </article>
         <article class="card stack audience-card">
-          <h3 class="section-title">Для тех, кому давно интересно программирование</h3>
+          {{ card_head('code', 'Для тех, кому давно интересно программирование') }}
           <p>Если вам всегда было интересно создавать программы, но языки, термины и сложный вход останавливали, OpenScript помогает начать с практики и современных инструментов.</p>
         </article>
         <article class="card stack audience-card">
-          <h3 class="section-title">Для тех, кто работает с таблицами и отчётами</h3>
+          {{ card_head('table', 'Для тех, кто работает с таблицами и отчётами') }}
           <p>OpenScript помогает собирать данные, считать показатели, находить изменения и показывать результат в понятном виде — без ручной сборки отчётов каждый раз.</p>
         </article>
       </div>
@@ -78,118 +205,106 @@
         <h2 class="section-title">Какие задачи можно решать с OpenScript</h2>
       </div>
 
-      <div class="use-cases" data-use-cases>
-        <div class="use-case-tabs" role="tablist" aria-label="Сценарии OpenScript">
-          <button id="use-case-idea-tab" type="button" class="use-case-tab is-active" role="tab" aria-selected="true" aria-controls="use-case-idea" data-use-case-tab data-target="use-case-idea">Проверить идею</button>
-          <button id="use-case-helper-tab" type="button" class="use-case-tab" role="tab" aria-selected="false" aria-controls="use-case-helper" data-use-case-tab data-target="use-case-helper">Создать себе помощника</button>
-          <button id="use-case-bot-tab" type="button" class="use-case-tab" role="tab" aria-selected="false" aria-controls="use-case-bot" data-use-case-tab data-target="use-case-bot">Сделать бота для клиентов или команды</button>
-          <button id="use-case-agent-tab" type="button" class="use-case-tab" role="tab" aria-selected="false" aria-controls="use-case-agent" data-use-case-tab data-target="use-case-agent">Создать агента для действий</button>
-          <button id="use-case-trends-tab" type="button" class="use-case-tab" role="tab" aria-selected="false" aria-controls="use-case-trends" data-use-case-tab data-target="use-case-trends">Следить за трендами и данными</button>
-          <button id="use-case-automation-tab" type="button" class="use-case-tab" role="tab" aria-selected="false" aria-controls="use-case-automation" data-use-case-tab data-target="use-case-automation">Автоматизировать рутину</button>
+      <div class="carousel-shell use-case-carousel" data-carousel>
+        <div class="carousel-controls">
+          <div class="stack carousel-heading">
+            <p class="panel-kicker">Выберите сценарий</p>
+            <p class="muted">Все варианты доступны без autoplay, а на мобильном продолжают работать как удобный скролл-сценарий.</p>
+          </div>
+          <div class="carousel-control-row">
+            <div class="carousel-counter" aria-live="polite">
+              <span data-carousel-current>01</span>
+              <span class="carousel-counter-separator">/</span>
+              <span data-carousel-total>06</span>
+            </div>
+            <div class="carousel-nav">
+              <button type="button" class="carousel-button" data-carousel-prev aria-label="Предыдущий сценарий">
+                <span aria-hidden="true">←</span>
+              </button>
+              <button type="button" class="carousel-button" data-carousel-next aria-label="Следующий сценарий">
+                <span aria-hidden="true">→</span>
+              </button>
+            </div>
+          </div>
         </div>
 
-        <div class="use-case-stage">
-          <article class="card use-case-panel" id="use-case-idea" role="tabpanel" aria-labelledby="use-case-idea-tab" data-use-case-panel>
-            <div class="stack use-case-copy">
-              <p class="panel-kicker">Проверить идею</p>
-              <h3 class="section-title">Проверить идею</h3>
+        <div class="carousel-viewport" data-carousel-viewport tabindex="0" aria-label="Сценарии OpenScript">
+          <div class="carousel-track">
+            <article class="card use-case-slide" data-carousel-slide role="group" aria-roledescription="slide" aria-label="Проверить идею">
+              {{ card_head('idea', 'Проверить идею') }}
               <p>Соберите простую версию идеи и поймите, стоит ли развивать её дальше.</p>
               <p class="muted">Напишите MVP, чтобы проверить идею перед тем, как платить разработчику: простой сервис, бот, форма, инструмент для клиентов или внутренняя автоматизация.</p>
-            </div>
-            <div class="use-case-meta">
-              <span>MVP</span>
-              <span>простой сервис</span>
-              <span>бот</span>
-              <span>форма</span>
-              <span>инструмент</span>
-              <span>автоматизация</span>
-            </div>
-          </article>
+              <div class="chip-row">
+                <span>MVP</span>
+                <span>простой сервис</span>
+                <span>форма</span>
+              </div>
+            </article>
 
-          <article class="card use-case-panel" id="use-case-helper" role="tabpanel" aria-labelledby="use-case-helper-tab" data-use-case-panel>
-            <div class="stack use-case-copy">
-              <p class="panel-kicker">Создать себе помощника</p>
-              <h3 class="section-title">Создать себе помощника</h3>
+            <article class="card use-case-slide" data-carousel-slide role="group" aria-roledescription="slide" aria-label="Создать себе помощника">
+              {{ card_head('support', 'Создать себе помощника') }}
               <p>Соберите помощника, который берёт на себя повторяющиеся действия.</p>
               <p class="muted">Он может разбирать сообщения, готовить черновики ответов, собирать данные, приводить таблицы в порядок, напоминать о задачах или помогать проходить однотипные рабочие процессы.</p>
-            </div>
-            <div class="use-case-meta">
-              <span>сообщения</span>
-              <span>черновики</span>
-              <span>данные</span>
-              <span>таблицы</span>
-              <span>напоминания</span>
-              <span>задачи</span>
-            </div>
-          </article>
+              <div class="chip-row">
+                <span>сообщения</span>
+                <span>черновики</span>
+                <span>таблицы</span>
+              </div>
+            </article>
 
-          <article class="card use-case-panel" id="use-case-bot" role="tabpanel" aria-labelledby="use-case-bot-tab" data-use-case-panel>
-            <div class="stack use-case-copy">
-              <p class="panel-kicker">Сделать бота для клиентов или команды</p>
-              <h3 class="section-title">Сделать бота для клиентов или команды</h3>
+            <article class="card use-case-slide" data-carousel-slide role="group" aria-roledescription="slide" aria-label="Сделать бота для клиентов или команды">
+              {{ card_head('bot', 'Сделать бота для клиентов или команды') }}
               <p>Бот может принимать заявки, задавать вопросы, сохранять ответы и передавать их вам.</p>
               <p class="muted">Клиент пишет в VK, MAX или Telegram, бот уточняет детали, складывает заявку в таблицу и отправляет уведомление.</p>
-            </div>
-            <div class="use-case-meta">
-              <span>VK</span>
-              <span>MAX</span>
-              <span>Telegram</span>
-              <span>заявки</span>
-              <span>таблица</span>
-              <span>уведомление</span>
-            </div>
-          </article>
+              <div class="chip-row">
+                <span>VK</span>
+                <span>MAX</span>
+                <span>Telegram</span>
+              </div>
+            </article>
 
-          <article class="card use-case-panel" id="use-case-agent" role="tabpanel" aria-labelledby="use-case-agent-tab" data-use-case-panel>
-            <div class="stack use-case-copy">
-              <p class="panel-kicker">Создать агента для действий</p>
-              <h3 class="section-title">Создать агента для действий</h3>
+            <article class="card use-case-slide" data-carousel-slide role="group" aria-roledescription="slide" aria-label="Создать агента для действий">
+              {{ card_head('agent', 'Создать агента для действий') }}
               <p>Агент — это не просто чат. Он может выполнять пошаговую задачу: открыть сайт, найти информацию, заполнить форму, сравнить варианты, собрать данные и показать результат.</p>
               <p class="muted">Агентов можно использовать для работы с сайтами, сервисами, кабинетами и повторяющимися процессами.</p>
-            </div>
-            <div class="use-case-meta">
-              <span>сайты</span>
-              <span>сервисы</span>
-              <span>кабинеты</span>
-              <span>формы</span>
-              <span>данные</span>
-              <span>процессы</span>
-            </div>
-          </article>
+              <div class="chip-row">
+                <span>сайты</span>
+                <span>кабинеты</span>
+                <span>процессы</span>
+              </div>
+            </article>
 
-          <article class="card use-case-panel" id="use-case-trends" role="tabpanel" aria-labelledby="use-case-trends-tab" data-use-case-panel>
-            <div class="stack use-case-copy">
-              <p class="panel-kicker">Следить за трендами и данными</p>
-              <h3 class="section-title">Следить за трендами и данными</h3>
+            <article class="card use-case-slide" data-carousel-slide role="group" aria-roledescription="slide" aria-label="Следить за трендами и данными">
+              {{ card_head('chart', 'Следить за трендами и данными') }}
               <p>Соберите инструмент, который помогает видеть, что происходит в вашей нише.</p>
               <p class="muted">Какие темы обсуждают, какие товары набирают интерес, какие вопросы задают клиенты, как меняются цены конкурентов и какие идеи стоит проверить первыми.</p>
-            </div>
-            <div class="use-case-meta">
-              <span>темы</span>
-              <span>товары</span>
-              <span>цены</span>
-              <span>вопросы</span>
-              <span>клиенты</span>
-              <span>ниша</span>
-            </div>
-          </article>
+              <div class="chip-row">
+                <span>темы</span>
+                <span>товары</span>
+                <span>цены</span>
+              </div>
+            </article>
 
-          <article class="card use-case-panel" id="use-case-automation" role="tabpanel" aria-labelledby="use-case-automation-tab" data-use-case-panel>
-            <div class="stack use-case-copy">
-              <p class="panel-kicker">Автоматизировать рутину</p>
-              <h3 class="section-title">Автоматизировать рутину</h3>
+            <article class="card use-case-slide" data-carousel-slide role="group" aria-roledescription="slide" aria-label="Автоматизировать рутину">
+              {{ card_head('repeat', 'Автоматизировать рутину') }}
               <p>Уберите ручные действия, которые каждый день забирают время.</p>
               <p class="muted">Обработка файлов, прайсов, таблиц, заявок, описаний, списков, отчётов и других однотипных задач.</p>
-            </div>
-            <div class="use-case-meta">
-              <span>файлы</span>
-              <span>прайсы</span>
-              <span>таблицы</span>
-              <span>заявки</span>
-              <span>отчёты</span>
-              <span>однотипные задачи</span>
-            </div>
-          </article>
+              <div class="chip-row">
+                <span>файлы</span>
+                <span>прайсы</span>
+                <span>отчёты</span>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <div class="carousel-dots" role="tablist" aria-label="Сценарии OpenScript">
+          <button type="button" class="carousel-dot is-active" data-carousel-dot data-index="0" aria-label="Проверить идею"></button>
+          <button type="button" class="carousel-dot" data-carousel-dot data-index="1" aria-label="Создать себе помощника"></button>
+          <button type="button" class="carousel-dot" data-carousel-dot data-index="2" aria-label="Сделать бота для клиентов или команды"></button>
+          <button type="button" class="carousel-dot" data-carousel-dot data-index="3" aria-label="Создать агента для действий"></button>
+          <button type="button" class="carousel-dot" data-carousel-dot data-index="4" aria-label="Следить за трендами и данными"></button>
+          <button type="button" class="carousel-dot" data-carousel-dot data-index="5" aria-label="Автоматизировать рутину"></button>
         </div>
       </div>
 
@@ -205,30 +320,29 @@
       </div>
 
       <article class="card stack flow-card flow-card--intro">
-        <p class="panel-kicker">Концепция</p>
-        <h3 class="section-title">Концепция</h3>
+        {{ card_head('plan', 'Концепция') }}
         <p>У вас в подчинении два ИИ-специалиста: Ведущий разработчик, который организует и управляет работой, и технический исполнитель, который выполняет техническую часть на сервере.</p>
       </article>
 
-      <div class="work-flow-grid">
-        <article class="card stack flow-card">
-          <h3 class="section-title">Ведущий разработчик организует и управляет работой</h3>
+      <div class="workflow-grid">
+        <article class="card stack flow-step">
+          {{ card_head('plan', 'Ведущий разработчик организует и управляет работой') }}
           <p>Ведущий разработчик разбирает вашу идею, формирует план, подготавливает технические инструкции для исполнителя, контролирует ход работы, проверяет результат и помогает довести задачу до рабочего состояния.</p>
         </article>
-        <article class="card stack flow-card">
-          <h3 class="section-title">Технический исполнитель выполняет работу на сервере</h3>
+        <article class="card stack flow-step">
+          {{ card_head('server', 'Технический исполнитель выполняет работу на сервере') }}
           <p>Технический исполнитель получает готовые инструкции, вносит изменения на сервере, запускает проверки, исправляет ошибки и возвращает отчёт о выполнении.</p>
         </article>
-        <article class="card stack flow-card">
-          <h3 class="section-title">Вы принимаете результат</h3>
+        <article class="card stack flow-step">
+          {{ card_head('result', 'Вы принимаете результат') }}
           <p>Вы смотрите результат, тестируете, при необходимости даёте указания по изменениям, а ведущий разработчик превращает их в точные технические инструкции для исполнителя.</p>
         </article>
-        <article class="card stack flow-card">
-          <h3 class="section-title">Документы ускоряют старт</h3>
+        <article class="card stack flow-step">
+          {{ card_head('package', 'Документы ускоряют старт') }}
           <p>Внутри OpenScript собраны правила, примеры, инструкции и подходы, которые помогают быстрее понять процесс и начинать работу, опираясь на уже пройденный кем-то путь.</p>
         </article>
-        <article class="card stack flow-card">
-          <h3 class="section-title">Комьюнити помогает не застрять</h3>
+        <article class="card stack flow-step">
+          {{ card_head('users', 'Комьюнити помогает не застрять') }}
           <p>В чатах VK, MAX и Telegram можно задавать вопросы, смотреть опыт других участников и получать помощь от сообщества и админов.</p>
         </article>
       </div>
@@ -245,42 +359,46 @@
 
       <div class="package-grid">
         <article class="card stack package-card">
-          <p class="panel-kicker">На 1 месяц</p>
+          <div class="package-group-head">
+            {{ card_head('price', 'На 1 месяц') }}
+          </div>
           <div class="package-items">
-            <div class="package-item">
-              <h3 class="section-title">Подписка на ChatGPT Plus на 1 месяц</h3>
+            <article class="package-item">
+              {{ card_head('plan', 'Подписка на ChatGPT Plus на 1 месяц') }}
               <p class="muted">В работе используются одни из самых сильных нейросетевых моделей в мире. ChatGPT Plus даёт доступ к продвинутым моделям, которые помогают ИИ-специалистам разбирать задачи, готовить технические инструкции, находить ошибки и сопровождать работу над проектом.</p>
-            </div>
-            <div class="package-item">
-              <h3 class="section-title">Аренда сервера на 1 месяц</h3>
+            </article>
+            <article class="package-item">
+              {{ card_head('server', 'Аренда сервера на 1 месяц') }}
               <p class="muted">Для разработки используется удалённый сервер. На нём ведётся вся техническая работа: создаётся проект, вносятся изменения, запускаются проверки, исправляются ошибки и готовится результат. После запуска проект продолжает работать на сервере.</p>
-            </div>
+            </article>
           </div>
         </article>
 
         <article class="card stack package-card">
-          <p class="panel-kicker">Навсегда</p>
+          <div class="package-group-head">
+            {{ card_head('package', 'Навсегда') }}
+          </div>
           <div class="package-items package-items-forever">
-            <div class="package-item">
-              <h3 class="section-title">Доступ к материалам навсегда</h3>
+            <article class="package-item">
+              {{ card_head('result', 'Доступ к материалам навсегда') }}
               <p class="muted">Материалы остаются с вами и не исчезают после первого запуска.</p>
-            </div>
-            <div class="package-item">
-              <h3 class="section-title">Пошаговые инструкции</h3>
+            </article>
+            <article class="package-item">
+              {{ card_head('plan', 'Пошаговые инструкции') }}
               <p class="muted">Понятные шаги помогают начать без хаотичного поиска решений.</p>
-            </div>
-            <div class="package-item">
-              <h3 class="section-title">Готовые команды и примеры</h3>
+            </article>
+            <article class="package-item">
+              {{ card_head('code', 'Готовые команды и примеры') }}
               <p class="muted">Можно копировать рабочие заготовки и адаптировать их под свою задачу.</p>
-            </div>
-            <div class="package-item">
-              <h3 class="section-title">Помощь с настройкой и началом работы</h3>
+            </article>
+            <article class="package-item">
+              {{ card_head('support', 'Помощь с настройкой и началом работы') }}
               <p class="muted">Мы помогаем пройти первые шаги и не застрять на старте.</p>
-            </div>
-            <div class="package-item">
-              <h3 class="section-title">Комьюнити в VK, MAX и Telegram</h3>
+            </article>
+            <article class="package-item">
+              {{ card_head('users', 'Комьюнити в VK, MAX и Telegram') }}
               <p class="muted">В чатах помогают участники и админы.</p>
-            </div>
+            </article>
           </div>
         </article>
       </div>
@@ -301,16 +419,20 @@
 
         <div class="stack offer-side">
           <div class="card offer-side-card">
-            <p class="panel-kicker">На 1 месяц</p>
-            <p>ChatGPT Plus</p>
-            <p>Аренда сервера</p>
+            {{ card_head('price', 'На 1 месяц') }}
+            <div class="offer-side-list">
+              <p>ChatGPT Plus</p>
+              <p>Аренда сервера</p>
+            </div>
           </div>
           <div class="card offer-side-card">
-            <p class="panel-kicker">Навсегда</p>
-            <p>Материалы</p>
-            <p>Инструкции</p>
-            <p>Помощь</p>
-            <p>Комьюнити</p>
+            {{ card_head('package', 'Навсегда') }}
+            <div class="offer-side-list">
+              <p>Материалы</p>
+              <p>Инструкции</p>
+              <p>Помощь</p>
+              <p>Комьюнити</p>
+            </div>
           </div>
           <a class="button button-primary offer-cta" href="{{ start_href }}">Начать работу</a>
         </div>
@@ -325,31 +447,31 @@
 
       <div class="faq-list">
         <details class="card faq-item">
-          <summary>Нужно ли уметь программировать?</summary>
+          <summary><span class="faq-summary-icon">{{ ui_icon('faq') }}</span><span>Нужно ли уметь программировать?</span></summary>
           <p>Нет. OpenScript рассчитан на людей без технического опыта. Вам не нужно заранее знать языки программирования.</p>
         </details>
         <details class="card faq-item">
-          <summary>Нужно ли заранее разбираться в сложных инструментах?</summary>
+          <summary><span class="faq-summary-icon">{{ ui_icon('faq') }}</span><span>Нужно ли заранее разбираться в сложных инструментах?</span></summary>
           <p>Нет. Идея в том, чтобы дать понятный порядок действий, рабочую среду и помощь на первых шагах.</p>
         </details>
         <details class="card faq-item">
-          <summary>Какие программы и какое железо нужны для работы?</summary>
+          <summary><span class="faq-summary-icon">{{ ui_icon('faq') }}</span><span>Какие программы и какое железо нужны для работы?</span></summary>
           <p>Достаточно обычного компьютера или ноутбука, браузера Google Chrome и стандартного терминала вашей операционной системы. Мощное железо, отдельная видеокарта и сложная установка программ не нужны: основная работа проходит через браузер и терминал ОС.</p>
         </details>
         <details class="card faq-item">
-          <summary>Что я смогу сделать?</summary>
+          <summary><span class="faq-summary-icon">{{ ui_icon('faq') }}</span><span>Что я смогу сделать?</span></summary>
           <p>Начать с простых рабочих вещей: бот для заявок, MVP идеи, помощник для рутины, сбор данных, обработка таблиц, агент для пошаговых действий.</p>
         </details>
         <details class="card faq-item">
-          <summary>Мне помогут, если я застряну?</summary>
+          <summary><span class="faq-summary-icon">{{ ui_icon('faq') }}</span><span>Мне помогут, если я застряну?</span></summary>
           <p>Да. Внутри есть чаты в VK, MAX и Telegram, где можно задавать вопросы. Помогают участники и админы.</p>
         </details>
         <details class="card faq-item">
-          <summary>Доступ к материалам останется?</summary>
+          <summary><span class="faq-summary-icon">{{ ui_icon('faq') }}</span><span>Доступ к материалам останется?</span></summary>
           <p>Да. После оплаты доступ к материалам остаётся навсегда.</p>
         </details>
         <details class="card faq-item">
-          <summary>Это разработка проекта за меня?</summary>
+          <summary><span class="faq-summary-icon">{{ ui_icon('faq') }}</span><span>Это разработка проекта за меня?</span></summary>
           <p>Нет. OpenScript помогает вам начать делать свои инструменты самостоятельно: с инструкциями, средой, примерами и поддержкой на старте.</p>
         </details>
       </div>
@@ -357,34 +479,103 @@
 
     <script>
       (function () {
-        document.querySelectorAll('[data-use-cases]').forEach((root) => {
-          const tabs = Array.from(root.querySelectorAll('[data-use-case-tab]'));
-          const panels = Array.from(root.querySelectorAll('[data-use-case-panel]'));
+        document.querySelectorAll('[data-carousel]').forEach((carousel) => {
+          const viewport = carousel.querySelector('[data-carousel-viewport]');
+          const slides = Array.from(carousel.querySelectorAll('[data-carousel-slide]'));
+          const prev = carousel.querySelector('[data-carousel-prev]');
+          const next = carousel.querySelector('[data-carousel-next]');
+          const current = carousel.querySelector('[data-carousel-current]');
+          const total = carousel.querySelector('[data-carousel-total]');
+          const dots = Array.from(carousel.querySelectorAll('[data-carousel-dot]'));
 
-          if (!tabs.length || !panels.length) {
+          if (!viewport || !slides.length) {
             return;
           }
 
-          const activate = (targetId) => {
-            tabs.forEach((tab) => {
-              const isActive = tab.dataset.target === targetId;
-              tab.classList.toggle('is-active', isActive);
-              tab.setAttribute('aria-selected', String(isActive));
-              tab.tabIndex = isActive ? 0 : -1;
+          const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          let activeIndex = 0;
+
+          const setActive = (index, scroll = false) => {
+            const normalized = ((index % slides.length) + slides.length) % slides.length;
+            activeIndex = normalized;
+
+            slides.forEach((slide, slideIndex) => {
+              const isActive = slideIndex === activeIndex;
+              slide.classList.toggle('is-active', isActive);
+              slide.setAttribute('aria-current', isActive ? 'true' : 'false');
             });
 
-            panels.forEach((panel) => {
-              const isActive = panel.id === targetId;
-              panel.classList.toggle('is-active', isActive);
-              panel.hidden = !isActive;
+            dots.forEach((dot, dotIndex) => {
+              const isActive = dotIndex === activeIndex;
+              dot.classList.toggle('is-active', isActive);
+              dot.setAttribute('aria-pressed', String(isActive));
             });
+
+            if (current) {
+              current.textContent = String(activeIndex + 1).padStart(2, '0');
+            }
+
+            if (scroll) {
+              slides[activeIndex].scrollIntoView({
+                behavior: prefersReducedMotion ? 'auto' : 'smooth',
+                block: 'nearest',
+                inline: 'center',
+              });
+            }
           };
 
-          root.classList.add('is-enhanced');
-          tabs.forEach((tab) => {
-            tab.addEventListener('click', () => activate(tab.dataset.target));
+          const syncFromViewport = () => {
+            const viewportCenter = viewport.getBoundingClientRect().left + viewport.clientWidth / 2;
+            let bestIndex = activeIndex;
+            let bestDistance = Number.POSITIVE_INFINITY;
+
+            slides.forEach((slide, index) => {
+              const rect = slide.getBoundingClientRect();
+              const slideCenter = rect.left + rect.width / 2;
+              const distance = Math.abs(slideCenter - viewportCenter);
+              if (distance < bestDistance) {
+                bestDistance = distance;
+                bestIndex = index;
+              }
+            });
+
+            if (bestIndex !== activeIndex) {
+              setActive(bestIndex, false);
+            }
+          };
+
+          if (total) {
+            total.textContent = String(slides.length).padStart(2, '0');
+          }
+
+          if (prev) {
+            prev.addEventListener('click', () => setActive(activeIndex - 1, true));
+          }
+
+          if (next) {
+            next.addEventListener('click', () => setActive(activeIndex + 1, true));
+          }
+
+          dots.forEach((dot) => {
+            dot.addEventListener('click', () => setActive(Number(dot.dataset.index), true));
           });
-          activate(tabs[0].dataset.target);
+
+          viewport.addEventListener('scroll', () => {
+            window.requestAnimationFrame(syncFromViewport);
+          }, { passive: true });
+
+          viewport.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowLeft') {
+              event.preventDefault();
+              setActive(activeIndex - 1, true);
+            }
+            if (event.key === 'ArrowRight') {
+              event.preventDefault();
+              setActive(activeIndex + 1, true);
+            }
+          });
+
+          setActive(0, false);
         });
       }());
     </script>
