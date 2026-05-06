@@ -178,6 +178,15 @@ button.nav-button:hover {
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 }
 
+.public-landing-page .card-grid.tight > .card:not(.faq-item) {
+  text-align: center;
+}
+
+.public-landing-page .card-grid.tight > .card:not(.faq-item) .section-title,
+.public-landing-page .card-grid.tight > .card:not(.faq-item) p {
+  text-align: center;
+}
+
 .form {
   display: grid;
   gap: 14px;
