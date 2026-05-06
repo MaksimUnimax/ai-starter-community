@@ -13,9 +13,8 @@
     <h3 class="section-title">{{ title }}</h3>
   </div>
   {%- endmacro %}
-  {% macro audience_head(index, icon_name, title) -%}
+  {% macro audience_head(icon_name, title) -%}
   <div class="audience-head">
-    <span class="audience-index">{{ index }}</span>
     <span class="icon-badge">{{ ui_icon(icon_name) }}</span>
     <h3 class="section-title">{{ title }}</h3>
   </div>
@@ -137,17 +136,17 @@
           <div class="stack story-showcase-inner">
             <p class="section-kicker">Витрина</p>
             <h2 class="section-title">Что можно создать</h2>
-            <p class="muted">OpenScript показывает, что можно делать без умения программировать: от простых MVP до автоматизаций и сервисных инструментов.</p>
+            <p class="muted">С OpenScript можно создавать рабочие инструменты без умения программировать: от простых MVP до автоматизаций, AI-помощников и сервисных решений.</p>
             <div class="story-showcase-grid" role="list" aria-label="Примеры того, что можно создать">
               <span class="story-showcase-item" role="listitem"><span class="story-showcase-mark">{{ ui_icon('idea') }}</span><span>MVP</span></span>
-              <span class="story-showcase-item" role="listitem"><span class="story-showcase-mark">{{ ui_icon('bot') }}</span><span>боты</span></span>
-              <span class="story-showcase-item" role="listitem"><span class="story-showcase-mark">{{ ui_icon('agent') }}</span><span>агенты</span></span>
-              <span class="story-showcase-item" role="listitem"><span class="story-showcase-mark">{{ ui_icon('support') }}</span><span>помощники</span></span>
+              <span class="story-showcase-item" role="listitem"><span class="story-showcase-mark">{{ ui_icon('bot') }}</span><span>Боты</span></span>
+              <span class="story-showcase-item" role="listitem"><span class="story-showcase-mark">{{ ui_icon('agent') }}</span><span>AI-агенты</span></span>
+              <span class="story-showcase-item" role="listitem"><span class="story-showcase-mark">{{ ui_icon('support') }}</span><span>AI-помощники</span></span>
               <span class="story-showcase-item" role="listitem"><span class="story-showcase-mark">{{ ui_icon('chart') }}</span><span>Трейдинг-боты</span></span>
-              <span class="story-showcase-item" role="listitem"><span class="story-showcase-mark">{{ ui_icon('bag') }}</span><span>биддеры для маркетплейсов</span></span>
-              <span class="story-showcase-item" role="listitem"><span class="story-showcase-mark">{{ ui_icon('repeat') }}</span><span>автоматизации</span></span>
-              <span class="story-showcase-item" role="listitem"><span class="story-showcase-mark">{{ ui_icon('code') }}</span><span>парсеры и сбор данных</span></span>
-              <span class="story-showcase-item story-showcase-item-wide" role="listitem"><span class="story-showcase-mark">{{ ui_icon('table') }}</span><span>инструменты для таблиц и отчётов</span></span>
+              <span class="story-showcase-item" role="listitem"><span class="story-showcase-mark">{{ ui_icon('bag') }}</span><span>Биддеры для маркетплейсов</span></span>
+              <span class="story-showcase-item" role="listitem"><span class="story-showcase-mark">{{ ui_icon('repeat') }}</span><span>Автоматизации</span></span>
+              <span class="story-showcase-item" role="listitem"><span class="story-showcase-mark">{{ ui_icon('code') }}</span><span>Парсеры и сбор данных</span></span>
+              <span class="story-showcase-item story-showcase-item-wide" role="listitem"><span class="story-showcase-mark">{{ ui_icon('table') }}</span><span>Инструменты для таблиц и отчётов</span></span>
             </div>
           </div>
         </aside>
@@ -162,27 +161,27 @@
 
       <div class="audience-grid">
         <article class="card stack audience-card">
-          {{ audience_head('01', 'idea', 'Для тех, у кого есть идея MVP') }}
+          {{ audience_head('idea', 'Для тех, у кого есть идея MVP') }}
           <p>Хотите проверить идею, но не готовы сразу платить разработчику. OpenScript помогает собрать простую рабочую версию и понять, стоит ли развивать проект дальше.</p>
         </article>
         <article class="card stack audience-card">
-          {{ audience_head('02', 'users', 'Для малого бизнеса и самозанятых') }}
+          {{ audience_head('users', 'Для малого бизнеса и самозанятых') }}
           <p>Когда заявки, таблицы, файлы, напоминания и ответы клиентам начинают забирать слишком много времени, OpenScript помогает создавать простые инструменты под свои рабочие задачи.</p>
         </article>
         <article class="card stack audience-card">
-          {{ audience_head('03', 'bag', 'Для селлеров и онлайн-продавцов') }}
+          {{ audience_head('bag', 'Для селлеров и онлайн-продавцов') }}
           <p>Если нужно следить за ценами, товарами, остатками, описаниями и конкурентами, OpenScript помогает собирать инструменты, которые упрощают ежедневную работу с продажами.</p>
         </article>
         <article class="card stack audience-card">
-          {{ audience_head('04', 'repeat', 'Для тех, кто хочет сменить траекторию') }}
+          {{ audience_head('repeat', 'Для тех, кто хочет сменить траекторию') }}
           <p>Если вы чувствуете, что пора искать новое направление, OpenScript даёт возможность попробовать себя в создании программ, ботов и инструментов без долгого входа в классическое программирование.</p>
         </article>
         <article class="card stack audience-card">
-          {{ audience_head('05', 'code', 'Для тех, кому давно интересно программирование') }}
+          {{ audience_head('code', 'Для тех, кому давно интересно программирование') }}
           <p>Если вам всегда было интересно создавать программы, но языки, термины и сложный вход останавливали, OpenScript помогает начать с практики и современных инструментов.</p>
         </article>
         <article class="card stack audience-card">
-          {{ audience_head('06', 'table', 'Для тех, кто работает с таблицами и отчётами') }}
+          {{ audience_head('table', 'Для тех, кто работает с таблицами и отчётами') }}
           <p>OpenScript помогает собирать данные, считать показатели, находить изменения и показывать результат в понятном виде — без ручной сборки отчётов каждый раз.</p>
         </article>
       </div>
@@ -292,8 +291,8 @@
           <button type="button" class="carousel-step" data-carousel-step data-carousel-dot data-index="1" aria-label="Создать себе помощника"><span>02</span></button>
           <button type="button" class="carousel-step" data-carousel-step data-carousel-dot data-index="2" aria-label="Сделать бота для клиентов или команды"><span>03</span></button>
           <button type="button" class="carousel-step" data-carousel-step data-carousel-dot data-index="3" aria-label="Создать агента для действий"><span>04</span></button>
-          <button type="button" class="carousel-step" data-carousel-step data-index="4" aria-label="Следить за трендами и данными"><span>05</span></button>
-          <button type="button" class="carousel-step" data-carousel-step data-index="5" aria-label="Автоматизировать рутину"><span>06</span></button>
+          <button type="button" class="carousel-step" data-carousel-step data-carousel-dot data-index="4" aria-label="Следить за трендами и данными"><span>05</span></button>
+          <button type="button" class="carousel-step" data-carousel-step data-carousel-dot data-index="5" aria-label="Автоматизировать рутину"><span>06</span></button>
         </div>
       </div>
 
@@ -428,20 +427,12 @@
         </div>
 
         <div class="stack offer-side">
-          <div class="card offer-side-card">
-            {{ card_head('price', 'На 1 месяц') }}
-            <div class="offer-side-list">
-              <p>ChatGPT Plus</p>
-              <p>Аренда сервера</p>
-            </div>
-          </div>
-          <div class="card offer-side-card">
-            {{ card_head('package', 'Навсегда') }}
-            <div class="offer-side-list">
-              <p>Материалы</p>
-              <p>Инструкции</p>
-              <p>Помощь</p>
-              <p>Комьюнити</p>
+          <div class="card offer-side-card offer-summary-card">
+            {{ card_head('price', 'Как действует доступ') }}
+            <div class="offer-summary-list">
+              <p>ChatGPT Plus и сервер — на 1 месяц</p>
+              <p>Материалы, инструкции и помощь — навсегда</p>
+              <p>Продление — отдельно в кабинете</p>
             </div>
           </div>
           <a class="button button-primary offer-cta" href="{{ start_href }}">Начать работу</a>
@@ -489,7 +480,7 @@
 
     <script>
       (function () {
-        const revealTargets = Array.from(document.querySelectorAll('.public-landing-page .story-hero, .public-landing-page .story-section, .public-landing-page .offer-block, .public-landing-page .faq-item, .public-landing-page .audience-card, .public-landing-page .use-case-slide, .public-landing-page .flow-step, .public-landing-page .package-card, .public-landing-page .offer-value-card'));
+        const revealTargets = Array.from(document.querySelectorAll('.public-landing-page .story-hero, .public-landing-page .story-showcase-panel, .public-landing-page .audience-grid, .public-landing-page .carousel-shell, .public-landing-page .flow-card--intro, .public-landing-page .specialists-flow, .public-landing-page .workflow-support-grid, .public-landing-page .package-grid, .public-landing-page .offer-block, .public-landing-page .faq-list'));
         const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
         if (!reducedMotion && revealTargets.length) {
@@ -523,7 +514,9 @@
             return;
           }
 
+          const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
           let activeIndex = 0;
+          let settleTimer = 0;
 
           const setActive = (index, scroll = false) => {
             const normalized = ((index % slides.length) + slides.length) % slides.length;
@@ -575,6 +568,11 @@
             }
           };
 
+          const scheduleSyncFromViewport = () => {
+            window.clearTimeout(settleTimer);
+            settleTimer = window.setTimeout(syncFromViewport, 120);
+          };
+
           if (total) {
             total.textContent = String(slides.length).padStart(2, '0');
           }
@@ -591,9 +589,10 @@
             dot.addEventListener('click', () => setActive(Number(dot.dataset.index), true));
           });
 
-          viewport.addEventListener('scroll', () => {
-            window.requestAnimationFrame(syncFromViewport);
-          }, { passive: true });
+          viewport.addEventListener('scroll', scheduleSyncFromViewport, { passive: true });
+          if ('onscrollend' in viewport) {
+            viewport.addEventListener('scrollend', syncFromViewport);
+          }
 
           viewport.addEventListener('keydown', (event) => {
             if (event.key === 'ArrowLeft') {
