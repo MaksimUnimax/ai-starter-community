@@ -2,6 +2,7 @@
 
 {% block content %}
   {% set start_href = "/cabinet" if current_user else "/register" %}
+  <div class="public-landing-page">
   <section class="card stack landing-hero">
     <div class="stack hero-copy core-idea-copy">
       <p class="muted">OpenScript</p>
@@ -223,4 +224,5 @@
       </details>
     </div>
   </section>
+  </div>
 {% endblock %}
