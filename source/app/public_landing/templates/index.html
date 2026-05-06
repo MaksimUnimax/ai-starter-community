@@ -199,21 +199,6 @@
             <p class="panel-kicker">Выберите сценарий</p>
             <p class="muted">Все варианты доступны без autoplay, а на мобильном продолжают работать как удобный скролл-сценарий.</p>
           </div>
-          <div class="carousel-control-row">
-            <div class="carousel-counter" aria-live="polite">
-              <span data-carousel-current>01</span>
-              <span class="carousel-counter-separator">/</span>
-              <span data-carousel-total>06</span>
-            </div>
-            <div class="carousel-nav">
-              <button type="button" class="carousel-button" data-carousel-prev aria-label="Предыдущий сценарий">
-                <span aria-hidden="true">←</span>
-              </button>
-              <button type="button" class="carousel-button" data-carousel-next aria-label="Следующий сценарий">
-                <span aria-hidden="true">→</span>
-              </button>
-            </div>
-          </div>
         </div>
 
         <div class="carousel-viewport" data-carousel-viewport tabindex="0" aria-label="Сценарии OpenScript">
@@ -286,6 +271,20 @@
           </div>
         </div>
 
+        <div class="carousel-bottom-controls" aria-label="Управление сценарием">
+          <button type="button" class="carousel-button" data-carousel-prev aria-label="Предыдущий сценарий">
+            <span aria-hidden="true">←</span>
+          </button>
+          <div class="carousel-counter" aria-live="polite">
+            <span data-carousel-current>01</span>
+            <span class="carousel-counter-separator">/</span>
+            <span data-carousel-total>06</span>
+          </div>
+          <button type="button" class="carousel-button" data-carousel-next aria-label="Следующий сценарий">
+            <span aria-hidden="true">→</span>
+          </button>
+        </div>
+
         <div class="carousel-stepper" role="tablist" aria-label="Сценарии OpenScript">
           <button type="button" class="carousel-step is-active" data-carousel-step data-carousel-dot data-index="0" aria-label="Проверить идею"><span>01</span></button>
           <button type="button" class="carousel-step" data-carousel-step data-carousel-dot data-index="1" aria-label="Создать себе помощника"><span>02</span></button>
@@ -309,9 +308,20 @@
 
       <article class="card stack flow-card flow-card--intro">
         {{ card_head('plan', 'Концепция') }}
-        <p>У вас в подчинении два ИИ-специалиста:</p>
-        <p><strong>Ведущий разработчик</strong> — организация и управление работой.</p>
-        <p><strong>Технический исполнитель</strong> — выполнение технической работы на сервере.</p>
+        <div class="concept-layout">
+          <div class="stack concept-lead">
+            <p>У вас в подчинении два ИИ-специалиста:</p>
+            <p class="muted">Один отвечает за организацию и управление работой, другой выполняет техническую часть на сервере.</p>
+          </div>
+          <div class="concept-roles" aria-label="Роли в концепции">
+            <article class="concept-role">
+              <p><strong>Ведущий разработчик</strong> — организация и управление работой.</p>
+            </article>
+            <article class="concept-role">
+              <p><strong>Технический исполнитель</strong> — выполнение технической работы на сервере.</p>
+            </article>
+          </div>
+        </div>
       </article>
 
       <div class="specialists-flow" aria-label="Поток работы OpenScript">
@@ -408,25 +418,26 @@
         <div class="stack offer-copy">
           <p class="section-kicker">Финальное предложение</p>
           <h2 class="section-title">Полный доступ — 4 990 ₽</h2>
-          <div class="offer-value-grid">
-            <article class="offer-value-card">
-              {{ card_head('price', 'На 1 месяц') }}
-              <p class="muted">Подписка на ChatGPT Plus на 1 месяц</p>
-              <p class="muted">Аренда сервера на 1 месяц</p>
-            </article>
-            <article class="offer-value-card">
-              {{ card_head('package', 'Навсегда') }}
-              <p class="muted">Доступ к материалам навсегда</p>
-              <p class="muted">Пошаговые инструкции</p>
-              <p class="muted">Готовые команды и примеры</p>
-              <p class="muted">Помощь с настройкой и началом работы</p>
-              <p class="muted">Комьюнити в VK, MAX и Telegram</p>
-            </article>
-          </div>
           <p class="offer-renewal">
             Продлевать подписку ChatGPT Plus и аренду сервера можно по отдельности в личном кабинете.
           </p>
           <a class="button button-primary offer-cta" href="{{ start_href }}">Начать работу</a>
+        </div>
+
+        <div class="offer-value-grid">
+          <article class="offer-value-card">
+            {{ card_head('price', 'На 1 месяц') }}
+            <p class="muted">Подписка на ChatGPT Plus на 1 месяц</p>
+            <p class="muted">Аренда сервера на 1 месяц</p>
+          </article>
+          <article class="offer-value-card">
+            {{ card_head('package', 'Навсегда') }}
+            <p class="muted">Доступ к материалам навсегда</p>
+            <p class="muted">Пошаговые инструкции</p>
+            <p class="muted">Готовые команды и примеры</p>
+            <p class="muted">Помощь с настройкой и началом работы</p>
+            <p class="muted">Комьюнити в VK, MAX и Telegram</p>
+          </article>
         </div>
       </div>
     </section>
