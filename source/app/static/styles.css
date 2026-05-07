@@ -4383,3 +4383,130 @@ button:hover {
     padding: 18px;
   }
 }
+
+/* === HOMEPAGE_CAROUSEL_CONTROLS_BACK_INSIDE_CARD_KIMI_20260507_01 === */
+
+/* Move prev/next controls back inside carousel card area as large side buttons.
+   Remove bottom control rail. Keep 01-06 stepper. */
+
+.page--landing .public-landing-page .carousel-button {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  transform: translateY(-50%);
+  width: 64px;
+  height: 64px;
+  padding: 0;
+  border-radius: 999px;
+  border: 1px solid rgba(159, 178, 233, 0.22);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow:
+    0 18px 40px rgba(16, 32, 51, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.88);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+}
+
+.page--landing .public-landing-page .carousel-button:hover {
+  border-color: rgba(159, 178, 233, 0.35);
+  background: #fff;
+  box-shadow:
+    0 22px 48px rgba(16, 32, 51, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+  transform: translateY(-50%) scale(1.04);
+}
+
+.page--landing .public-landing-page .carousel-button:active {
+  transform: translateY(-50%) scale(0.98);
+}
+
+.page--landing .public-landing-page .carousel-button .carousel-chevron {
+  width: 24px;
+  height: 24px;
+}
+
+.page--landing .public-landing-page .carousel-button-prev {
+  left: 14px;
+}
+
+.page--landing .public-landing-page .carousel-button-next {
+  right: 14px;
+}
+
+.public-landing-page .carousel-bottom-controls {
+  display: none;
+}
+
+.page--landing .public-landing-page .use-case-slide {
+  padding-left: 76px;
+  padding-right: 76px;
+}
+
+@media (max-width: 900px) {
+  .page--landing .public-landing-page .carousel-button {
+    width: 56px;
+    height: 56px;
+  }
+
+  .page--landing .public-landing-page .carousel-button .carousel-chevron {
+    width: 22px;
+    height: 22px;
+  }
+
+  .page--landing .public-landing-page .carousel-button-prev {
+    left: 12px;
+  }
+
+  .page--landing .public-landing-page .carousel-button-next {
+    right: 12px;
+  }
+
+  .page--landing .public-landing-page .use-case-slide {
+    padding-left: 64px;
+    padding-right: 64px;
+  }
+}
+
+@media (max-width: 760px) {
+  .page--landing .public-landing-page .carousel-button {
+    width: 52px;
+    height: 52px;
+  }
+
+  .page--landing .public-landing-page .carousel-button .carousel-chevron {
+    width: 20px;
+    height: 20px;
+  }
+
+  .page--landing .public-landing-page .carousel-button-prev {
+    left: 10px;
+  }
+
+  .page--landing .public-landing-page .carousel-button-next {
+    right: 10px;
+  }
+
+  .page--landing .public-landing-page .use-case-slide {
+    padding-left: 56px;
+    padding-right: 56px;
+  }
+}
+
+@media (max-width: 560px) {
+  .page--landing .public-landing-page .carousel-button {
+    width: 48px;
+    height: 48px;
+  }
+
+  .page--landing .public-landing-page .carousel-button .carousel-chevron {
+    width: 18px;
+    height: 18px;
+  }
+
+  .page--landing .public-landing-page .use-case-slide {
+    padding-left: 52px;
+    padding-right: 52px;
+  }
+}
