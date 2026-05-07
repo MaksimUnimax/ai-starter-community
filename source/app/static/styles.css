@@ -4290,3 +4290,96 @@ button:hover {
     min-height: 40px;
   }
 }
+
+/* === HOMEPAGE_UI_SPRITE_GAP_ROOT_CAUSE_FIX_KIMI_20260507_01 === */
+
+/* Root cause: the inline SVG sprite is placed BEFORE .public-landing-page
+   in the DOM, so the scoped rule .public-landing-page .ui-sprite does not
+   match it. The sprite gets default inline rendering (~300x150px) and
+   creates the huge blank space between header and hero. */
+.ui-sprite {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Revert unnecessary header/menu experiments from previous Kimi runs.
+   Restore original product-story-03 landing styles. */
+.page--landing .page-shell {
+  padding-top: 10px;
+  padding-bottom: 30px;
+}
+
+.page--landing .top-nav {
+  width: auto;
+  margin: 0 0 10px;
+  padding: 10px 12px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.74);
+  border-color: rgba(159, 178, 233, 0.18);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow:
+    0 12px 28px rgba(16, 32, 51, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.74);
+}
+
+.page--landing .nav-link,
+.page--landing .nav-form .nav-button {
+  min-height: 38px;
+  padding: 8px 12px;
+  font-size: inherit;
+  background: rgba(241, 246, 255, 0.88);
+  color: var(--text);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.76);
+}
+
+.page--landing .nav-link[href="/login"] {
+  background: rgba(241, 246, 255, 0.88);
+  color: var(--text);
+  border-color: transparent;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.76);
+}
+
+.page--landing .nav-link[href="/login"]:hover {
+  background: rgba(230, 237, 248, 0.98);
+  color: var(--text);
+}
+
+.page--landing .page-content {
+  gap: 12px;
+}
+
+.page--landing .public-landing-page {
+  gap: 20px;
+}
+
+.public-landing-page .story-hero {
+  padding: 30px;
+}
+
+@media (max-width: 760px) {
+  .page--landing .page-shell {
+    width: min(1120px, calc(100% - 24px));
+    padding-top: 8px;
+    padding-bottom: 24px;
+  }
+
+  .page--landing .top-nav {
+    width: auto;
+    margin: 0 0 8px;
+    padding: 10px 12px;
+  }
+
+  .public-landing-page .story-hero {
+    padding: 22px;
+  }
+}
+
+@media (max-width: 560px) {
+  .public-landing-page .story-hero {
+    padding: 18px;
+  }
+}
