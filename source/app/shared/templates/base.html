@@ -9,7 +9,7 @@
   {% endif %}
   <link rel="stylesheet" href="/static/styles.css">
 </head>
-  <body class="page">
+  <body class="page{% if request.url.path == '/' %} page--landing{% endif %}">
     <div class="page-shell">
       <header class="top-nav" aria-label="Основная навигация">
         <a class="nav-link" href="/">Главная</a>

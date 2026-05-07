@@ -201,8 +201,12 @@
           </div>
         </div>
 
-        <div class="carousel-viewport" data-carousel-viewport tabindex="0" aria-label="Сценарии OpenScript">
-          <div class="carousel-track">
+        <div class="carousel-stage">
+          <button type="button" class="carousel-button carousel-button-prev" data-carousel-prev aria-label="Предыдущий сценарий">
+            <span aria-hidden="true">←</span>
+          </button>
+          <div class="carousel-viewport" data-carousel-viewport tabindex="0" aria-label="Сценарии OpenScript">
+            <div class="carousel-track">
             <article class="card use-case-slide" data-carousel-slide role="group" aria-roledescription="slide" aria-label="Проверить идею">
               {{ card_head('idea', 'Проверить идею') }}
               <p>Соберите простую версию идеи и поймите, стоит ли развивать её дальше.</p>
@@ -268,21 +272,19 @@
                 <span>отчёты</span>
               </div>
             </article>
+            </div>
           </div>
+          <button type="button" class="carousel-button carousel-button-next" data-carousel-next aria-label="Следующий сценарий">
+            <span aria-hidden="true">→</span>
+          </button>
         </div>
 
         <div class="carousel-bottom-controls" aria-label="Управление сценарием">
-          <button type="button" class="carousel-button" data-carousel-prev aria-label="Предыдущий сценарий">
-            <span aria-hidden="true">←</span>
-          </button>
           <div class="carousel-counter" aria-live="polite">
             <span data-carousel-current>01</span>
             <span class="carousel-counter-separator">/</span>
             <span data-carousel-total>06</span>
           </div>
-          <button type="button" class="carousel-button" data-carousel-next aria-label="Следующий сценарий">
-            <span aria-hidden="true">→</span>
-          </button>
         </div>
 
         <div class="carousel-stepper" role="tablist" aria-label="Сценарии OpenScript">
@@ -418,25 +420,29 @@
         <div class="stack offer-copy">
           <p class="section-kicker">Финальное предложение</p>
           <h2 class="section-title">Полный доступ — 4 990 ₽</h2>
+          <a class="button button-primary offer-cta" href="{{ start_href }}">Начать работу</a>
           <p class="offer-renewal">
             Продлевать подписку ChatGPT Plus и аренду сервера можно по отдельности в личном кабинете.
           </p>
-          <a class="button button-primary offer-cta" href="{{ start_href }}">Начать работу</a>
         </div>
 
         <div class="offer-value-grid">
           <article class="offer-value-card">
             {{ card_head('price', 'На 1 месяц') }}
-            <p class="muted">Подписка на ChatGPT Plus на 1 месяц</p>
-            <p class="muted">Аренда сервера на 1 месяц</p>
+            <div class="offer-value-list">
+              <p>Подписка на ChatGPT Plus на 1 месяц</p>
+              <p>Аренда сервера на 1 месяц</p>
+            </div>
           </article>
-          <article class="offer-value-card">
+          <article class="offer-value-card offer-value-card-forever">
             {{ card_head('package', 'Навсегда') }}
-            <p class="muted">Доступ к материалам навсегда</p>
-            <p class="muted">Пошаговые инструкции</p>
-            <p class="muted">Готовые команды и примеры</p>
-            <p class="muted">Помощь с настройкой и началом работы</p>
-            <p class="muted">Комьюнити в VK, MAX и Telegram</p>
+            <div class="offer-value-list offer-value-list-forever">
+              <p>Доступ к материалам навсегда</p>
+              <p>Пошаговые инструкции</p>
+              <p>Готовые команды и примеры</p>
+              <p>Помощь с настройкой и началом работы</p>
+              <p>Комьюнити в VK, MAX и Telegram</p>
+            </div>
           </article>
         </div>
       </div>
