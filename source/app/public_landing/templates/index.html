@@ -203,7 +203,7 @@
 
         <div class="carousel-stage">
           <button type="button" class="carousel-button carousel-button-prev" data-carousel-prev aria-label="Предыдущий сценарий">
-            <span aria-hidden="true">←</span>
+            <svg class="carousel-chevron" aria-hidden="true" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
           </button>
           <div class="carousel-viewport" data-carousel-viewport tabindex="0" aria-label="Сценарии OpenScript">
             <div class="carousel-track">
@@ -275,7 +275,7 @@
             </div>
           </div>
           <button type="button" class="carousel-button carousel-button-next" data-carousel-next aria-label="Следующий сценарий">
-            <span aria-hidden="true">→</span>
+            <svg class="carousel-chevron" aria-hidden="true" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
           </button>
         </div>
 
@@ -426,24 +426,24 @@
           </p>
         </div>
 
-        <div class="offer-value-grid">
-          <article class="offer-value-card">
-            {{ card_head('price', 'На 1 месяц') }}
-            <div class="offer-value-list">
-              <p>Подписка на ChatGPT Plus на 1 месяц</p>
-              <p>Аренда сервера на 1 месяц</p>
-            </div>
-          </article>
-          <article class="offer-value-card offer-value-card-forever">
-            {{ card_head('package', 'Навсегда') }}
-            <div class="offer-value-list offer-value-list-forever">
-              <p>Доступ к материалам навсегда</p>
-              <p>Пошаговые инструкции</p>
-              <p>Готовые команды и примеры</p>
-              <p>Помощь с настройкой и началом работы</p>
-              <p>Комьюнити в VK, MAX и Telegram</p>
-            </div>
-          </article>
+        <div class="offer-summary">
+          <div class="offer-summary-group">
+            <p class="offer-summary-title">На 1 месяц</p>
+            <ul class="offer-summary-list">
+              <li>Подписка на ChatGPT Plus на 1 месяц</li>
+              <li>Аренда сервера на 1 месяц</li>
+            </ul>
+          </div>
+          <div class="offer-summary-group">
+            <p class="offer-summary-title">Навсегда</p>
+            <ul class="offer-summary-list">
+              <li>Доступ к материалам навсегда</li>
+              <li>Пошаговые инструкции</li>
+              <li>Готовые команды и примеры</li>
+              <li>Помощь с настройкой и началом работы</li>
+              <li>Комьюнити в VK, MAX и Telegram</li>
+            </ul>
+          </div>
         </div>
       </div>
     </section>
