@@ -4168,3 +4168,125 @@ button:hover {
     gap: 14px;
   }
 }
+
+/* === HOMEPAGE_PRODUCT_STORY_03_HEADER_CAROUSEL_REAL_LAYOUT_FIX_KIMI_20260507_01 === */
+
+/* A) Header + gap real fix */
+.page--landing .page-shell {
+  padding-top: 0;
+  padding-bottom: 24px;
+}
+
+.page--landing .top-nav {
+  width: fit-content;
+  margin: 0 auto 4px;
+  padding: 5px 10px;
+  gap: 6px 10px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.5);
+  border-color: rgba(159, 178, 233, 0.12);
+  box-shadow:
+    0 6px 16px rgba(16, 32, 51, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+.public-landing-page .story-hero {
+  padding: 20px;
+}
+
+@media (max-width: 760px) {
+  .page--landing .top-nav {
+    width: fit-content;
+    margin: 0 auto 4px;
+    padding: 5px 10px;
+  }
+
+  .public-landing-page .story-hero {
+    padding: 18px;
+  }
+}
+
+@media (max-width: 560px) {
+  .public-landing-page .story-hero {
+    padding: 16px;
+  }
+}
+
+/* B) Carousel controls real UX fix */
+.page--landing .public-landing-page .carousel-button {
+  position: static;
+  top: auto;
+  transform: none;
+  z-index: auto;
+}
+
+.page--landing .public-landing-page .carousel-button-prev,
+.page--landing .public-landing-page .carousel-button-next {
+  left: auto;
+  right: auto;
+}
+
+.public-landing-page .carousel-bottom-controls .carousel-button {
+  width: auto;
+  height: auto;
+  min-height: 44px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(159, 178, 233, 0.2);
+  box-shadow:
+    0 10px 22px rgba(16, 32, 51, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.84);
+}
+
+.public-landing-page .carousel-bottom-controls .carousel-button:hover {
+  background: rgba(255, 255, 255, 0.98);
+  border-color: rgba(159, 178, 233, 0.32);
+  box-shadow:
+    0 14px 28px rgba(16, 32, 51, 0.09),
+    inset 0 1px 0 rgba(255, 255, 255, 0.88);
+  transform: translateY(-1px);
+}
+
+.public-landing-page .carousel-bottom-controls .carousel-button:active {
+  transform: translateY(0);
+}
+
+.public-landing-page .carousel-bottom-controls .carousel-button .carousel-chevron {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+}
+
+.public-landing-page .carousel-bottom-controls .carousel-counter {
+  min-height: 44px;
+  padding-inline: 14px;
+}
+
+.page--landing .public-landing-page .use-case-slide {
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+@media (max-width: 760px) {
+  .page--landing .public-landing-page .use-case-slide {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .public-landing-page .carousel-bottom-controls .carousel-button {
+    min-height: 40px;
+    padding: 8px 14px;
+    font-size: 0.9rem;
+  }
+
+  .public-landing-page .carousel-bottom-controls .carousel-counter {
+    min-height: 40px;
+  }
+}
