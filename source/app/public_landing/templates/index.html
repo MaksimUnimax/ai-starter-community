@@ -14,11 +14,12 @@
   </div>
   {%- endmacro %}
   {% macro audience_head(icon_name, title) -%}
-  <div class="audience-head">
+  <div class="card-head">
     <span class="icon-badge">{{ ui_icon(icon_name) }}</span>
     <h3 class="section-title">{{ title }}</h3>
   </div>
   {%- endmacro %}
+
   <svg class="ui-sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
     <symbol id="icon-idea" viewBox="0 0 24 24">
       <path d="M12 3a6 6 0 0 0-3 11v2h6v-2a6 6 0 0 0-3-11Z"/>
@@ -114,310 +115,270 @@
       <path d="M12 8v4l3 2"/>
     </symbol>
   </svg>
+
   <div class="public-landing-page">
-    <section class="card story-hero">
+    <!-- SVG Background -->
+    <img class="hero-bg-svg" src="/static/images/human-ai-hero-bg.svg" alt="" aria-hidden="true">
+    <div class="hero-readability-overlay"></div>
+
+    <section class="story-hero">
       <div class="story-hero-grid">
-        <div class="stack story-hero-copy">
-          <p class="eyebrow">OpenScript</p>
-          <h1 class="story-hero-title">Пришло новое время для тех, кто хочет создавать</h1>
-          <div class="story-hero-lead">
-            <p>Создание программ перестало быть закрытой территорией.</p>
-            <p>На первый план выходит не знание языков программирования, а умение видеть потребности людей, замечать тренды и превращать идеи в рабочие инструменты.</p>
-            <p>OpenScript помогает войти в этот новый мир и начать воплощать свои идеи в жизнь — даже если у вас нет технических знаний и опыта.</p>
-          </div>
-
-          <div class="actions hero-actions">
-            <a class="button button-primary" href="{{ start_href }}">Начать работу</a>
-            <a class="button button-secondary" href="#how-it-works">Как это работает</a>
-          </div>
+        <p class="eyebrow">OpenScript</p>
+        <h1 class="story-hero-title">Пришло новое время для тех, кто хочет создавать</h1>
+        <p class="story-hero-lead">Создание программ перестало быть закрытой территорией. На первый план выходит не знание языков программирования, а умение видеть потребности людей, замечать тренды и превращать идеи в рабочие инструменты. OpenScript помогает войти в этот новый мир — даже если у вас нет технических знаний.</p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="{{ start_href }}">Начать работу</a>
+          <a class="button button-secondary" href="#how-it-works">Как это работает</a>
         </div>
-
-        <aside class="card story-showcase-panel" aria-label="Что можно создать с OpenScript">
-          <div class="stack story-showcase-inner">
-            <p class="section-kicker">Витрина</p>
-            <h2 class="section-title">Что можно создать</h2>
-            <p class="muted">С OpenScript можно создавать рабочие инструменты без умения программировать: от простых MVP до автоматизаций, AI-помощников и сервисных решений.</p>
-            <div class="story-showcase-grid" role="list" aria-label="Примеры того, что можно создать">
-              <span class="story-showcase-item" role="listitem"><span class="story-showcase-mark">{{ ui_icon('idea') }}</span><span>MVP</span></span>
-              <span class="story-showcase-item" role="listitem"><span class="story-showcase-mark">{{ ui_icon('bot') }}</span><span>Боты</span></span>
-              <span class="story-showcase-item" role="listitem"><span class="story-showcase-mark">{{ ui_icon('agent') }}</span><span>AI-агенты</span></span>
-              <span class="story-showcase-item" role="listitem"><span class="story-showcase-mark">{{ ui_icon('support') }}</span><span>AI-помощники</span></span>
-              <span class="story-showcase-item" role="listitem"><span class="story-showcase-mark">{{ ui_icon('chart') }}</span><span>Трейдинг-боты</span></span>
-              <span class="story-showcase-item" role="listitem"><span class="story-showcase-mark">{{ ui_icon('bag') }}</span><span>Биддеры для маркетплейсов</span></span>
-              <span class="story-showcase-item" role="listitem"><span class="story-showcase-mark">{{ ui_icon('repeat') }}</span><span>Автоматизации</span></span>
-              <span class="story-showcase-item" role="listitem"><span class="story-showcase-mark">{{ ui_icon('code') }}</span><span>Парсеры и сбор данных</span></span>
-              <span class="story-showcase-item story-showcase-item-wide" role="listitem"><span class="story-showcase-mark">{{ ui_icon('table') }}</span><span>Инструменты для таблиц и отчётов</span></span>
-            </div>
-          </div>
-        </aside>
+        <div class="hero-badges">
+          <span class="hero-badge"><svg class="badge-icon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0-3 11v2h6v-2a6 6 0 0 0-3-11Z"/><path d="M9.5 19h5"/><path d="M10.5 22h3"/></svg>MVP</span>
+          <span class="hero-badge"><svg class="badge-icon" viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="11" rx="4"/><path d="M12 3v3"/><path d="M9 11h.01M15 11h.01"/><path d="M10 15h4"/></svg>Боты</span>
+          <span class="hero-badge"><svg class="badge-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="m14.4 9.6-1 3.4-3.4 1 1-3.4Z"/><path d="M12 6v2"/><path d="M18 12h-2"/><path d="M12 18v-2"/><path d="M6 12h2"/></svg>AI-агенты</span>
+          <span class="hero-badge"><svg class="badge-icon" viewBox="0 0 24 24"><path d="M12 4a8 8 0 1 0 8 8"/><path d="M12 8v4l3 2"/></svg>AI-помощники</span>
+          <span class="hero-badge"><svg class="badge-icon" viewBox="0 0 24 24"><path d="M5 19h14"/><path d="m6 15 4-4 3 2 5-6"/><path d="M17 7h1v1"/></svg>Трейдинг-боты</span>
+          <span class="hero-badge"><svg class="badge-icon" viewBox="0 0 24 24"><path d="M7 7a7 7 0 0 1 10.5 1.2L19 10"/><path d="M19 4v6h-6"/><path d="M17 17a7 7 0 0 1-10.5-1.2L5 14"/><path d="M5 20v-6h6"/></svg>Автоматизации</span>
+          <span class="hero-badge"><svg class="badge-icon" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="M4 10h16"/><path d="M4 15h16"/><path d="M9 5v14"/><path d="M15 5v14"/></svg>Таблицы и отчёты</span>
+        </div>
       </div>
     </section>
 
-    <section class="stack story-section">
-      <div class="stack section-copy">
+    <section class="story-section">
+      <div class="section-copy">
         <p class="section-kicker">Аудитория</p>
         <h2 class="section-title">Для кого OpenScript</h2>
       </div>
-
-      <div class="audience-grid">
-        <article class="card stack audience-card">
+      <div class="audience-grid reveal">
+        <article class="card audience-card">
           {{ audience_head('idea', 'Для тех, у кого есть идея MVP') }}
           <p>Хотите проверить идею, но не готовы сразу платить разработчику. OpenScript помогает собрать простую рабочую версию и понять, стоит ли развивать проект дальше.</p>
         </article>
-        <article class="card stack audience-card">
+        <article class="card audience-card">
           {{ audience_head('users', 'Для малого бизнеса и самозанятых') }}
           <p>Когда заявки, таблицы, файлы, напоминания и ответы клиентам начинают забирать слишком много времени, OpenScript помогает создавать простые инструменты под свои рабочие задачи.</p>
         </article>
-        <article class="card stack audience-card">
+        <article class="card audience-card">
           {{ audience_head('bag', 'Для селлеров и онлайн-продавцов') }}
           <p>Если нужно следить за ценами, товарами, остатками, описаниями и конкурентами, OpenScript помогает собирать инструменты, которые упрощают ежедневную работу с продажами.</p>
         </article>
-        <article class="card stack audience-card">
+        <article class="card audience-card">
           {{ audience_head('repeat', 'Для тех, кто хочет сменить траекторию') }}
           <p>Если вы чувствуете, что пора искать новое направление, OpenScript даёт возможность попробовать себя в создании программ, ботов и инструментов без долгого входа в классическое программирование.</p>
         </article>
-        <article class="card stack audience-card">
-          {{ audience_head('code', 'Для тех, кому давно интересно программирование') }}
+        <article class="card audience-card">
+          {{ audience_head('code', 'Для тех, кому интересно программирование') }}
           <p>Если вам всегда было интересно создавать программы, но языки, термины и сложный вход останавливали, OpenScript помогает начать с практики и современных инструментов.</p>
         </article>
-        <article class="card stack audience-card">
+        <article class="card audience-card">
           {{ audience_head('table', 'Для тех, кто работает с таблицами и отчётами') }}
           <p>OpenScript помогает собирать данные, считать показатели, находить изменения и показывать результат в понятном виде — без ручной сборки отчётов каждый раз.</p>
         </article>
       </div>
     </section>
 
-    <section class="stack story-section" id="use-cases">
-      <div class="stack section-copy">
+    <section class="story-section" id="use-cases">
+      <div class="section-copy">
         <p class="section-kicker">Сценарии</p>
         <h2 class="section-title">Какие задачи можно решать с OpenScript</h2>
       </div>
-
       <div class="carousel-shell use-case-carousel" data-carousel>
-        <div class="carousel-controls">
-          <div class="stack carousel-heading">
-            <p class="panel-kicker">Выберите сценарий</p>
-            <p class="muted">Все варианты доступны без autoplay, а на мобильном продолжают работать как удобный скролл-сценарий.</p>
-          </div>
-        </div>
-
         <div class="carousel-stage">
-          <button type="button" class="carousel-button carousel-button-prev" data-carousel-prev aria-label="Предыдущий сценарий">
-            <svg class="carousel-chevron" aria-hidden="true" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-          </button>
           <div class="carousel-viewport" data-carousel-viewport tabindex="0" aria-label="Сценарии OpenScript">
             <div class="carousel-track">
-            <article class="card use-case-slide" data-carousel-slide role="group" aria-roledescription="slide" aria-label="Проверить идею">
-              {{ card_head('idea', 'Проверить идею') }}
-              <p>Соберите простую версию идеи и поймите, стоит ли развивать её дальше.</p>
-              <p class="muted">Напишите MVP, чтобы проверить идею перед тем, как платить разработчику: простой сервис, бот, форма, инструмент для клиентов или внутренняя автоматизация.</p>
-              <div class="chip-row">
-                <span>MVP</span>
-                <span>простой сервис</span>
-                <span>форма</span>
-              </div>
-            </article>
-
-            <article class="card use-case-slide" data-carousel-slide role="group" aria-roledescription="slide" aria-label="Создать себе помощника">
-              {{ card_head('support', 'Создать себе помощника') }}
-              <p>Соберите помощника, который берёт на себя повторяющиеся действия.</p>
-              <p class="muted">Он может разбирать сообщения, готовить черновики ответов, собирать данные, приводить таблицы в порядок, напоминать о задачах или помогать проходить однотипные рабочие процессы.</p>
-              <div class="chip-row">
-                <span>сообщения</span>
-                <span>черновики</span>
-                <span>таблицы</span>
-              </div>
-            </article>
-
-            <article class="card use-case-slide" data-carousel-slide role="group" aria-roledescription="slide" aria-label="Сделать бота для клиентов или команды">
-              {{ card_head('bot', 'Сделать бота для клиентов или команды') }}
-              <p>Бот может принимать заявки, задавать вопросы, сохранять ответы и передавать их вам.</p>
-              <p class="muted">Клиент пишет в VK, MAX или Telegram, бот уточняет детали, складывает заявку в таблицу и отправляет уведомление.</p>
-              <div class="chip-row">
-                <span>VK</span>
-                <span>MAX</span>
-                <span>Telegram</span>
-              </div>
-            </article>
-
-            <article class="card use-case-slide" data-carousel-slide role="group" aria-roledescription="slide" aria-label="Создать агента для действий">
-              {{ card_head('agent', 'Создать агента для действий') }}
-              <p>Агент — это не просто чат. Он может выполнять пошаговую задачу: открыть сайт, найти информацию, заполнить форму, сравнить варианты, собрать данные и показать результат.</p>
-              <p class="muted">Агентов можно использовать для работы с сайтами, сервисами, кабинетами и повторяющимися процессами.</p>
-              <div class="chip-row">
-                <span>сайты</span>
-                <span>кабинеты</span>
-                <span>процессы</span>
-              </div>
-            </article>
-
-            <article class="card use-case-slide" data-carousel-slide role="group" aria-roledescription="slide" aria-label="Следить за трендами и данными">
-              {{ card_head('chart', 'Следить за трендами и данными') }}
-              <p>Соберите инструмент, который помогает видеть, что происходит в вашей нише.</p>
-              <p class="muted">Какие темы обсуждают, какие товары набирают интерес, какие вопросы задают клиенты, как меняются цены конкурентов и какие идеи стоит проверить первыми.</p>
-              <div class="chip-row">
-                <span>темы</span>
-                <span>товары</span>
-                <span>цены</span>
-              </div>
-            </article>
-
-            <article class="card use-case-slide" data-carousel-slide role="group" aria-roledescription="slide" aria-label="Автоматизировать рутину">
-              {{ card_head('repeat', 'Автоматизировать рутину') }}
-              <p>Уберите ручные действия, которые каждый день забирают время.</p>
-              <p class="muted">Обработка файлов, прайсов, таблиц, заявок, описаний, списков, отчётов и других однотипных задач.</p>
-              <div class="chip-row">
-                <span>файлы</span>
-                <span>прайсы</span>
-                <span>отчёты</span>
-              </div>
-            </article>
+              <article class="use-case-slide" data-carousel-slide role="group" aria-roledescription="slide" aria-label="Проверить идею">
+                {{ card_head('idea', 'Проверить идею') }}
+                <p>Соберите простую версию идеи и поймите, стоит ли развивать её дальше. Напишите MVP, чтобы проверить идею перед тем, как платить разработчику: простой сервис, бот, форма, инструмент для клиентов или внутренняя автоматизация.</p>
+                <div class="chip-row">
+                  <span>MVP</span>
+                  <span>простой сервис</span>
+                  <span>форма</span>
+                </div>
+              </article>
+              <article class="use-case-slide" data-carousel-slide role="group" aria-roledescription="slide" aria-label="Создать себе помощника">
+                {{ card_head('support', 'Создать себе помощника') }}
+                <p>Соберите помощника, который берёт на себя повторяющиеся действия. Он может разбирать сообщения, готовить черновики ответов, собирать данные, приводить таблицы в порядок, напоминать о задачах.</p>
+                <div class="chip-row">
+                  <span>сообщения</span>
+                  <span>черновики</span>
+                  <span>таблицы</span>
+                </div>
+              </article>
+              <article class="use-case-slide" data-carousel-slide role="group" aria-roledescription="slide" aria-label="Сделать бота для клиентов">
+                {{ card_head('bot', 'Сделать бота для клиентов') }}
+                <p>Бот может принимать заявки, задавать вопросы, сохранять ответы и передавать их вам. Клиент пишет в VK, MAX или Telegram, бот уточняет детали, складывает заявку в таблицу и отправляет уведомление.</p>
+                <div class="chip-row">
+                  <span>VK</span>
+                  <span>MAX</span>
+                  <span>Telegram</span>
+                </div>
+              </article>
+              <article class="use-case-slide" data-carousel-slide role="group" aria-roledescription="slide" aria-label="Создать агента для действий">
+                {{ card_head('agent', 'Создать агента для действий') }}
+                <p>Агент — это не просто чат. Он может выполнять пошаговую задачу: открыть сайт, найти информацию, заполнить форму, сравнить варианты, собрать данные и показать результат.</p>
+                <div class="chip-row">
+                  <span>сайты</span>
+                  <span>кабинеты</span>
+                  <span>процессы</span>
+                </div>
+              </article>
+              <article class="use-case-slide" data-carousel-slide role="group" aria-roledescription="slide" aria-label="Следить за трендами и данными">
+                {{ card_head('chart', 'Следить за трендами и данными') }}
+                <p>Соберите инструмент, который помогает видеть, что происходит в вашей нише. Какие темы обсуждают, какие товары набирают интерес, какие вопросы задают клиенты, как меняются цены конкурентов.</p>
+                <div class="chip-row">
+                  <span>темы</span>
+                  <span>товары</span>
+                  <span>цены</span>
+                </div>
+              </article>
+              <article class="use-case-slide" data-carousel-slide role="group" aria-roledescription="slide" aria-label="Автоматизировать рутину">
+                {{ card_head('repeat', 'Автоматизировать рутину') }}
+                <p>Уберите ручные действия, которые каждый день забирают время. Обработка файлов, прайсов, таблиц, заявок, описаний, списков, отчётов и других однотипных задач.</p>
+                <div class="chip-row">
+                  <span>файлы</span>
+                  <span>прайсы</span>
+                  <span>отчёты</span>
+                </div>
+              </article>
             </div>
           </div>
-          <button type="button" class="carousel-button carousel-button-next" data-carousel-next aria-label="Следующий сценарий">
-            <svg class="carousel-chevron" aria-hidden="true" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-          </button>
-        </div>
-
-        <div class="carousel-stepper" role="tablist" aria-label="Сценарии OpenScript">
-          <button type="button" class="carousel-step is-active" data-carousel-step data-carousel-dot data-index="0" aria-label="Проверить идею"><span>01</span></button>
-          <button type="button" class="carousel-step" data-carousel-step data-carousel-dot data-index="1" aria-label="Создать себе помощника"><span>02</span></button>
-          <button type="button" class="carousel-step" data-carousel-step data-carousel-dot data-index="2" aria-label="Сделать бота для клиентов или команды"><span>03</span></button>
-          <button type="button" class="carousel-step" data-carousel-step data-carousel-dot data-index="3" aria-label="Создать агента для действий"><span>04</span></button>
-          <button type="button" class="carousel-step" data-carousel-step data-carousel-dot data-index="4" aria-label="Следить за трендами и данными"><span>05</span></button>
-          <button type="button" class="carousel-step" data-carousel-step data-carousel-dot data-index="5" aria-label="Автоматизировать рутину"><span>06</span></button>
         </div>
       </div>
-
-      <p class="muted section-note">
+      <p class="muted section-note" style="text-align:center;margin-top:20px;color:var(--muted);">
         Это только примеры. Внутри OpenScript вы будете учиться не списку шаблонов, а способу превращать свою задачу в рабочий инструмент.
       </p>
     </section>
 
-    <section class="stack story-section" id="how-it-works">
-      <div class="stack section-copy">
+    <section class="story-section" id="how-it-works">
+      <div class="section-copy center">
         <p class="section-kicker">Механика</p>
         <h2 class="section-title">Как устроена работа</h2>
       </div>
 
-      <article class="card stack flow-card flow-card--intro">
-        {{ card_head('plan', 'Концепция') }}
-        <div class="concept-layout">
-          <div class="stack concept-lead">
-            <p>У вас в подчинении два ИИ-специалиста:</p>
-            <p class="muted">Один отвечает за организацию и управление работой, другой выполняет техническую часть на сервере.</p>
+      <div class="team-strip reveal">
+        <p><strong>У вас в подчинении два ИИ-специалиста.</strong> Один отвечает за организацию и управление работой, другой выполняет техническую часть на сервере.</p>
+        <div class="team-row">
+          <div class="team-card">
+            <div class="team-avatar" style="background:var(--bg);color:var(--fg);border:2px solid var(--border);">Вы</div>
+            <strong>Заказчик</strong>
+            <p>Формулируете идею, задачу или желаемый результат</p>
           </div>
-          <div class="concept-roles" aria-label="Роли в концепции">
-            <article class="concept-role">
-              <p><strong>Ведущий разработчик</strong> — организация и управление работой.</p>
-            </article>
-            <article class="concept-role">
-              <p><strong>Технический исполнитель</strong> — выполнение технической работы на сервере.</p>
-            </article>
+          <div class="team-arrow">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </div>
+          <div class="team-card">
+            <div class="team-avatar">ВР</div>
+            <strong>Ведущий разработчик</strong>
+            <p>Организует работу, разбивает задачу на шаги и готовит инструкции</p>
+          </div>
+          <div class="team-arrow">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </div>
+          <div class="team-card">
+            <div class="team-avatar" style="background:var(--accent-hover);">ТИ</div>
+            <strong>Технический исполнитель</strong>
+            <p>Выполняет техническую часть на сервере, запускает проверки и устраняет ошибки</p>
           </div>
         </div>
-      </article>
-
-      <div class="specialists-flow" aria-label="Поток работы OpenScript">
-        <article class="card stack flow-step flow-step-person">
-          {{ card_head('idea', 'Вы') }}
-          <p>Вы формулируете идею, задачу или желаемый результат.</p>
-        </article>
-        <article class="card stack flow-step flow-step-person">
-          {{ card_head('plan', 'Ведущий разработчик') }}
-          <p>Ведущий разработчик организует и управляет работой, разбивает задачу на шаги и готовит инструкции.</p>
-        </article>
-        <article class="card stack flow-step flow-step-person">
-          {{ card_head('server', 'Технический исполнитель') }}
-          <p>Технический исполнитель выполняет техническую часть на сервере, запускает проверки и устраняет ошибки.</p>
-        </article>
-        <article class="card stack flow-step flow-step-person">
-          {{ card_head('result', 'Результат') }}
-          <p>Вы принимаете результат, тестируете его и даёте следующий комментарий, если что-то нужно улучшить.</p>
-        </article>
       </div>
 
-      <div class="workflow-support-grid">
-        <article class="card stack flow-step">
+      <div class="process-track reveal">
+        <div class="process-step">
+          <span class="process-num">1</span>
+          <span class="card-title">Идея</span>
+          <p>Вы формулируете задачу или желаемый результат</p>
+        </div>
+        <div class="process-step">
+          <span class="process-num">2</span>
+          <span class="card-title">План</span>
+          <p>Ведущий разработчик разбивает задачу на шаги</p>
+        </div>
+        <div class="process-step">
+          <span class="process-num">3</span>
+          <span class="card-title">Работа</span>
+          <p>Технический исполнитель делает техническую часть</p>
+        </div>
+        <div class="process-step">
+          <span class="process-num">4</span>
+          <span class="card-title">Результат</span>
+          <p>Вы проверяете, тестируете и даёте комментарии</p>
+        </div>
+      </div>
+
+      <div class="flow-support reveal">
+        <div class="card">
           {{ card_head('package', 'Документы ускоряют старт') }}
           <p>Внутри OpenScript собраны правила, примеры, инструкции и подходы, которые помогают быстрее понять процесс и начинать работу, опираясь на уже пройденный кем-то путь.</p>
-        </article>
-        <article class="card stack flow-step">
+        </div>
+        <div class="card">
           {{ card_head('users', 'Комьюнити помогает не застрять') }}
           <p>В чатах VK, MAX и Telegram можно задавать вопросы, смотреть опыт других участников и получать помощь от сообщества и админов.</p>
-        </article>
+        </div>
       </div>
     </section>
 
-    <section class="stack story-section">
-      <div class="stack section-copy">
+    <section class="story-section" id="pricing">
+      <div class="section-copy center">
         <p class="section-kicker">Состав доступа</p>
         <h2 class="section-title">Что входит в полный доступ</h2>
-        <p class="muted">
-          В полный доступ входят подписка на ChatGPT Plus на 1 месяц и аренда сервера на 1 месяц. После оплаты вы также получаете постоянный доступ к материалам, инструкциям, помощи на старте и комьюнити. Доступ к материалам и базе помощи остаётся у вас навсегда.
-        </p>
+        <p class="muted">В полный доступ входят подписка на ChatGPT Plus на 1 месяц и аренда сервера на 1 месяц. После оплаты вы также получаете постоянный доступ к материалам, инструкциям, помощи на старте и комьюнити. Доступ к материалам и базе помощи остаётся у вас навсегда.</p>
       </div>
 
-      <div class="package-grid">
-        <article class="card stack package-card package-card-month">
+      <div class="package-grid reveal">
+        <div class="card package-card">
           <div class="package-group-head">
             {{ card_head('price', 'На 1 месяц') }}
             <p class="muted">Эта часть действует в первый месяц и помогает запустить рабочую среду без лишних шагов.</p>
           </div>
           <div class="package-month-grid">
-            <article class="package-item package-item-premium">
-              {{ card_head('plan', 'Подписка на ChatGPT Plus на 1 месяц') }}
-              <p class="muted">В работе используются одни из самых сильных нейросетевых моделей в мире. ChatGPT Plus даёт доступ к продвинутым моделям, которые помогают ИИ-специалистам разбирать задачи, готовить технические инструкции, находить ошибки и сопровождать работу над проектом.</p>
-            </article>
-            <article class="package-item package-item-premium">
-              {{ card_head('server', 'Аренда сервера на 1 месяц') }}
-              <p class="muted">Для разработки используется удалённый сервер. На нём ведётся вся техническая работа: создаётся проект, вносятся изменения, запускаются проверки, исправляются ошибки и готовится результат. После запуска проект продолжает работать на сервере.</p>
-            </article>
+            <div class="package-item">
+              {{ card_head('plan', 'Подписка на ChatGPT Plus') }}
+              <p>В работе используются одни из самых сильных нейросетевых моделей в мире. ChatGPT Plus даёт доступ к продвинутым моделям, которые помогают ИИ-специалистам разбирать задачи, готовить технические инструкции, находить ошибки и сопровождать работу над проектом.</p>
+            </div>
+            <div class="package-item">
+              {{ card_head('server', 'Аренда сервера') }}
+              <p>Для разработки используется удалённый сервер. На нём ведётся вся техническая работа: создаётся проект, вносятся изменения, запускаются проверки, исправляются ошибки и готовится результат. После запуска проект продолжает работать на сервере.</p>
+            </div>
           </div>
-        </article>
+        </div>
 
-        <article class="card stack package-card package-card-forever">
+        <div class="card package-card">
           <div class="package-group-head">
             {{ card_head('package', 'Навсегда') }}
             <p class="muted">Это остаётся с вами после оплаты и помогает возвращаться к работе без потери смысла и контекста.</p>
           </div>
           <div class="package-forever-grid">
-            <article class="package-item">
+            <div class="package-item">
               {{ card_head('result', 'Доступ к материалам навсегда') }}
-              <p class="muted">Материалы остаются с вами и не исчезают после первого запуска.</p>
-            </article>
-            <article class="package-item">
+              <p>Материалы остаются с вами и не исчезают после первого запуска.</p>
+            </div>
+            <div class="package-item">
               {{ card_head('plan', 'Пошаговые инструкции') }}
-              <p class="muted">Понятные шаги помогают начать без хаотичного поиска решений.</p>
-            </article>
-            <article class="package-item">
+              <p>Понятные шаги помогают начать без хаотичного поиска решений.</p>
+            </div>
+            <div class="package-item">
               {{ card_head('code', 'Готовые команды и примеры') }}
-              <p class="muted">Можно копировать рабочие заготовки и адаптировать их под свою задачу.</p>
-            </article>
-            <article class="package-item">
-              {{ card_head('support', 'Помощь с настройкой и началом работы') }}
-              <p class="muted">Мы помогаем пройти первые шаги и не застрять на старте.</p>
-            </article>
-            <article class="package-item package-item-wide">
+              <p>Можно копировать рабочие заготовки и адаптировать их под свою задачу.</p>
+            </div>
+            <div class="package-item">
+              {{ card_head('support', 'Помощь с настройкой') }}
+              <p>Мы помогаем пройти первые шаги и не застрять на старте.</p>
+            </div>
+            <div class="package-item package-item-wide">
               {{ card_head('users', 'Комьюнити в VK, MAX и Telegram') }}
-              <p class="muted">В чатах помогают участники и админы.</p>
-            </article>
+              <p>В чатах помогают участники и админы.</p>
+            </div>
           </div>
-        </article>
+        </div>
       </div>
     </section>
 
-    <section class="card stack offer-block">
+    <section class="card stack offer-block reveal">
       <div class="offer-grid">
-        <div class="stack offer-copy">
+        <div class="offer-copy">
           <p class="section-kicker">Финальное предложение</p>
           <h2 class="section-title">Полный доступ — 4 990 ₽</h2>
           <a class="button button-primary offer-cta" href="{{ start_href }}">Начать работу</a>
-          <p class="offer-renewal">
-            Продлевать подписку ChatGPT Plus и аренду сервера можно по отдельности в личном кабинете.
-          </p>
+          <p class="offer-renewal">Продлевать подписку ChatGPT Plus и аренду сервера можно по отдельности в личном кабинете.</p>
         </div>
-
         <div class="offer-summary">
           <div class="offer-summary-group">
             <p class="offer-summary-title">На 1 месяц</p>
@@ -441,38 +402,37 @@
     </section>
 
     <section class="stack story-section">
-      <div class="stack section-copy">
+      <div class="section-copy center">
         <p class="section-kicker">Вопросы</p>
         <h2 class="section-title">Вопросы перед стартом</h2>
       </div>
-
-      <div class="faq-list">
-        <details class="card faq-item">
-          <summary><span class="faq-summary-icon">{{ ui_icon('faq') }}</span><span>Нужно ли уметь программировать?</span></summary>
+      <div class="faq-list reveal">
+        <details class="faq-item">
+          <summary>Нужно ли уметь программировать?</summary>
           <p>Нет. OpenScript рассчитан на людей без технического опыта. Вам не нужно заранее знать языки программирования.</p>
         </details>
-        <details class="card faq-item">
-          <summary><span class="faq-summary-icon">{{ ui_icon('faq') }}</span><span>Нужно ли заранее разбираться в сложных инструментах?</span></summary>
+        <details class="faq-item">
+          <summary>Нужно ли заранее разбираться в сложных инструментах?</summary>
           <p>Нет. Идея в том, чтобы дать понятный порядок действий, рабочую среду и помощь на первых шагах.</p>
         </details>
-        <details class="card faq-item">
-          <summary><span class="faq-summary-icon">{{ ui_icon('faq') }}</span><span>Какие программы и какое железо нужны для работы?</span></summary>
+        <details class="faq-item">
+          <summary>Какие программы и какое железо нужны для работы?</summary>
           <p>Достаточно обычного компьютера или ноутбука, браузера Google Chrome и стандартного терминала вашей операционной системы. Мощное железо, отдельная видеокарта и сложная установка программ не нужны: основная работа проходит через браузер и терминал ОС.</p>
         </details>
-        <details class="card faq-item">
-          <summary><span class="faq-summary-icon">{{ ui_icon('faq') }}</span><span>Что я смогу сделать?</span></summary>
+        <details class="faq-item">
+          <summary>Что я смогу сделать?</summary>
           <p>Начать с простых рабочих вещей: бот для заявок, MVP идеи, помощник для рутины, сбор данных, обработка таблиц, агент для пошаговых действий.</p>
         </details>
-        <details class="card faq-item">
-          <summary><span class="faq-summary-icon">{{ ui_icon('faq') }}</span><span>Мне помогут, если я застряну?</span></summary>
+        <details class="faq-item">
+          <summary>Мне помогут, если я застряну?</summary>
           <p>Да. Внутри есть чаты в VK, MAX и Telegram, где можно задавать вопросы. Помогают участники и админы.</p>
         </details>
-        <details class="card faq-item">
-          <summary><span class="faq-summary-icon">{{ ui_icon('faq') }}</span><span>Доступ к материалам останется?</span></summary>
+        <details class="faq-item">
+          <summary>Доступ к материалам останется?</summary>
           <p>Да. После оплаты доступ к материалам остаётся навсегда.</p>
         </details>
-        <details class="card faq-item">
-          <summary><span class="faq-summary-icon">{{ ui_icon('faq') }}</span><span>Это разработка проекта за меня?</span></summary>
+        <details class="faq-item">
+          <summary>Это разработка проекта за меня?</summary>
           <p>Нет. OpenScript помогает вам начать делать свои инструменты самостоятельно: с инструкциями, средой, примерами и поддержкой на старте.</p>
         </details>
       </div>
@@ -480,7 +440,7 @@
 
     <script>
       (function () {
-        const revealTargets = Array.from(document.querySelectorAll('.public-landing-page .story-hero, .public-landing-page .story-showcase-panel, .public-landing-page .audience-grid, .public-landing-page .carousel-shell, .public-landing-page .flow-card--intro, .public-landing-page .specialists-flow, .public-landing-page .workflow-support-grid, .public-landing-page .package-grid, .public-landing-page .offer-block, .public-landing-page .faq-list'));
+        const revealTargets = Array.from(document.querySelectorAll('.public-landing-page .audience-grid, .public-landing-page .team-strip, .public-landing-page .process-track, .public-landing-page .flow-support, .public-landing-page .package-grid, .public-landing-page .offer-block, .public-landing-page .faq-list'));
         const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
         if (!reducedMotion && revealTargets.length) {
@@ -491,7 +451,7 @@
                 observer.unobserve(entry.target);
               }
             });
-          }, { threshold: 0.16, rootMargin: '0px 0px -8% 0px' });
+          }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
 
           revealTargets.forEach((element) => {
             element.classList.add('reveal');
@@ -500,113 +460,6 @@
         } else {
           revealTargets.forEach((element) => element.classList.add('is-visible'));
         }
-
-        document.querySelectorAll('[data-carousel]').forEach((carousel) => {
-          const viewport = carousel.querySelector('[data-carousel-viewport]');
-          const slides = Array.from(carousel.querySelectorAll('[data-carousel-slide]'));
-          const prev = carousel.querySelector('[data-carousel-prev]');
-          const next = carousel.querySelector('[data-carousel-next]');
-          const current = carousel.querySelector('[data-carousel-current]');
-          const total = carousel.querySelector('[data-carousel-total]');
-          const dots = Array.from(carousel.querySelectorAll('[data-carousel-dot]'));
-
-          if (!viewport || !slides.length) {
-            return;
-          }
-
-          const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-          let activeIndex = 0;
-          let settleTimer = 0;
-
-          const setActive = (index, scroll = false) => {
-            const normalized = ((index % slides.length) + slides.length) % slides.length;
-            activeIndex = normalized;
-
-            slides.forEach((slide, slideIndex) => {
-              const isActive = slideIndex === activeIndex;
-              slide.classList.toggle('is-active', isActive);
-              slide.setAttribute('aria-current', isActive ? 'true' : 'false');
-            });
-
-            dots.forEach((dot, dotIndex) => {
-              const isActive = dotIndex === activeIndex;
-              dot.classList.toggle('is-active', isActive);
-              dot.setAttribute('aria-pressed', String(isActive));
-            });
-
-            if (current) {
-              current.textContent = String(activeIndex + 1).padStart(2, '0');
-            }
-
-            if (scroll) {
-              const slide = slides[activeIndex];
-              const targetLeft = slide.offsetLeft - (viewport.clientWidth - slide.clientWidth) / 2;
-              viewport.scrollTo({
-                left: Math.max(0, targetLeft),
-                behavior: reducedMotion ? 'auto' : 'smooth',
-              });
-            }
-          };
-
-          const syncFromViewport = () => {
-            const viewportCenter = viewport.getBoundingClientRect().left + viewport.clientWidth / 2;
-            let bestIndex = activeIndex;
-            let bestDistance = Number.POSITIVE_INFINITY;
-
-            slides.forEach((slide, index) => {
-              const rect = slide.getBoundingClientRect();
-              const slideCenter = rect.left + rect.width / 2;
-              const distance = Math.abs(slideCenter - viewportCenter);
-              if (distance < bestDistance) {
-                bestDistance = distance;
-                bestIndex = index;
-              }
-            });
-
-            if (bestIndex !== activeIndex) {
-              setActive(bestIndex, false);
-            }
-          };
-
-          const scheduleSyncFromViewport = () => {
-            window.clearTimeout(settleTimer);
-            settleTimer = window.setTimeout(syncFromViewport, 120);
-          };
-
-          if (total) {
-            total.textContent = String(slides.length).padStart(2, '0');
-          }
-
-          if (prev) {
-            prev.addEventListener('click', () => setActive(activeIndex - 1, true));
-          }
-
-          if (next) {
-            next.addEventListener('click', () => setActive(activeIndex + 1, true));
-          }
-
-          dots.forEach((dot) => {
-            dot.addEventListener('click', () => setActive(Number(dot.dataset.index), true));
-          });
-
-          viewport.addEventListener('scroll', scheduleSyncFromViewport, { passive: true });
-          if ('onscrollend' in viewport) {
-            viewport.addEventListener('scrollend', syncFromViewport);
-          }
-
-          viewport.addEventListener('keydown', (event) => {
-            if (event.key === 'ArrowLeft') {
-              event.preventDefault();
-              setActive(activeIndex - 1, true);
-            }
-            if (event.key === 'ArrowRight') {
-              event.preventDefault();
-              setActive(activeIndex + 1, true);
-            }
-          });
-
-          setActive(0, false);
-        });
       }());
     </script>
   </div>

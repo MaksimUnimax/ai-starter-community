@@ -1,0 +1,193 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <style>
+      .main-stroke { stroke: #D67A3E; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+      .secondary-stroke { stroke: #BFA994; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+      .faint { stroke: #D67A3E; fill: none; stroke-linecap: round; stroke-linejoin: round; opacity: 0.12; }
+      .very-faint { stroke: #D67A3E; fill: none; stroke-linecap: round; stroke-linejoin: round; opacity: 0.06; }
+      .card-fill { fill: #FFF8F1; opacity: 0.5; }
+      .card-stroke { stroke: #D67A3E; fill: none; stroke-linecap: round; stroke-linejoin: round; opacity: 0.22; }
+      .text-label { fill: #BFA994; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; letter-spacing: 0.08em; opacity: 0.35; }
+    </style>
+  </defs>
+
+  <!-- Blueprint rings behind center -->
+  <g class="blueprint-rings">
+    <circle cx="960" cy="460" r="380" class="very-faint" stroke-width="0.8"/>
+    <circle cx="960" cy="460" r="320" class="faint" stroke-width="0.8"/>
+    <circle cx="960" cy="460" r="260" class="very-faint" stroke-width="0.8"/>
+    <circle cx="960" cy="460" r="200" class="faint" stroke-width="0.8" stroke-dasharray="4 8"/>
+    <circle cx="960" cy="460" r="140" class="very-faint" stroke-width="0.8"/>
+    <ellipse cx="960" cy="460" rx="380" ry="120" class="very-faint" stroke-width="0.6"/>
+    <ellipse cx="960" cy="460" rx="320" ry="100" class="faint" stroke-width="0.6"/>
+    <ellipse cx="960" cy="460" rx="260" ry="80" class="very-faint" stroke-width="0.6"/>
+    <!-- Crosshairs -->
+    <line x1="580" y1="460" x2="1340" y2="460" class="very-faint" stroke-width="0.6"/>
+    <line x1="960" y1="80" x2="960" y2="840" class="very-faint" stroke-width="0.6"/>
+  </g>
+
+  <!-- Vitruvian cyborg figure -->
+  <g class="vitruvian-cyborg" opacity="0.12">
+    <!-- Central body outline -->
+    <circle cx="960" cy="360" r="28" class="main-stroke" stroke-width="1"/>
+    <line x1="960" y1="332" x2="960" y2="240" class="main-stroke" stroke-width="1"/>
+    <line x1="960" y1="388" x2="960" y2="620" class="main-stroke" stroke-width="1"/>
+    <!-- Arms spread -->
+    <line x1="760" y1="340" x2="1160" y2="340" class="main-stroke" stroke-width="1"/>
+    <line x1="800" y1="320" x2="820" y2="360" class="main-stroke" stroke-width="1"/>
+    <line x1="1120" y1="320" x2="1100" y2="360" class="main-stroke" stroke-width="1"/>
+    <!-- Legs -->
+    <line x1="960" y1="620" x2="900" y2="740" class="main-stroke" stroke-width="1"/>
+    <line x1="960" y1="620" x2="1020" y2="740" class="main-stroke" stroke-width="1"/>
+    <!-- Inner torso circuits -->
+    <rect x="940" y="380" width="40" height="80" rx="20" class="main-stroke" stroke-width="0.8"/>
+    <line x1="950" y1="400" x2="970" y2="400" class="main-stroke" stroke-width="0.8"/>
+    <line x1="950" y1="420" x2="970" y2="420" class="main-stroke" stroke-width="0.8"/>
+    <line x1="950" y1="440" x2="970" y2="440" class="main-stroke" stroke-width="0.8"/>
+    <!-- Head circuits -->
+    <circle cx="960" cy="280" r="18" class="main-stroke" stroke-width="0.8"/>
+    <line x1="960" y1="262" x2="960" y2="250" class="main-stroke" stroke-width="0.8"/>
+    <line x1="950" y1="270" x2="942" y2="270" class="main-stroke" stroke-width="0.8"/>
+    <line x1="970" y1="270" x2="978" y2="270" class="main-stroke" stroke-width="0.8"/>
+    <!-- Proportion lines -->
+    <line x1="920" y1="240" x2="1000" y2="240" class="faint" stroke-width="0.6"/>
+    <line x1="920" y1="740" x2="1000" y2="740" class="faint" stroke-width="0.6"/>
+  </g>
+
+  <!-- Circuit lines around edges -->
+  <g class="circuit-lines">
+    <!-- Top-left corner traces -->
+    <polyline points="40,80 80,80 100,60 140,60 160,80 200,80" class="faint" stroke-width="0.8"/>
+    <polyline points="60,120 100,120 120,100 180,100" class="very-faint" stroke-width="0.8"/>
+    <circle cx="80" cy="80" r="4" class="faint" stroke-width="0.8"/>
+    <circle cx="160" cy="80" r="4" class="faint" stroke-width="0.8"/>
+    <!-- Top-right corner traces -->
+    <polyline points="1720,60 1760,60 1780,80 1840,80 1860,100 1880,100" class="faint" stroke-width="0.8"/>
+    <polyline points="1700,100 1740,100 1760,120 1820,120" class="very-faint" stroke-width="0.8"/>
+    <circle cx="1760" cy="60" r="4" class="faint" stroke-width="0.8"/>
+    <!-- Bottom-left traces -->
+    <polyline points="60,980 100,980 120,1000 160,1000 180,1020" class="faint" stroke-width="0.8"/>
+    <polyline points="80,940 120,940 140,960 180,960" class="very-faint" stroke-width="0.8"/>
+    <!-- Bottom-right traces -->
+    <polyline points="1740,1000 1780,1000 1800,980 1840,980 1860,960" class="faint" stroke-width="0.8"/>
+    <polyline points="1760,1020 1800,1020 1820,1000 1860,1000" class="very-faint" stroke-width="0.8"/>
+    <!-- Horizontal mid traces -->
+    <polyline points="200,900 240,900 260,880 300,880 320,900 360,900" class="very-faint" stroke-width="0.8"/>
+    <polyline points="1560,900 1600,900 1620,880 1660,880 1680,900 1720,900" class="very-faint" stroke-width="0.8"/>
+  </g>
+
+  <!-- Robot hand from left -->
+  <g class="robot-hand-left" opacity="0.22">
+    <!-- Forearm structure -->
+    <path d="M-20,520 L120,480 L160,500 L180,490 L200,500 L220,495 L240,505 L260,500 L280,510 L300,505" class="main-stroke" stroke-width="1.2"/>
+    <path d="M-20,560 L120,520 L160,540 L180,530 L200,540 L220,535 L240,545 L260,540 L280,550 L300,545" class="main-stroke" stroke-width="1.2"/>
+    <!-- Joint lines -->
+    <line x1="120" y1="480" x2="120" y2="520" class="main-stroke" stroke-width="1"/>
+    <line x1="160" y1="500" x2="160" y2="540" class="main-stroke" stroke-width="1"/>
+    <line x1="200" y1="500" x2="200" y2="540" class="main-stroke" stroke-width="1"/>
+    <line x1="240" y1="505" x2="240" y2="545" class="main-stroke" stroke-width="1"/>
+    <line x1="280" y1="510" x2="280" y2="550" class="main-stroke" stroke-width="1"/>
+    <!-- Finger segments reaching inward -->
+    <path d="M300,505 L340,485 L360,495 L380,490" class="main-stroke" stroke-width="1"/>
+    <path d="M300,520 L350,510 L370,520" class="main-stroke" stroke-width="1"/>
+    <path d="M300,535 L340,545 L360,540" class="main-stroke" stroke-width="1"/>
+    <!-- Mechanical details -->
+    <circle cx="140" cy="500" r="8" class="faint" stroke-width="0.8"/>
+    <circle cx="220" cy="520" r="6" class="faint" stroke-width="0.8"/>
+    <circle cx="260" cy="530" r="5" class="faint" stroke-width="0.8"/>
+    <rect x="100" y="490" width="20" height="20" rx="4" class="faint" stroke-width="0.8"/>
+    <!-- Panel lines -->
+    <line x1="60" y1="510" x2="60" y2="550" class="faint" stroke-width="0.8"/>
+    <line x1="80" y1="505" x2="80" y2="545" class="faint" stroke-width="0.8"/>
+  </g>
+
+  <!-- Human hand from right -->
+  <g class="human-hand-right" opacity="0.18">
+    <!-- Forearm outline -->
+    <path d="M1940,520 L1800,490 L1760,510 L1740,500 L1720,510 L1700,505 L1680,515 L1660,510 L1640,520 L1620,515" class="secondary-stroke" stroke-width="1.2"/>
+    <path d="M1940,560 L1800,530 L1760,550 L1740,540 L1720,550 L1700,545 L1680,555 L1660,550 L1640,560 L1620,555" class="secondary-stroke" stroke-width="1.2"/>
+    <!-- Wrist and palm -->
+    <path d="M1620,515 L1580,495 L1560,505 L1540,500" class="secondary-stroke" stroke-width="1"/>
+    <path d="M1620,555 L1580,535 L1560,545 L1540,540" class="secondary-stroke" stroke-width="1"/>
+    <!-- Fingers reaching inward -->
+    <path d="M1540,500 L1510,485 L1490,495" class="secondary-stroke" stroke-width="1"/>
+    <path d="M1540,515 L1500,505 L1480,515" class="secondary-stroke" stroke-width="1"/>
+    <path d="M1540,530 L1510,540 L1490,535" class="secondary-stroke" stroke-width="1"/>
+    <path d="M1540,540 L1520,555" class="secondary-stroke" stroke-width="1"/>
+    <!-- Anatomical proportion lines -->
+    <line x1="1800" y1="490" x2="1800" y2="530" class="secondary-stroke" stroke-width="0.8"/>
+    <line x1="1760" y1="510" x2="1760" y2="550" class="secondary-stroke" stroke-width="0.8"/>
+    <line x1="1720" y1="510" x2="1720" y2="550" class="secondary-stroke" stroke-width="0.8"/>
+    <line x1="1680" y1="515" x2="1680" y2="555" class="secondary-stroke" stroke-width="0.8"/>
+    <!-- Subtle shading lines -->
+    <line x1="1860" y1="520" x2="1860" y2="540" class="very-faint" stroke-width="0.8"/>
+    <line x1="1840" y1="515" x2="1840" y2="545" class="very-faint" stroke-width="0.8"/>
+  </g>
+
+  <!-- UI cards around hero -->
+  <g class="ui-cards">
+    <!-- Card 1: Анализ задач -->
+    <g transform="translate(140, 280)" opacity="0.45">
+      <rect x="0" y="0" width="140" height="52" rx="12" class="card-fill"/>
+      <rect x="0" y="0" width="140" height="52" rx="12" class="card-stroke" stroke-width="1"/>
+      <circle cx="22" cy="26" r="10" class="card-stroke" stroke-width="1"/>
+      <line x1="40" y1="18" x2="120" y2="18" class="card-stroke" stroke-width="1"/>
+      <line x1="40" y1="28" x2="110" y2="28" class="card-stroke" stroke-width="1"/>
+      <line x1="40" y1="38" x2="100" y2="38" class="card-stroke" stroke-width="1"/>
+      <text x="70" y="80" text-anchor="middle" class="text-label">АНАЛИЗ ЗАДАЧ</text>
+    </g>
+    <!-- Card 2: Планирование -->
+    <g transform="translate(1640, 260)" opacity="0.45">
+      <rect x="0" y="0" width="140" height="52" rx="12" class="card-fill"/>
+      <rect x="0" y="0" width="140" height="52" rx="12" class="card-stroke" stroke-width="1"/>
+      <rect x="12" y="16" width="20" height="20" rx="4" class="card-stroke" stroke-width="1"/>
+      <line x1="40" y1="18" x2="120" y2="18" class="card-stroke" stroke-width="1"/>
+      <line x1="40" y1="28" x2="110" y2="28" class="card-stroke" stroke-width="1"/>
+      <line x1="40" y1="38" x2="100" y2="38" class="card-stroke" stroke-width="1"/>
+      <text x="70" y="80" text-anchor="middle" class="text-label">ПЛАНИРОВАНИЕ</text>
+    </g>
+    <!-- Card 3: Кодирование -->
+    <g transform="translate(120, 720)" opacity="0.4">
+      <rect x="0" y="0" width="140" height="52" rx="12" class="card-fill"/>
+      <rect x="0" y="0" width="140" height="52" rx="12" class="card-stroke" stroke-width="1"/>
+      <line x1="16" y1="20" x2="32" y2="20" class="card-stroke" stroke-width="1"/>
+      <line x1="16" y1="32" x2="28" y2="32" class="card-stroke" stroke-width="1"/>
+      <line x1="40" y1="18" x2="120" y2="18" class="card-stroke" stroke-width="1"/>
+      <line x1="40" y1="28" x2="110" y2="28" class="card-stroke" stroke-width="1"/>
+      <line x1="40" y1="38" x2="100" y2="38" class="card-stroke" stroke-width="1"/>
+      <text x="70" y="80" text-anchor="middle" class="text-label">КОДИРОВАНИЕ</text>
+    </g>
+    <!-- Card 4: Тестирование -->
+    <g transform="translate(1660, 740)" opacity="0.4">
+      <rect x="0" y="0" width="140" height="52" rx="12" class="card-fill"/>
+      <rect x="0" y="0" width="140" height="52" rx="12" class="card-stroke" stroke-width="1"/>
+      <polyline points="12,26 18,32 28,20" class="card-stroke" stroke-width="1.2"/>
+      <line x1="40" y1="18" x2="120" y2="18" class="card-stroke" stroke-width="1"/>
+      <line x1="40" y1="28" x2="110" y2="28" class="card-stroke" stroke-width="1"/>
+      <line x1="40" y1="38" x2="100" y2="38" class="card-stroke" stroke-width="1"/>
+      <text x="70" y="80" text-anchor="middle" class="text-label">ТЕСТИРОВАНИЕ</text>
+    </g>
+    <!-- Card 5: Деплой -->
+    <g transform="translate(1640, 500)" opacity="0.38">
+      <rect x="0" y="0" width="140" height="52" rx="12" class="card-fill"/>
+      <rect x="0" y="0" width="140" height="52" rx="12" class="card-stroke" stroke-width="1"/>
+      <polygon points="22,18 30,26 22,34 14,26" class="card-stroke" stroke-width="1"/>
+      <line x1="40" y1="18" x2="120" y2="18" class="card-stroke" stroke-width="1"/>
+      <line x1="40" y1="28" x2="110" y2="28" class="card-stroke" stroke-width="1"/>
+      <line x1="40" y1="38" x2="100" y2="38" class="card-stroke" stroke-width="1"/>
+      <text x="70" y="80" text-anchor="middle" class="text-label">ДЕПЛОЙ</text>
+    </g>
+  </g>
+
+  <!-- Fine decorative dots -->
+  <g class="decorative-dots">
+    <circle cx="200" cy="200" r="2" fill="#D67A3E" opacity="0.15"/>
+    <circle cx="240" cy="180" r="1.5" fill="#D67A3E" opacity="0.1"/>
+    <circle cx="1700" cy="220" r="2" fill="#D67A3E" opacity="0.15"/>
+    <circle cx="1740" cy="190" r="1.5" fill="#D67A3E" opacity="0.1"/>
+    <circle cx="180" cy="860" r="2" fill="#D67A3E" opacity="0.12"/>
+    <circle cx="1720" cy="880" r="2" fill="#D67A3E" opacity="0.12"/>
+    <circle cx="960" cy="140" r="2" fill="#BFA994" opacity="0.1"/>
+    <circle cx="960" cy="900" r="2" fill="#BFA994" opacity="0.1"/>
+  </g>
+</svg>
