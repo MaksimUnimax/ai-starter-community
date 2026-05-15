@@ -191,6 +191,24 @@ a { color: inherit; }
   justify-content: center;
 }
 
+.hero-visual {
+  width: min(1120px, 100%);
+  margin: 30px auto 0;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.hero-visual img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 260px;
+  object-fit: contain;
+  object-position: center;
+  opacity: 0.86;
+}
+
 .hero-badges {
   display: flex;
   flex-wrap: wrap;
@@ -857,6 +875,14 @@ a { color: inherit; }
     margin-top: 28px;
   }
 
+  .hero-visual {
+    margin-top: 24px;
+  }
+
+  .hero-visual img {
+    max-height: 170px;
+  }
+
   .section {
     padding: 40px 0;
   }
@@ -940,6 +966,9 @@ a { color: inherit; }
         <a href="#pricing" class="btn btn-secondary">Посмотреть, что входит</a>
       </div>
     </div>
+  </div>
+  <div class="hero-visual" aria-hidden="true">
+    <img src="{{ url_for('static', filename='images/human_ai_hero_background_transparent.png') }}" alt="" decoding="async" draggable="false">
   </div>
   <div class="container hero-cards">
     <div class="hero-summary reveal">
