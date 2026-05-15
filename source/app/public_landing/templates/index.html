@@ -179,8 +179,8 @@ a { color: inherit; }
   border-radius: 40px;
   background: radial-gradient(
     circle at 50% 45%,
-    rgba(250, 246, 241, 0.74) 0%,
-    rgba(250, 246, 241, 0.48) 50%,
+    rgba(250, 246, 241, 0.78) 0%,
+    rgba(250, 246, 241, 0.52) 46%,
     rgba(250, 246, 241, 0) 76%
   );
 }
@@ -224,28 +224,12 @@ a { color: inherit; }
   position: absolute;
   left: 50%;
   top: 43%;
-  width: min(1450px, 122vw);
+  width: min(1280px, 108vw);
   max-width: none;
   height: auto;
   transform: translate(-50%, -50%);
-  opacity: 0.42;
-  filter: sepia(0.08) saturate(1.35) contrast(1.42);
-}
-
-.hero::before {
-  content: "";
-  position: absolute;
-  z-index: 1;
-  inset: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(
-      circle at 50% 33%,
-      rgba(250, 246, 241, 0.42) 0%,
-      rgba(250, 246, 241, 0.24) 32%,
-      rgba(250, 246, 241, 0.06) 58%,
-      rgba(250, 246, 241, 0) 78%
-    );
+  opacity: 0.78;
+  filter: sepia(0.04) saturate(1.85) contrast(1.85) brightness(0.92);
 }
 
 .hero-badges {
@@ -909,7 +893,8 @@ a { color: inherit; }
   .hero-bg-visual img {
     width: 175vw;
     top: 39%;
-    opacity: 0.32;
+    opacity: 0.58;
+    filter: sepia(0.04) saturate(1.65) contrast(1.65) brightness(0.94);
   }
 
   .hero-title {
