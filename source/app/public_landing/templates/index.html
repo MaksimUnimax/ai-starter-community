@@ -968,7 +968,7 @@ a { color: inherit; }
     </div>
   </div>
   <div class="hero-visual" aria-hidden="true">
-    <img src="{{ url_for('static', filename='images/human_ai_hero_background_transparent.png') }}" alt="" decoding="async" draggable="false">
+    <img src="{{ request.url_for('static', path='images/human_ai_hero_background_transparent.png') }}" alt="" decoding="async" draggable="false">
   </div>
   <div class="container hero-cards">
     <div class="hero-summary reveal">
