@@ -1,0 +1,357 @@
+{% extends "base.html" %}
+
+{% block content %}
+  {% set start_href = "/cabinet" if current_user else "/register" %}
+
+  <div class="public-landing-page">
+    <section class="hero">
+      <div class="hero-art" aria-hidden="true">
+        <img
+          class="hero-art-image"
+          src="{{ request.url_for('static', path='images/human_ai_hero_background_transparent.png') }}"
+          alt=""
+          decoding="async"
+          draggable="false"
+        >
+      </div>
+      <div class="hero-mobile-art" aria-hidden="true">
+        <img
+          class="hero-mobile-art-image"
+          src="{{ request.url_for('static', path='images/mobile_hero_background_DETAIL_no_squares.webp') }}"
+          alt=""
+          decoding="async"
+          draggable="false"
+        >
+      </div>
+      <div class="container hero-inner">
+        <p class="eyebrow">OpenScript</p>
+        <h1 class="hero-title">Пришло новое время для тех, кто хочет создавать</h1>
+        <p class="hero-lead">Создание программ перестало быть закрытой территорией. На первый план выходит не знание языков программирования, а умение видеть потребности людей, замечать тренды и превращать идеи в рабочие инструменты. OpenScript помогает войти в этот новый мир — даже если у вас нет технических знаний.</p>
+        <div class="hero-actions">
+          <a href="{{ start_href }}" class="btn btn-primary">Начать работу</a>
+          <a href="#how-it-works" class="btn btn-secondary">Как это работает</a>
+        </div>
+        <div class="hero-badges">
+          <span class="hero-badge"><svg class="badge-icon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0-3 11v2h6v-2a6 6 0 0 0-3-11Z"/><path d="M9.5 19h5"/><path d="M10.5 22h3"/></svg>MVP</span>
+          <span class="hero-badge"><svg class="badge-icon" viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="11" rx="4"/><path d="M12 3v3"/><path d="M9 11h.01M15 11h.01"/><path d="M10 15h4"/></svg>Боты</span>
+          <span class="hero-badge"><svg class="badge-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="m14.4 9.6-1 3.4-3.4 1 1-3.4Z"/><path d="M12 6v2"/><path d="M18 12h-2"/><path d="M12 18v-2"/><path d="M6 12h2"/></svg>AI-агенты</span>
+          <span class="hero-badge"><svg class="badge-icon" viewBox="0 0 24 24"><path d="M12 4a8 8 0 1 0 8 8"/><path d="M12 8v4l3 2"/></svg>AI-помощники</span>
+          <span class="hero-badge"><svg class="badge-icon" viewBox="0 0 24 24"><path d="M5 19h14"/><path d="m6 15 4-4 3 2 5-6"/><path d="M17 7h1v1"/></svg>Трейдинг-боты</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <p class="eyebrow">Аудитория</p>
+          <h2 class="section-title">Для кого OpenScript</h2>
+        </div>
+        <div class="audience-grid reveal">
+          <div class="card audience-card">
+            <div class="card-head">
+              <span class="card-icon"><svg viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0-3 11v2h6v-2a6 6 0 0 0-3-11Z"/><path d="M9.5 19h5"/><path d="M10.5 22h3"/></svg></span>
+              <span class="card-title">Для тех, у кого есть идея MVP</span>
+            </div>
+            <p class="card-text">Хотите проверить идею, но не готовы сразу платить разработчику. OpenScript помогает собрать простую рабочую версию и понять, стоит ли развивать проект дальше.</p>
+          </div>
+          <div class="card audience-card">
+            <div class="card-head">
+              <span class="card-icon"><svg viewBox="0 0 24 24"><path d="M9.5 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M4.5 19a5 5 0 0 1 10 0"/><path d="M16.5 12a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"/><path d="M13.8 19a4.3 4.3 0 0 1 6.2 0"/></svg></span>
+              <span class="card-title">Для малого бизнеса и самозанятых</span>
+            </div>
+            <p class="card-text">Когда заявки, таблицы, файлы, напоминания и ответы клиентам начинают забирать слишком много времени, OpenScript помогает создавать простые инструменты под свои рабочие задачи.</p>
+          </div>
+          <div class="card audience-card">
+            <div class="card-head">
+              <span class="card-icon"><svg viewBox="0 0 24 24"><path d="M8 8a4 4 0 0 1 8 0"/><path d="M5.5 8h13L17.5 20h-11L5.5 8Z"/><path d="M10 11h4"/></svg></span>
+              <span class="card-title">Для селлеров и онлайн-продавцов</span>
+            </div>
+            <p class="card-text">Если нужно следить за ценами, товарами, остатками, описаниями и конкурентами, OpenScript помогает собирать инструменты, которые упрощают ежедневную работу с продажами.</p>
+          </div>
+          <div class="card audience-card">
+            <div class="card-head">
+              <span class="card-icon"><svg viewBox="0 0 24 24"><path d="M7 7a7 7 0 0 1 10.5 1.2L19 10"/><path d="M19 4v6h-6"/><path d="M17 17a7 7 0 0 1-10.5-1.2L5 14"/><path d="M5 20v-6h6"/></svg></span>
+              <span class="card-title">Для тех, кто хочет сменить траекторию</span>
+            </div>
+            <p class="card-text">Если вы чувствуете, что пора искать новое направление, OpenScript даёт возможность попробовать себя в создании программ, ботов и инструментов без долгого входа в классическое программирование.</p>
+          </div>
+          <div class="card audience-card">
+            <div class="card-head">
+              <span class="card-icon"><svg viewBox="0 0 24 24"><path d="m9 8-4 4 4 4"/><path d="m15 8 4 4-4 4"/><path d="M13 6 11 18"/></svg></span>
+              <span class="card-title">Для тех, кому интересно программирование</span>
+            </div>
+            <p class="card-text">Если вам всегда было интересно создавать программы, но языки, термины и сложный вход останавливали, OpenScript помогает начать с практики и современных инструментов.</p>
+          </div>
+          <div class="card audience-card">
+            <div class="card-head">
+              <span class="card-icon"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="M4 10h16"/><path d="M4 15h16"/><path d="M9 5v14"/><path d="M15 5v14"/></svg></span>
+              <span class="card-title">Для тех, кто работает с таблицами и отчётами</span>
+            </div>
+            <p class="card-text">OpenScript помогает собирать данные, считать показатели, находить изменения и показывать результат в понятном виде — без ручной сборки отчётов каждый раз.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="use-cases">
+      <div class="container">
+        <div class="section-header">
+          <p class="eyebrow">Сценарии</p>
+          <h2 class="section-title">Какие задачи можно решать с OpenScript</h2>
+        </div>
+        <div class="usecase-grid reveal">
+          <div class="card usecase-card">
+            <div class="card-head"><span class="card-icon"><svg viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0-3 11v2h6v-2a6 6 0 0 0-3-11Z"/><path d="M9.5 19h5"/><path d="M10.5 22h3"/></svg></span><span class="card-title">Проверить идею</span></div>
+            <p class="card-text">Соберите простую версию идеи и поймите, стоит ли развивать её дальше. Напишите MVP, чтобы проверить идею перед тем, как платить разработчику: простой сервис, бот, форма, инструмент для клиентов или внутренняя автоматизация.</p>
+            <div class="usecase-chips"><span class="chip">MVP</span><span class="chip">простой сервис</span><span class="chip">форма</span></div>
+          </div>
+          <div class="card usecase-card">
+            <div class="card-head"><span class="card-icon"><svg viewBox="0 0 24 24"><path d="M12 4a8 8 0 1 0 8 8"/><path d="M12 8v4l3 2"/></svg></span><span class="card-title">Создать себе помощника</span></div>
+            <p class="card-text">Соберите помощника, который берёт на себя повторяющиеся действия. Он может разбирать сообщения, готовить черновики ответов, собирать данные, приводить таблицы в порядок, напоминать о задачах.</p>
+            <div class="usecase-chips"><span class="chip">сообщения</span><span class="chip">черновики</span><span class="chip">таблицы</span></div>
+          </div>
+          <div class="card usecase-card">
+            <div class="card-head"><span class="card-icon"><svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="11" rx="4"/><path d="M12 3v3"/><path d="M9 11h.01M15 11h.01"/><path d="M10 15h4"/></svg></span><span class="card-title">Сделать бота для клиентов</span></div>
+            <p class="card-text">Бот может принимать заявки, задавать вопросы, сохранять ответы и передавать их вам. Клиент пишет в VK, MAX или Telegram, бот уточняет детали, складывает заявку в таблицу и отправляет уведомление.</p>
+            <div class="usecase-chips"><span class="chip">VK</span><span class="chip">MAX</span><span class="chip">Telegram</span></div>
+          </div>
+          <div class="card usecase-card">
+            <div class="card-head"><span class="card-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="m14.4 9.6-1 3.4-3.4 1 1-3.4Z"/><path d="M12 6v2"/><path d="M18 12h-2"/><path d="M12 18v-2"/><path d="M6 12h2"/></svg></span><span class="card-title">Создать агента для действий</span></div>
+            <p class="card-text">Агент — это не просто чат. Он может выполнять пошаговую задачу: открыть сайт, найти информацию, заполнить форму, сравнить варианты, собрать данные и показать результат.</p>
+            <div class="usecase-chips"><span class="chip">сайты</span><span class="chip">кабинеты</span><span class="chip">процессы</span></div>
+          </div>
+          <div class="card usecase-card">
+            <div class="card-head"><span class="card-icon"><svg viewBox="0 0 24 24"><path d="M5 19h14"/><path d="m6 15 4-4 3 2 5-6"/><path d="M17 7h1v1"/></svg></span><span class="card-title">Следить за трендами и данными</span></div>
+            <p class="card-text">Соберите инструмент, который помогает видеть, что происходит в вашей нише. Какие темы обсуждают, какие товары набирают интерес, какие вопросы задают клиенты, как меняются цены конкурентов.</p>
+            <div class="usecase-chips"><span class="chip">темы</span><span class="chip">товары</span><span class="chip">цены</span></div>
+          </div>
+          <div class="card usecase-card">
+            <div class="card-head"><span class="card-icon"><svg viewBox="0 0 24 24"><path d="M7 7a7 7 0 0 1 10.5 1.2L19 10"/><path d="M19 4v6h-6"/><path d="M17 17a7 7 0 0 1-10.5-1.2L5 14"/><path d="M5 20v-6h6"/></svg></span><span class="card-title">Автоматизировать рутину</span></div>
+            <p class="card-text">Уберите ручные действия, которые каждый день забирают время. Обработка файлов, прайсов, таблиц, заявок, описаний, списков, отчётов и других однотипных задач.</p>
+            <div class="usecase-chips"><span class="chip">файлы</span><span class="chip">прайсы</span><span class="chip">отчёты</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="how-it-works">
+      <div class="container">
+        <div class="section-header center">
+          <p class="eyebrow">Механика</p>
+          <h2 class="section-title">Как устроена работа</h2>
+        </div>
+
+        <div class="team-strip reveal">
+          <p><strong>У вас в подчинении два ИИ-специалиста.</strong> Один отвечает за организацию и управление работой, другой выполняет техническую часть на сервере.</p>
+          <div class="team-row">
+            <div class="team-card">
+              <div class="team-avatar" style="background:var(--bg);color:var(--fg);border:2px solid var(--border);">Вы</div>
+              <strong>Заказчик</strong>
+              <p>Формулируете идею, задачу или желаемый результат</p>
+            </div>
+            <div class="team-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </div>
+            <div class="team-card">
+              <div class="team-avatar">ВР</div>
+              <strong>Ведущий разработчик</strong>
+              <p>Организует работу, разбивает задачу на шаги и готовит инструкции</p>
+            </div>
+            <div class="team-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </div>
+            <div class="team-card">
+              <div class="team-avatar" style="background:var(--accent-hover);">ТИ</div>
+              <strong>Технический исполнитель</strong>
+              <p>Выполняет техническую часть на сервере, запускает проверки и устраняет ошибки</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="process-track reveal">
+          <div class="process-step">
+            <span class="process-num">1</span>
+            <span class="card-title">Идея</span>
+            <p>Вы формулируете задачу или желаемый результат</p>
+          </div>
+          <div class="process-step">
+            <span class="process-num">2</span>
+            <span class="card-title">План</span>
+            <p>Ведущий разработчик разбивает задачу на шаги</p>
+          </div>
+          <div class="process-step">
+            <span class="process-num">3</span>
+            <span class="card-title">Работа</span>
+            <p>Технический исполнитель делает техническую часть</p>
+          </div>
+          <div class="process-step">
+            <span class="process-num">4</span>
+            <span class="card-title">Результат</span>
+            <p>Вы проверяете, тестируете и даёте комментарии</p>
+          </div>
+        </div>
+
+        <div class="flow-support reveal">
+          <div class="card">
+            <div class="card-head"><span class="card-icon"><svg viewBox="0 0 24 24"><path d="M12 4 5 8l7 4 7-4-7-4Z"/><path d="M5 8v8l7 4 7-4V8"/><path d="M12 12v8"/></svg></span><span class="card-title">Документы ускоряют старт</span></div>
+            <p class="card-text">Внутри OpenScript собраны правила, примеры, инструкции и подходы, которые помогают быстрее понять процесс и начинать работу, опираясь на уже пройденный кем-то путь.</p>
+          </div>
+          <div class="card">
+            <div class="card-head"><span class="card-icon"><svg viewBox="0 0 24 24"><path d="M9.5 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M4.5 19a5 5 0 0 1 10 0"/><path d="M16.5 12a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"/><path d="M13.8 19a4.3 4.3 0 0 1 6.2 0"/></svg></span><span class="card-title">Комьюнити помогает не застрять</span></div>
+            <p class="card-text">В чатах VK, MAX и Telegram можно задавать вопросы, смотреть опыт других участников и получать помощь от сообщества и админов.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="pricing">
+      <div class="container">
+        <div class="section-header center">
+          <p class="eyebrow">Состав доступа</p>
+          <h2 class="section-title">Что входит в полный доступ</h2>
+          <p class="section-desc">В полный доступ входят подписка на ChatGPT Plus на 1 месяц и аренда сервера на 1 месяц. После оплаты вы также получаете постоянный доступ к материалам, инструкциям, помощи на старте и комьюнити. Доступ к материалам и базе помощи остаётся у вас навсегда.</p>
+        </div>
+
+        <div class="package-grid reveal">
+          <div class="card package-card">
+            <div class="package-head">
+              <div class="card-head"><span class="card-icon"><svg viewBox="0 0 24 24"><path d="M5 12 12 5h7v7l-7 7-7-7Z"/><path d="M15.5 8.5h.01"/><path d="M8.5 15.5 15.5 8.5"/></svg></span><span class="card-title">На 1 месяц</span></div>
+              <p class="card-text">Эта часть действует в первый месяц и помогает запустить рабочую среду без лишних шагов.</p>
+            </div>
+            <div class="package-items">
+              <div class="package-item">
+                <div class="card-head"><span class="card-icon"><svg viewBox="0 0 24 24"><path d="M8 5h8"/><path d="M7 7h10v12H7z"/><path d="m9 11 1.2 1.2L13.5 9"/><path d="M9 15h6"/></svg></span><span class="card-title">Подписка на ChatGPT Plus</span></div>
+                <p>В работе используются одни из самых сильных нейросетевых моделей в мире. ChatGPT Plus даёт доступ к продвинутым моделям, которые помогают ИИ-специалистам разбирать задачи, готовить технические инструкции, находить ошибки и сопровождать работу над проектом.</p>
+              </div>
+              <div class="package-item">
+                <div class="card-head"><span class="card-icon"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="6" rx="2"/><rect x="4" y="13" width="16" height="6" rx="2"/><path d="M8 8h.01M8 16h.01"/><path d="M11 8h5M11 16h5"/></svg></span><span class="card-title">Аренда сервера</span></div>
+                <p>Для разработки используется удалённый сервер. На нём ведётся вся техническая работа: создаётся проект, вносятся изменения, запускаются проверки, исправляются ошибки и готовится результат. После запуска проект продолжает работать на сервере.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card package-card">
+            <div class="package-head">
+              <div class="card-head"><span class="card-icon"><svg viewBox="0 0 24 24"><path d="M12 4 5 8l7 4 7-4-7-4Z"/><path d="M5 8v8l7 4 7-4V8"/><path d="M12 12v8"/></svg></span><span class="card-title">Навсегда</span></div>
+              <p class="card-text">Это остаётся с вами после оплаты и помогает возвращаться к работе без потери смысла и контекста.</p>
+            </div>
+            <div class="package-items">
+              <div class="package-item">
+                <div class="card-head"><span class="card-icon"><svg viewBox="0 0 24 24"><path d="m12 4 1.8 3.6L18 9.4l-4.2 1.8L12 14.8l-1.8-3.6L6 9.4l4.2-1.8Z"/><path d="m7 18 3 3 7-7"/></svg></span><span class="card-title">Доступ к материалам навсегда</span></div>
+                <p>Материалы остаются с вами и не исчезают после первого запуска.</p>
+              </div>
+              <div class="package-item">
+                <div class="card-head"><span class="card-icon"><svg viewBox="0 0 24 24"><path d="M8 5h8"/><path d="M7 7h10v12H7z"/><path d="m9 11 1.2 1.2L13.5 9"/><path d="M9 15h6"/></svg></span><span class="card-title">Пошаговые инструкции</span></div>
+                <p>Понятные шаги помогают начать без хаотичного поиска решений.</p>
+              </div>
+              <div class="package-item">
+                <div class="card-head"><span class="card-icon"><svg viewBox="0 0 24 24"><path d="m9 8-4 4 4 4"/><path d="m15 8 4 4-4 4"/><path d="M13 6 11 18"/></svg></span><span class="card-title">Готовые команды и примеры</span></div>
+                <p>Можно копировать рабочие заготовки и адаптировать их под свою задачу.</p>
+              </div>
+              <div class="package-item">
+                <div class="card-head"><span class="card-icon"><svg viewBox="0 0 24 24"><path d="M12 4a8 8 0 1 0 8 8"/><path d="M12 8v4l3 2"/></svg></span><span class="card-title">Помощь с настройкой</span></div>
+                <p>Мы помогаем пройти первые шаги и не застрять на старте.</p>
+              </div>
+              <div class="package-item" style="grid-column: 1 / -1;">
+                <div class="card-head"><span class="card-icon"><svg viewBox="0 0 24 24"><path d="M9.5 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M4.5 19a5 5 0 0 1 10 0"/><path d="M16.5 12a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"/><path d="M13.8 19a4.3 4.3 0 0 1 6.2 0"/></svg></span><span class="card-title">Комьюнити в VK, MAX и Telegram</span></div>
+                <p>В чатах помогают участники и админы.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="offer reveal">
+          <div class="offer-inner">
+            <p class="eyebrow">Финальное предложение</p>
+            <h2 class="offer-price">Полный доступ — 4 990 ₽</h2>
+            <a href="{{ start_href }}" class="btn btn-primary" style="font-size:1.05rem;padding:16px 36px;">Начать работу</a>
+            <p class="offer-renewal">Продлевать подписку ChatGPT Plus и аренду сервера можно по отдельности в личном кабинете.</p>
+            <div class="offer-lists">
+              <div class="offer-group">
+                <p class="offer-group-title">На 1 месяц</p>
+                <ul>
+                  <li>Подписка на ChatGPT Plus на 1 месяц</li>
+                  <li>Аренда сервера на 1 месяц</li>
+                </ul>
+              </div>
+              <div class="offer-group">
+                <p class="offer-group-title">Навсегда</p>
+                <ul>
+                  <li>Доступ к материалам навсегда</li>
+                  <li>Пошаговые инструкции</li>
+                  <li>Готовые команды и примеры</li>
+                  <li>Помощь с настройкой и началом работы</li>
+                  <li>Комьюнити в VK, MAX и Telegram</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-header center">
+          <p class="eyebrow">Вопросы</p>
+          <h2 class="section-title">Вопросы перед стартом</h2>
+        </div>
+        <div class="faq-list reveal">
+          <details class="faq-item">
+            <summary>Нужно ли уметь программировать?</summary>
+            <p>Нет. OpenScript рассчитан на людей без технического опыта. Вам не нужно заранее знать языки программирования.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Нужно ли заранее разбираться в сложных инструментах?</summary>
+            <p>Нет. Идея в том, чтобы дать понятный порядок действий, рабочую среду и помощь на первых шагах.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Какие программы и какое железо нужны для работы?</summary>
+            <p>Достаточно обычного компьютера или ноутбука, браузера Google Chrome и стандартного терминала вашей операционной системы. Мощное железо, отдельная видеокарта и сложная установка программ не нужны: основная работа проходит через браузер и терминал ОС.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Что я смогу сделать?</summary>
+            <p>Начать с простых рабочих вещей: бот для заявок, MVP идеи, помощник для рутины, сбор данных, обработка таблиц, агент для пошаговых действий.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Мне помогут, если я застряну?</summary>
+            <p>Да. Внутри есть чаты в VK, MAX и Telegram, где можно задавать вопросы. Помогают участники и админы.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Доступ к материалам останется?</summary>
+            <p>Да. После оплаты доступ к материалам остаётся навсегда.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Это разработка проекта за меня?</summary>
+            <p>Нет. OpenScript помогает вам начать делать свои инструменты самостоятельно: с инструкциями, средой, примерами и поддержкой на старте.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <script>
+      (function () {
+        const revealTargets = Array.from(document.querySelectorAll('.reveal'));
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (!reducedMotion && revealTargets.length) {
+          const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                observer.unobserve(entry.target);
+              }
+            });
+          }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+          revealTargets.forEach((el) => observer.observe(el));
+        } else {
+          revealTargets.forEach((el) => el.classList.add('is-visible'));
+        }
+      })();
+    </script>
+  </div>
+{% endblock %}

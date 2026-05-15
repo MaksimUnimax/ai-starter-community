@@ -1,0 +1,911 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenScript — первый ИИ-бот без опыта в программировании</title>
+<meta name="description" content="OpenScript помогает пройти первый проект с ИИ-наставником, создать своего первого ИИ-бота и понять, как дальше делать боты, автоматизации и MVP самостоятельно.">
+<style>
+:root {
+  --bg: #f2f4f8;
+  --surface: #ffffff;
+  --surface-alt: #f6f8fc;
+  --fg: #0b1220;
+  --muted: #4a5568;
+  --border: #d8dce6;
+  --accent: #1d4ed8;
+  --accent-soft: #dbeafe;
+  --accent-hover: #1e40af;
+  --shadow-sm: 0 1px 3px rgba(11,18,32,0.06);
+  --shadow: 0 4px 16px rgba(11,18,32,0.08);
+  --shadow-lg: 0 12px 40px rgba(11,18,32,0.12);
+  --radius-sm: 8px;
+  --radius: 14px;
+  --radius-lg: 22px;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.6;
+}
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Nav */
+.nav {
+  position: sticky;
+  top: 12px;
+  z-index: 100;
+  padding: 12px 0;
+}
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 18px;
+  background: rgba(255,255,255,0.92);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(12px);
+  box-shadow: var(--shadow);
+}
+.nav-logo {
+  font-weight: 800;
+  font-size: 1.15rem;
+  letter-spacing: -0.03em;
+  color: var(--fg);
+  text-decoration: none;
+}
+.nav-links {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.nav-links a, .nav-links button {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+.nav-links a:hover, .nav-links button:hover {
+  background: var(--surface-alt);
+  color: var(--fg);
+}
+.nav-cta {
+  background: var(--accent) !important;
+  color: #fff !important;
+  border-color: var(--accent) !important;
+}
+.nav-cta:hover {
+  background: var(--accent-hover) !important;
+}
+
+/* Hero */
+.hero {
+  padding: 48px 0 64px;
+}
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 40px;
+  align-items: center;
+}
+.hero-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.eyebrow {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.hero-title {
+  font-size: clamp(2.4rem, 5.2vw, 4.2rem);
+  font-weight: 800;
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+  max-width: 14ch;
+}
+.hero-lead {
+  font-size: 1.05rem;
+  color: var(--muted);
+  max-width: 52ch;
+  line-height: 1.65;
+}
+.hero-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all .18s ease;
+}
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(29,78,216,0.28);
+}
+.btn-primary:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+}
+.btn-secondary {
+  background: var(--surface);
+  color: var(--fg);
+  border-color: var(--border);
+  box-shadow: var(--shadow-sm);
+}
+.btn-secondary:hover {
+  border-color: #b0b8c8;
+  transform: translateY(-1px);
+}
+
+/* Product Panel */
+.product-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.product-panel-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.product-panel-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.product-panel-desc {
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+.product-tags {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+.product-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--fg);
+  transition: all .15s ease;
+}
+.product-tag:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+}
+.product-tag-wide { grid-column: 1 / -1; }
+.tag-icon {
+  width: 18px; height: 18px;
+  flex: 0 0 auto;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Sections */
+.section {
+  padding: 64px 0;
+}
+.section-header {
+  max-width: 64ch;
+  margin-bottom: 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.section-title {
+  font-size: clamp(1.6rem, 3.2vw, 2.4rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+.section-desc {
+  color: var(--muted);
+  font-size: 1.02rem;
+  line-height: 1.6;
+}
+
+/* Cards */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  transition: all .18s ease;
+}
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  border-color: #c4c9d4;
+}
+.card-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.card-icon {
+  width: 36px; height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background: var(--accent-soft);
+  color: var(--accent);
+  flex: 0 0 auto;
+}
+.card-icon svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.card-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.card-text {
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+/* Audience */
+.audience-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+/* Use cases */
+.usecase-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.usecase-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.usecase-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: auto;
+}
+.chip {
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+/* Flow */
+.flow-section {}
+.flow-concept {
+  background: linear-gradient(135deg, #f0f4ff, #f8faff);
+}
+.flow-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-top: 24px;
+}
+.flow-step {
+  position: relative;
+}
+.flow-step::after {
+  content: "→";
+  position: absolute;
+  top: 28px;
+  right: -14px;
+  color: var(--accent);
+  font-size: 1rem;
+  font-weight: 800;
+  opacity: 0.5;
+}
+.flow-step:last-child::after { content: none; }
+.flow-num {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+.flow-support {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-top: 16px;
+}
+
+/* Package */
+.package-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+.package-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.package-head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.package-items {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.package-item {
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.package-item:first-child { padding-top: 0; border-top: 0; }
+
+/* Offer */
+.offer {
+  background: linear-gradient(135deg, #f0f4ff, #f8faff);
+  border: 1px solid #c7d2fe;
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  position: relative;
+  overflow: hidden;
+}
+.offer::before {
+  content: "";
+  position: absolute;
+  top: -80px; right: -80px;
+  width: 240px; height: 240px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(29,78,216,0.08), transparent 70%);
+  pointer-events: none;
+}
+.offer-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: start;
+  position: relative;
+  z-index: 1;
+}
+.offer-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.offer-price {
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+.offer-renewal {
+  padding: 12px 14px;
+  background: rgba(255,255,255,0.8);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.offer-side {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.offer-group {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+}
+.offer-group-title {
+  font-weight: 800;
+  font-size: 0.92rem;
+  margin-bottom: 10px;
+  color: var(--fg);
+}
+.offer-group ul {
+  margin: 0; padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.offer-group li {
+  font-size: 0.85rem;
+  color: var(--muted);
+  padding: 6px 8px;
+  background: var(--surface-alt);
+  border-radius: var(--radius-sm);
+}
+
+/* FAQ */
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.faq-item {
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.faq-item summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 20px;
+  cursor: pointer;
+  font-weight: 800;
+  font-size: 0.98rem;
+  list-style: none;
+}
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary::after {
+  content: "+";
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 1.2rem;
+  line-height: 1;
+}
+.faq-item[open] summary::after { content: "−"; }
+.faq-item p {
+  padding: 0 20px 18px;
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* Footer */
+.footer {
+  padding: 40px 0;
+  border-top: 1px solid var(--border);
+  margin-top: 32px;
+}
+.footer-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.footer-title {
+  font-weight: 800;
+  color: var(--fg);
+  font-size: 0.95rem;
+}
+.footer a { color: var(--muted); }
+.footer a:hover { color: var(--accent); }
+
+/* Reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity .5s ease, transform .5s ease;
+}
+.reveal.is-visible { opacity: 1; transform: none; }
+
+/* Responsive */
+@media (max-width: 960px) {
+  .hero-grid { grid-template-columns: 1fr; }
+  .product-panel { order: -1; }
+  .audience-grid { grid-template-columns: repeat(2, 1fr); }
+  .usecase-grid { grid-template-columns: repeat(2, 1fr); }
+  .flow-grid { grid-template-columns: repeat(2, 1fr); }
+  .flow-step:nth-child(2)::after { content: none; }
+  .package-grid { grid-template-columns: 1fr; }
+  .offer-grid { grid-template-columns: 1fr; }
+  .offer-side { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 640px) {
+  .container { padding: 0 16px; }
+  .section { padding: 44px 0; }
+  .audience-grid { grid-template-columns: 1fr; }
+  .usecase-grid { grid-template-columns: 1fr; }
+  .flow-grid { grid-template-columns: 1fr; }
+  .flow-step::after { content: none !important; }
+  .flow-support { grid-template-columns: 1fr; }
+  .offer { padding: 24px; }
+  .offer-side { grid-template-columns: 1fr; }
+  .product-tags { grid-template-columns: 1fr; }
+  .nav-inner { flex-wrap: wrap; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="container nav-inner">
+    <a href="/" class="nav-logo">OpenScript</a>
+    <div class="nav-links">
+      <a href="#how-it-works">Как работает</a>
+      <a href="#pricing">Состав и цена</a>
+      <a href="/login">Войти</a>
+      <a href="{{ start_href }}" class="nav-cta">Начать работу</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="container hero-grid">
+    <div class="hero-copy">
+      <p class="eyebrow">OpenScript</p>
+      <h1 class="hero-title">Пришло новое время для тех, кто хочет создавать</h1>
+      <p class="hero-lead">Создание программ перестало быть закрытой территорией. На первый план выходит не знание языков программирования, а умение видеть потребности людей, замечать тренды и превращать идеи в рабочие инструменты. OpenScript помогает войти в этот новый мир и начать воплощать свои идеи в жизнь — даже если у вас нет технических знаний и опыта.</p>
+      <div class="hero-actions">
+        <a href="{{ start_href }}" class="btn btn-primary">Начать работу</a>
+        <a href="#how-it-works" class="btn btn-secondary">Как это работает</a>
+      </div>
+    </div>
+    <div class="product-panel">
+      <div class="product-panel-header">
+        <p class="eyebrow">Витрина</p>
+        <p class="product-panel-title">Что можно создать</p>
+        <p class="product-panel-desc">С OpenScript можно создавать рабочие инструменты без умения программировать: от простых MVP до автоматизаций, AI-помощников и сервисных решений.</p>
+      </div>
+      <div class="product-tags">
+        <span class="product-tag"><svg class="tag-icon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0-3 11v2h6v-2a6 6 0 0 0-3-11Z"/><path d="M9.5 19h5"/><path d="M10.5 22h3"/></svg>MVP</span>
+        <span class="product-tag"><svg class="tag-icon" viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="11" rx="4"/><path d="M12 3v3"/><path d="M9 11h.01M15 11h.01"/><path d="M10 15h4"/></svg>Боты</span>
+        <span class="product-tag"><svg class="tag-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="m14.4 9.6-1 3.4-3.4 1 1-3.4Z"/><path d="M12 6v2"/><path d="M18 12h-2"/><path d="M12 18v-2"/><path d="M6 12h2"/></svg>AI-агенты</span>
+        <span class="product-tag"><svg class="tag-icon" viewBox="0 0 24 24"><path d="M12 4a8 8 0 1 0 8 8"/><path d="M12 8v4l3 2"/></svg>AI-помощники</span>
+        <span class="product-tag"><svg class="tag-icon" viewBox="0 0 24 24"><path d="M5 19h14"/><path d="m6 15 4-4 3 2 5-6"/><path d="M17 7h1v1"/></svg>Трейдинг-боты</span>
+        <span class="product-tag"><svg class="tag-icon" viewBox="0 0 24 24"><path d="M8 8a4 4 0 0 1 8 0"/><path d="M5.5 8h13L17.5 20h-11L5.5 8Z"/><path d="M10 11h4"/></svg>Биддеры для маркетплейсов</span>
+        <span class="product-tag"><svg class="tag-icon" viewBox="0 0 24 24"><path d="M7 7a7 7 0 0 1 10.5 1.2L19 10"/><path d="M19 4v6h-6"/><path d="M17 17a7 7 0 0 1-10.5-1.2L5 14"/><path d="M5 20v-6h6"/></svg>Автоматизации</span>
+        <span class="product-tag"><svg class="tag-icon" viewBox="0 0 24 24"><path d="m9 8-4 4 4 4"/><path d="m15 8 4 4-4 4"/><path d="M13 6 11 18"/></svg>Парсеры и сбор данных</span>
+        <span class="product-tag product-tag-wide"><svg class="tag-icon" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="M4 10h16"/><path d="M4 15h16"/><path d="M9 5v14"/><path d="M15 5v14"/></svg>Инструменты для таблиц и отчётов</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <p class="eyebrow">Аудитория</p>
+      <h2 class="section-title">Для кого OpenScript</h2>
+    </div>
+    <div class="audience-grid reveal">
+      <div class="card">
+        <div class="card-head">
+          <span class="card-icon"><svg viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0-3 11v2h6v-2a6 6 0 0 0-3-11Z"/><path d="M9.5 19h5"/><path d="M10.5 22h3"/></svg></span>
+          <span class="card-title">Для тех, у кого есть идея MVP</span>
+        </div>
+        <p class="card-text">Хотите проверить идею, но не готовы сразу платить разработчику. OpenScript помогает собрать простую рабочую версию и понять, стоит ли развивать проект дальше.</p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <span class="card-icon"><svg viewBox="0 0 24 24"><path d="M9.5 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M4.5 19a5 5 0 0 1 10 0"/><path d="M16.5 12a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"/><path d="M13.8 19a4.3 4.3 0 0 1 6.2 0"/></svg></span>
+          <span class="card-title">Для малого бизнеса и самозанятых</span>
+        </div>
+        <p class="card-text">Когда заявки, таблицы, файлы, напоминания и ответы клиентам начинают забирать слишком много времени, OpenScript помогает создавать простые инструменты под свои рабочие задачи.</p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <span class="card-icon"><svg viewBox="0 0 24 24"><path d="M8 8a4 4 0 0 1 8 0"/><path d="M5.5 8h13L17.5 20h-11L5.5 8Z"/><path d="M10 11h4"/></svg></span>
+          <span class="card-title">Для селлеров и онлайн-продавцов</span>
+        </div>
+        <p class="card-text">Если нужно следить за ценами, товарами, остатками, описаниями и конкурентами, OpenScript помогает собирать инструменты, которые упрощают ежедневную работу с продажами.</p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <span class="card-icon"><svg viewBox="0 0 24 24"><path d="M7 7a7 7 0 0 1 10.5 1.2L19 10"/><path d="M19 4v6h-6"/><path d="M17 17a7 7 0 0 1-10.5-1.2L5 14"/><path d="M5 20v-6h6"/></svg></span>
+          <span class="card-title">Для тех, кто хочет сменить траекторию</span>
+        </div>
+        <p class="card-text">Если вы чувствуете, что пора искать новое направление, OpenScript даёт возможность попробовать себя в создании программ, ботов и инструментов без долгого входа в классическое программирование.</p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <span class="card-icon"><svg viewBox="0 0 24 24"><path d="m9 8-4 4 4 4"/><path d="m15 8 4 4-4 4"/><path d="M13 6 11 18"/></svg></span>
+          <span class="card-title">Для тех, кому интересно программирование</span>
+        </div>
+        <p class="card-text">Если вам всегда было интересно создавать программы, но языки, термины и сложный вход останавливали, OpenScript помогает начать с практики и современных инструментов.</p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <span class="card-icon"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="M4 10h16"/><path d="M4 15h16"/><path d="M9 5v14"/><path d="M15 5v14"/></svg></span>
+          <span class="card-title">Для тех, кто работает с таблицами и отчётами</span>
+        </div>
+        <p class="card-text">OpenScript помогает собирать данные, считать показатели, находить изменения и показывать результат в понятном виде — без ручной сборки отчётов каждый раз.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <p class="eyebrow">Сценарии</p>
+      <h2 class="section-title">Какие задачи можно решать с OpenScript</h2>
+    </div>
+    <div class="usecase-grid reveal">
+      <div class="card usecase-card">
+        <div class="card-head"><span class="card-icon"><svg viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0-3 11v2h6v-2a6 6 0 0 0-3-11Z"/><path d="M9.5 19h5"/><path d="M10.5 22h3"/></svg></span><span class="card-title">Проверить идею</span></div>
+        <p class="card-text">Соберите простую версию идеи и поймите, стоит ли развивать её дальше. Напишите MVP, чтобы проверить идею перед тем, как платить разработчику: простой сервис, бот, форма, инструмент для клиентов или внутренняя автоматизация.</p>
+        <div class="usecase-chips"><span class="chip">MVP</span><span class="chip">простой сервис</span><span class="chip">форма</span></div>
+      </div>
+      <div class="card usecase-card">
+        <div class="card-head"><span class="card-icon"><svg viewBox="0 0 24 24"><path d="M12 4a8 8 0 1 0 8 8"/><path d="M12 8v4l3 2"/></svg></span><span class="card-title">Создать себе помощника</span></div>
+        <p class="card-text">Соберите помощника, который берёт на себя повторяющиеся действия. Он может разбирать сообщения, готовить черновики ответов, собирать данные, приводить таблицы в порядок, напоминать о задачах.</p>
+        <div class="usecase-chips"><span class="chip">сообщения</span><span class="chip">черновики</span><span class="chip">таблицы</span></div>
+      </div>
+      <div class="card usecase-card">
+        <div class="card-head"><span class="card-icon"><svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="11" rx="4"/><path d="M12 3v3"/><path d="M9 11h.01M15 11h.01"/><path d="M10 15h4"/></svg></span><span class="card-title">Сделать бота для клиентов</span></div>
+        <p class="card-text">Бот может принимать заявки, задавать вопросы, сохранять ответы и передавать их вам. Клиент пишет в VK, MAX или Telegram, бот уточняет детали, складывает заявку в таблицу и отправляет уведомление.</p>
+        <div class="usecase-chips"><span class="chip">VK</span><span class="chip">MAX</span><span class="chip">Telegram</span></div>
+      </div>
+      <div class="card usecase-card">
+        <div class="card-head"><span class="card-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="m14.4 9.6-1 3.4-3.4 1 1-3.4Z"/><path d="M12 6v2"/><path d="M18 12h-2"/><path d="M12 18v-2"/><path d="M6 12h2"/></svg></span><span class="card-title">Создать агента для действий</span></div>
+        <p class="card-text">Агент — это не просто чат. Он может выполнять пошаговую задачу: открыть сайт, найти информацию, заполнить форму, сравнить варианты, собрать данные и показать результат.</p>
+        <div class="usecase-chips"><span class="chip">сайты</span><span class="chip">кабинеты</span><span class="chip">процессы</span></div>
+      </div>
+      <div class="card usecase-card">
+        <div class="card-head"><span class="card-icon"><svg viewBox="0 0 24 24"><path d="M5 19h14"/><path d="m6 15 4-4 3 2 5-6"/><path d="M17 7h1v1"/></svg></span><span class="card-title">Следить за трендами и данными</span></div>
+        <p class="card-text">Соберите инструмент, который помогает видеть, что происходит в вашей нише. Какие темы обсуждают, какие товары набирают интерес, как меняются цены конкурентов.</p>
+        <div class="usecase-chips"><span class="chip">темы</span><span class="chip">товары</span><span class="chip">цены</span></div>
+      </div>
+      <div class="card usecase-card">
+        <div class="card-head"><span class="card-icon"><svg viewBox="0 0 24 24"><path d="M7 7a7 7 0 0 1 10.5 1.2L19 10"/><path d="M19 4v6h-6"/><path d="M17 17a7 7 0 0 1-10.5-1.2L5 14"/><path d="M5 20v-6h6"/></svg></span><span class="card-title">Автоматизировать рутину</span></div>
+        <p class="card-text">Уберите ручные действия, которые каждый день забирают время. Обработка файлов, прайсов, таблиц, заявок, описаний, списков, отчётов и других однотипных задач.</p>
+        <div class="usecase-chips"><span class="chip">файлы</span><span class="chip">прайсы</span><span class="chip">отчёты</span></div>
+      </div>
+    </div>
+    <p class="section-desc" style="margin-top:18px; font-size:0.9rem;">Это только примеры. Внутри OpenScript вы будете учиться не списку шаблонов, а способу превращать свою задачу в рабочий инструмент.</p>
+  </div>
+</section>
+
+<section class="section" id="how-it-works">
+  <div class="container">
+    <div class="section-header">
+      <p class="eyebrow">Механика</p>
+      <h2 class="section-title">Как устроена работа</h2>
+    </div>
+    <div class="card flow-concept reveal">
+      <div class="card-head">
+        <span class="card-icon"><svg viewBox="0 0 24 24"><path d="M8 5h8"/><path d="M7 7h10v12H7z"/><path d="m9 11 1.2 1.2L13.5 9"/><path d="M9 15h6"/></svg></span>
+        <span class="card-title">Концепция</span>
+      </div>
+      <p style="color:var(--muted); font-size:0.95rem; margin-bottom:12px;">У вас в подчинении два ИИ-специалиста. Один отвечает за организацию и управление работой, другой выполняет техническую часть на сервере.</p>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div class="card" style="background:#fff;">
+          <p style="font-weight:800; margin-bottom:4px;">Ведущий разработчик</p>
+          <p class="card-text">Организация и управление работой.</p>
+        </div>
+        <div class="card" style="background:#fff;">
+          <p style="font-weight:800; margin-bottom:4px;">Технический исполнитель</p>
+          <p class="card-text">Выполнение технической работы на сервере.</p>
+        </div>
+      </div>
+    </div>
+    <div class="flow-grid reveal">
+      <div class="card flow-step">
+        <p class="flow-num">01</p>
+        <div class="card-head" style="margin-bottom:8px;"><span class="card-icon"><svg viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0-3 11v2h6v-2a6 6 0 0 0-3-11Z"/><path d="M9.5 19h5"/><path d="M10.5 22h3"/></svg></span><span class="card-title">Вы</span></div>
+        <p class="card-text">Вы формулируете идею, задачу или желаемый результат.</p>
+      </div>
+      <div class="card flow-step">
+        <p class="flow-num">02</p>
+        <div class="card-head" style="margin-bottom:8px;"><span class="card-icon"><svg viewBox="0 0 24 24"><path d="M8 5h8"/><path d="M7 7h10v12H7z"/><path d="m9 11 1.2 1.2L13.5 9"/><path d="M9 15h6"/></svg></span><span class="card-title">Ведущий разработчик</span></div>
+        <p class="card-text">Организует и управляет работой, разбивает задачу на шаги и готовит инструкции.</p>
+      </div>
+      <div class="card flow-step">
+        <p class="flow-num">03</p>
+        <div class="card-head" style="margin-bottom:8px;"><span class="card-icon"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="6" rx="2"/><rect x="4" y="13" width="16" height="6" rx="2"/><path d="M8 8h.01M8 16h.01"/><path d="M11 8h5M11 16h5"/></svg></span><span class="card-title">Технический исполнитель</span></div>
+        <p class="card-text">Выполняет техническую часть на сервере, запускает проверки и устраняет ошибки.</p>
+      </div>
+      <div class="card flow-step">
+        <p class="flow-num">04</p>
+        <div class="card-head" style="margin-bottom:8px;"><span class="card-icon"><svg viewBox="0 0 24 24"><path d="m12 4 1.8 3.6L18 9.4l-4.2 1.8L12 14.8l-1.8-3.6L6 9.4l4.2-1.8Z"/><path d="m7 18 3 3 7-7"/></svg></span><span class="card-title">Результат</span></div>
+        <p class="card-text">Вы принимаете результат, тестируете его и даёте следующий комментарий, если что-то нужно улучшить.</p>
+      </div>
+    </div>
+    <div class="flow-support reveal">
+      <div class="card">
+        <div class="card-head"><span class="card-icon"><svg viewBox="0 0 24 24"><path d="M12 4 5 8l7 4 7-4-7-4Z"/><path d="M5 8v8l7 4 7-4V8"/><path d="M12 12v8"/></svg></span><span class="card-title">Документы ускоряют старт</span></div>
+        <p class="card-text">Внутри OpenScript собраны правила, примеры, инструкции и подходы, которые помогают быстрее понять процесс и начинать работу, опираясь на уже пройденный кем-то путь.</p>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon"><svg viewBox="0 0 24 24"><path d="M9.5 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M4.5 19a5 5 0 0 1 10 0"/><path d="M16.5 12a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"/><path d="M13.8 19a4.3 4.3 0 0 1 6.2 0"/></svg></span><span class="card-title">Комьюнити помогает не застрять</span></div>
+        <p class="card-text">В чатах VK, MAX и Telegram можно задавать вопросы, смотреть опыт других участников и получать помощь от сообщества и админов.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="pricing">
+  <div class="container">
+    <div class="section-header">
+      <p class="eyebrow">Состав доступа</p>
+      <h2 class="section-title">Что входит в полный доступ</h2>
+      <p class="section-desc">В полный доступ входят подписка на ChatGPT Plus на 1 месяц и аренда сервера на 1 месяц. После оплаты вы также получаете постоянный доступ к материалам, инструкциям, помощи на старте и комьюнити. Доступ к материалам и базе помощи остаётся у вас навсегда.</p>
+    </div>
+    <div class="package-grid reveal">
+      <div class="card package-card">
+        <div class="package-head">
+          <div class="card-head"><span class="card-icon"><svg viewBox="0 0 24 24"><path d="M5 12 12 5h7v7l-7 7-7-7Z"/><path d="M15.5 8.5h.01"/><path d="M8.5 15.5 15.5 8.5"/></svg></span><span class="card-title">На 1 месяц</span></div>
+          <p class="card-text">Эта часть действует в первый месяц и помогает запустить рабочую среду без лишних шагов.</p>
+        </div>
+        <div class="package-items">
+          <div class="package-item">
+            <div class="card-head"><span class="card-icon"><svg viewBox="0 0 24 24"><path d="M8 5h8"/><path d="M7 7h10v12H7z"/><path d="m9 11 1.2 1.2L13.5 9"/><path d="M9 15h6"/></svg></span><span class="card-title">Подписка на ChatGPT Plus на 1 месяц</span></div>
+            <p class="card-text">В работе используются одни из самых сильных нейросетевых моделей в мире. ChatGPT Plus даёт доступ к продвинутым моделям, которые помогают ИИ-специалистам разбирать задачи, готовить технические инструкции, находить ошибки и сопровождать работу над проектом.</p>
+          </div>
+          <div class="package-item">
+            <div class="card-head"><span class="card-icon"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="6" rx="2"/><rect x="4" y="13" width="16" height="6" rx="2"/><path d="M8 8h.01M8 16h.01"/><path d="M11 8h5M11 16h5"/></svg></span><span class="card-title">Аренда сервера на 1 месяц</span></div>
+            <p class="card-text">Для разработки используется удалённый сервер. На нём ведётся вся техническая работа: создаётся проект, вносятся изменения, запускаются проверки, исправляются ошибки и готовится результат. После запуска проект продолжает работать на сервере.</p>
+          </div>
+        </div>
+      </div>
+      <div class="card package-card">
+        <div class="package-head">
+          <div class="card-head"><span class="card-icon"><svg viewBox="0 0 24 24"><path d="M12 4 5 8l7 4 7-4-7-4Z"/><path d="M5 8v8l7 4 7-4V8"/><path d="M12 12v8"/></svg></span><span class="card-title">Навсегда</span></div>
+          <p class="card-text">Это остаётся с вами после оплаты и помогает возвращаться к работе без потери смысла и контекста.</p>
+        </div>
+        <div class="package-items">
+          <div class="package-item">
+            <div class="card-head"><span class="card-icon"><svg viewBox="0 0 24 24"><path d="m12 4 1.8 3.6L18 9.4l-4.2 1.8L12 14.8l-1.8-3.6L6 9.4l4.2-1.8Z"/><path d="m7 18 3 3 7-7"/></svg></span><span class="card-title">Доступ к материалам навсегда</span></div>
+            <p class="card-text">Материалы остаются с вами и не исчезают после первого запуска.</p>
+          </div>
+          <div class="package-item">
+            <div class="card-head"><span class="card-icon"><svg viewBox="0 0 24 24"><path d="M8 5h8"/><path d="M7 7h10v12H7z"/><path d="m9 11 1.2 1.2L13.5 9"/><path d="M9 15h6"/></svg></span><span class="card-title">Пошаговые инструкции</span></div>
+            <p class="card-text">Понятные шаги помогают начать без хаотичного поиска решений.</p>
+          </div>
+          <div class="package-item">
+            <div class="card-head"><span class="card-icon"><svg viewBox="0 0 24 24"><path d="m9 8-4 4 4 4"/><path d="m15 8 4 4-4 4"/><path d="M13 6 11 18"/></svg></span><span class="card-title">Готовые команды и примеры</span></div>
+            <p class="card-text">Можно копировать рабочие заготовки и адаптировать их под свою задачу.</p>
+          </div>
+          <div class="package-item">
+            <div class="card-head"><span class="card-icon"><svg viewBox="0 0 24 24"><path d="M12 4a8 8 0 1 0 8 8"/><path d="M12 8v4l3 2"/></svg></span><span class="card-title">Помощь с настройкой и началом работы</span></div>
+            <p class="card-text">Мы помогаем пройти первые шаги и не застрять на старте.</p>
+          </div>
+          <div class="package-item">
+            <div class="card-head"><span class="card-icon"><svg viewBox="0 0 24 24"><path d="M9.5 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M4.5 19a5 5 0 0 1 10 0"/><path d="M16.5 12a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"/><path d="M13.8 19a4.3 4.3 0 0 1 6.2 0"/></svg></span><span class="card-title">Комьюнити в VK, MAX и Telegram</span></div>
+            <p class="card-text">В чатах помогают участники и админы.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="offer reveal">
+      <div class="offer-grid">
+        <div class="offer-copy">
+          <p class="eyebrow">Финальное предложение</p>
+          <h2 class="offer-price">Полный доступ — 4 990 ₽</h2>
+          <a href="{{ start_href }}" class="btn btn-primary" style="width:fit-content;">Начать работу</a>
+          <p class="offer-renewal">Продлевать подписку ChatGPT Plus и аренду сервера можно по отдельности в личном кабинете.</p>
+        </div>
+        <div class="offer-side">
+          <div class="offer-group">
+            <p class="offer-group-title">На 1 месяц</p>
+            <ul><li>Подписка на ChatGPT Plus на 1 месяц</li><li>Аренда сервера на 1 месяц</li></ul>
+          </div>
+          <div class="offer-group">
+            <p class="offer-group-title">Навсегда</p>
+            <ul><li>Доступ к материалам навсегда</li><li>Пошаговые инструкции</li><li>Готовые команды и примеры</li><li>Помощь с настройкой и началом работы</li><li>Комьюнити в VK, MAX и Telegram</li></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <p class="eyebrow">Вопросы</p>
+      <h2 class="section-title">Вопросы перед стартом</h2>
+    </div>
+    <div class="faq-list reveal">
+      <details class="card faq-item">
+        <summary><span style="display:inline-flex;align-items:center;gap:10px;"><span class="card-icon" style="width:28px;height:28px;"><svg viewBox="0 0 24 24" style="width:14px;height:14px;"><circle cx="12" cy="12" r="8"/><path d="M9.8 9a2.2 2.2 0 1 1 3.2 2c-.9.5-1.5 1.2-1.5 2.5"/><path d="M12 17h.01"/></svg></span>Нужно ли уметь программировать?</span></summary>
+        <p>Нет. OpenScript рассчитан на людей без технического опыта. Вам не нужно заранее знать языки программирования.</p>
+      </details>
+      <details class="card faq-item">
+        <summary><span style="display:inline-flex;align-items:center;gap:10px;"><span class="card-icon" style="width:28px;height:28px;"><svg viewBox="0 0 24 24" style="width:14px;height:14px;"><circle cx="12" cy="12" r="8"/><path d="M9.8 9a2.2 2.2 0 1 1 3.2 2c-.9.5-1.5 1.2-1.5 2.5"/><path d="M12 17h.01"/></svg></span>Нужно ли заранее разбираться в сложных инструментах?</span></summary>
+        <p>Нет. Идея в том, чтобы дать понятный порядок действий, рабочую среду и помощь на первых шагах.</p>
+      </details>
+      <details class="card faq-item">
+        <summary><span style="display:inline-flex;align-items:center;gap:10px;"><span class="card-icon" style="width:28px;height:28px;"><svg viewBox="0 0 24 24" style="width:14px;height:14px;"><circle cx="12" cy="12" r="8"/><path d="M9.8 9a2.2 2.2 0 1 1 3.2 2c-.9.5-1.5 1.2-1.5 2.5"/><path d="M12 17h.01"/></svg></span>Какие программы и какое железо нужны для работы?</span></summary>
+        <p>Достаточно обычного компьютера или ноутбука, браузера Google Chrome и стандартного терминала вашей операционной системы. Мощное железо, отдельная видеокарта и сложная установка программ не нужны: основная работа проходит через браузер и терминал ОС.</p>
+      </details>
+      <details class="card faq-item">
+        <summary><span style="display:inline-flex;align-items:center;gap:10px;"><span class="card-icon" style="width:28px;height:28px;"><svg viewBox="0 0 24 24" style="width:14px;height:14px;"><circle cx="12" cy="12" r="8"/><path d="M9.8 9a2.2 2.2 0 1 1 3.2 2c-.9.5-1.5 1.2-1.5 2.5"/><path d="M12 17h.01"/></svg></span>Что я смогу сделать?</span></summary>
+        <p>Начать с простых рабочих вещей: бот для заявок, MVP идеи, помощник для рутины, сбор данных, обработка таблиц, агент для пошаговых действий.</p>
+      </details>
+      <details class="card faq-item">
+        <summary><span style="display:inline-flex;align-items:center;gap:10px;"><span class="card-icon" style="width:28px;height:28px;"><svg viewBox="0 0 24 24" style="width:14px;height:14px;"><circle cx="12" cy="12" r="8"/><path d="M9.8 9a2.2 2.2 0 1 1 3.2 2c-.9.5-1.5 1.2-1.5 2.5"/><path d="M12 17h.01"/></svg></span>Мне помогут, если я застряну?</span></summary>
+        <p>Да. Внутри есть чаты в VK, MAX и Telegram, где можно задавать вопросы. Помогают участники и админы.</p>
+      </details>
+      <details class="card faq-item">
+        <summary><span style="display:inline-flex;align-items:center;gap:10px;"><span class="card-icon" style="width:28px;height:28px;"><svg viewBox="0 0 24 24" style="width:14px;height:14px;"><circle cx="12" cy="12" r="8"/><path d="M9.8 9a2.2 2.2 0 1 1 3.2 2c-.9.5-1.5 1.2-1.5 2.5"/><path d="M12 17h.01"/></svg></span>Доступ к материалам останется?</span></summary>
+        <p>Да. После оплаты доступ к материалам остаётся навсегда.</p>
+      </details>
+      <details class="card faq-item">
+        <summary><span style="display:inline-flex;align-items:center;gap:10px;"><span class="card-icon" style="width:28px;height:28px;"><svg viewBox="0 0 24 24" style="width:14px;height:14px;"><circle cx="12" cy="12" r="8"/><path d="M9.8 9a2.2 2.2 0 1 1 3.2 2c-.9.5-1.5 1.2-1.5 2.5"/><path d="M12 17h.01"/></svg></span>Это разработка проекта за меня?</span></summary>
+        <p>Нет. OpenScript помогает вам начать делать свои инструменты самостоятельно: с инструкциями, средой, примерами и поддержкой на старте.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container footer-inner">
+    <p class="footer-title">Юридическая информация</p>
+    <p>ИП Ягофаров М.Р. · ИНН: 741705866660 · ОГРНИП: 320745600093211</p>
+    <p>Email: <a href="mailto:OpenScripts@yandex.com">OpenScripts@yandex.com</a></p>
+    <p>OpenScript не гарантирует трудоустройство, не обещает стать разработчиком за месяц и не заменяет полноценную команду разработки для сложных продуктов.</p>
+  </div>
+</footer>
+
+<script>
+(function() {
+  const targets = document.querySelectorAll('.reveal');
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && targets.length) {
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('is-visible'); obs.unobserve(e.target); } });
+    }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+    targets.forEach((t) => obs.observe(t));
+  } else {
+    targets.forEach((t) => t.classList.add('is-visible'));
+  }
+})();
+</script>
+</body>
+</html>

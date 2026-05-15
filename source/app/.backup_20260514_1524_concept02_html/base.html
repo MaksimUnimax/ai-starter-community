@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OpenScript — первый ИИ-бот без опыта в программировании</title>
+  <meta name="description" content="OpenScript помогает пройти первый проект с ИИ-наставником, создать своего первого ИИ-бота и понять, как дальше делать боты, автоматизации и MVP самостоятельно.">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+  <body class="page{% if request.url.path == '/' %} page--landing{% endif %}">
+    <div class="page-shell">
+      <header class="top-nav" aria-label="Основная навигация">
+        <div class="nav-inner">
+          <a class="nav-logo" href="/">OpenScript</a>
+          <div class="nav-links">
+            {% if current_user %}
+              <a href="/materials">Работа с ИИ</a>
+              <a href="/cabinet">Личный кабинет</a>
+              {% if current_user.role == "admin" %}
+                <a href="/admin">Админ-панель</a>
+              {% endif %}
+              <form class="nav-form" method="post" action="/logout">
+                <button class="nav-link nav-button" type="submit">Выйти</button>
+              </form>
+            {% else %}
+              <a href="#what-you-get">Что вы получите</a>
+              <a href="#first-project">Первый проект</a>
+              <a href="#how-it-works">Как проходит работа</a>
+              <a href="#pricing">Цена</a>
+              <a href="/login">Войти</a>
+              <a href="/register" class="nav-cta">Начать первый проект</a>
+            {% endif %}
+          </div>
+        </div>
+      </header>
+      <main class="page-content">
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+    <footer class="site-footer" aria-label="Юридическая информация">
+      <div class="site-footer-inner">
+        <p class="site-footer-title">OpenScript</p>
+        <address class="site-footer-legal">
+          <p>ИП Ягофаров М.Р.</p>
+          <p>ИНН: 741705866660</p>
+          <p>ОГРНИП: 320745600093211</p>
+          <p>Email: <a href="mailto:OpenScripts@yandex.com">OpenScripts@yandex.com</a></p>
+        </address>
+      </div>
+    </footer>
+  </body>
+</html>

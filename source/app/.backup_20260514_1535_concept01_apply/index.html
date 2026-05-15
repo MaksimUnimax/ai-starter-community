@@ -1,0 +1,1255 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenScript — Первый ИИ-бот без опыта</title>
+<style>
+:root {
+  --bg: #faf6f1;
+  --surface: #fffefc;
+  --surface-alt: #f5ede3;
+  --fg: #2a2118;
+  --muted: #786a5e;
+  --border: #eadfce;
+  --accent: #c45c26;
+  --accent-soft: rgba(196, 92, 38, 0.1);
+  --accent-strong: #a84a1c;
+  --success: #47644a;
+  --success-soft: rgba(71, 100, 74, 0.1);
+  --shadow: 0 12px 40px rgba(42, 33, 24, 0.06);
+  --font-display: Georgia, "Times New Roman", "Iowan Old Style", serif;
+  --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; }
+
+.container {
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.section {
+  padding: 56px 0;
+}
+
+.section-header {
+  max-width: 760px;
+  margin: 0 auto 30px;
+  text-align: center;
+}
+
+.section-header.align-left {
+  margin-left: 0;
+  text-align: left;
+}
+
+.section-title {
+  margin: 12px 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 3.4vw, 2.9rem);
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+}
+
+.section-desc {
+  margin: 14px 0 0;
+  font-size: 1.02rem;
+  color: var(--muted);
+}
+
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  padding: 12px 0;
+  background: color-mix(in srgb, var(--bg) 88%, white 12%);
+  backdrop-filter: blur(10px);
+}
+
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 18px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: rgba(255, 254, 252, 0.92);
+}
+
+.nav-logo {
+  flex: 0 0 auto;
+  text-decoration: none;
+  font-family: var(--font-display);
+  font-size: 1.18rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--muted);
+  padding: 8px 14px;
+  border-radius: 999px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.nav-links a:hover {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+.nav-links .nav-cta {
+  background: var(--accent);
+  color: #fff;
+}
+
+.nav-links .nav-cta:hover {
+  background: var(--accent-strong);
+  color: #fff;
+}
+
+.hero {
+  padding: 38px 0 34px;
+}
+
+.hero-wrap {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.9fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.hero-copy {
+  padding: 12px 0;
+}
+
+.hero-title {
+  margin: 14px 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 5.8vw, 4.4rem);
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+.hero-lead {
+  margin: 16px 0 0;
+  max-width: 62ch;
+  font-size: 1.08rem;
+  color: var(--muted);
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.hero-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.hero-badge,
+.mini-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.hero-badge-dot,
+.mini-badge-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex: 0 0 auto;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 26px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.btn:hover { transform: translateY(-1px); }
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: var(--accent-strong);
+}
+
+.btn-secondary {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--fg);
+}
+
+.btn-secondary:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 28px;
+  box-shadow: var(--shadow);
+}
+
+.card.flat-shadow { box-shadow: none; }
+
+.card-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.card-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.22rem;
+  font-weight: 700;
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+}
+
+.card-text,
+.card-list,
+.card-note {
+  color: var(--muted);
+}
+
+.card-text {
+  margin: 10px 0 0;
+  font-size: 0.95rem;
+}
+
+.card-list {
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+}
+
+.card-list li,
+.detail-list li,
+.offer-group li,
+.limit-list li,
+.faq-item p {
+  position: relative;
+  padding-left: 18px;
+}
+
+.card-list li::before,
+.detail-list li::before,
+.offer-group li::before,
+.limit-list li::before,
+.check-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.hero-summary {
+  display: grid;
+  gap: 14px;
+}
+
+.hero-summary .card {
+  padding: 24px;
+}
+
+.hero-summary .card-list {
+  gap: 12px;
+}
+
+.hero-summary .card-list li {
+  padding-left: 22px;
+  font-size: 0.94rem;
+}
+
+.product-strip {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.strip-item {
+  padding: 16px 18px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+}
+
+.strip-item strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 0.92rem;
+}
+
+.strip-item span {
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.compare-grid,
+.triple-grid,
+.levels-grid,
+.community-grid,
+.faq-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.compare-grid {
+  grid-template-columns: 1fr 1fr;
+}
+
+.compare-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 26px;
+}
+
+.compare-card h3,
+.level-card h3,
+.step-card h3,
+.community-card h3,
+.faq-item summary {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.18rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.compare-card ul,
+.detail-list,
+.offer-group ul,
+.limit-list,
+.check-list {
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+  color: var(--muted);
+}
+
+.check-list li {
+  position: relative;
+  padding-left: 18px;
+}
+
+.compare-card.now {
+  background: linear-gradient(180deg, #fff8f3 0%, var(--surface) 100%);
+}
+
+.triple-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.project-highlight {
+  background: linear-gradient(180deg, #fff8f1 0%, #fffefc 100%);
+  border: 1px solid #e8d4be;
+}
+
+.project-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: 18px;
+}
+
+.detail-box {
+  padding: 22px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.detail-box h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  letter-spacing: -0.02em;
+}
+
+.detail-list {
+  margin-top: 12px;
+}
+
+.project-note {
+  margin-top: 18px;
+  padding: 18px 20px;
+  border-radius: 20px;
+  background: var(--accent-soft);
+  color: var(--fg);
+  font-size: 0.95rem;
+}
+
+.two-column {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.estimate-intro {
+  max-width: 760px;
+  margin: 0 auto 22px;
+  text-align: center;
+  color: var(--muted);
+}
+
+.levels-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.level-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 26px;
+}
+
+.level-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--surface-alt);
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.level-card p {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 0.94rem;
+}
+
+.example-card {
+  margin-top: 18px;
+  padding: 28px;
+}
+
+.example-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.example-option {
+  padding: 20px;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.example-option strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 1rem;
+}
+
+.example-option p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.process-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+  position: relative;
+}
+
+.process-grid::before {
+  content: "";
+  position: absolute;
+  top: 28px;
+  left: 9%;
+  right: 9%;
+  height: 2px;
+  background: repeating-linear-gradient(to right, var(--border) 0, var(--border) 8px, transparent 8px, transparent 18px);
+}
+
+.step-card {
+  position: relative;
+  z-index: 1;
+  padding: 0 8px;
+  text-align: center;
+}
+
+.step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 1.12rem;
+  font-weight: 700;
+}
+
+.step-card p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.pricing-shell {
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  background: linear-gradient(180deg, #fffaf5 0%, var(--surface) 100%);
+  padding: 38px;
+}
+
+.price-head {
+  max-width: 720px;
+  text-align: center;
+  margin: 0 auto 22px;
+}
+
+.price-value {
+  margin: 14px 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.offer-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.offer-group {
+  padding: 24px;
+  border-radius: 22px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.offer-group h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.12rem;
+  letter-spacing: -0.02em;
+}
+
+.offer-group p {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.offer-group ul {
+  margin-top: 14px;
+}
+
+.pricing-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin-top: 28px;
+}
+
+.pricing-note {
+  max-width: 720px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.community-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.community-card {
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background: var(--surface);
+}
+
+.community-card p {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.limits-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.limit-card {
+  padding: 28px;
+}
+
+.limit-card.bad {
+  background: #fffaf6;
+}
+
+.limit-card.good {
+  background: linear-gradient(180deg, #fffefc 0%, #f8f3eb 100%);
+}
+
+.limit-card h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  letter-spacing: -0.02em;
+}
+
+.limit-list {
+  margin-top: 14px;
+}
+
+.faq-list {
+  display: grid;
+  gap: 10px;
+}
+
+.faq-item {
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.faq-item summary {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 22px 24px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.faq-item summary::-webkit-details-marker { display: none; }
+
+.faq-item summary::after {
+  content: "+";
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 1.2rem;
+  font-family: var(--font-mono);
+}
+
+.faq-item[open] summary::after { content: "−"; }
+
+.faq-item p {
+  margin: 0;
+  padding: 0 24px 22px 42px;
+  color: var(--muted);
+  font-size: 0.94rem;
+}
+
+.final-cta {
+  text-align: center;
+  padding: 38px 30px;
+  border-radius: 28px;
+  border: 1px solid var(--border);
+  background: linear-gradient(180deg, #fff7f1 0%, var(--surface) 100%);
+}
+
+.final-cta p {
+  max-width: 700px;
+  margin: 14px auto 0;
+  color: var(--muted);
+}
+
+.final-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.footer {
+  padding: 42px 0 56px;
+  border-top: 1px solid var(--border);
+}
+
+.footer-inner {
+  display: grid;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.footer-title {
+  color: var(--fg);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (max-width: 980px) {
+  .hero-wrap,
+  .project-layout,
+  .two-column,
+  .compare-grid,
+  .limits-grid,
+  .offer-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .triple-grid,
+  .levels-grid,
+  .community-grid,
+  .product-strip,
+  .example-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .process-grid {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  .process-grid::before { display: none; }
+}
+
+@media (max-width: 720px) {
+  .container { width: min(100% - 24px, 1120px); }
+
+  .nav-inner {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+
+  .nav-links {
+    justify-content: center;
+  }
+
+  .hero {
+    padding: 24px 0 24px;
+  }
+
+  .hero-title {
+    font-size: clamp(2rem, 10vw, 3rem);
+  }
+
+  .section {
+    padding: 40px 0;
+  }
+
+  .card,
+  .pricing-shell,
+  .team-card,
+  .compare-card,
+  .level-card,
+  .offer-group,
+  .community-card,
+  .limit-card,
+  .final-cta {
+    padding: 22px;
+    border-radius: 20px;
+  }
+
+  .triple-grid,
+  .levels-grid,
+  .community-grid,
+  .product-strip,
+  .example-grid,
+  .process-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .faq-item summary {
+    padding: 18px 20px;
+    font-size: 1.02rem;
+  }
+
+  .faq-item p {
+    padding: 0 20px 18px 38px;
+  }
+
+  .hero-actions,
+  .final-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="container nav-inner">
+    <a href="/" class="nav-logo">OpenScript</a>
+    <div class="nav-links">
+      <a href="#what-you-get">Что вы получите</a>
+      <a href="#first-project">Первый проект</a>
+      <a href="#how-it-works">Как проходит работа</a>
+      <a href="#pricing">Цена</a>
+      <a href="/login">Войти</a>
+      <a href="{{ start_href }}" class="nav-cta">Начать первый проект</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="container hero-wrap">
+    <div class="hero-copy">
+      <span class="eyebrow">Первый управляемый опыт с ИИ</span>
+      <h1 class="hero-title">Создайте первого ИИ-бота без опыта в программировании</h1>
+      <p class="hero-lead">OpenScript проводит вас через первый реальный проект с ИИ-наставником: вы создаёте рабочий инструмент, понимаете процесс разработки и получаете метод, чтобы дальше самостоятельно делать своих ботов, автоматизации и MVP без опыта в программировании.</p>
+      <div class="hero-actions">
+        <a href="{{ start_href }}" class="btn btn-primary">Начать первый проект</a>
+        <a href="#pricing" class="btn btn-secondary">Посмотреть, что входит</a>
+      </div>
+    </div>
+    <div class="hero-summary reveal">
+      <div class="card flat-shadow" id="what-you-get">
+        <span class="card-kicker">СМЫСЛ ПРОДУКТА</span>
+        <h2 class="card-title">Программирование стало доступно без технической базы и больших бюджетов</h2>
+        <p class="card-text">Раньше для создания бота, автоматизации или простого сервиса нужны были знания программирования, разработчик или большой бюджет. Сейчас эту работу можно делать вместе с ИИ: описать задачу, получить код, проверить результат и постепенно собирать рабочий инструмент.</p>
+        <p class="card-text">OpenScript нужен, чтобы пройти этот первый путь не вслепую: создать своего первого ИИ-бота, понять принцип работы и дальше продолжать уже самостоятельно.</p>
+      </div>
+      <div class="card flat-shadow">
+        <span class="card-kicker">ЧТО ВЫ ПОЛУЧАЕТЕ ЗА ПЕРВЫЙ МЕСЯЦ</span>
+        <h2 class="card-title">Создадите своего первого ИИ-бота</h2>
+        <ul class="card-list">
+          <li>Пройдёте первый проект от задачи до рабочего результата;</li>
+          <li>Создадите своего первого ИИ-бота;</li>
+          <li>Получите подписку ChatGPT Plus на месяц;</li>
+          <li>Получите сервер и окружение для старта;</li>
+          <li>Научитесь ставить задачу ИИ и проверять результат;</li>
+          <li>Поймёте, как продолжать уже со своей идеей.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-header align-left">
+      <span class="eyebrow">Что вы покупаете</span>
+      <h2 class="section-title">Вы покупаете не курс, а первый управляемый опыт разработки</h2>
+    </div>
+    <div class="triple-grid reveal">
+      <div class="card">
+        <h3 class="card-title">Первый рабочий проект</h3>
+        <p class="card-text">Вы не смотрите набор уроков и не получаете абстрактную теорию. Вы проходите реальную работу над первым ИИ-ботом и в конце получаете рабочий результат.</p>
+      </div>
+      <div class="card">
+        <h3 class="card-title">ИИ-наставник в первом проекте</h3>
+        <p class="card-text">Во время стартового проекта ИИ-наставник объясняет базовые вещи простым языком, помогает понять шаги разработки и не даёт потеряться в технических деталях.</p>
+      </div>
+      <div class="card">
+        <h3 class="card-title">Навык для самостоятельной работы</h3>
+        <p class="card-text">После первого проекта у вас остаётся не только ИИ-бот, но и понимание, как дальше ставить задачи, проверять результат и создавать другие продукты уже самостоятельно.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="first-project">
+  <div class="container">
+    <div class="section-header">
+      <span class="eyebrow">Ключевой блок</span>
+      <h2 class="section-title">Первый проект: ИИ-бот для учёта расходов</h2>
+      <p class="section-desc">На первом проекте вы проходите путь от задачи до рабочего инструмента. ИИ-наставник объясняет базовые понятия простым языком, а технический ИИ-исполнитель помогает собрать результат. Важно не просто получить бота, а понять, как устроена работа с ИИ-разработкой.</p>
+    </div>
+    <div class="card project-highlight reveal">
+      <div class="project-layout">
+        <div class="detail-box">
+          <h3>Что делает бот</h3>
+          <ul class="detail-list">
+            <li>Помогает фиксировать расходы;</li>
+            <li>Раскладывает траты по категориям;</li>
+            <li>Показывает понятную сводку;</li>
+            <li>Помогает видеть, куда уходят деньги;</li>
+            <li>Становится первым примером вашего собственного ИИ-инструмента.</li>
+          </ul>
+        </div>
+        <div class="detail-box">
+          <h3>Что у вас остаётся после проекта</h3>
+          <ul class="detail-list">
+            <li>Рабочий ИИ-бот;</li>
+            <li>Пошаговая дорожная карта;</li>
+            <li>Материалы и инструкции;</li>
+            <li>Понимание процесса разработки;</li>
+            <li>Основа для следующих ботов, автоматизаций и MVP.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="two-column" style="margin-top: 16px;">
+        <div class="detail-box">
+          <h3>Что вы понимаете по ходу</h3>
+          <ul class="detail-list">
+            <li>Как описывать задачу;</li>
+            <li>Как превращать задачу в понятное ТЗ;</li>
+            <li>Как разбивать работу на шаги;</li>
+            <li>Как давать задания техническому ИИ-исполнителю;</li>
+            <li>Как проверять результат;</li>
+            <li>Как исправлять ошибки;</li>
+            <li>Как не ломать проект при доработках.</li>
+          </ul>
+        </div>
+        <div class="detail-box">
+          <h3>Итог первого месяца</h3>
+          <p class="card-text">В итоге вы сами создадите первого ИИ-бота и увидите весь путь его появления: от задачи и ТЗ до проверки результата. У вас останется рабочий бот, материалы, дорожная карта и главное — понимание, как дальше создавать другие продукты с помощью ИИ уже самостоятельно.</p>
+        </div>
+      </div>
+      <div class="project-note">Задача первого проекта — не сделать вас профессиональным программистом за месяц, а дать первый управляемый опыт разработки, после которого вы понимаете принцип работы и можете двигаться дальше со своими задачами.</div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <span class="eyebrow">Подход</span>
+      <h2 class="section-title">Вы не просто нажимаете кнопку — вы учитесь управлять разработкой</h2>
+      <p class="section-desc">Во многих ИИ-сервисах пользователь пишет одну команду и ждёт, что что-то произойдёт внутри. В OpenScript подход другой: вы видите шаги, понимаете, зачем они нужны, принимаете решения и постепенно учитесь управлять процессом. Поэтому результат — это не только готовый инструмент, но и новое понимание того, как создавать следующие проекты.</p>
+    </div>
+    <div class="compare-grid reveal">
+      <div class="compare-card">
+        <h3>Обычный ИИ-сервис</h3>
+        <ul>
+          <li>Команда в одно поле;</li>
+          <li>Непонятно, что происходит внутри;</li>
+          <li>Сложно повторить результат самостоятельно;</li>
+          <li>Пользователь остаётся зависимым от сервиса;</li>
+          <li>Часто высокая стоимость за готовые ИИ-функции.</li>
+        </ul>
+      </div>
+      <div class="compare-card now">
+        <h3>OpenScript</h3>
+        <ul>
+          <li>Пошаговая работа;</li>
+          <li>Объяснения по ходу первого проекта;</li>
+          <li>Видимый процесс разработки;</li>
+          <li>Контроль результата;</li>
+          <li>Навык, который можно использовать дальше самостоятельно;</li>
+          <li>Базовая стоимость входа — подписка на ChatGPT Plus и стартовое окружение.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="how-it-works">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Как проходит работа</h2>
+      <p class="section-desc">OpenScript показывает общий принцип работы с ИИ-разработкой: вы формулируете задачу, ИИ помогает разложить её на шаги, технический ИИ-исполнитель выполняет работу, а вы проверяете результат и принимаете решения.</p>
+    </div>
+    <div class="process-grid reveal">
+      <div class="step-card">
+        <span class="step-num">1</span>
+        <h3>Вы описываете задачу</h3>
+        <p>Вы простыми словами объясняете, какой инструмент хотите получить и какую проблему он должен решать.</p>
+      </div>
+      <div class="step-card">
+        <span class="step-num">2</span>
+        <h3>Задача превращается в понятный план</h3>
+        <p>ИИ помогает разложить задачу на шаги, выделить первую версию и убрать лишнее, чтобы проект можно было реально довести до результата.</p>
+      </div>
+      <div class="step-card">
+        <span class="step-num">3</span>
+        <h3>Технический ИИ-исполнитель делает изменения</h3>
+        <p>Он пишет код, запускает проверки, возвращает отчёт и показывает, что именно было сделано.</p>
+      </div>
+      <div class="step-card">
+        <span class="step-num">4</span>
+        <h3>Вы проверяете результат</h3>
+        <p>Вы смотрите, что получилось, задаёте вопросы, просите исправления и постепенно учитесь понимать, как управлять процессом.</p>
+      </div>
+      <div class="step-card">
+        <span class="step-num">5</span>
+        <h3>Вы повторяете подход на своих проектах</h3>
+        <p>После стартового проекта вы можете использовать тот же принцип для своих ботов, автоматизаций и MVP.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="pricing">
+  <div class="container">
+    <div class="pricing-shell reveal">
+      <div class="price-head">
+        <span class="eyebrow">Цена</span>
+        <h2 class="section-title">Стартовый месяц OpenScript — 4 990 ₽</h2>
+        <p class="section-desc">Это первый управляемый месяц, в котором вы проходите стартовый проект, получаете рабочую среду, материалы, инструкции и поддержку, чтобы начать создавать свои инструменты с ИИ.</p>
+      </div>
+      <div class="offer-grid">
+        <div class="offer-group">
+          <h3>Первый месяц</h3>
+          <p>Всё, что нужно, чтобы пройти стартовый проект и не застрять на первых шагах. Подписка ChatGPT Plus входит в стоимость и остаётся у вас.</p>
+          <ul>
+            <li>Подписка ChatGPT Plus на месяц;</li>
+            <li>Сервер и окружение для старта;</li>
+            <li>Первый проект с ИИ-наставником;</li>
+            <li>Дорожная карта разработки;</li>
+            <li>Помощь на первых шагах.</li>
+          </ul>
+        </div>
+        <div class="offer-group">
+          <h3>Навсегда</h3>
+          <p>Остаётся у вас после оплаты и помогает повторять подход уже на своих идеях.</p>
+          <ul>
+            <li>Доступ к материалам;</li>
+            <li>Пошаговые инструкции;</li>
+            <li>База команд и промптов;</li>
+            <li>Правила работы с техническим ИИ-исполнителем;</li>
+            <li>Дорожная карта первого проекта;</li>
+            <li>Понимание, как повторять подход на своих идеях.</li>
+          </ul>
+        </div>
+        <div class="offer-group">
+          <h3>Комьюнити</h3>
+          <p>Поддержка вокруг главного результата: первого проекта и навыка самостоятельной работы.</p>
+          <ul>
+            <li>Помощь, если застряли;</li>
+            <li>Обмен идеями;</li>
+            <li>Обсуждение проектов;</li>
+            <li>Поиск соратников;</li>
+            <li>Возможность объединяться для более крупных продуктов.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="pricing-actions">
+        <a href="{{ start_href }}" class="btn btn-primary">Начать первый проект</a>
+        <p class="pricing-note">После первого месяца вы сможете продолжать самостоятельно. Продление OpenScript не обязательно, но внешние инструменты, серверы и API при необходимости оплачиваются отдельно.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Комьюнити помогает не застрять и найти соратников</h2>
+      <p class="section-desc">OpenScript — это не только материалы. В комьюнити можно задавать вопросы, смотреть, что делают другие, находить людей с похожими задачами и объединяться для более крупных продуктов.</p>
+    </div>
+    <div class="community-grid reveal">
+      <div class="community-card">
+        <h3>Получить помощь, если застряли</h3>
+        <p>Можно быстро задать вопрос и не тратить дни на тупик, который уже проходил кто-то другой.</p>
+      </div>
+      <div class="community-card">
+        <h3>Посмотреть примеры других участников</h3>
+        <p>Чужие проекты помогают понять масштаб, уровень сложности и хорошие первые шаги.</p>
+      </div>
+      <div class="community-card">
+        <h3>Найти соратников для задачи</h3>
+        <p>Если хотите расти дальше, комьюнити помогает искать людей под совместные продукты и MVP.</p>
+      </div>
+      <div class="community-card">
+        <h3>Продолжить развитие после первого проекта</h3>
+        <p>Это не главный продукт, а поддерживающая среда вокруг вашего старта и следующих шагов.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <span class="eyebrow">FAQ</span>
+      <h2 class="section-title">Вопросы перед стартом</h2>
+    </div>
+    <div class="faq-list reveal">
+      <details class="faq-item">
+        <summary>Нужно ли уметь программировать?</summary>
+        <p>Нет. OpenScript рассчитан на людей без опыта в программировании и технической разработке. Ваша задача — научиться описывать задачу, понимать шаги и проверять результат.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Это курс?</summary>
+        <p>Не совсем. В OpenScript есть материалы и объяснения, но главный смысл — пройти первый реальный проект и создать своего первого ИИ-бота.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Кто объясняет, если я не понимаю?</summary>
+        <p>В стартовом проекте объясняет ИИ-наставник. Он помогает идти по дорожной карте и понимать базовые вещи простым языком.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Что я получу за первый месяц?</summary>
+        <p>Вы создадите первого ИИ-бота, пройдёте дорожную карту, получите материалы и поймёте, как дальше работать со своими задачами.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Смогу ли я потом продолжать без OpenScript?</summary>
+        <p>Да. Цель первого месяца — дать вам метод и понимание процесса, чтобы вы могли продолжать самостоятельно. При этом внешние инструменты, серверы или API при необходимости оплачиваются отдельно.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Что входит в 4 990 ₽?</summary>
+        <p>Стартовый месяц, помощь с рабочей средой, ChatGPT Plus на месяц, сервер и окружение для старта, первый проект с ИИ-наставником, материалы, инструкции и доступ к комьюнити.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="final-cta reveal">
+      <span class="eyebrow">Финальный шаг</span>
+      <h2 class="section-title">Начните с первого ИИ-бота — дальше сможете идти со своими идеями</h2>
+      <p>OpenScript нужен, чтобы пройти стартовый барьер: создать первый рабочий инструмент, понять процесс разработки и получить метод, который можно применять дальше самостоятельно.</p>
+      <div class="final-actions">
+        <a href="{{ start_href }}" class="btn btn-primary">Начать первый проект</a>
+        <a href="#pricing" class="btn btn-secondary">Посмотреть, что входит</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container footer-inner">
+    <div class="footer-title">Юридическая информация</div>
+    <div>ИП Ягофаров М.Р.</div>
+    <div>ИНН: 741705866660</div>
+    <div>ОГРНИП: 320745600093211</div>
+    <div>Email: <a href="mailto:OpenScripts@yandex.com">OpenScripts@yandex.com</a></div>
+    <div>OpenScript не гарантирует трудоустройство, не обещает стать разработчиком за месяц и не заменяет полноценную команду разработки для сложных продуктов.</div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  const revealTargets = Array.from(document.querySelectorAll(".reveal"));
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (reducedMotion || revealTargets.length === 0) {
+    revealTargets.forEach((el) => el.classList.add("is-visible"));
+    return;
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("is-visible");
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: "0px 0px -6% 0px" });
+
+  revealTargets.forEach((el) => observer.observe(el));
+})();
+</script>
+</body>
+</html>
