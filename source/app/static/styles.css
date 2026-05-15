@@ -568,7 +568,7 @@ html { scroll-behavior: smooth; }
 }
 
 .public-landing-page .hero {
-  padding: 38px 0 34px;
+  padding: 28px 0 42px;
 }
 
 .public-landing-page .hero-wrap {
@@ -608,6 +608,27 @@ html { scroll-behavior: smooth; }
   gap: 12px;
   margin-top: 24px;
   justify-content: center;
+}
+
+.public-landing-page .hero-bg-visual {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  user-select: none;
+  overflow: hidden;
+}
+
+.public-landing-page .hero-bg-visual img {
+  position: absolute;
+  left: 50%;
+  top: 33%;
+  width: min(1280px, 108vw);
+  max-width: none;
+  height: auto;
+  transform: translate(-50%, -50%);
+  opacity: 0.76;
+  filter: sepia(0.04) saturate(1.75) contrast(1.75) brightness(0.94);
 }
 
 .public-landing-page .hero-badges {
@@ -1260,6 +1281,13 @@ html { scroll-behavior: smooth; }
 
   .public-landing-page .hero {
     padding: 24px 0 24px;
+  }
+
+  .public-landing-page .hero-bg-visual img {
+    width: 175vw;
+    top: 33%;
+    opacity: 0.58;
+    filter: sepia(0.04) saturate(1.65) contrast(1.65) brightness(0.94);
   }
 
   .public-landing-page .hero-title {
