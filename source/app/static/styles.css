@@ -628,7 +628,7 @@ html { scroll-behavior: smooth; }
   height: auto;
   transform: translate(-50%, -50%);
   opacity: 0.76;
-  filter: sepia(0.04) saturate(1.75) contrast(1.75) brightness(0.94);
+  filter: sepia(0.04) saturate(1.55) contrast(1.75) brightness(0.72);
 }
 
 .public-landing-page .hero-badges {
@@ -1287,7 +1287,7 @@ html { scroll-behavior: smooth; }
     width: 175vw;
     top: 33%;
     opacity: 0.58;
-    filter: sepia(0.04) saturate(1.65) contrast(1.65) brightness(0.94);
+    filter: sepia(0.04) saturate(1.55) contrast(1.65) brightness(0.72);
   }
 
   .public-landing-page .hero-title {
