@@ -220,7 +220,15 @@ a { color: inherit; }
   overflow: hidden;
 }
 
-.hero-bg-visual img {
+.hero-bg-desktop {
+  display: block;
+}
+
+.hero-bg-mobile {
+  display: none;
+}
+
+.hero-bg-desktop img {
   position: absolute;
   left: 50%;
   top: 33%;
@@ -887,14 +895,47 @@ a { color: inherit; }
   }
 
   .hero {
-    padding: 24px 0 30px;
+    padding: 18px 0 30px;
+    min-height: 760px;
   }
 
-  .hero-bg-visual img {
-    width: 175vw;
-    top: 33%;
-    opacity: 0.58;
-    filter: sepia(0.04) saturate(1.55) contrast(1.65) brightness(0.72);
+  .hero-bg-desktop {
+    display: none;
+  }
+
+  .hero-bg-mobile {
+    display: block;
+  }
+
+  .hero-bg-mobile img {
+    position: absolute;
+    left: 50%;
+    top: 42%;
+    width: 118vw;
+    max-width: none;
+    height: auto;
+    transform: translate(-50%, -50%);
+    opacity: 0.62;
+    filter: sepia(0.04) saturate(1.45) contrast(1.45) brightness(0.86);
+  }
+
+  .hero-copy {
+    position: relative;
+    padding: 16px 14px 18px;
+  }
+
+  .hero-copy::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: -12px -10px;
+    border-radius: 28px;
+    background: radial-gradient(
+      circle at 50% 42%,
+      rgba(250, 246, 241, 0.82) 0%,
+      rgba(250, 246, 241, 0.56) 52%,
+      rgba(250, 246, 241, 0) 78%
+    );
   }
 
   .hero-title {
@@ -984,8 +1025,11 @@ a { color: inherit; }
 </nav>
 
 <section class="hero">
-  <div class="hero-bg-visual" aria-hidden="true">
+  <div class="hero-bg-visual hero-bg-desktop" aria-hidden="true">
     <img src="{{ request.url_for('static', path='images/human_ai_hero_background_v2.png') }}" alt="" decoding="async" draggable="false">
+  </div>
+  <div class="hero-bg-visual hero-bg-mobile" aria-hidden="true">
+    <img src="{{ request.url_for('static', path='images/mobile_vitruvian_NO_SQUARES_transparent.webp') }}" alt="" decoding="async" draggable="false">
   </div>
   <div class="container hero-wrap">
     <div class="hero-copy">

@@ -619,7 +619,15 @@ html { scroll-behavior: smooth; }
   overflow: hidden;
 }
 
-.public-landing-page .hero-bg-visual img {
+.public-landing-page .hero-bg-desktop {
+  display: block;
+}
+
+.public-landing-page .hero-bg-mobile {
+  display: none;
+}
+
+.public-landing-page .hero-bg-desktop img {
   position: absolute;
   left: 50%;
   top: 33%;
@@ -1283,11 +1291,24 @@ html { scroll-behavior: smooth; }
     padding: 24px 0 24px;
   }
 
-  .public-landing-page .hero-bg-visual img {
-    width: 175vw;
-    top: 33%;
-    opacity: 0.58;
-    filter: sepia(0.04) saturate(1.55) contrast(1.65) brightness(0.72);
+  .public-landing-page .hero-bg-desktop {
+    display: none;
+  }
+
+  .public-landing-page .hero-bg-mobile {
+    display: block;
+  }
+
+  .public-landing-page .hero-bg-mobile img {
+    position: absolute;
+    left: 50%;
+    top: 42%;
+    width: 118vw;
+    max-width: none;
+    height: auto;
+    transform: translate(-50%, -50%);
+    opacity: 0.62;
+    filter: sepia(0.04) saturate(1.45) contrast(1.45) brightness(0.86);
   }
 
   .public-landing-page .hero-title {
