@@ -620,11 +620,11 @@ html { scroll-behavior: smooth; }
 }
 
 .public-landing-page .hero-bg-desktop {
-  display: block;
+  display: block !important;
 }
 
 .public-landing-page .hero-bg-mobile {
-  display: none;
+  display: none !important;
 }
 
 .public-landing-page .hero-bg-desktop img {
@@ -1291,12 +1291,13 @@ html { scroll-behavior: smooth; }
     padding: 24px 0 24px;
   }
 
-  .public-landing-page .hero-bg-desktop {
-    display: none;
+  .public-landing-page .hero-bg-desktop,
+  .public-landing-page .hero-bg-desktop img {
+    display: none !important;
   }
 
   .public-landing-page .hero-bg-mobile {
-    display: block;
+    display: block !important;
   }
 
   .public-landing-page .hero-bg-mobile img {

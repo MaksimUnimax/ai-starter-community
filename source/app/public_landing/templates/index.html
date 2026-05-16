@@ -221,11 +221,11 @@ a { color: inherit; }
 }
 
 .hero-bg-desktop {
-  display: block;
+  display: block !important;
 }
 
 .hero-bg-mobile {
-  display: none;
+  display: none !important;
 }
 
 .hero-bg-desktop img {
@@ -881,7 +881,7 @@ a { color: inherit; }
   .process-grid::before { display: none; }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 768px) {
   .container { width: min(100% - 24px, 1120px); }
 
   .nav-inner {
@@ -899,24 +899,25 @@ a { color: inherit; }
     min-height: 760px;
   }
 
-  .hero-bg-desktop {
-    display: none;
+  .hero-bg-desktop,
+  .hero-bg-desktop img {
+    display: none !important;
   }
 
   .hero-bg-mobile {
-    display: block;
+    display: block !important;
   }
 
   .hero-bg-mobile img {
     position: absolute;
     left: 50%;
-    top: 42%;
-    width: 118vw;
+    top: 33%;
+    width: 115vw;
     max-width: none;
     height: auto;
     transform: translate(-50%, -50%);
-    opacity: 0.62;
-    filter: sepia(0.04) saturate(1.45) contrast(1.45) brightness(0.86);
+    opacity: 0.72;
+    filter: sepia(0.04) saturate(1.55) contrast(1.55) brightness(0.84);
   }
 
   .hero-copy {
