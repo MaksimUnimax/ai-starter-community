@@ -895,8 +895,7 @@ a { color: inherit; }
   }
 
   .hero {
-    padding: 18px 0 30px;
-    min-height: 760px;
+    padding: 18px 0 28px;
   }
 
   .hero-bg-desktop,
@@ -911,13 +910,13 @@ a { color: inherit; }
   .hero-bg-mobile img {
     position: absolute;
     left: 50%;
-    top: 33%;
-    width: 115vw;
+    top: 30%;
+    width: min(560px, 138vw);
     max-width: none;
     height: auto;
     transform: translate(-50%, -50%);
-    opacity: 0.72;
-    filter: sepia(0.04) saturate(1.55) contrast(1.55) brightness(0.84);
+    opacity: 0.76;
+    filter: sepia(0.04) saturate(1.55) contrast(1.75) brightness(0.72);
   }
 
   .hero-copy {
@@ -933,9 +932,9 @@ a { color: inherit; }
     border-radius: 28px;
     background: radial-gradient(
       circle at 50% 42%,
-      rgba(250, 246, 241, 0.82) 0%,
-      rgba(250, 246, 241, 0.56) 52%,
-      rgba(250, 246, 241, 0) 78%
+      rgba(250, 246, 241, 0.70) 0%,
+      rgba(250, 246, 241, 0.42) 50%,
+      rgba(250, 246, 241, 0) 76%
     );
   }
 
