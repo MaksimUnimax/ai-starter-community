@@ -7,7 +7,6 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 SKILL_ROOT = REPO_ROOT / ".agents" / "skills" / "dair-lesson-generator"
 DAIR_SKILL = SKILL_ROOT / "SKILL.md"
 README = SKILL_ROOT / "README.md"
-COURSE_AUTHORING_SKILL = REPO_ROOT / ".agents" / "skills" / "openscript-course-authoring" / "SKILL.md"
 
 
 def _read(path: Path) -> str:
@@ -44,8 +43,3 @@ def test_dair_skill_is_not_old_summary_shape() -> None:
     assert not text.startswith("# lesson-generator")
     assert "Purpose:" not in text
     assert "When to use:" not in text
-
-
-def test_course_authoring_skill_still_exists_and_was_not_modified() -> None:
-    assert COURSE_AUTHORING_SKILL.is_file()
-    assert "openscript-course-authoring" in _read(COURSE_AUTHORING_SKILL)

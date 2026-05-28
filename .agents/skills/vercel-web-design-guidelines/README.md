@@ -1,18 +1,18 @@
-# dair-lesson-generator
+# vercel-web-design-guidelines
 
 This folder contains an active repo-scoped Codex skill.
 
 `SKILL.md` is an exact local copy from:
 
-- /opt/openscript-site-docs/docs/codex_source/tools/dair_lesson_generator/SKILL.md
+- /opt/openscript-site-docs/docs/codex_source/tools/frontend_design_skills/vercel_web_design_guidelines/SKILL.md
 
 Use this repo-scoped skill explicitly:
 
 ```text
-$dair-lesson-generator
+$vercel-web-design-guidelines
 
 Read and follow:
-- /opt/ai-starter-community/.agents/skills/dair-lesson-generator/SKILL.md
+- /opt/ai-starter-community/.agents/skills/vercel-web-design-guidelines/SKILL.md
 
 STOP_SKILL_NOT_FOUND:
 If the skill file is missing, stop before making changes.
