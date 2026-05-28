@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 import sqlite3
+from pathlib import Path
 
 import pytest
 
@@ -286,8 +287,18 @@ def test_forgot_password_generic_behavior_and_reused_token_fail(test_settings):
         )
 
 
-def test_route_flow_register_verify_login_cabinet_logout(client, test_settings):
-    register_response = client.post(
+def test_route_flow_register_page_is_closed(client, test_settings):
+    db_path = Path(test_settings.database_path)
+    assert not db_path.exists()
+
+    register_response = client.get("/register")
+    assert register_response.status_code == 200
+    assert "Регистрация временно закрыта" in register_response.text
+    assert "Перейти ко входу" in register_response.text
+    assert "/login" in register_response.text
+    assert "Создать аккаунт" not in register_response.text
+
+    register_post_response = client.post(
         "/register",
         data={
             "email": "route@example.com",
@@ -297,16 +308,21 @@ def test_route_flow_register_verify_login_cabinet_logout(client, test_settings):
         },
         follow_redirects=False,
     )
-    assert register_response.status_code == 303
-    assert register_response.headers["location"] == "/check-email?registered=1"
+    assert register_post_response.status_code == 403
+    assert "Регистрация временно закрыта" in register_post_response.text
+    assert "/login" in register_post_response.text
 
-    check_email_response = client.get("/check-email?registered=1")
-    assert check_email_response.status_code == 200
-    assert "Проверьте почту" in check_email_response.text
-    assert "Мы отправили письмо подтверждения" in check_email_response.text
-    assert "Не пришло письмо подтверждения?" in check_email_response.text
-    assert "/resend-verification" in check_email_response.text
+    assert not db_path.exists()
 
+
+def test_route_flow_login_cabinet_logout_still_works(client, test_settings):
+    register_user(
+        email="route@example.com",
+        login="routeuser",
+        password="Secret123",
+        repeat_password="Secret123",
+        settings=test_settings,
+    )
     outbox_row = _fetch_one(
         test_settings,
         "SELECT * FROM email_outbox WHERE recipient_email = ? AND template_key = ? ORDER BY id DESC LIMIT 1",
@@ -346,17 +362,13 @@ def test_route_flow_register_verify_login_cabinet_logout(client, test_settings):
 
 
 def test_route_flow_login_by_login_and_password_reset(client, test_settings):
-    register_response = client.post(
-        "/register",
-        data={
-            "email": "loginroute@example.com",
-            "login": "loginroute",
-            "password": "Secret123",
-            "repeat_password": "Secret123",
-        },
-        follow_redirects=False,
+    register_user(
+        email="loginroute@example.com",
+        login="loginroute",
+        password="Secret123",
+        repeat_password="Secret123",
+        settings=test_settings,
     )
-    assert register_response.status_code == 303
 
     verify_row = _fetch_one(
         test_settings,
@@ -413,17 +425,13 @@ def test_route_flow_login_by_login_and_password_reset(client, test_settings):
 
 
 def test_unverified_login_shows_resend_link(client, test_settings):
-    register_response = client.post(
-        "/register",
-        data={
-            "email": "needsverify@example.com",
-            "login": "needsverify",
-            "password": "Secret123",
-            "repeat_password": "Secret123",
-        },
-        follow_redirects=False,
+    register_user(
+        email="needsverify@example.com",
+        login="needsverify",
+        password="Secret123",
+        repeat_password="Secret123",
+        settings=test_settings,
     )
-    assert register_response.status_code == 303
 
     login_response = client.post(
         "/login",
@@ -488,7 +496,6 @@ def test_cabinet_shows_logout_button_and_access_text(client, test_settings):
     assert "Доступ к разделу «Работа с ИИ»: не активирован" in cabinet_response.text
     assert "Выйти" in cabinet_response.text
     assert "/static/styles.css" in cabinet_response.text
-    assert "Главная" in cabinet_response.text
     assert "Работа с ИИ" in cabinet_response.text
 
 

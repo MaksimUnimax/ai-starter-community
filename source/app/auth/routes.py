@@ -9,7 +9,6 @@ from jinja2 import ChoiceLoader, FileSystemLoader
 
 from app.auth.service import (
     AuthError,
-    ConflictError,
     NotFoundError,
     NotVerifiedError,
     UnauthorizedError,
@@ -17,7 +16,6 @@ from app.auth.service import (
     authenticate_user,
     create_password_reset_request,
     create_session,
-    register_user,
     reset_password,
     revoke_session,
     resend_verification_request,
@@ -34,15 +32,21 @@ templates.env.loader = ChoiceLoader(
     ]
 )
 
+REGISTRATION_CLOSED_MESSAGE = (
+    "Регистрация временно закрыта. Мы готовим курсы и материалы раздела «Работа с ИИ». "
+    "Если у вас уже есть аккаунт, войдите через страницу входа."
+)
+
 
 def _template(request: Request, template_name: str, **context) -> HTMLResponse:
+    status_code = context.pop("status_code", 200)
     payload = {
         "request": request,
         "title": context.pop("title", "Страница"),
         "current_user": get_current_user_from_cookies(request.cookies),
     }
     payload.update(context)
-    return templates.TemplateResponse(request, template_name, payload)
+    return templates.TemplateResponse(request, template_name, payload, status_code=status_code)
 
 
 def _login_notice(request: Request) -> str | None:
@@ -62,10 +66,8 @@ def register_page(request: Request) -> HTMLResponse:
         request,
         "register.html",
         title="Регистрация",
-        notice=request.query_params.get("notice"),
-        error=request.query_params.get("error"),
-        email="",
-        login="",
+        notice=REGISTRATION_CLOSED_MESSAGE,
+        registration_closed=True,
     )
 
 
@@ -82,27 +84,14 @@ def register_submit(
     password: str = Form(default=""),
     repeat_password: str = Form(default=""),
 ) -> HTMLResponse:
-    try:
-        register_user(email=email, login=login, password=password, repeat_password=repeat_password)
-    except (ValidationError, ConflictError) as exc:
-        return _template(
-            request,
-            "register.html",
-            title="Регистрация",
-            error=str(exc),
-            email=email,
-            login=login,
-        )
-    except AuthError as exc:
-        return _template(
-            request,
-            "register.html",
-            title="Регистрация",
-            error=str(exc),
-            email=email,
-            login=login,
-        )
-    return RedirectResponse(url="/check-email?registered=1", status_code=303)
+    return _template(
+        request,
+        "register.html",
+        title="Регистрация",
+        notice=REGISTRATION_CLOSED_MESSAGE,
+        registration_closed=True,
+        status_code=403,
+    )
 
 
 @router.get("/check-email", response_class=HTMLResponse)

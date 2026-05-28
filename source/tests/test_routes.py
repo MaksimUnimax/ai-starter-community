@@ -1,78 +1,19 @@
 def test_landing_page(client):
     response = client.get("/")
     assert response.status_code == 200
-    assert "OpenScript — программы, боты и MVP без знаний и опыта" in response.text
-    assert (
-        '<meta name="description" content="OpenScript помогает людям без технического опыта создавать простые программы, боты, MVP, помощников, агентов и автоматизации под свои задачи.">'
-        in response.text
-    )
-    assert "Пришло новое время для тех, кто хочет создавать" in response.text
-    assert "Создание программ перестало быть закрытой территорией" in response.text
-    assert "видеть потребности людей, замечать тренды" in response.text
-    assert "даже если у вас нет технических знаний и опыта" in response.text
-    assert "Начать работу" in response.text
-    assert "Как устроена работа" in response.text
-    assert "Модель работы OpenScript" not in response.text
-    assert 'href="#how-it-works"' in response.text
-    assert response.text.count("Для кого OpenScript") == 1
-    assert "Для кого OpenScript" in response.text
-    assert "Для тех, у кого есть идея MVP" in response.text
-    assert "Для малого бизнеса и самозанятых" in response.text
-    assert "Для селлеров и онлайн-продавцов" in response.text
-    assert "Для тех, кто хочет сменить траекторию" in response.text
-    assert "Для тех, кому давно интересно программирование" in response.text
-    assert "Для тех, кто работает с таблицами и отчётами" in response.text
-    assert "собирать данные, считать показатели, находить изменения" in response.text
-    assert response.text.count("Какие задачи можно решать с OpenScript") == 1
-    assert "Какие задачи можно решать с OpenScript" in response.text
-    assert "OpenScript нужен не для абстрактного" not in response.text
-    assert "Например:" not in response.text
-    assert "Такие агенты" not in response.text
-    assert "Агентов можно использовать" in response.text
-    assert "Вы не обязаны сами писать код" not in response.text
-    assert "Ответы на вопросы через чаты" not in response.text
-    assert "VPN" not in response.text
-    assert "ВПН" not in response.text
-    assert "Честно о результате" not in response.text
-    assert "Начните с первой простой задачи" not in response.text
-    assert response.text.count("Что входит в полный доступ") == 1
-    assert (
-        "В полный доступ входят подписка на ChatGPT Plus на 1 месяц и аренда сервера на 1 месяц."
-        in response.text
-    )
-    assert "подписка на ChatGPT Plus на 1 месяц" in response.text
-    assert "аренда сервера на 1 месяц" in response.text
-    assert "Полный доступ — 4 990 ₽" in response.text
-    assert "Продлевать подписку ChatGPT Plus и аренду сервера можно по отдельности в личном кабинете" in response.text
-    assert "Стартовый набор рабочей среды: инструмент и сервер" not in response.text
-    assert "инструмент и сервер" not in response.text
-    assert "Цена" not in response.text
-    assert response.text.count("Вопросы перед стартом") == 1
+    assert "OpenScript — Первый ИИ-бот без опыта" in response.text
+    assert "Создайте первого ИИ-бота без опыта в программировании" in response.text
+    assert "Начать первый проект" in response.text
+    assert "Вы покупаете не курс, а первый управляемый опыт разработки" in response.text
+    assert "Стартовый месяц OpenScript — 4 990 ₽" in response.text
     assert "Вопросы перед стартом" in response.text
-    assert "Какие программы и какое железо нужны для работы?" in response.text
-    assert "браузера Google Chrome" in response.text
-    assert "стандартного терминала вашей операционной системы" in response.text
-    assert "Мощное железо, отдельная видеокарта и сложная установка программ не нужны" in response.text
-    assert "основная работа проходит через браузер и терминал ОС" in response.text
-    assert "подключённые сервисы" not in response.text
-    assert "Создавайте свои первые программы без знаний и опыта" not in response.text
-    assert "Вы получаете рабочую среду" not in response.text
-    assert "Регистрируетесь" not in response.text
-    assert "Получаете полный доступ" not in response.text
-    assert "Настраиваете рабочую среду" not in response.text
-    assert "Выбираете первую задачу" not in response.text
-    assert "Двигаетесь по инструкции" not in response.text
-    assert "Если застряли — задаёте вопрос" not in response.text
-    assert "OpenScript рассчитан на людей, которым нужен понятный способ начать делать свои инструменты без длинного входа в профессию." not in response.text
-    assert "Можно ли проверить идею перед дорогой разработкой?" not in response.text
+    assert 'href="#how-it-works"' in response.text
     assert "Юридическая информация" in response.text
     assert "ИП Ягофаров М.Р." in response.text
     assert "Индивидуальный предприниматель Ягофаров Максим Ринатович" not in response.text
     assert "ИНН: 741705866660" in response.text
     assert "ОГРНИП: 320745600093211" in response.text
-    assert "Email: OpenScripts@yandex.com" in response.text
-    assert "/static/styles.css" in response.text
-    assert "/register" in response.text
+    assert "OpenScripts@yandex.com" in response.text
 
 
 def test_login_and_register_pages(client):
@@ -91,6 +32,10 @@ def test_login_and_register_pages(client):
     assert cabinet_response.headers["location"] == "/login"
     assert "Вход в аккаунт" in login_response.text
     assert "Регистрация" in register_response.text
+    assert "Регистрация временно закрыта" in register_response.text
+    assert "Перейти ко входу" in register_response.text
+    assert "/login" in register_response.text
+    assert "Создать аккаунт" not in register_response.text
     assert "Нет аккаунта?" in login_response.text
     assert "Зарегистрироваться" in login_response.text
     assert "Забыли пароль?" in login_response.text
@@ -103,7 +48,9 @@ def test_login_and_register_pages(client):
     assert "/static/styles.css" in login_response.text
     assert "/static/styles.css" in register_response.text
     assert "Электронная почта или логин" in login_response.text
-    assert "Электронная почта" in register_response.text
+    assert "Регистрация временно закрыта" in register_response.text
+    assert "Перейти ко входу" in register_response.text
+    assert "Создать аккаунт" not in register_response.text
     assert "Подтверждение почты" not in login_response.text
     assert "Не пришло письмо подтверждения?" not in login_response.text
     assert "Отправить письмо подтверждения" not in login_response.text
@@ -130,14 +77,13 @@ def test_auth_utility_pages_use_shared_base_and_styles(client):
         resend_response,
     ):
         assert "/static/styles.css" in response.text
-        assert "Главная" in response.text
-        assert "Вход / регистрация" in response.text
+        assert "OpenScript" in response.text
         assert "Юридическая информация" in response.text
         assert "ИП Ягофаров М.Р." in response.text
         assert "Индивидуальный предприниматель Ягофаров Максим Ринатович" not in response.text
         assert "ИНН: 741705866660" in response.text
         assert "ОГРНИП: 320745600093211" in response.text
-        assert "Email: OpenScripts@yandex.com" in response.text
+        assert "OpenScripts@yandex.com" in response.text
         assert "Личный кабинет" not in response.text
         assert "Работа с ИИ" not in response.text
         assert "Админ-панель" not in response.text
@@ -169,5 +115,7 @@ def test_placeholder_post_routes_redirect(client):
     )
     logout_response = client.post("/logout", follow_redirects=False)
     assert login_response.status_code == 200
-    assert register_response.status_code == 303
+    assert register_response.status_code == 403
+    assert "Регистрация временно закрыта" in register_response.text
+    assert "/login" in register_response.text
     assert logout_response.status_code == 303

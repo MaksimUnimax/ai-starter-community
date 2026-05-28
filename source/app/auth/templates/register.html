@@ -5,36 +5,49 @@
     <div class="stack">
       <p class="muted">Создание аккаунта</p>
       <h1 class="section-title">Регистрация</h1>
-      <p>Создайте аккаунт, затем подтвердите почту по ссылке из письма.</p>
-      <p>После регистрации вы увидите страницу подтверждения почты.</p>
+      {% if registration_closed %}
+        <div class="alert alert-info">
+          <p>{{ notice }}</p>
+        </div>
+        <div class="actions">
+          <a class="button button-primary" href="/login">Перейти ко входу</a>
+        </div>
+      {% else %}
+        <p>Создайте аккаунт, затем подтвердите почту по ссылке из письма.</p>
+        <p>После регистрации вы увидите страницу подтверждения почты.</p>
+      {% endif %}
     </div>
 
-    {% if notice %}
-      <div class="alert alert-info">{{ notice }}</div>
-    {% endif %}
-    {% if error %}
-      <div class="alert alert-error">{{ error }}</div>
+    {% if not registration_closed %}
+      {% if notice %}
+        <div class="alert alert-info">{{ notice }}</div>
+      {% endif %}
+      {% if error %}
+        <div class="alert alert-error">{{ error }}</div>
+      {% endif %}
     {% endif %}
 
-    <form class="form" method="post" action="/register">
-      <label class="form-row">
-        <span>Электронная почта</span>
-        <input class="input" type="email" name="email" value="{{ email or '' }}" autocomplete="email">
-      </label>
-      <label class="form-row">
-        <span>Логин</span>
-        <input class="input" type="text" name="login" value="{{ login or '' }}" autocomplete="username">
-      </label>
-      <label class="form-row">
-        <span>Пароль</span>
-        <input class="input" type="password" name="password" autocomplete="new-password">
-      </label>
-      <label class="form-row">
-        <span>Повтор пароля</span>
-        <input class="input" type="password" name="repeat_password" autocomplete="new-password">
-      </label>
-      <button class="button button-primary" type="submit">Создать аккаунт</button>
-    </form>
+    {% if not registration_closed %}
+      <form class="form" method="post" action="/register">
+        <label class="form-row">
+          <span>Электронная почта</span>
+          <input class="input" type="email" name="email" value="{{ email or '' }}" autocomplete="email">
+        </label>
+        <label class="form-row">
+          <span>Логин</span>
+          <input class="input" type="text" name="login" value="{{ login or '' }}" autocomplete="username">
+        </label>
+        <label class="form-row">
+          <span>Пароль</span>
+          <input class="input" type="password" name="password" autocomplete="new-password">
+        </label>
+        <label class="form-row">
+          <span>Повтор пароля</span>
+          <input class="input" type="password" name="repeat_password" autocomplete="new-password">
+        </label>
+        <button class="button button-primary" type="submit">Создать аккаунт</button>
+      </form>
+    {% endif %}
 
     <div class="stack">
       <p>Уже есть аккаунт?</p>
