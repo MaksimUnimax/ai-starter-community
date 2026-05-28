@@ -23,6 +23,7 @@ REQUIRED_HEADINGS = [
     "Какой отчёт принести в ChatGPT",
     "Типичные ошибки",
     "Критерии готово",
+    "Что делать если failed",
     "Переход к следующему уроку",
 ]
 
@@ -66,6 +67,8 @@ def test_lesson_has_practical_task_self_check_and_answer_reference():
     assert "CHATGPT_REPORT_BEGIN" in text
     assert "RESULT: SUCCESS" in text
     assert "## Готовый ответ" in text
+    assert "## Что делать если failed" in text
+    assert "перечитай" in text.lower()
     assert "../answers/01-kak-my-rabotaem.md" in text
 
 
