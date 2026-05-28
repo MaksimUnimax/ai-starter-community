@@ -1,0 +1,10 @@
+course_id: openscript-work-with-ai
+title: "Работа с ИИ"
+status: draft
+audience: "non-programmers"
+version: "0.1"
+language: "ru"
+source_tools:
+  - dair_lesson_generator
+  - codex
+lessons: []
