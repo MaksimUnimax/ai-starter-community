@@ -14,9 +14,34 @@
 
 ## Задание
 
+:::task
+title: Практическое задание
+input:
+```text
+Вставь сюда пример отчёта или входные данные для разбора.
+```
+questions:
+- Что нужно найти в примере?
+- Какие поля важнее всего?
+answer_ref: ../answers/01-kak-my-rabotaem.md
+:::
+
 ## Готовый ответ
 
 ## Самопроверка
+
+:::check
+question: Что показывает RESULT?
+answer: RESULT показывает итог run: SUCCESS, STOP или FAIL.
+:::
+
+:::checklist
+- [ ] Я нашёл RESULT
+- [ ] Я нашёл TASK_ID
+- [ ] Я нашёл files_changed
+- [ ] Я нашёл tests
+- [ ] Я нашёл commit
+:::
 
 ## Какой отчёт принести в ChatGPT
 

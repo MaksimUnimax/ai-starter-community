@@ -60,6 +60,11 @@ def test_lesson_has_practical_task_self_check_and_answer_reference():
     text = LESSON.read_text(encoding="utf-8")
     assert "## Практика по шагам" in text
     assert "## Самопроверка" in text
+    assert ":::task" in text
+    assert text.count(":::check") >= 5
+    assert ":::checklist" in text
+    assert "CHATGPT_REPORT_BEGIN" in text
+    assert "RESULT: SUCCESS" in text
     assert "## Готовый ответ" in text
     assert "../answers/01-kak-my-rabotaem.md" in text
 
@@ -74,3 +79,5 @@ def test_answer_has_pass_fail_checklist():
     text = ANSWER.read_text(encoding="utf-8")
     assert "# Pass/Fail Checklist" in text
     assert "# Ready Answer" in text
+    assert "| Поле |" in text
+    assert "CHATGPT_REPORT_BEGIN" in text

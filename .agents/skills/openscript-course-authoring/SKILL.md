@@ -34,6 +34,26 @@ Every real lesson must include:
 - acceptance criteria
 - next lesson bridge
 
+## Interactive lesson requirement
+
+Every real lesson must also include:
+
+- at least one worked example
+- at least one interactive mini-test block
+- at least one practical task with concrete input
+- at least one pass/fail checklist
+- at least one revealed-answer block
+- at least one "what to do if failed" block
+- no pure text-wall lessons
+
+Recommended block style:
+
+- `:::check` for a single question with a revealed answer
+- `:::task` for a practical task with input and answer reference
+- `:::checklist` for pass/fail criteria
+
+Use the blocks to make the lesson checkable without requiring the learner to invent prompts or guess the next step.
+
 ## Do not do
 
 - Do not create empty lessons.
@@ -43,6 +63,7 @@ Every real lesson must include:
 - Do not ask the user to invent prompts from scratch.
 - Do not ship tasks without ready answers.
 - Do not ship tasks without pass/fail criteria.
+- Do not ship lessons that are only prose without interactive checks.
 - Do not change app, runtime, or DB unless a future prompt explicitly allows it.
 - Do not call model/provider APIs unless a future prompt explicitly allows it.
 - Do not keep accepted course source only in runtime state.

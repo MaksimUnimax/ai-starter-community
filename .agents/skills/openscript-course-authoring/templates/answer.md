@@ -2,6 +2,8 @@
 
 # Ready Answer
 
+## Worked Example
+
 # Explanation
 
 # Pass/Fail Checklist

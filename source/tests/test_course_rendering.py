@@ -4,7 +4,7 @@ import re
 import sqlite3
 
 from app.auth.service import authenticate_user, create_session, register_user, verify_email
-from app.materials.course_loader import get_lesson, list_lessons, load_course
+from app.materials.course_loader import get_lesson, list_lessons, load_course, render_markdown
 
 
 def _connect(test_settings):
@@ -63,8 +63,60 @@ def test_list_lessons_returns_lesson_1():
 def test_get_lesson_finds_lesson_by_slug():
     lesson = get_lesson("kak-my-rabotaem-chatgpt-codex-user")
     assert lesson["title"] == "Как мы работаем: ChatGPT проектирует, Codex выполняет, пользователь проверяет"
-    assert "ChatGPT объясняет" in lesson["content"]
-    assert "Codex" in lesson["content"]
+    assert ":::task" in lesson["content"]
+    assert lesson["content"].count(":::check") >= 5
+    assert "CHATGPT_REPORT_BEGIN" in lesson["content"]
+
+
+def test_render_markdown_handles_interactive_blocks_and_escapes_html():
+    html = render_markdown(
+        """Before
+:::check
+question: Что показывает `RESULT`?
+answer: `RESULT` показывает итог run.
+:::
+After
+"""
+    )
+
+    assert "<details" in html
+    assert "Показать ответ" in html
+    assert "Что показывает <code>RESULT</code>?" in html
+    assert "RESULT" in html
+
+    task_html = render_markdown(
+        """:::task
+title: Найди поля в отчёте
+input:
+```text
+RESULT: SUCCESS
+```
+questions:
+- Где `RESULT`?
+- Какой `TASK_ID`?
+answer_ref: ../answers/01-kak-my-rabotaem.md
+:::
+"""
+    )
+    assert "lesson-task" in task_html
+    assert "Найди поля в отчёте" in task_html
+    assert "RESULT: SUCCESS" in task_html
+    assert "lesson-checklist" not in task_html
+
+    checklist_html = render_markdown(
+        """:::checklist
+- [ ] Я нашёл RESULT
+- [x] Я нашёл TASK_ID
+:::
+"""
+    )
+    assert "lesson-checklist" in checklist_html
+    assert 'type="checkbox"' in checklist_html
+    assert "checked" in checklist_html
+
+    safe_html = render_markdown("<script>alert(1)</script>")
+    assert "<script>" not in safe_html
+    assert "&lt;script&gt;alert(1)&lt;/script&gt;" in safe_html
 
 
 def test_materials_and_lesson_pages_render_course_content(client, test_settings):
@@ -83,8 +135,11 @@ def test_materials_and_lesson_pages_render_course_content(client, test_settings)
     lesson_response = client.get("/materials/lessons/kak-my-rabotaem-chatgpt-codex-user")
     assert lesson_response.status_code == 200
     assert "Как мы работаем: ChatGPT проектирует, Codex выполняет, пользователь проверяет" in lesson_response.text
-    assert "ChatGPT объясняет, что именно нужно сделать и зачем." in lesson_response.text
     assert "Какой отчёт принести в ChatGPT" in lesson_response.text
+    assert "lesson-check" in lesson_response.text
+    assert "lesson-task" in lesson_response.text
+    assert "lesson-checklist" in lesson_response.text
+    assert "Показать ответ" in lesson_response.text
     assert "Вернуться к материалам" in lesson_response.text
     assert "/materials" in lesson_response.text
 
