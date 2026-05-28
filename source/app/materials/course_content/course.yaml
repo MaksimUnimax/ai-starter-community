@@ -1,0 +1,17 @@
+course_id: work-with-ai
+title: "Работа с ИИ"
+status: draft
+audience: "Новички без опыта программирования"
+language: ru
+version: 0.1.0
+source_tools:
+  - openscript-course-authoring
+  - "DAIR lesson-generator style"
+lessons:
+  - id: lesson-01
+    order: 1
+    title: "Как мы работаем: ChatGPT проектирует, Codex выполняет, пользователь проверяет"
+    slug: kak-my-rabotaem-chatgpt-codex-user
+    status: draft
+    lesson_path: lessons/01-kak-my-rabotaem.md
+    answer_path: answers/01-kak-my-rabotaem.md

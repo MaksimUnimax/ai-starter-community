@@ -33,5 +33,5 @@ def test_skill_contract_terms():
     assert "checkable tasks" in text
 
 
-def test_skill_does_not_create_course_content_directory():
-    assert not COURSE_CONTENT_DIR.exists()
+def test_skill_does_not_include_generated_course_output_inside_skill_folder():
+    assert not (SKILL_ROOT / "course_content").exists()
