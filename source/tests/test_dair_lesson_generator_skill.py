@@ -21,19 +21,29 @@ def test_dair_skill_files_exist() -> None:
 
 def test_dair_skill_contains_required_concepts() -> None:
     text = _read(DAIR_SKILL)
-    assert text.startswith("# lesson-generator")
-    assert "create compact standalone lesson and mini-course artifacts" in text
-    assert "lesson navigation or table of contents" in text
+    assert text.startswith("---")
+    assert "name: lesson-generator" in text
+    assert "Build compact, standalone multi-lesson course artifacts" in text
+    assert "lesson navigation" in text
+    assert "objectives" in text
     assert "flashcards" in text
-    assert "quiz" in text
-    assert "`index.html`" in text
-    assert "`styles.css`" in text
-    assert "`script.js`" in text
+    assert "quizzes" in text
+    assert "index.html" in text
+    assert "styles.css" in text
+    assert "script.js" in text
+    assert any(token in text for token in ("smoke", "parse", "Start Learning", "feedback"))
 
 
 def test_dair_skill_does_not_instruct_read_upstream_as_working_path() -> None:
     text = _read(DAIR_SKILL).lower()
     assert "read upstream" not in text
+
+
+def test_dair_skill_is_not_old_summary_shape() -> None:
+    text = _read(DAIR_SKILL)
+    assert not text.startswith("# lesson-generator")
+    assert "Purpose:" not in text
+    assert "When to use:" not in text
 
 
 def test_course_authoring_skill_still_exists_and_was_not_modified() -> None:

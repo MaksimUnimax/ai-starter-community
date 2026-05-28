@@ -2,7 +2,7 @@
 
 This folder contains an active repo-scoped Codex skill.
 
-`SKILL.md` is an exact local copy of the DAIR lesson-generator skill from:
+`SKILL.md` is an exact local copy of the full raw DAIR lesson-generator skill from:
 
 - `/opt/openscript-site-docs/docs/codex_source/tools/dair_lesson_generator/SKILL.md`
 
