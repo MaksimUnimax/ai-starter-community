@@ -346,10 +346,14 @@ def test_route_flow_login_cabinet_logout_still_works(client, test_settings):
     assert cabinet_response.status_code == 200
     assert "route@example.com" in cabinet_response.text
     assert "routeuser" in cabinet_response.text
-    assert "Вы вошли как:" in cabinet_response.text
-    assert "Электронная почта:" in cabinet_response.text
-    assert "Статус аккаунта: активен" in cabinet_response.text
-    assert "Доступ к разделу «Работа с ИИ»: не активирован" in cabinet_response.text
+    assert "Логин: <strong>routeuser</strong>" in cabinet_response.text
+    assert "Email: route@example.com" in cabinet_response.text
+    assert "Работа с ИИ" in cabinet_response.text
+    assert "Здесь появятся курсы, уроки и материалы по работе с ИИ." in cabinet_response.text
+    assert "Сейчас раздел готовится." in cabinet_response.text
+    assert "Перейти к материалам" in cabinet_response.text
+    assert "Доступные тарифы" not in cabinet_response.text
+    assert "Оплата" not in cabinet_response.text
     assert "Выйти" in cabinet_response.text
 
     logout_response = client.post("/logout", follow_redirects=False)
@@ -492,8 +496,13 @@ def test_cabinet_shows_logout_button_and_access_text(client, test_settings):
     assert cabinet_response.status_code == 200
     assert "cabinetux@example.com" in cabinet_response.text
     assert "cabinetux" in cabinet_response.text
-    assert "Статус аккаунта: активен" in cabinet_response.text
-    assert "Доступ к разделу «Работа с ИИ»: не активирован" in cabinet_response.text
+    assert "Логин: <strong>cabinetux</strong>" in cabinet_response.text
+    assert "Email: cabinetux@example.com" in cabinet_response.text
+    assert "Здесь появятся курсы, уроки и материалы по работе с ИИ." in cabinet_response.text
+    assert "Сейчас раздел готовится." in cabinet_response.text
+    assert "Перейти к материалам" in cabinet_response.text
+    assert "Доступные тарифы" not in cabinet_response.text
+    assert "Оплата" not in cabinet_response.text
     assert "Выйти" in cabinet_response.text
     assert "/static/styles.css" in cabinet_response.text
     assert "Работа с ИИ" in cabinet_response.text

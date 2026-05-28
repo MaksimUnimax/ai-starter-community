@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from app.auth.service import register_user, verify_email
-from app.tariffs.service import seed_initial_catalog
 
 
 def _verify_registered_user(client, test_settings, email: str, login: str):
@@ -33,8 +32,7 @@ def _extract_token_from_db(test_settings, email: str):
     return match.group(1)
 
 
-def test_cabinet_displays_active_tariff_catalog_and_no_payment_action(client, test_settings):
-    seed_initial_catalog(settings=test_settings)
+def test_cabinet_displays_course_shell_without_tariffs_or_payment_noise(client, test_settings):
     _verify_registered_user(client, test_settings, "cabinet-catalog@example.com", "cabinetcatalog")
     token = _extract_token_from_db(test_settings, "cabinet-catalog@example.com")
     verify_email(token, settings=test_settings)
@@ -51,39 +49,20 @@ def test_cabinet_displays_active_tariff_catalog_and_no_payment_action(client, te
     assert "/static/styles.css" in cabinet_response.text
     assert "Личный кабинет" in cabinet_response.text
     assert "Аккаунт" in cabinet_response.text
-    assert "Вы вошли как:" in cabinet_response.text
-    assert "Электронная почта:" in cabinet_response.text
-    assert "Статус аккаунта: активен" in cabinet_response.text
-    assert "Доступ" in cabinet_response.text
-    assert "Доступ к разделу «Работа с ИИ»: не активирован" in cabinet_response.text
-    assert "Раздел «Работа с ИИ» будет доступен после оплаты." in cabinet_response.text
-    assert "Перейти к разделу Работа с ИИ" in cabinet_response.text
-    assert "Доступные тарифы" in cabinet_response.text
-    assert "Стартовый доступ" in cabinet_response.text
-    assert "4990 ₽" in cabinet_response.text
-    assert "AI / GPT-инструмент" in cabinet_response.text
-    assert "Описание" not in cabinet_response.text  # no raw schema labels beyond user copy
-    assert "ai_gpt_tool" not in cabinet_response.text
-    assert "starter_4990_rub" not in cabinet_response.text
-    assert "/admin" not in cabinet_response.text
-    assert "Оплата будет подключена позже." in cabinet_response.text
-    assert "Сейчас можно посмотреть тарифы и будущие материалы." in cabinet_response.text
-    assert "После подключения оплаты здесь появится информация о доступе и продлении опций." in cabinet_response.text
-    assert "Главная" in cabinet_response.text
+    assert "Логин: <strong>cabinetcatalog</strong>" in cabinet_response.text
+    assert "Email: cabinet-catalog@example.com" in cabinet_response.text
     assert "Личный кабинет" in cabinet_response.text
     assert "Работа с ИИ" in cabinet_response.text
-    assert "Вход / регистрация" not in cabinet_response.text
-    assert "Войти" not in cabinet_response.text
-    assert "Регистрация" not in cabinet_response.text
-    assert "Access" not in cabinet_response.text
-    assert "Status" not in cabinet_response.text
-    assert "Price" not in cabinet_response.text
-    assert "Currency" not in cabinet_response.text
-    assert "Included options" not in cabinet_response.text
-    assert "Logout" not in cabinet_response.text
-    assert "Payment" not in cabinet_response.text
-    assert "Code" not in cabinet_response.text
-    assert "Title" not in cabinet_response.text
-    assert "action=\"/checkout\"" not in cabinet_response.text
-    assert "checkout" not in cabinet_response.text.lower()
-    assert "pay now" not in cabinet_response.text.lower()
+    assert "Здесь появятся курсы, уроки и материалы по работе с ИИ." in cabinet_response.text
+    assert "Сейчас раздел готовится." in cabinet_response.text
+    assert "Перейти к материалам" in cabinet_response.text
+    assert "/materials" in cabinet_response.text
+    assert "Доступные тарифы" not in cabinet_response.text
+    assert "Оплата" not in cabinet_response.text
+    assert "Что дальше" not in cabinet_response.text
+    assert "Раздел «Работа с ИИ» будет доступен после оплаты." not in cabinet_response.text
+    assert "активирован" not in cabinet_response.text
+    assert "доступен по роли" not in cabinet_response.text
+    assert "Стартовый доступ" not in cabinet_response.text
+    assert "Оплата будет подключена позже." not in cabinet_response.text
+    assert "Последний платёж" not in cabinet_response.text

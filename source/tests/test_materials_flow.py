@@ -85,13 +85,19 @@ def test_materials_shows_locked_state_without_access(client, test_settings):
     response = client.get("/materials")
     assert response.status_code == 200
     assert "/static/styles.css" in response.text
-    assert "Главная" in response.text
     assert "Личный кабинет" in response.text
     assert "Работа с ИИ" in response.text
-    assert response.text.count('href="/cabinet"') == 2
-    assert "Раздел «Работа с ИИ» будет доступен после оплаты." in response.text
-    assert "После первой оплаты доступ к разделу останется навсегда." in response.text
+    assert "Раздел «Работа с ИИ» готовится." in response.text
+    assert "Здесь будут уроки, задания и материалы курса." in response.text
+    assert "Что будет внутри" in response.text
+    assert "Как это будет устроено" in response.text
+    assert "Вернуться в личный кабинет" in response.text
+    assert "/cabinet" in response.text
+    assert "Раздел «Работа с ИИ» будет доступен после оплаты." not in response.text
+    assert "После первой оплаты доступ к разделу останется навсегда." not in response.text
     assert "Быстрый старт" not in response.text
+    assert "Как работать с AI-агентом" not in response.text
+    assert "Команды для копирования" not in response.text
     assert "/admin" not in response.text
     assert "Payment" not in response.text
     assert "Locked" not in response.text
@@ -101,17 +107,15 @@ def test_materials_shows_placeholder_sections_when_access_granted(client, test_s
     _prepare_and_login_verified_user(client, test_settings, "materials-open@example.com", "materialsopen", grant_access=True)
     response = client.get("/materials")
     assert response.status_code == 200
-    assert "Раздел «Работа с ИИ» будет доступен после оплаты." not in response.text
-    assert "Быстрый старт" in response.text
-    assert "Как работать с AI-агентом" in response.text
-    assert "Команды для копирования" in response.text
-    assert "Частые ошибки" in response.text
-    assert "Видеоинструкции" in response.text
-    assert "Ссылки на чаты" in response.text
+    assert "Раздел «Работа с ИИ» готовится." in response.text
+    assert "Здесь будут уроки, задания и материалы курса." in response.text
+    assert "Что будет внутри" in response.text
+    assert "Как это будет устроено" in response.text
     assert "/static/styles.css" in response.text
-    assert "Главная" in response.text
     assert "Личный кабинет" in response.text
     assert "Работа с ИИ" in response.text
+    assert "Вернуться в личный кабинет" in response.text
+    assert "/cabinet" in response.text
     assert "/admin" not in response.text
     assert "Payment" not in response.text
     assert "Content" not in response.text
@@ -122,9 +126,13 @@ def test_cabinet_contains_materials_link_and_locked_hint(client, test_settings):
     response = client.get("/cabinet")
     assert response.status_code == 200
     assert "/materials" in response.text
-    assert "Перейти к разделу Работа с ИИ" in response.text
-    assert "Доступ к разделу «Работа с ИИ»: не активирован" in response.text
-    assert "Раздел «Работа с ИИ» будет доступен после оплаты." in response.text
+    assert "Перейти к материалам" in response.text
+    assert "Логин: <strong>materialscabinet</strong>" in response.text
+    assert "Email: materials-cabinet@example.com" in response.text
+    assert "Здесь появятся курсы, уроки и материалы по работе с ИИ." in response.text
+    assert "Сейчас раздел готовится." in response.text
+    assert "Доступ к разделу «Работа с ИИ»" not in response.text
+    assert "Раздел «Работа с ИИ» будет доступен после оплаты." not in response.text
 
 
 def test_staff_roles_can_open_materials_without_payment_marker(client, test_settings):
@@ -136,7 +144,9 @@ def test_staff_roles_can_open_materials_without_payment_marker(client, test_sett
         _prepare_and_login_verified_user(client, test_settings, email, login, role=role)
         response = client.get("/materials")
         assert response.status_code == 200
-        assert "Быстрый старт" in response.text
+        assert "Раздел «Работа с ИИ» готовится." in response.text
+        assert "Здесь будут уроки, задания и материалы курса." in response.text
+        assert "Быстрый старт" not in response.text
         assert "Раздел «Работа с ИИ» будет доступен после оплаты." not in response.text
 
 
@@ -144,19 +154,25 @@ def test_cabinet_access_labels_for_staff_and_paid_user(client, test_settings):
     _prepare_and_login_verified_user(client, test_settings, "cabinet-paid@example.com", "cabinetpaid", grant_access=True)
     paid_response = client.get("/cabinet")
     assert paid_response.status_code == 200
-    assert "Доступ к разделу «Работа с ИИ»: активирован" in paid_response.text
+    assert "Логин: <strong>cabinetpaid</strong>" in paid_response.text
+    assert "Email: cabinet-paid@example.com" in paid_response.text
+    assert "Перейти к материалам" in paid_response.text
 
     client.cookies.clear()
     _prepare_and_login_verified_user(client, test_settings, "cabinet-moderator@example.com", "cabinetmod", role="moderator")
     moderator_response = client.get("/cabinet")
     assert moderator_response.status_code == 200
-    assert "Доступ к разделу «Работа с ИИ»: доступен по роли" in moderator_response.text
+    assert "Логин: <strong>cabinetmod</strong>" in moderator_response.text
+    assert "Email: cabinet-moderator@example.com" in moderator_response.text
+    assert "Перейти к материалам" in moderator_response.text
 
     client.cookies.clear()
     _prepare_and_login_verified_user(client, test_settings, "cabinet-admin@example.com", "cabinetadm", role="admin")
     admin_response = client.get("/cabinet")
     assert admin_response.status_code == 200
-    assert "Доступ к разделу «Работа с ИИ»: доступен по роли" in admin_response.text
+    assert "Логин: <strong>cabinetadm</strong>" in admin_response.text
+    assert "Email: cabinet-admin@example.com" in admin_response.text
+    assert "Перейти к материалам" in admin_response.text
 
 
 def test_materials_redirects_unauthenticated_user_is_unchanged(client):

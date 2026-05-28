@@ -50,16 +50,20 @@ def _nav_block(body: str) -> str:
     return body[start:end]
 
 
-def test_anonymous_navigation_shows_only_home_and_auth_link(client):
-    response = client.get("/")
+def test_anonymous_navigation_shows_public_links_and_login(client):
+    response = client.get("/login")
     assert response.status_code == 200
-    assert "Главная" in response.text
-    assert "Вход / регистрация" in response.text
-    assert "Личный кабинет" not in response.text
-    assert "Работа с ИИ" not in response.text
-    assert "Админ-панель" not in response.text
-    assert "Войти" not in response.text
-    assert "Регистрация" not in response.text
+    nav = _nav_block(response.text)
+    assert "Что вы получите" in nav
+    assert "Первый проект" in nav
+    assert "Как проходит работа" in nav
+    assert "Цена" in nav
+    assert "Войти" in nav
+    assert "Начать первый проект" not in nav
+    assert "Личный кабинет" not in nav
+    assert "Работа с ИИ" not in nav
+    assert "Админ-панель" not in nav
+    assert "Регистрация" not in nav
 
 
 def test_login_and_register_pages_link_to_each_other(client):
@@ -79,7 +83,7 @@ def test_login_and_register_pages_link_to_each_other(client):
 def test_authenticated_user_navigation_order_and_labels(client, test_settings):
     _make_user(client, test_settings, "nav-user@example.com", "navuser", role="user")
 
-    landing = client.get("/")
+    landing = client.get("/login")
     cabinet = client.get("/cabinet")
 
     assert landing.status_code == 200
@@ -87,23 +91,22 @@ def test_authenticated_user_navigation_order_and_labels(client, test_settings):
 
     for body in (landing.text, cabinet.text):
         nav = _nav_block(body)
-        assert "Вход / регистрация" not in nav
         assert "Войти" not in nav
+        assert "Начать первый проект" not in nav
         assert "Регистрация" not in nav
         assert "Админ-панель" not in nav
-        assert "Главная" in nav
         assert "Работа с ИИ" in nav
         assert "Личный кабинет" in nav
         assert "Выйти" in nav
 
     cabinet_nav = _nav_block(cabinet.text)
-    assert cabinet_nav.index("Главная") < cabinet_nav.index("Работа с ИИ") < cabinet_nav.index("Личный кабинет") < cabinet_nav.index("Выйти")
+    assert cabinet_nav.index("Работа с ИИ") < cabinet_nav.index("Личный кабинет") < cabinet_nav.index("Выйти")
 
 
 def test_authenticated_moderator_navigation_has_no_admin_panel(client, test_settings):
     _make_user(client, test_settings, "nav-moderator@example.com", "navmoderator", role="moderator")
 
-    landing = client.get("/")
+    landing = client.get("/login")
     cabinet = client.get("/cabinet")
 
     assert landing.status_code == 200
@@ -111,9 +114,8 @@ def test_authenticated_moderator_navigation_has_no_admin_panel(client, test_sett
 
     for body in (landing.text, cabinet.text):
         nav = _nav_block(body)
-        assert "Вход / регистрация" not in nav
+        assert "Войти" not in nav
         assert "Админ-панель" not in nav
-        assert "Главная" in nav
         assert "Работа с ИИ" in nav
         assert "Личный кабинет" in nav
         assert "Выйти" in nav
@@ -122,7 +124,7 @@ def test_authenticated_moderator_navigation_has_no_admin_panel(client, test_sett
 def test_authenticated_admin_navigation_includes_admin_panel(client, test_settings):
     _make_user(client, test_settings, "nav-admin@example.com", "navadmin", role="admin")
 
-    landing = client.get("/")
+    landing = client.get("/login")
     cabinet = client.get("/cabinet")
 
     assert landing.status_code == 200
@@ -130,14 +132,13 @@ def test_authenticated_admin_navigation_includes_admin_panel(client, test_settin
 
     for body in (landing.text, cabinet.text):
         nav = _nav_block(body)
-        assert "Вход / регистрация" not in nav
         assert "Войти" not in nav
+        assert "Начать первый проект" not in nav
         assert "Регистрация" not in nav
-        assert "Главная" in nav
         assert "Работа с ИИ" in nav
         assert "Личный кабинет" in nav
         assert "Админ-панель" in nav
         assert "Выйти" in nav
 
     cabinet_nav = _nav_block(cabinet.text)
-    assert cabinet_nav.index("Главная") < cabinet_nav.index("Работа с ИИ") < cabinet_nav.index("Личный кабинет") < cabinet_nav.index("Админ-панель") < cabinet_nav.index("Выйти")
+    assert cabinet_nav.index("Работа с ИИ") < cabinet_nav.index("Личный кабинет") < cabinet_nav.index("Админ-панель") < cabinet_nav.index("Выйти")

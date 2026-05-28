@@ -5,54 +5,24 @@
     <div class="stack">
       <p class="muted">Раздел «Работа с ИИ»</p>
       <h1 class="section-title">Работа с ИИ</h1>
-      {% if has_materials_access %}
-        <p>Доступ открыт. Это пока заглушка структуры будущего раздела.</p>
-      {% else %}
-        <div class="alert alert-info">
-          <p>Раздел «Работа с ИИ» будет доступен после оплаты.</p>
-          <p class="muted">После первой оплаты доступ к разделу останется навсегда.</p>
-        </div>
-      {% endif %}
+      <p>Раздел «Работа с ИИ» готовится.</p>
+      <p class="form-help">Здесь будут уроки, задания и материалы курса.</p>
     </div>
 
-    {% if has_materials_access %}
-      <div class="card-grid tight">
-        <section class="card stack">
-          <h2 class="section-title">Быстрый старт</h2>
-          <p class="muted">Содержание появится позже.</p>
-        </section>
-        <section class="card stack">
-          <h2 class="section-title">Как работать с AI-агентом</h2>
-          <p class="muted">Содержание появится позже.</p>
-        </section>
-        <section class="card stack">
-          <h2 class="section-title">Команды для копирования</h2>
-          <p class="muted">Содержание появится позже.</p>
-        </section>
-        <section class="card stack">
-          <h2 class="section-title">Частые ошибки</h2>
-          <p class="muted">Содержание появится позже.</p>
-        </section>
-        <section class="card stack">
-          <h2 class="section-title">Видеоинструкции</h2>
-          <p class="muted">Содержание появится позже.</p>
-        </section>
-        <section class="card stack">
-          <h2 class="section-title">Ссылки на чаты</h2>
-          <p class="muted">Содержание появится позже.</p>
-        </section>
-      </div>
-    {% else %}
-      <div class="actions">
-        <a class="button button-primary" href="/cabinet">Вернуться в личный кабинет</a>
-      </div>
-    {% endif %}
+    <div class="card-grid tight">
+      <section class="card stack">
+        <h2 class="section-title">Что будет внутри</h2>
+        <p class="muted">Пока это каркас будущего курса.</p>
+      </section>
+      <section class="card stack">
+        <h2 class="section-title">Как это будет устроено</h2>
+        <p class="muted">Сюда позже добавим уроки, практику и материалы.</p>
+      </section>
+    </div>
 
     <div class="actions">
+      <a class="button button-primary" href="/cabinet">Вернуться в личный кабинет</a>
       <a class="button button-secondary" href="/">На главную</a>
-      {% if has_materials_access %}
-        <a class="button button-secondary" href="/cabinet">Личный кабинет</a>
-      {% endif %}
     </div>
   </section>
 {% endblock %}

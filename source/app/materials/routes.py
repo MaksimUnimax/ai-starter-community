@@ -11,8 +11,6 @@ from jinja2 import ChoiceLoader, FileSystemLoader
 
 from app.auth.service import get_current_user_from_cookies
 from app.core.config import get_settings
-from app.materials.service import user_has_materials_access
-
 router = APIRouter()
 templates = Jinja2Templates(directory=str(Path(__file__).resolve().parent / "templates"))
 templates.env.loader = ChoiceLoader(
@@ -39,15 +37,12 @@ def materials_page(request: Request):
     user = get_current_user_from_cookies(request.cookies, settings=settings)
     if user is None:
         return RedirectResponse(url="/login", status_code=303)
-
-    has_access = user_has_materials_access(user)
     return _template(
         request,
         "materials.html",
         title="Работа с ИИ",
         user_email=user.email,
         user_login=user.login,
-        has_materials_access=has_access,
     )
 
 

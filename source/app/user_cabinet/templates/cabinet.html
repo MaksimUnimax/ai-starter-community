@@ -6,9 +6,8 @@
       <p class="muted">Личный кабинет</p>
       <h1 class="section-title">Личный кабинет</h1>
       <h2 class="section-title">Аккаунт</h2>
-      <p>Вы вошли как: <strong>{{ user_login }}</strong></p>
-      <p>Электронная почта: {{ user_email }}</p>
-      <p>Статус аккаунта: {{ account_status_label }}</p>
+      <p>Логин: <strong>{{ user_login }}</strong></p>
+      <p>Email: {{ user_email }}</p>
     </div>
     <form method="post" action="/logout">
       <button class="button button-secondary" type="submit">Выйти</button>
@@ -16,57 +15,11 @@
   </section>
 
   <section class="card stack">
-    <h2 class="section-title">Доступ</h2>
-    <p>Доступ к разделу «Работа с ИИ»: {{ materials_access_label }}</p>
-    <p class="form-help">{{ materials_access_hint }}</p>
-    <a class="button button-primary" href="/materials">Перейти к разделу Работа с ИИ</a>
-  </section>
-
-  {% if tariffs %}
-    <section class="stack">
-      <h2 class="section-title">Доступные тарифы</h2>
-      <div class="card-grid tight">
-        {% for tariff in tariffs %}
-          <article class="card stack">
-            <h3 class="section-title">{{ tariff.title }}</h3>
-            {% if tariff.description %}
-              <p>{{ tariff.description }}</p>
-            {% endif %}
-            <p><strong>Цена:</strong> {{ tariff.price_amount_minor // 100 }} ₽</p>
-            {% if tariff.options %}
-              <div class="stack">
-                <h4 class="section-title">Включённые опции</h4>
-                <ul>
-                  {% for option in tariff.options %}
-                    <li>
-                      <strong>{{ option.title }}</strong>
-                      {% if option.description %}
-                        <span> — {{ option.description }}</span>
-                      {% endif %}
-                    </li>
-                  {% endfor %}
-                </ul>
-              </div>
-            {% endif %}
-          </article>
-        {% endfor %}
-      </div>
-    </section>
-  {% else %}
-    <section class="card stack">
-      <h2 class="section-title">Доступные тарифы</h2>
-      <p>Каталог появится здесь, когда тарифы будут добавлены.</p>
-    </section>
-  {% endif %}
-
-  <section class="card stack">
-    <h2 class="section-title">Оплата</h2>
-    <p>Оплата будет подключена позже.</p>
-    <p>Сейчас можно посмотреть тарифы и будущие материалы.</p>
-  </section>
-
-  <section class="card stack">
-    <h2 class="section-title">Что дальше</h2>
-    <p>После подключения оплаты здесь появится информация о доступе и продлении опций.</p>
+    <h2 class="section-title">Работа с ИИ</h2>
+    <p>Здесь появятся курсы, уроки и материалы по работе с ИИ.</p>
+    <p class="form-help">Сейчас раздел готовится.</p>
+    <div class="actions">
+      <a class="button button-primary" href="/materials">Перейти к материалам</a>
+    </div>
   </section>
 {% endblock %}
