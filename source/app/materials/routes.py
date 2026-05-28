@@ -4,13 +4,21 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from jinja2 import ChoiceLoader, FileSystemLoader
 
 from app.auth.service import get_current_user_from_cookies
 from app.core.config import get_settings
+from app.materials.course_loader import (
+    get_lesson,
+    list_lessons,
+    load_course,
+    render_markdown,
+    LessonNotFoundError,
+)
+
 router = APIRouter()
 templates = Jinja2Templates(directory=str(Path(__file__).resolve().parent / "templates"))
 templates.env.loader = ChoiceLoader(
@@ -37,10 +45,14 @@ def materials_page(request: Request):
     user = get_current_user_from_cookies(request.cookies, settings=settings)
     if user is None:
         return RedirectResponse(url="/login", status_code=303)
+    course = load_course()
     return _template(
         request,
         "materials.html",
         title="Работа с ИИ",
+        course_title=course["title"],
+        course_audience=course["audience"],
+        lessons=list_lessons(),
         user_email=user.email,
         user_login=user.login,
     )
@@ -53,3 +65,28 @@ def materials_head(request: Request):
     if user is None:
         return RedirectResponse(url="/login", status_code=303)
     return materials_page(request)
+
+
+@router.get("/materials/lessons/{slug}", response_class=HTMLResponse)
+def lesson_page(request: Request, slug: str):
+    settings = get_settings()
+    user = get_current_user_from_cookies(request.cookies, settings=settings)
+    if user is None:
+        return RedirectResponse(url="/login", status_code=303)
+    try:
+        lesson = get_lesson(slug)
+    except LessonNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    return _template(
+        request,
+        "lesson.html",
+        title=lesson["title"],
+        course_title=load_course()["title"],
+        lesson=lesson,
+        lesson_html=render_markdown(lesson["content"]),
+    )
+
+
+@router.head("/materials/lessons/{slug}")
+def lesson_head(request: Request, slug: str):
+    return lesson_page(request, slug)

@@ -1,24 +1,46 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <section class="card stack">
-    <div class="stack">
-      <p class="muted">Раздел «Работа с ИИ»</p>
-      <h1 class="section-title">Работа с ИИ</h1>
-      <p>Раздел «Работа с ИИ» готовится.</p>
-      <p class="form-help">Здесь будут уроки, задания и материалы курса.</p>
+  <section class="stack">
+    <div class="card stack">
+      <div class="stack">
+        <p class="muted">Раздел «Работа с ИИ»</p>
+        <h1 class="section-title">{{ course_title }}</h1>
+        <p>Курс для новичков без опыта программирования.</p>
+        <p class="form-help">Сначала мы разбираем схему работы, потом переходим к практическим урокам.</p>
+      </div>
+
+      <div class="card-grid tight">
+        <section class="card stack">
+          <h2 class="section-title">Для кого курс</h2>
+          <p class="muted">{{ course_audience }}</p>
+        </section>
+        <section class="card stack">
+          <h2 class="section-title">Как устроен старт</h2>
+          <p class="muted">Уроки идут по одному, с готовыми ответами и проверкой результата.</p>
+        </section>
+      </div>
     </div>
 
-    <div class="card-grid tight">
-      <section class="card stack">
-        <h2 class="section-title">Что будет внутри</h2>
-        <p class="muted">Пока это каркас будущего курса.</p>
-      </section>
-      <section class="card stack">
-        <h2 class="section-title">Как это будет устроено</h2>
-        <p class="muted">Сюда позже добавим уроки, практику и материалы.</p>
-      </section>
-    </div>
+    <section class="stack">
+      <div class="card stack">
+        <h2 class="section-title">Уроки курса</h2>
+        <p class="form-help">Сейчас доступен первый реальный урок. Дальше список будет расти.</p>
+      </div>
+
+      <div class="card-grid">
+        {% for lesson in lessons %}
+          <article class="card stack">
+            <p class="muted">Урок {{ lesson.order }}</p>
+            <h3 class="section-title">{{ lesson.title }}</h3>
+            <p class="form-help">Статус: {{ lesson.status }}</p>
+            <div class="actions">
+              <a class="button button-primary" href="/materials/lessons/{{ lesson.slug }}">Открыть урок</a>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    </section>
 
     <div class="actions">
       <a class="button button-primary" href="/cabinet">Вернуться в личный кабинет</a>

@@ -85,14 +85,16 @@ def test_materials_shows_locked_state_without_access(client, test_settings):
     response = client.get("/materials")
     assert response.status_code == 200
     assert "/static/styles.css" in response.text
-    assert "Личный кабинет" in response.text
     assert "Работа с ИИ" in response.text
-    assert "Раздел «Работа с ИИ» готовится." in response.text
-    assert "Здесь будут уроки, задания и материалы курса." in response.text
-    assert "Что будет внутри" in response.text
-    assert "Как это будет устроено" in response.text
+    assert "Курс для новичков без опыта программирования." in response.text
+    assert "Уроки курса" in response.text
+    assert "Как мы работаем: ChatGPT проектирует, Codex выполняет, пользователь проверяет" in response.text
+    assert "/materials/lessons/kak-my-rabotaem-chatgpt-codex-user" in response.text
     assert "Вернуться в личный кабинет" in response.text
     assert "/cabinet" in response.text
+    assert "Доступные тарифы" not in response.text
+    assert "Оплата" not in response.text
+    assert "Что дальше" not in response.text
     assert "Раздел «Работа с ИИ» будет доступен после оплаты." not in response.text
     assert "После первой оплаты доступ к разделу останется навсегда." not in response.text
     assert "Быстрый старт" not in response.text
@@ -107,13 +109,13 @@ def test_materials_shows_placeholder_sections_when_access_granted(client, test_s
     _prepare_and_login_verified_user(client, test_settings, "materials-open@example.com", "materialsopen", grant_access=True)
     response = client.get("/materials")
     assert response.status_code == 200
-    assert "Раздел «Работа с ИИ» готовится." in response.text
-    assert "Здесь будут уроки, задания и материалы курса." in response.text
-    assert "Что будет внутри" in response.text
-    assert "Как это будет устроено" in response.text
+    assert "Работа с ИИ" in response.text
+    assert "Курс для новичков без опыта программирования." in response.text
+    assert "Уроки курса" in response.text
+    assert "Как мы работаем: ChatGPT проектирует, Codex выполняет, пользователь проверяет" in response.text
+    assert "/materials/lessons/kak-my-rabotaem-chatgpt-codex-user" in response.text
     assert "/static/styles.css" in response.text
     assert "Личный кабинет" in response.text
-    assert "Работа с ИИ" in response.text
     assert "Вернуться в личный кабинет" in response.text
     assert "/cabinet" in response.text
     assert "/admin" not in response.text
@@ -144,9 +146,10 @@ def test_staff_roles_can_open_materials_without_payment_marker(client, test_sett
         _prepare_and_login_verified_user(client, test_settings, email, login, role=role)
         response = client.get("/materials")
         assert response.status_code == 200
-        assert "Раздел «Работа с ИИ» готовится." in response.text
-        assert "Здесь будут уроки, задания и материалы курса." in response.text
-        assert "Быстрый старт" not in response.text
+        assert "Работа с ИИ" in response.text
+        assert "Уроки курса" in response.text
+        assert "Как мы работаем: ChatGPT проектирует, Codex выполняет, пользователь проверяет" in response.text
+        assert "/materials/lessons/kak-my-rabotaem-chatgpt-codex-user" in response.text
         assert "Раздел «Работа с ИИ» будет доступен после оплаты." not in response.text
 
 

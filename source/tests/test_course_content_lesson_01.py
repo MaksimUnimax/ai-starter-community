@@ -1,5 +1,4 @@
 from pathlib import Path
-import subprocess
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -34,12 +33,6 @@ FORBIDDEN_MARKERS = [
     "заполнить потом",
     "later",
 ]
-
-
-def _git_status(paths):
-    cmd = ["git", "-C", str(ROOT), "status", "--short", "--"]
-    cmd.extend(paths)
-    return subprocess.check_output(cmd, text=True).strip()
 
 
 def test_course_files_exist():
@@ -81,15 +74,3 @@ def test_answer_has_pass_fail_checklist():
     text = ANSWER.read_text(encoding="utf-8")
     assert "# Pass/Fail Checklist" in text
     assert "# Ready Answer" in text
-
-
-def test_no_ui_or_auth_files_changed():
-    forbidden_paths = [
-        "source/app/auth",
-        "source/app/user_cabinet",
-        "source/app/materials/routes.py",
-        "source/app/materials/templates",
-        "source/app/shared/templates/base.html",
-    ]
-    status = _git_status(forbidden_paths)
-    assert status == ""

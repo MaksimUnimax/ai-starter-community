@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="stack">
+    <div class="card stack">
+      <div class="stack">
+        <p class="muted">Раздел «Работа с ИИ»</p>
+        <a href="/materials">← К списку уроков</a>
+        <h1 class="section-title">{{ lesson.title }}</h1>
+        <p class="form-help">Урок {{ lesson.order }} из курса «{{ course_title }}»</p>
+      </div>
+    </div>
+
+    <article class="card stack lesson-content">
+      {{ lesson_html | safe }}
+    </article>
+
+    <div class="actions">
+      <a class="button button-primary" href="/materials">Вернуться к материалам</a>
+      <a class="button button-secondary" href="/cabinet">В кабинет</a>
+    </div>
+  </section>
+{% endblock %}
