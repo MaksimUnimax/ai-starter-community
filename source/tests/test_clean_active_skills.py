@@ -21,7 +21,6 @@ ACTIVE_SKILLS = {
     "anthropic-frontend-design": {"markers": (), "min_lines": 20},
     "taste-skill": {"markers": (), "min_lines": 20},
     "microsoft-frontend-design-review": {"markers": (), "min_lines": 20},
-    "vercel-web-design-guidelines": {"markers": (), "min_lines": 20},
     "ilm-alan-frontend-design": {"markers": (), "min_lines": 20},
     "mblode-agent-skills": {"markers": (), "min_lines": 20},
 }
@@ -29,6 +28,7 @@ ACTIVE_SKILLS = {
 BANNED_SKILLS = (
     "openscript-course-authoring",
     "openscript-lesson-ui-opendesign",
+    "vercel-web-design-guidelines",
 )
 
 BANNED_TESTS = (
