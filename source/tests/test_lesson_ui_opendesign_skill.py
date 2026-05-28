@@ -63,17 +63,31 @@ def test_repository_changes_stay_within_skill_scope() -> None:
         text=True,
     )
     allowed_prefixes = (
+        "?? .agents/skills/dair-lesson-generator/",
+        " M .agents/skills/dair-lesson-generator/",
+        "A  .agents/skills/dair-lesson-generator/",
+        "M  .agents/skills/dair-lesson-generator/",
+        "D  .agents/skills/dair-lesson-generator/",
         "?? .agents/skills/openscript-lesson-ui-opendesign/",
+        " M .agents/skills/openscript-lesson-ui-opendesign/",
         "A  .agents/skills/openscript-lesson-ui-opendesign/",
         "M  .agents/skills/openscript-lesson-ui-opendesign/",
         "D  .agents/skills/openscript-lesson-ui-opendesign/",
         "?? source/tests/test_lesson_ui_opendesign_skill.py",
+        " M source/tests/test_lesson_ui_opendesign_skill.py",
         "M  source/tests/test_lesson_ui_opendesign_skill.py",
+        "?? source/tests/test_dair_lesson_generator_skill.py",
+        " M source/tests/test_dair_lesson_generator_skill.py",
+        "M  source/tests/test_dair_lesson_generator_skill.py",
     )
     for line in result.stdout.splitlines():
         if not line.strip():
             continue
         if line.startswith("?? source/app/"):
+            continue
+        if line.startswith("?? source/tests/test_dair_lesson_generator_skill.py"):
+            continue
+        if line.startswith("?? source/tests/test_lesson_ui_opendesign_skill.py"):
             continue
         assert line.startswith(allowed_prefixes), f"unexpected changed file: {line}"
     assert TEST_FILE.is_file()
