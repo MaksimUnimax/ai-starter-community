@@ -157,6 +157,16 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Работа с ИИ" in page_response.text
     assert "Как разрабатывать с помощью ChatGPT и Codex" in page_response.text
     assert "Тестовая версия курса" in page_response.text
+    assert "Проектная работа с ИИ: роль пользователя, ChatGPT и Codex" in page_response.text
+    assert "Вы не пишете код вручную, но управляете задачей, проверкой и принятием результата." in page_response.text
+    assert "Сделай мне ИИ-агента" in page_response.text
+    assert "Пользователь — заказчик и владелец результата" in page_response.text
+    assert "ChatGPT — ведущий программист" in page_response.text
+    assert "Codex — исполнитель на сервере" in page_response.text
+    assert "Практика: опишите своего первого ИИ-агента" in page_response.text
+    assert "Типичные ошибки" in page_response.text
+    assert "Главный вывод урока" in page_response.text
+    assert "Пользователь ставит цель → ChatGPT проектирует технический шаг → Codex выполняет задачу на сервере → Codex возвращает отчёт → ChatGPT проверяет отчёт → пользователь смотрит результат и принимает решение." in page_response.text
     assert "Карта курса" in page_response.text
     assert "Как теперь можно делать проекты без знания кода" in page_response.text
     assert "Кто что делает: пользователь, ChatGPT и Codex" in page_response.text
@@ -206,7 +216,16 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "quiz" in script_response.text
     assert "checkpoint-list" in script_response.text
     assert "Как разрабатывать с помощью ChatGPT и Codex" in script_response.text
-    assert "Как теперь можно делать проекты без знания кода" in script_response.text
+    assert "Проектная работа с ИИ: роль пользователя, ChatGPT и Codex" in script_response.text
+    assert "Вы не пишете код вручную, но управляете задачей, проверкой и принятием результата." in script_response.text
+    assert "Сделай мне ИИ-агента" in script_response.text
+    assert "Пользователь — заказчик и владелец результата" in script_response.text
+    assert "ChatGPT — ведущий программист" in script_response.text
+    assert "Codex — исполнитель на сервере" in script_response.text
+    assert "Практика: опишите своего первого ИИ-агента" in script_response.text
+    assert "Типичные ошибки" in script_response.text
+    assert "Главный вывод урока" in script_response.text
+    assert "Пользователь ставит цель → ChatGPT проектирует технический шаг → Codex выполняет задачу на сервере → Codex возвращает отчёт → ChatGPT проверяет отчёт → пользователь смотрит результат и принимает решение." in script_response.text
     assert "Git простыми словами" in script_response.text
     assert "Как дать Codex право отправлять проект в GitHub" in script_response.text
     assert "deploy key" in script_response.text

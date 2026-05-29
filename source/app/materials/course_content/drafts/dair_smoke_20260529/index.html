@@ -154,7 +154,269 @@
         </article>
 
         <article class="panel lesson-shell">
-          <div id="active-section" aria-live="polite"></div>
+          <div id="active-section" aria-live="polite">
+            <article class="section-card lesson-one">
+              <header class="section-header">
+                <p class="eyebrow">Урок 1</p>
+                <h3>Проектная работа с ИИ: роль пользователя, ChatGPT и Codex</h3>
+                <p class="muted">Вы не пишете код вручную, но управляете задачей, проверкой и принятием результата.</p>
+                <p class="muted">
+                  В этом уроке мы разбираем первую и самую важную мысль курса: для работы над проектом не обязательно писать код вручную, но нужно понимать, как организована работа.
+                </p>
+              </header>
+
+              <div class="section-body">
+                <section class="callout">
+                  <span class="block-label">Вступление</span>
+                  <p>Если пользователь просто говорит “сделай мне ИИ-агента”, этого недостаточно. Не ясно, для чего агент нужен, где он будет работать, что ему разрешено, что запрещено и как проверить результат.</p>
+                  <p>Правильная работа начинается не с кода, а с постановки задачи: что нужно получить, какие есть ограничения, кто проверяет результат и какой отчёт должен вернуть исполнитель.</p>
+                </section>
+
+                <section class="info-grid">
+                  <div>
+                    <span class="block-label">После урока вы сможете</span>
+                    <ul>
+                      <li>объяснить свою роль в разработке с ИИ;</li>
+                      <li>отличить роль ChatGPT от роли Codex;</li>
+                      <li>сформулировать первую безопасную задачу для работы над ИИ-агентом;</li>
+                      <li>понять, почему результат проверяется по фактам, а не по обещанию “готово”;</li>
+                      <li>подготовить основу для следующего шага разработки.</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <span class="block-label">В работе участвуют три роли</span>
+                    <div class="summary-grid" style="margin-top: 12px;">
+                      <div>
+                        <span class="summary-label">Пользователь</span>
+                        <strong>Пользователь — заказчик и владелец результата</strong>
+                        <p class="muted">Он формулирует цель, объясняет, какой результат нужен, проверяет готовую работу и принимает решение: подходит или нужно исправлять.</p>
+                      </div>
+                      <div>
+                        <span class="summary-label">ChatGPT</span>
+                        <strong>ChatGPT — ведущий программист, архитектор и технический руководитель</strong>
+                        <p class="muted">Он разбирает задачу, выбирает подход, инструменты и языки, планирует архитектуру, делит работу на безопасные шаги, пишет точные задания для Codex, контролирует отчёты и проверяет ход работы.</p>
+                      </div>
+                      <div>
+                        <span class="summary-label">Codex</span>
+                        <strong>Codex — исполнитель на сервере</strong>
+                        <p class="muted">Он работает на сервере в нужном репозитории, читает файлы проекта, вносит изменения, запускает проверки, делает commit/push, если это входит в задачу, и возвращает отчёт.</p>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <section class="callout">
+                  <span class="block-label">Схема процесса</span>
+                  <p>Пользователь ставит цель → ChatGPT проектирует технический шаг → Codex выполняет задачу на сервере → Codex возвращает отчёт → ChatGPT проверяет отчёт → пользователь смотрит результат и принимает решение.</p>
+                  <ol>
+                    <li>Пользователь ставит цель.</li>
+                    <li>ChatGPT проектирует технический шаг.</li>
+                    <li>Codex выполняет задачу на сервере.</li>
+                    <li>Codex возвращает отчёт.</li>
+                    <li>ChatGPT проверяет отчёт.</li>
+                    <li>Пользователь смотрит результат и принимает решение.</li>
+                  </ol>
+                </section>
+
+                <section class="callout">
+                  <span class="block-label">Почему это важно</span>
+                  <p>Работа без ручного написания кода не означает работу без контроля. Пользователь может не знать, как устроены файлы и команды, но он должен понимать, что именно нужно сделать и как будет проверяться результат.</p>
+                </section>
+
+                <section class="info-grid">
+                  <div>
+                    <span class="block-label">Плохая постановка задачи</span>
+                    <p class="muted">“Сделай мне ИИ-агента.”</p>
+                    <ul>
+                      <li>не понятно, для чего агент нужен;</li>
+                      <li>не понятно, кто будет им пользоваться;</li>
+                      <li>не понятно, где он должен работать;</li>
+                      <li>не понятно, что агент должен уметь;</li>
+                      <li>не понятно, какие данные ему можно использовать;</li>
+                      <li>не понятно, что агенту запрещено делать;</li>
+                      <li>не понятно, как проверить, что агент работает правильно.</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <span class="block-label">Профессиональная постановка задачи</span>
+                    <p>Нужно спроектировать первого ИИ-агента для работы с задачами пользователя.</p>
+                    <p>Агент должен помогать пользователю разбирать задачу, задавать уточняющие вопросы, предлагать следующий безопасный шаг и формировать задание для Codex.</p>
+                    <p>На первом этапе агент не должен сам менять файлы, запускать команды или принимать решения за пользователя.</p>
+                    <strong>Нужно описать</strong>
+                    <ul>
+                      <li>цель агента;</li>
+                      <li>сценарии использования;</li>
+                      <li>что агент получает на вход;</li>
+                      <li>что агент возвращает на выход;</li>
+                      <li>какие действия агенту запрещены;</li>
+                      <li>как пользователь проверяет результат;</li>
+                      <li>какие данные нужны для следующего шага разработки.</li>
+                    </ul>
+                    <p>Результат должен быть не кодом сразу, а понятным техническим описанием агента, по которому потом можно будет дать Codex отдельную задачу на реализацию.</p>
+                  </div>
+                </section>
+
+                <section class="callout">
+                  <span class="block-label">Разбор примера</span>
+                  <div class="summary-grid" style="margin-top: 12px;">
+                    <div><span class="summary-label">Цель</span><strong>агент помогает пользователю вести проект.</strong></div>
+                    <div><span class="summary-label">Роль агента</span><strong>разбирать задачу и готовить следующий безопасный шаг.</strong></div>
+                    <div><span class="summary-label">Ограничение</span><strong>агент пока ничего не меняет сам.</strong></div>
+                    <div><span class="summary-label">Результат</span><strong>техническое описание, а не сразу код.</strong></div>
+                    <div><span class="summary-label">Проверка</span><strong>пользователь может понять, что агент делает, чего не делает и зачем нужен.</strong></div>
+                  </div>
+                </section>
+
+                <section class="callout">
+                  <span class="block-label">Практика: опишите своего первого ИИ-агента</span>
+                  <p>Ответьте на шесть вопросов:</p>
+                  <ol>
+                    <li>Для чего нужен агент?</li>
+                    <li>Какую одну главную задачу он должен помогать решать?</li>
+                    <li>Что пользователь будет давать агенту на вход?</li>
+                    <li>Что агент должен возвращать на выход?</li>
+                    <li>Какие действия агенту запрещены?</li>
+                    <li>Как понять, что агент сработал правильно?</li>
+                  </ol>
+                </section>
+
+                <section class="callout">
+                  <span class="block-label">Пример ответа</span>
+                  <p>Мне нужен ИИ-агент, который помогает начинать новую задачу по проекту.</p>
+                  <p>Пользователь пишет агенту, что хочет изменить или добавить.</p>
+                  <p>Агент должен:</p>
+                  <ul>
+                    <li>кратко пересказать задачу;</li>
+                    <li>найти, чего не хватает;</li>
+                    <li>задать уточняющие вопросы;</li>
+                    <li>предложить один следующий безопасный шаг;</li>
+                    <li>подготовить черновик задания для ChatGPT или Codex.</li>
+                  </ul>
+                  <p>Агенту запрещено: самому менять файлы; запускать команды; придумывать факты о проекте; читать секреты; делать несколько задач сразу. Результат считается правильным, если пользователь получил понятный следующий шаг и понимает, что делать дальше.</p>
+                </section>
+
+                <section class="callout">
+                  <span class="block-label">Типичные ошибки</span>
+                  <ol>
+                    <li>Просить “сделай агента” без описания задачи.</li>
+                    <li>Давать агенту слишком много полномочий сразу.</li>
+                    <li>Не указывать, что агенту запрещено.</li>
+                    <li>Не определять, как пользователь проверит результат.</li>
+                    <li>Просить Codex сразу писать код, когда сначала нужно техническое описание.</li>
+                  </ol>
+                </section>
+
+                <section class="callout">
+                  <span class="block-label">Проверьте себя</span>
+                  <ul>
+                    <li>Я могу объяснить, зачем нужен мой агент.</li>
+                    <li>Я могу назвать одну главную задачу агента.</li>
+                    <li>Я понимаю, что агент получает на вход.</li>
+                    <li>Я понимаю, что агент должен вернуть на выход.</li>
+                    <li>Я указал, что агенту запрещено.</li>
+                    <li>Я понимаю, как проверить результат.</li>
+                  </ul>
+                </section>
+
+                <section class="module-grid">
+                  <div class="section-kicker">Карточки</div>
+                  <div class="flashcard-grid">
+                    <button class="flashcard is-flipped" type="button" aria-label="Перевернуть карточку">
+                      <span class="flashcard-inner">
+                        <span class="flashcard-face flashcard-front">
+                          <strong>Что делает пользователь?</strong>
+                          <span>Нажми, чтобы увидеть ответ</span>
+                        </span>
+                        <span class="flashcard-face flashcard-back">
+                          <strong>Формулирует цель, проверяет результат и принимает решение.</strong>
+                          <span class="flashcard-note">Карточка перевёрнута в тестовой версии урока.</span>
+                        </span>
+                      </span>
+                    </button>
+                    <button class="flashcard is-flipped" type="button" aria-label="Перевернуть карточку">
+                      <span class="flashcard-inner">
+                        <span class="flashcard-face flashcard-front">
+                          <strong>Что делает ChatGPT?</strong>
+                          <span>Нажми, чтобы увидеть ответ</span>
+                        </span>
+                        <span class="flashcard-face flashcard-back">
+                          <strong>Ведёт техническую работу: проектирует шаг, выбирает подход, готовит задание и проверяет отчёт.</strong>
+                          <span class="flashcard-note">Карточка перевёрнута в тестовой версии урока.</span>
+                        </span>
+                      </span>
+                    </button>
+                    <button class="flashcard is-flipped" type="button" aria-label="Перевернуть карточку">
+                      <span class="flashcard-inner">
+                        <span class="flashcard-face flashcard-front">
+                          <strong>Что делает Codex?</strong>
+                          <span>Нажми, чтобы увидеть ответ</span>
+                        </span>
+                        <span class="flashcard-face flashcard-back">
+                          <strong>Выполняет задачу на сервере в нужном репозитории и возвращает отчёт.</strong>
+                          <span class="flashcard-note">Карточка перевёрнута в тестовой версии урока.</span>
+                        </span>
+                      </span>
+                    </button>
+                    <button class="flashcard is-flipped" type="button" aria-label="Перевернуть карточку">
+                      <span class="flashcard-inner">
+                        <span class="flashcard-face flashcard-front">
+                          <strong>Почему фраза “Сделай мне ИИ-агента” плохая?</strong>
+                          <span>Нажми, чтобы увидеть ответ</span>
+                        </span>
+                        <span class="flashcard-face flashcard-back">
+                          <strong>В ней нет цели, ограничений, входных данных, результата и проверки.</strong>
+                          <span class="flashcard-note">Карточка перевёрнута в тестовой версии урока.</span>
+                        </span>
+                      </span>
+                    </button>
+                  </div>
+                </section>
+
+                <section class="module-grid">
+                  <div class="section-kicker">Проверка знаний</div>
+                  <div class="quiz-list">
+                    <div class="quiz-card">
+                      <strong>Что не так с задачей “Сделай мне ИИ-агента”?</strong>
+                      <div class="quiz-options">
+                        <button class="quiz-option is-correct" type="button">Она слишком короткая и не задаёт цель, ограничения и проверку.</button>
+                        <button class="quiz-option" type="button">Она идеально подходит для Codex.</button>
+                        <button class="quiz-option" type="button">В ней уже есть все нужные требования.</button>
+                      </div>
+                    </div>
+                    <div class="quiz-card">
+                      <strong>Кто проектирует технический шаг и контролирует ход работы?</strong>
+                      <div class="quiz-options">
+                        <button class="quiz-option is-correct" type="button">ChatGPT как ведущий программист и архитектор.</button>
+                        <button class="quiz-option" type="button">Codex сам выбирает всю архитектуру проекта.</button>
+                        <button class="quiz-option" type="button">Пользователь вручную пишет код.</button>
+                      </div>
+                    </div>
+                    <div class="quiz-card">
+                      <strong>Где работает Codex?</strong>
+                      <div class="quiz-options">
+                        <button class="quiz-option is-correct" type="button">На сервере в нужном репозитории проекта.</button>
+                        <button class="quiz-option" type="button">Только в браузере пользователя.</button>
+                        <button class="quiz-option" type="button">В документах без доступа к проекту.</button>
+                      </div>
+                    </div>
+                    <div class="quiz-card">
+                      <strong>Что должен вернуть первый этап по ИИ-агенту?</strong>
+                      <div class="quiz-options">
+                        <button class="quiz-option" type="button">Сразу большой готовый продукт без проверки.</button>
+                        <button class="quiz-option is-correct" type="button">Понятное техническое описание агента и следующий безопасный шаг.</button>
+                        <button class="quiz-option" type="button">Секретные ключи и пароли.</button>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <section class="callout">
+                  <span class="block-label">Главный вывод урока</span>
+                  <p>Пользователь не пишет код вручную, но управляет целью и принимает результат. ChatGPT ведёт техническую работу как ведущий программист. Codex выполняет конкретную задачу на сервере и возвращает отчёт. Хорошая работа начинается с понятной постановки задачи, а не с просьбы “сделай всё”.</p>
+                </section>
+              </div>
+            </article>
+          </div>
         </article>
       </section>
     </main>

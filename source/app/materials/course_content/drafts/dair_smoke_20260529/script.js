@@ -6,49 +6,243 @@ const courseData = {
     {
       id: "lesson-1",
       navLabel: "Урок 1",
-      navMeta: "Без знания кода",
+      navMeta: "Роли и первый шаг",
       eyebrow: "Урок 1",
-      title: "Как теперь можно делать проекты без знания кода",
+      title: "Проектная работа с ИИ: роль пользователя, ChatGPT и Codex",
+      subtitle:
+        "Вы не пишете код вручную, но управляете задачей, проверкой и принятием результата.",
       description:
-        "Пользователь не пишет код вручную, но понимает процесс, задаёт цель и проверяет результат вместе с ChatGPT и Codex.",
-      objectives: [
-        "Понять, где пользователь участвует в процессе.",
-        "Увидеть, что код вручную писать не обязательно.",
-        "Понять, как выглядит безопасный первый шаг."
+        "В этом уроке мы разбираем первую и самую важную мысль курса: для работы над проектом не обязательно писать код вручную, но нужно понимать, как организована работа.",
+      intro: [
+        "Если пользователь просто говорит “сделай мне ИИ-агента”, этого недостаточно. Не ясно, для чего агент нужен, где он будет работать, что ему разрешено, что запрещено и как проверить результат.",
+        "Правильная работа начинается не с кода, а с постановки задачи: что нужно получить, какие есть ограничения, кто проверяет результат и какой отчёт должен вернуть исполнитель."
       ],
-      keyConcepts: [
-        "Процесс важнее ручного кода",
-        "Проверка результата",
-        "Пользователь как участник работы"
+      learningOutcomeTitle: "После урока вы сможете",
+      learningOutcome: [
+        "объяснить свою роль в разработке с ИИ;",
+        "отличить роль ChatGPT от роли Codex;",
+        "сформулировать первую безопасную задачу для работы над ИИ-агентом;",
+        "понять, почему результат проверяется по фактам, а не по обещанию “готово”;",
+        "подготовить основу для следующего шага разработки."
       ],
-      practicalTask:
-        "Объясни, почему можно делать проект без ручного написания кода, но нельзя без понимания процесса.",
-      expectedAnswer:
-        "Пользователь понимает цель, читает подсказки ChatGPT, даёт контекст Codex и проверяет результат.",
-      flashcards: [
+      roleTitle: "В работе участвуют три роли",
+      roles: [
         {
-          front: "Можно ли обойтись без ручного кода?",
-          back: "Да, если пользователь понимает процесс и проверяет результат."
+          name: "Пользователь",
+          label: "Пользователь — заказчик и владелец результата",
+          lead: "заказчик и владелец результата",
+          description:
+            "Он формулирует цель, объясняет, какой результат нужен, проверяет готовую работу и принимает решение: подходит или нужно исправлять."
         },
         {
-          front: "Что остаётся обязательным?",
-          back: "Понимание шагов, контекста и результата."
+          name: "ChatGPT",
+          label: "ChatGPT — ведущий программист, архитектор и технический руководитель",
+          lead: "ведущий программист, архитектор и технический руководитель",
+          description:
+            "Он разбирает задачу, выбирает подход, инструменты и языки, планирует архитектуру, делит работу на безопасные шаги, пишет точные задания для Codex, контролирует отчёты и проверяет ход работы."
+        },
+        {
+          name: "Codex",
+          label: "Codex — исполнитель на сервере",
+          lead: "исполнитель на сервере",
+          description:
+            "Он работает на сервере в нужном репозитории, читает файлы проекта, вносит изменения, запускает проверки, делает commit/push, если это входит в задачу, и возвращает отчёт."
+        }
+      ],
+      processTitle: "Схема процесса",
+      processScheme:
+        "Пользователь ставит цель → ChatGPT проектирует технический шаг → Codex выполняет задачу на сервере → Codex возвращает отчёт → ChatGPT проверяет отчёт → пользователь смотрит результат и принимает решение.",
+      processSteps: [
+        "Пользователь ставит цель",
+        "ChatGPT проектирует технический шаг",
+        "Codex выполняет задачу на сервере",
+        "Codex возвращает отчёт",
+        "ChatGPT проверяет отчёт",
+        "Пользователь смотрит результат и принимает решение"
+      ],
+      importantExplanationTitle: "Почему это важно",
+      importantExplanation:
+        "Работа без ручного написания кода не означает работу без контроля. Пользователь может не знать, как устроены файлы и команды, но он должен понимать, что именно нужно сделать и как будет проверяться результат.",
+      badExampleTitle: "Плохая постановка задачи",
+      badExampleQuote: "Сделай мне ИИ-агента.",
+      badExampleReasons: [
+        "не понятно, для чего агент нужен;",
+        "не понятно, кто будет им пользоваться;",
+        "не понятно, где он должен работать;",
+        "не понятно, что агент должен уметь;",
+        "не понятно, какие данные ему можно использовать;",
+        "не понятно, что агенту запрещено делать;",
+        "не понятно, как проверить, что агент работает правильно."
+      ],
+      goodExampleTitle: "Профессиональная постановка задачи",
+      goodExampleIntro:
+        "Нужно спроектировать первого ИИ-агента для работы с задачами пользователя.",
+      goodExampleText:
+        "Агент должен помогать пользователю разбирать задачу, задавать уточняющие вопросы, предлагать следующий безопасный шаг и формировать задание для Codex.",
+      goodExampleLimit:
+        "На первом этапе агент не должен сам менять файлы, запускать команды или принимать решения за пользователя.",
+      goodExampleQuestionsTitle: "Нужно описать",
+      goodExampleQuestions: [
+        "цель агента;",
+        "сценарии использования;",
+        "что агент получает на вход;",
+        "что агент возвращает на выход;",
+        "какие действия агенту запрещены;",
+        "как пользователь проверяет результат;",
+        "какие данные нужны для следующего шага разработки."
+      ],
+      goodExampleResult:
+        "Результат должен быть не кодом сразу, а понятным техническим описанием агента, по которому потом можно будет дать Codex отдельную задачу на реализацию.",
+      exampleBreakdownTitle: "Разбор примера",
+      exampleBreakdown: [
+        {
+          label: "Цель",
+          text: "агент помогает пользователю вести проект."
+        },
+        {
+          label: "Роль агента",
+          text: "разбирать задачу и готовить следующий безопасный шаг."
+        },
+        {
+          label: "Ограничение",
+          text: "агент пока ничего не меняет сам."
+        },
+        {
+          label: "Результат",
+          text: "техническое описание, а не сразу код."
+        },
+        {
+          label: "Проверка",
+          text: "пользователь может понять, что агент делает, чего не делает и зачем нужен."
+        }
+      ],
+      practiceTitle: "Практика: опишите своего первого ИИ-агента",
+      practiceIntro: "Ответьте на шесть вопросов:",
+      practiceQuestions: [
+        "Для чего нужен агент?",
+        "Какую одну главную задачу он должен помогать решать?",
+        "Что пользователь будет давать агенту на вход?",
+        "Что агент должен возвращать на выход?",
+        "Какие действия агенту запрещены?",
+        "Как понять, что агент сработал правильно?"
+      ],
+      exampleAnswerTitle: "Пример ответа",
+      exampleAnswerParagraphs: [
+        "Мне нужен ИИ-агент, который помогает начинать новую задачу по проекту.",
+        "Пользователь пишет агенту, что хочет изменить или добавить.",
+        "Агент должен:"
+      ],
+      exampleAnswerBullets: [
+        "кратко пересказать задачу;",
+        "найти, чего не хватает;",
+        "задать уточняющие вопросы;",
+        "предложить один следующий безопасный шаг;",
+        "подготовить черновик задания для ChatGPT или Codex."
+      ],
+      exampleAnswerFooter:
+        "Агенту запрещено: самому менять файлы; запускать команды; придумывать факты о проекте; читать секреты; делать несколько задач сразу. Результат считается правильным, если пользователь получил понятный следующий шаг и понимает, что делать дальше.",
+      commonMistakesTitle: "Типичные ошибки",
+      commonMistakes: [
+        "Просить “сделай агента” без описания задачи.",
+        "Давать агенту слишком много полномочий сразу.",
+        "Не указывать, что агенту запрещено.",
+        "Не определять, как пользователь проверит результат.",
+        "Просить Codex сразу писать код, когда сначала нужно техническое описание."
+      ],
+      selfCheckTitle: "Проверьте себя",
+      selfCheck: [
+        "Я могу объяснить, зачем нужен мой агент.",
+        "Я могу назвать одну главную задачу агента.",
+        "Я понимаю, что агент получает на вход.",
+        "Я понимаю, что агент должен вернуть на выход.",
+        "Я указал, что агенту запрещено.",
+        "Я понимаю, как проверить результат."
+      ],
+      flashcards: [
+        {
+          front: "Что делает пользователь?",
+          back: "Формулирует цель, проверяет результат и принимает решение."
+        },
+        {
+          front: "Что делает ChatGPT?",
+          back: "Ведёт техническую работу: проектирует шаг, выбирает подход, готовит задание и проверяет отчёт."
+        },
+        {
+          front: "Что делает Codex?",
+          back: "Выполняет задачу на сервере в нужном репозитории и возвращает отчёт."
+        },
+        {
+          front: "Почему фраза “Сделай мне ИИ-агента” плохая?",
+          back: "В ней нет цели, ограничений, входных данных, результата и проверки."
         }
       ],
       quiz: {
-        prompt: "Что важно в проекте без знания кода?",
+        prompt: "Что не так с задачей “Сделай мне ИИ-агента”?",
         options: [
-          "Можно ничего не понимать, если есть ChatGPT.",
-          "Пользователь понимает процесс и проверяет результат.",
-          "Код всегда пишется вручную."
+          "Она слишком короткая и не задаёт цель, ограничения и проверку.",
+          "Она идеально подходит для Codex.",
+          "В ней уже есть все нужные требования."
         ],
-        answerIndex: 1,
+        answerIndex: 0,
         explanation:
-          "Без ручного кода всё равно нужен человек, который понимает шаги и проверяет результат."
+          "Без цели, ограничений и проверки такую задачу нельзя безопасно передать в работу."
       },
+      reviewQuiz: [
+        {
+          prompt: "Кто проектирует технический шаг и контролирует ход работы?",
+          options: [
+            "ChatGPT как ведущий программист и архитектор.",
+            "Codex сам выбирает всю архитектуру проекта.",
+            "Пользователь вручную пишет код."
+          ],
+          answerIndex: 0,
+          explanation:
+            "ChatGPT ведёт техническую работу как архитектор и технический руководитель."
+        },
+        {
+          prompt: "Где работает Codex?",
+          options: [
+            "На сервере в нужном репозитории проекта.",
+            "Только в браузере пользователя.",
+            "В документах без доступа к проекту."
+          ],
+          answerIndex: 0,
+          explanation:
+            "Codex выполняет задачи именно на сервере в конкретном репозитории."
+        },
+        {
+          prompt: "Что должен вернуть первый этап по ИИ-агенту?",
+          options: [
+            "Сразу большой готовый продукт без проверки.",
+            "Понятное техническое описание агента и следующий безопасный шаг.",
+            "Секретные ключи и пароли."
+          ],
+          answerIndex: 1,
+          explanation:
+            "Сначала нужен понятный проектный результат, по которому можно дать Codex точную задачу."
+        }
+      ],
+      finalTakeawayTitle: "Главный вывод урока",
+      finalTakeaway:
+        "Пользователь не пишет код вручную, но управляет целью и принимает результат. ChatGPT ведёт техническую работу как ведущий программист. Codex выполняет конкретную задачу на сервере и возвращает отчёт. Хорошая работа начинается с понятной постановки задачи, а не с просьбы “сделай всё”.",
+      objectives: [
+        "Понять, как задавать работу с ИИ-агентом.",
+        "Отличить роль пользователя, ChatGPT и Codex.",
+        "Понять, почему нужен контроль и проверка."
+      ],
+      keyConcepts: [
+        "Постановка задачи",
+        "Роли в проекте",
+        "Безопасный шаг",
+        "Отчёт и проверка"
+      ],
+      practicalTask:
+        "Опишите своего первого ИИ-агента по шести вопросам из урока.",
+      expectedAnswer:
+        "Профессиональный ответ описывает цель, вход, выход, ограничения, проверку и следующий шаг, а не просит “сделать агента” без деталей.",
       reviewNotes: [
-        "Не путай отсутствие ручного кода с отсутствием контроля.",
-        "Понимание процесса остаётся обязательным."
+        "В начале важнее постановка задачи, чем код.",
+        "Пользователь отвечает за цель и проверку результата."
       ]
     },
     {
@@ -658,7 +852,151 @@ function renderReviewChecklist() {
   `;
 }
 
+function renderLessonOne(section) {
+  const flashcards = renderFlashcards(section);
+  const quiz = renderQuiz(section, section.reviewQuiz ? [section.quiz, ...section.reviewQuiz] : [section.quiz]);
+  const processScheme = section.processScheme || section.processSteps.join(" → ");
+
+  return `
+    <article class="section-card lesson-one">
+      <header class="section-header">
+        <p class="eyebrow">${escapeHTML(section.eyebrow)}</p>
+        <h3>${escapeHTML(section.title)}</h3>
+        <p class="muted">${escapeHTML(section.subtitle)}</p>
+        <p class="muted">${escapeHTML(section.description)}</p>
+      </header>
+
+      <div class="section-body">
+        <section class="callout">
+          <span class="block-label">Вступление</span>
+          ${section.intro.map((paragraph) => `<p>${escapeHTML(paragraph)}</p>`).join("")}
+        </section>
+
+        <section class="info-grid">
+          <div>
+            <span class="block-label">${escapeHTML(section.learningOutcomeTitle)}</span>
+            <ul>
+              ${section.learningOutcome.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}
+            </ul>
+          </div>
+
+          <div>
+            <span class="block-label">${escapeHTML(section.roleTitle)}</span>
+            <div class="summary-grid" style="margin-top: 12px;">
+              ${section.roles
+              .map(
+                (role) => `
+                    <div>
+                      <span class="summary-label">${escapeHTML(role.name)}</span>
+                      <strong>${escapeHTML(role.label || `${role.name} — ${role.lead}`)}</strong>
+                      <p class="muted">${escapeHTML(role.description)}</p>
+                    </div>
+                  `
+                )
+                .join("")}
+            </div>
+          </div>
+        </section>
+
+        <section class="callout">
+          <span class="block-label">${escapeHTML(section.processTitle)}</span>
+          <p>${escapeHTML(processScheme)}</p>
+          <ol>
+            ${section.processSteps.map((step) => `<li>${escapeHTML(step)}</li>`).join("")}
+          </ol>
+        </section>
+
+        <section class="callout">
+          <span class="block-label">${escapeHTML(section.importantExplanationTitle)}</span>
+          <p>${escapeHTML(section.importantExplanation)}</p>
+        </section>
+
+        <section class="info-grid">
+          <div>
+            <span class="block-label">${escapeHTML(section.badExampleTitle)}</span>
+            <p class="muted">“${escapeHTML(section.badExampleQuote)}”</p>
+            <ul>
+              ${section.badExampleReasons.map((reason) => `<li>${escapeHTML(reason)}</li>`).join("")}
+            </ul>
+          </div>
+
+          <div>
+            <span class="block-label">${escapeHTML(section.goodExampleTitle)}</span>
+            <p>${escapeHTML(section.goodExampleIntro)}</p>
+            <p>${escapeHTML(section.goodExampleText)}</p>
+            <p>${escapeHTML(section.goodExampleLimit)}</p>
+            <strong>${escapeHTML(section.goodExampleQuestionsTitle)}</strong>
+            <ul>
+              ${section.goodExampleQuestions.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}
+            </ul>
+            <p>${escapeHTML(section.goodExampleResult)}</p>
+          </div>
+        </section>
+
+        <section class="callout">
+          <span class="block-label">${escapeHTML(section.exampleBreakdownTitle)}</span>
+          <div class="summary-grid" style="margin-top: 12px;">
+            ${section.exampleBreakdown
+              .map(
+                (item) => `
+                  <div>
+                    <span class="summary-label">${escapeHTML(item.label)}</span>
+                    <strong>${escapeHTML(item.text)}</strong>
+                  </div>
+                `
+              )
+              .join("")}
+          </div>
+        </section>
+
+        <section class="callout">
+          <span class="block-label">${escapeHTML(section.practiceTitle)}</span>
+          <p>${escapeHTML(section.practiceIntro)}</p>
+          <ol>
+            ${section.practiceQuestions.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}
+          </ol>
+        </section>
+
+        <section class="callout">
+          <span class="block-label">${escapeHTML(section.exampleAnswerTitle)}</span>
+          ${section.exampleAnswerParagraphs.map((paragraph) => `<p>${escapeHTML(paragraph)}</p>`).join("")}
+          <ul>
+            ${section.exampleAnswerBullets.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}
+          </ul>
+          <p>${escapeHTML(section.exampleAnswerFooter)}</p>
+        </section>
+
+        <section class="callout">
+          <span class="block-label">${escapeHTML(section.commonMistakesTitle)}</span>
+          <ol>
+            ${section.commonMistakes.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}
+          </ol>
+        </section>
+
+        <section class="callout">
+          <span class="block-label">${escapeHTML(section.selfCheckTitle)}</span>
+          <ul>
+            ${section.selfCheck.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}
+          </ul>
+        </section>
+
+        ${flashcards}
+        ${quiz}
+
+        <section class="callout">
+          <span class="block-label">${escapeHTML(section.finalTakeawayTitle)}</span>
+          <p>${escapeHTML(section.finalTakeaway)}</p>
+        </section>
+      </div>
+    </article>
+  `;
+}
+
 function renderSectionContent(section) {
+  if (section.id === "lesson-1") {
+    return renderLessonOne(section);
+  }
+
   const flashcards = renderFlashcards(section);
   const quiz = renderQuiz(section, section.reviewQuiz ? [section.quiz, ...section.reviewQuiz] : [section.quiz]);
   const review = section.id === "review" ? renderReviewChecklist() : "";
