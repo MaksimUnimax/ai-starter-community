@@ -1196,6 +1196,24 @@ const progressLabel = document.getElementById("progress-label");
 const startLearningButton = document.getElementById("start-learning");
 const openReviewButton = document.getElementById("open-review");
 
+function isValidSectionId(sectionId) {
+  return courseData.sections.some((section) => section.id === sectionId);
+}
+
+function getLessonIdFromUrl() {
+  return new URLSearchParams(window.location.search).get("lesson");
+}
+
+function syncLessonQueryParam(sectionId) {
+  if (!window.history || typeof window.history.replaceState !== "function") {
+    return;
+  }
+
+  const url = new URL(window.location.href);
+  url.searchParams.set("lesson", sectionId);
+  window.history.replaceState({}, "", url.toString());
+}
+
 function escapeHTML(value) {
   return String(value)
     .replaceAll("&", "&amp;")
@@ -1601,9 +1619,15 @@ function renderActiveSection() {
   updateProgress();
 }
 
-function setActiveSection(sectionId) {
-  state.activeSectionId = sectionId;
-  state.visitedSections.add(sectionId);
+function setActiveSection(sectionId, options = {}) {
+  const resolvedSectionId = isValidSectionId(sectionId) ? sectionId : "lesson-1";
+  const shouldUpdateUrl = options.updateUrl !== false;
+
+  state.activeSectionId = resolvedSectionId;
+  state.visitedSections.add(resolvedSectionId);
+  if (shouldUpdateUrl) {
+    syncLessonQueryParam(resolvedSectionId);
+  }
   renderActiveSection();
 }
 
@@ -1653,4 +1677,7 @@ document.addEventListener("click", (event) => {
 });
 
 renderNavigation();
-renderActiveSection();
+const initialLessonId = getLessonIdFromUrl();
+setActiveSection(isValidSectionId(initialLessonId) ? initialLessonId : "lesson-1", {
+  updateUrl: false,
+});

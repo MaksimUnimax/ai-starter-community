@@ -345,6 +345,12 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "const courseData" in script_response.text
     assert "lesson-nav" in script_response.text
     assert "flashcards" in script_response.text
+    assert "getLessonIdFromUrl" in script_response.text
+    assert "syncLessonQueryParam" in script_response.text
+    assert "new URLSearchParams(window.location.search).get(\"lesson\")" in script_response.text
+    assert "window.history.replaceState" in script_response.text
+    assert "location.hash" not in script_response.text
+    assert "scrollIntoView" not in script_response.text
     assert "labelTranslations" in script_response.text
     assert "translateLessonMarkup" in script_response.text
     assert "Проверка знаний" in script_response.text
@@ -353,6 +359,7 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert 'state.answeredQuestions[quizKey(section.id, index)] !== undefined' in script_response.text
     assert "renderStructuredLesson" in script_response.text
     assert 'section.nextStepTargetId || "lesson-2"' in script_response.text
+    assert 'id: "review"' in script_response.text
     assert "Пользователь — это человек" in script_response.text
     assert "ChatGPT — это ИИ-помощник" in script_response.text
     assert "Codex — это ИИ-агент для программной разработки" in script_response.text
