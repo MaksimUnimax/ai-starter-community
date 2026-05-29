@@ -284,7 +284,7 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert ".course-intro-part" in styles_response.text
     assert ".course-intro .section-heading" in styles_response.text
     assert "text-align: center;" in styles_response.text
-    assert "line-height: 1.38;" in styles_response.text
+    assert "line-height: 1.34;" in styles_response.text
     assert ".definition-stack" in styles_response.text
     assert ".definition-card" in styles_response.text
     assert ".process-flow" in styles_response.text

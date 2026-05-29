@@ -1,11 +1,11 @@
 :root {
   color-scheme: light;
-  --bg: #fbf7ef;
-  --surface: #fffdf8;
-  --surface-strong: #fff9f0;
+  --bg: #e9ddca;
+  --surface: #f5ecde;
+  --surface-strong: #efe1cf;
   --text: #231f1a;
   --muted: #766f66;
-  --border: #e8ded0;
+  --border: #d8c5ae;
   --primary: #2d2924;
   --accent: #c2410c;
   --accent-soft: #fef2e5;
@@ -31,9 +31,9 @@ body {
   margin: 0;
   min-height: 100vh;
   background:
-    radial-gradient(circle at top left, rgba(194, 65, 12, 0.08), transparent 28%),
-    radial-gradient(circle at top right, rgba(21, 128, 61, 0.06), transparent 26%),
-    linear-gradient(180deg, #fefcf7 0%, var(--bg) 100%);
+    radial-gradient(circle at top left, rgba(194, 65, 12, 0.1), transparent 28%),
+    radial-gradient(circle at top right, rgba(21, 128, 61, 0.07), transparent 26%),
+    linear-gradient(180deg, #f2e5d4 0%, var(--bg) 100%);
   color: var(--text);
   font-family: "Avenir Next", "Segoe UI", "Trebuchet MS", system-ui, sans-serif;
   line-height: 1.55;
@@ -73,6 +73,7 @@ a {
 .course-head h1 {
   margin-top: 0;
   max-width: 24ch;
+  color: var(--accent);
 }
 
 .course-headline {
@@ -80,6 +81,7 @@ a {
   font-size: 1.08rem;
   font-weight: 700;
   max-width: 60ch;
+  color: var(--accent);
 }
 
 .course-note {
@@ -99,6 +101,7 @@ a {
   padding: 22px 32px;
   display: grid;
   gap: 12px;
+  background: linear-gradient(180deg, #efe0cc 0%, #e8d7c0 100%);
 }
 
 .course-intro-body {
@@ -110,9 +113,9 @@ a {
   display: grid;
   gap: 6px;
   padding: 12px 16px;
-  border: 1px solid var(--border);
+  border: 1px solid #cdb79c;
   border-radius: 12px;
-  background: #fff;
+  background: #efe3d2;
 }
 
 .course-intro-part + .course-intro-part {
@@ -125,13 +128,16 @@ a {
   font-size: 1.04rem;
   line-height: 1.15;
   text-align: center;
+  color: var(--accent);
 }
 
 .course-intro-part p {
   margin: 0;
-  max-width: 78ch;
+  max-width: 92ch;
+  margin-left: auto;
+  margin-right: auto;
   text-align: center;
-  line-height: 1.38;
+  line-height: 1.34;
 }
 
 .course-intro-part p + p {
@@ -141,6 +147,10 @@ a {
 .course-intro .section-heading {
   margin-bottom: 8px;
   text-align: center;
+}
+
+.course-intro .section-heading h2 {
+  color: var(--accent);
 }
 
 .hero {
