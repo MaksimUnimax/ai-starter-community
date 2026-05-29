@@ -292,6 +292,11 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert ".course-intro .section-heading" in styles_response.text
     assert "text-align: center;" in styles_response.text
     assert "line-height: 1.45;" in styles_response.text
+    assert ".course-note {" in styles_response.text
+    assert "color: var(--accent-strong);" in styles_response.text
+    assert "@media (max-width: 680px)" in styles_response.text
+    assert ".hero-bg-mobile {\n    display: none;" in styles_response.text
+    assert ".hero-bg-desktop {\n    display: none;" in styles_response.text
     assert ".definition-stack" in styles_response.text
     assert ".definition-card" in styles_response.text
     assert ".process-flow" in styles_response.text

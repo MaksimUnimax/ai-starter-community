@@ -167,7 +167,7 @@ a:hover {
 .course-note {
   margin: 16px auto 0;
   max-width: 720px;
-  color: var(--muted);
+  color: var(--accent-strong);
   font-size: 1.05rem;
 }
 
@@ -984,7 +984,7 @@ button:hover,
   }
 
   .hero-bg-mobile {
-    display: block;
+    display: none;
   }
 
   .hero-bg-visual img {
