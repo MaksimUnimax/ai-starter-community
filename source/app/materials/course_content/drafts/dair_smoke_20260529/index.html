@@ -48,7 +48,7 @@
           <span id="progress-label">Пока ничего не проверено.</span>
         </div>
       </div>
-      <p class="muted">Прогресс зависит только от проверки урока: quiz и практика.</p>
+      <p class="muted">Прогресс зависит только от проверки знаний.</p>
     </section>
 
     <article class="panel lesson-shell">
@@ -66,39 +66,54 @@
               <div class="section-body">
                 <section class="callout">
                   <span class="block-label">Вступление</span>
-                  <p>Если пользователь просто говорит “Сделай мне сайт”, этого недостаточно. Не ясно, для кого страница нужна, какая у неё цель, какие блоки должны быть на ней и как проверить результат.</p>
-                  <p>Правильная работа начинается не с кода, а с постановки задачи: что нужно получить, какие есть ограничения, кто проверяет результат и какой отчёт должен вернуть исполнитель.</p>
+                  <p>В этом курсе мы разбираем принцип работы над проектами через связку ChatGPT и Codex. Пользователь не пишет код вручную, но управляет целью, проверкой и принятием результата.</p>
+                  <p>Работа устроена так: пользователь объясняет, какой результат ему нужен, ChatGPT помогает превратить задачу в понятный технический план, а Codex выполняет конкретную задачу на сервере в проекте. После этого Codex возвращает отчёт, ChatGPT помогает его проверить, а пользователь смотрит готовый результат и принимает решение.</p>
+                  <p>Главный принцип: ИИ не заменяет управление проектом. Он помогает выполнять техническую работу, но цель, смысл и приёмка результата остаются за пользователем.</p>
                 </section>
 
-                <section class="info-grid">
-                  <div>
-                    <span class="block-label">После урока вы сможете</span>
-                    <ul>
-                      <li>Объяснить свою роль в разработке с ИИ.</li>
-                      <li>Отличить роль ChatGPT от роли Codex.</li>
-                      <li>Сформулировать первую безопасную задачу для страницы сайта.</li>
-                      <li>Понять, почему результат проверяется по фактам, а не по обещанию “Готово”.</li>
-                      <li>Подготовить основу для следующего шага разработки.</li>
-                    </ul>
+                <section class="callout">
+                  <span class="block-label">После урока вы сможете</span>
+                  <ul>
+                    <li>Объяснить свою роль в разработке с ИИ.</li>
+                    <li>Отличить роль ChatGPT от роли Codex.</li>
+                    <li>Сформулировать первую безопасную задачу для страницы сайта.</li>
+                    <li>Понять, почему результат проверяется по фактам, а не по обещанию “Готово”.</li>
+                    <li>Подготовить основу для следующего шага разработки.</li>
+                  </ul>
+                </section>
+
+                <section class="callout">
+                  <span class="block-label">Ключевые понятия</span>
+                  <div class="definition-stack">
+                    <div class="definition-card">
+                      <span class="summary-label">Пользователь</span>
+                      <p>Пользователь — это человек, который хочет получить готовый результат: сайт, страницу, сервис, бота, автоматизацию или другой проект.</p>
+                    </div>
+                    <div class="definition-card">
+                      <span class="summary-label">ChatGPT</span>
+                      <p>ChatGPT — это ИИ-помощник для диалога, анализа и планирования задачи. С ним можно обсудить идею, разобрать проблему, выбрать подход и подготовить понятное задание для технической работы.</p>
+                    </div>
+                    <div class="definition-card">
+                      <span class="summary-label">Codex</span>
+                      <p>Codex — это ИИ-агент для программной разработки. Он отличается от обычного чата тем, что работает с проектом: файлами, кодом, проверками и отчётом о выполненной задаче.</p>
+                    </div>
                   </div>
-                  <div>
-                    <span class="block-label">В работе участвуют три роли</span>
-                    <div class="role-grid">
-                      <div class="role-card">
-                        <span class="summary-label">Пользователь</span>
-                        <strong>Пользователь — заказчик и владелец результата</strong>
-                        <p class="muted">Он формулирует цель, объясняет, какой результат нужен, проверяет готовую работу и принимает решение: подходит или нужно исправлять.</p>
-                      </div>
-                      <div class="role-card">
-                        <span class="summary-label">ChatGPT</span>
-                        <strong>ChatGPT — ведущий программист, архитектор и технический руководитель</strong>
-                        <p class="muted">Он разбирает задачу, выбирает подход, инструменты и языки, планирует архитектуру, делит работу на безопасные шаги, пишет точные задания для Codex, контролирует отчёты и проверяет ход работы.</p>
-                      </div>
-                      <div class="role-card">
-                        <span class="summary-label">Codex</span>
-                        <strong>Codex — исполнитель на сервере</strong>
-                        <p class="muted">Он работает на сервере в нужном репозитории, читает файлы проекта, вносит изменения, запускает проверки, делает commit/push, если это входит в задачу, и возвращает отчёт.</p>
-                      </div>
+                </section>
+
+                <section class="callout">
+                  <span class="block-label">Как это работает в курсе</span>
+                  <div class="definition-stack">
+                    <div class="definition-card">
+                      <span class="summary-label">Пользователь</span>
+                      <p>Пользователь задаёт цель и принимает результат. Он объясняет, что хочет получить, смотрит готовую работу и решает: подходит результат или нужно исправлять.</p>
+                    </div>
+                    <div class="definition-card">
+                      <span class="summary-label">ChatGPT</span>
+                      <p>ChatGPT ведёт техническую работу. В курсе он используется как ведущий технический специалист: разбирает задачу, выбирает подход, планирует безопасный шаг и готовит точное задание для Codex.</p>
+                    </div>
+                    <div class="definition-card">
+                      <span class="summary-label">Codex</span>
+                      <p>Codex выполняет задачу на сервере. Он работает в нужном репозитории, меняет только разрешённые файлы, запускает проверки и возвращает отчёт.</p>
                     </div>
                   </div>
                 </section>
@@ -151,33 +166,6 @@
                     </ul>
                     <p>Результат первого этапа — понятное описание страницы и структуры блоков, по которому потом можно дать Codex отдельную задачу на реализацию.</p>
                   </div>
-                </section>
-
-                <section class="callout">
-                  <span class="block-label">Разбор примера</span>
-                  <div class="breakdown-grid" style="margin-top: 12px;">
-                    <div class="breakdown-card"><span class="summary-label">Цель</span><strong>Получить заявку на консультацию.</strong></div>
-                    <div class="breakdown-card"><span class="summary-label">Аудитория</span><strong>Человек, которому нужна услуга.</strong></div>
-                    <div class="breakdown-card"><span class="summary-label">Структура</span><strong>Заголовок, описание, преимущества, вопросы, форма.</strong></div>
-                    <div class="breakdown-card"><span class="summary-label">Ограничение</span><strong>Не трогать оплату, личный кабинет и другие разделы.</strong></div>
-                    <div class="breakdown-card"><span class="summary-label">Проверка</span><strong>Страница открывается, текст понятен, форма видна, путь пользователя логичен.</strong></div>
-                  </div>
-                </section>
-
-                <section class="callout">
-                  <span class="block-label">Практика: опишите страницу сайта</span>
-                  <p>Ответьте на шесть вопросов и заполните поля ниже:</p>
-                  <div class="practice-grid">
-                    <label class="practice-field"><span>Для кого нужна страница?</span><textarea rows="3" placeholder="Кратко и по делу" data-practice-input="audience"></textarea></label>
-                    <label class="practice-field"><span>Какую одну главную цель она должна решать?</span><textarea rows="3" placeholder="Кратко и по делу" data-practice-input="goal"></textarea></label>
-                    <label class="practice-field"><span>Какие 3–5 блоков должны быть на странице?</span><textarea rows="3" placeholder="Кратко и по делу" data-practice-input="blocks"></textarea></label>
-                    <label class="practice-field"><span>Какие данные пользователь должен оставить в форме?</span><textarea rows="3" placeholder="Кратко и по делу" data-practice-input="form"></textarea></label>
-                    <label class="practice-field"><span>Что нельзя трогать на сайте?</span><textarea rows="3" placeholder="Кратко и по делу" data-practice-input="forbidden"></textarea></label>
-                    <label class="practice-field"><span>Как понять, что страница работает правильно?</span><textarea rows="3" placeholder="Кратко и по делу" data-practice-input="check"></textarea></label>
-                  </div>
-                  <p class="muted">Заполните все поля. Затем нажмите кнопку проверки.</p>
-                  <button class="primary-button practice-button" type="button" data-practice-submit>Проверить практику</button>
-                  <div class="practice-feedback">Пока ничего не проверено.</div>
                 </section>
 
                 <section class="callout">

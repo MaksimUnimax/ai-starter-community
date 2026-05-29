@@ -321,14 +321,6 @@ h2 {
   font-size: 1.05rem;
 }
 
-.checkpoint-list {
-  margin: 14px 0 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  gap: 8px;
-}
-
 .lesson-strip,
 .lesson-progress,
 .lesson-shell {
@@ -339,24 +331,6 @@ h2 {
 .lesson-progress,
 .lesson-shell {
   width: 100%;
-}
-
-.lesson-progress .checkpoint-list {
-  margin-top: 10px;
-}
-
-.checkpoint-list li {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--muted);
-  font-size: 0.94rem;
-}
-
-.checkpoint-list input {
-  width: 16px;
-  height: 16px;
-  accent-color: var(--accent);
 }
 
 .source-cards {
@@ -453,10 +427,10 @@ h2 {
 .summary-grid > div,
 .info-grid > div,
 .role-card,
+.definition-card,
 .example-card,
 .breakdown-card,
 .process-step,
-.practice-field,
 .quiz-card,
 .callout,
 .next-step-card,
@@ -503,8 +477,12 @@ h2 {
 .role-grid,
 .example-grid,
 .breakdown-grid,
-.process-flow,
-.practice-grid {
+.process-flow {
+  display: grid;
+  gap: 12px;
+}
+
+.definition-stack {
   display: grid;
   gap: 12px;
 }
@@ -514,6 +492,7 @@ h2 {
 }
 
 .role-card,
+.definition-card,
 .example-card,
 .breakdown-card,
 .process-step {
@@ -525,17 +504,16 @@ h2 {
   border: 1px solid var(--border);
 }
 
+.definition-card p {
+  margin: 0;
+  line-height: 1.55;
+}
+
 .role-card strong,
 .example-card strong,
 .breakdown-card strong,
 .process-step strong {
   line-height: 1.35;
-}
-
-.role-card p,
-.example-card p,
-.breakdown-card p {
-  margin: 0;
 }
 
 .example-grid {
@@ -572,66 +550,6 @@ h2 {
 .process-summary {
   margin: 0;
   color: var(--muted);
-}
-
-.practice-grid {
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  margin-top: 12px;
-}
-
-.practice-field {
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 14px;
-}
-
-.practice-field span {
-  display: block;
-  font-weight: 700;
-  margin-bottom: 10px;
-}
-
-.practice-field textarea {
-  width: 100%;
-  min-height: 108px;
-  border-radius: calc(var(--radius) - 2px);
-  border: 1px solid var(--border);
-  padding: 12px 13px;
-  font: inherit;
-  color: var(--text);
-  background: #fff;
-  resize: vertical;
-}
-
-.practice-field textarea:focus {
-  outline: none;
-  box-shadow: var(--focus);
-  border-color: rgba(194, 65, 12, 0.35);
-}
-
-.practice-button {
-  margin-top: 10px;
-}
-
-.practice-feedback {
-  margin-top: 12px;
-  padding: 12px 14px;
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  background: var(--accent-soft);
-}
-
-.practice-feedback.is-success {
-  background: rgba(21, 128, 61, 0.08);
-  border-color: rgba(21, 128, 61, 0.24);
-  color: var(--success);
-}
-
-.practice-feedback.is-error {
-  background: rgba(180, 83, 9, 0.08);
-  border-color: rgba(180, 83, 9, 0.24);
-  color: var(--warning);
 }
 
 .example-card ul,
@@ -710,15 +628,20 @@ h2 {
   border: 1px solid var(--border);
   text-align: left;
   padding: 0;
-  overflow: hidden;
+  overflow: visible;
+  perspective: 1200px;
+}
+
+.flashcard,
+.flashcard-inner,
+.flashcard-face {
+  box-sizing: border-box;
+  min-width: 0;
 }
 
 .flashcard-inner {
-  position: absolute;
-  inset: 0;
   display: grid;
-  align-items: center;
-  padding: 14px;
+  min-height: 150px;
   transition: transform 260ms ease;
   transform-style: preserve-3d;
 }
@@ -728,12 +651,21 @@ h2 {
 }
 
 .flashcard-face {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  align-content: center;
+  grid-area: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 10px;
+  padding: 18px;
+  min-height: 150px;
+  height: auto;
+  overflow: visible;
+  overflow-wrap: break-word;
+  word-break: normal;
+  white-space: normal;
   backface-visibility: hidden;
-  padding: 16px;
 }
 
 .flashcard-back {
@@ -744,7 +676,16 @@ h2 {
 .flashcard-face strong {
   display: block;
   font-size: 1.05rem;
-  margin-bottom: 8px;
+  margin-bottom: 0;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+
+.flashcard-face span {
+  max-width: 100%;
+  overflow-wrap: break-word;
+  white-space: normal;
 }
 
 .flashcard-note {

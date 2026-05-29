@@ -14,8 +14,9 @@ const courseData = {
       description:
         "В этом уроке мы разбираем первую и самую важную мысль курса: для работы над проектом не обязательно писать код вручную, но нужно понимать, как организована работа.",
       intro: [
-        "Если пользователь просто говорит “Сделай мне сайт”, этого недостаточно. Не ясно, для кого страница нужна, какая у неё цель, какие блоки должны быть на ней и как проверить результат.",
-        "Правильная работа начинается не с кода, а с постановки задачи: что нужно получить, какие есть ограничения, кто проверяет результат и какой отчёт должен вернуть исполнитель."
+        "В этом курсе мы разбираем принцип работы над проектами через связку ChatGPT и Codex. Пользователь не пишет код вручную, но управляет целью, проверкой и принятием результата.",
+        "Работа устроена так: пользователь объясняет, какой результат ему нужен, ChatGPT помогает превратить задачу в понятный технический план, а Codex выполняет конкретную задачу на сервере в проекте. После этого Codex возвращает отчёт, ChatGPT помогает его проверить, а пользователь смотрит готовый результат и принимает решение.",
+        "Главный принцип: ИИ не заменяет управление проектом. Он помогает выполнять техническую работу, но цель, смысл и приёмка результата остаются за пользователем."
       ],
       learningOutcomeTitle: "После урока вы сможете",
       learningOutcome: [
@@ -25,28 +26,34 @@ const courseData = {
         "Понять, почему результат проверяется по фактам, а не по обещанию “Готово”.",
         "Подготовить основу для следующего шага разработки."
       ],
-      roleTitle: "В работе участвуют три роли",
-      roles: [
+      conceptsTitle: "Ключевые понятия",
+      concepts: [
         {
           name: "Пользователь",
-          label: "Пользователь — заказчик и владелец результата",
-          lead: "заказчик и владелец результата",
-          description:
-            "Он формулирует цель, объясняет, какой результат нужен, проверяет готовую работу и принимает решение: подходит или нужно исправлять."
+          text: "Пользователь — это человек, который хочет получить готовый результат: сайт, страницу, сервис, бота, автоматизацию или другой проект."
         },
         {
           name: "ChatGPT",
-          label: "ChatGPT — ведущий программист, архитектор и технический руководитель",
-          lead: "ведущий программист, архитектор и технический руководитель",
-          description:
-            "Он разбирает задачу, выбирает подход, инструменты и языки, планирует архитектуру, делит работу на безопасные шаги, пишет точные задания для Codex, контролирует отчёты и проверяет ход работы."
+          text: "ChatGPT — это ИИ-помощник для диалога, анализа и планирования задачи. С ним можно обсудить идею, разобрать проблему, выбрать подход и подготовить понятное задание для технической работы."
         },
         {
           name: "Codex",
-          label: "Codex — исполнитель на сервере",
-          lead: "исполнитель на сервере",
-          description:
-            "Он работает на сервере в нужном репозитории, читает файлы проекта, вносит изменения, запускает проверки, делает commit/push, если это входит в задачу, и возвращает отчёт."
+          text: "Codex — это ИИ-агент для программной разработки. Он отличается от обычного чата тем, что работает с проектом: файлами, кодом, проверками и отчётом о выполненной задаче."
+        }
+      ],
+      courseUsageTitle: "Как это работает в курсе",
+      courseUsage: [
+        {
+          name: "Пользователь",
+          text: "Пользователь задаёт цель и принимает результат. Он объясняет, что хочет получить, смотрит готовую работу и решает: подходит результат или нужно исправлять."
+        },
+        {
+          name: "ChatGPT",
+          text: "ChatGPT ведёт техническую работу. В курсе он используется как ведущий технический специалист: разбирает задачу, выбирает подход, планирует безопасный шаг и готовит точное задание для Codex."
+        },
+        {
+          name: "Codex",
+          text: "Codex выполняет задачу на сервере. Он работает в нужном репозитории, меняет только разрешённые файлы, запускает проверки и возвращает отчёт."
         }
       ],
       processTitle: "Схема процесса",
@@ -92,51 +99,6 @@ const courseData = {
       ],
       goodExampleResult:
         "Результат первого этапа — понятное описание страницы и структуры блоков, по которому потом можно дать Codex отдельную задачу на реализацию.",
-      exampleBreakdownTitle: "Разбор примера",
-      exampleBreakdown: [
-        {
-          label: "Цель",
-          text: "Получить заявку на консультацию."
-        },
-        {
-          label: "Аудитория",
-          text: "Человек, которому нужна услуга."
-        },
-        {
-          label: "Структура",
-          text: "Заголовок, описание, преимущества, вопросы, форма."
-        },
-        {
-          label: "Ограничение",
-          text: "Не трогать оплату, личный кабинет и другие разделы."
-        },
-        {
-          label: "Проверка",
-          text: "Страница открывается, текст понятен, форма видна, путь пользователя логичен."
-        }
-      ],
-      practiceTitle: "Практика: опишите страницу сайта",
-      practiceIntro: "Ответьте на шесть вопросов и заполните поля ниже:",
-      practiceFields: [
-        { key: "audience", label: "Для кого нужна страница?" },
-        { key: "goal", label: "Какую одну главную цель она должна решать?" },
-        { key: "blocks", label: "Какие 3–5 блоков должны быть на странице?" },
-        { key: "form", label: "Какие данные пользователь должен оставить в форме?" },
-        { key: "forbidden", label: "Что нельзя трогать на сайте?" },
-        { key: "check", label: "Как понять, что страница работает правильно?" }
-      ],
-      practiceHelper: "Заполните все поля. Затем нажмите кнопку проверки.",
-      practiceSuccessText:
-        "Практика заполнена. Теперь эту заготовку можно использовать для постановки задачи.",
-      practiceErrorPrefix: "Заполните поля:",
-      practiceQuestions: [
-        "Для кого нужна страница?",
-        "Какую одну главную цель она должна решать?",
-        "Какие 3–5 блоков должны быть на странице?",
-        "Какие данные пользователь должен оставить в форме?",
-        "Что нельзя трогать на сайте?",
-        "Как понять, что страница работает правильно?"
-      ],
       exampleAnswerTitle: "Пример ответа",
       exampleAnswerParagraphs: [
         "Мне нужна простая страница сайта для записи на консультацию.",
@@ -697,10 +659,7 @@ const state = {
   visitedSections: new Set(["lesson-1"]),
   flippedCards: new Set(),
   solvedQuestions: new Set(),
-  answeredQuestions: {},
-  practiceAnswers: {},
-  practiceValidated: false,
-  practiceFeedback: ""
+  answeredQuestions: {}
 };
 
 const lessonNavTitles = {
@@ -769,21 +728,6 @@ function getLessonOneSolvedCount() {
     }
   }
   return solvedCount;
-}
-
-function getPracticeFields() {
-  const lessonOne = courseData.sections.find((section) => section.id === "lesson-1");
-  return lessonOne?.practiceFields || [];
-}
-
-function renderPracticeField(field) {
-  const value = state.practiceAnswers[field.key] || "";
-  return `
-    <label class="practice-field">
-      <span>${escapeHTML(field.label)}</span>
-      <textarea data-practice-input="${escapeHTML(field.key)}" rows="3" placeholder="Кратко и по делу">${escapeHTML(value)}</textarea>
-    </label>
-  `;
 }
 
 function renderFlashcards(section) {
@@ -885,12 +829,6 @@ function renderLessonOne(section) {
   const flashcards = renderFlashcards(section);
   const quiz = renderQuiz(section, section.reviewQuiz ? [section.quiz, ...section.reviewQuiz] : [section.quiz]);
   const processScheme = section.processScheme || section.processSteps.join(" → ");
-  const practiceFields = getPracticeFields();
-  const practiceFeedback = `<div class="practice-feedback ${
-    state.practiceFeedback ? (state.practiceValidated ? "is-success" : "is-error") : ""
-  }">${
-    escapeHTML(state.practiceFeedback || "Пока ничего не проверено.")
-  }</div>`;
 
   return `
     <article class="section-card lesson-one">
@@ -907,29 +845,42 @@ function renderLessonOne(section) {
           ${section.intro.map((paragraph) => `<p>${escapeHTML(paragraph)}</p>`).join("")}
         </section>
 
-        <section class="info-grid">
-          <div>
-            <span class="block-label">${escapeHTML(section.learningOutcomeTitle)}</span>
-            <ul>
-              ${section.learningOutcome.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}
-            </ul>
-          </div>
+        <section class="callout">
+          <span class="block-label">${escapeHTML(section.learningOutcomeTitle)}</span>
+          <ul>
+            ${section.learningOutcome.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}
+          </ul>
+        </section>
 
-          <div>
-            <span class="block-label">${escapeHTML(section.roleTitle)}</span>
-            <div class="role-grid">
-              ${section.roles
-                .map(
-                  (role) => `
-                    <div class="role-card">
-                      <span class="summary-label">${escapeHTML(role.name)}</span>
-                      <strong>${escapeHTML(role.label || `${role.name} — ${role.lead}`)}</strong>
-                      <p class="muted">${escapeHTML(role.description)}</p>
-                    </div>
-                  `
-                )
-                .join("")}
-            </div>
+        <section class="callout">
+          <span class="block-label">${escapeHTML(section.conceptsTitle)}</span>
+          <div class="definition-stack">
+            ${section.concepts
+              .map(
+                (item) => `
+                  <div class="definition-card">
+                    <span class="summary-label">${escapeHTML(item.name)}</span>
+                    <p>${escapeHTML(item.text)}</p>
+                  </div>
+                `
+              )
+              .join("")}
+          </div>
+        </section>
+
+        <section class="callout">
+          <span class="block-label">${escapeHTML(section.courseUsageTitle)}</span>
+          <div class="definition-stack">
+            ${section.courseUsage
+              .map(
+                (item) => `
+                  <div class="definition-card">
+                    <span class="summary-label">${escapeHTML(item.name)}</span>
+                    <p>${escapeHTML(item.text)}</p>
+                  </div>
+                `
+              )
+              .join("")}
           </div>
         </section>
 
@@ -975,33 +926,6 @@ function renderLessonOne(section) {
             </ul>
             <p>${escapeHTML(section.goodExampleResult)}</p>
           </div>
-        </section>
-
-        <section class="callout">
-          <span class="block-label">${escapeHTML(section.exampleBreakdownTitle)}</span>
-          <div class="breakdown-grid">
-            ${section.exampleBreakdown
-              .map(
-                (item) => `
-                  <div class="breakdown-card">
-                    <span class="summary-label">${escapeHTML(item.label)}</span>
-                    <strong>${escapeHTML(item.text)}</strong>
-                  </div>
-                `
-              )
-              .join("")}
-          </div>
-        </section>
-
-        <section class="callout">
-          <span class="block-label">${escapeHTML(section.practiceTitle)}</span>
-          <p>${escapeHTML(section.practiceIntro)}</p>
-          <div class="practice-grid">
-            ${practiceFields.map((field) => renderPracticeField(field)).join("")}
-          </div>
-          <p class="muted">${escapeHTML(section.practiceHelper)}</p>
-          <button class="primary-button practice-button" type="button" data-practice-submit>Проверить практику</button>
-          ${practiceFeedback}
         </section>
 
         <section class="callout">
@@ -1107,9 +1031,7 @@ function renderSectionContent(section) {
 function updateProgress() {
   const totalQuestions = getLessonOneQuestionCount();
   const solvedQuestions = getLessonOneSolvedCount();
-  const quizScore = totalQuestions === 0 ? 0 : (solvedQuestions / totalQuestions) * 80;
-  const practiceScore = state.practiceValidated ? 20 : 0;
-  const progress = Math.min(100, Math.round(quizScore + practiceScore));
+  const progress = totalQuestions === 0 ? 0 : Math.min(100, Math.round((solvedQuestions / totalQuestions) * 100));
 
   progressFill.style.width = `${progress}%`;
   progressValue.textContent = `${progress}%`;
@@ -1117,9 +1039,9 @@ function updateProgress() {
   if (progress === 0) {
     progressLabel.textContent = "Пока ничего не проверено.";
   } else if (progress < 100) {
-    progressLabel.textContent = "Идёт проверка урока.";
+    progressLabel.textContent = `Выполнено ${solvedQuestions} из ${totalQuestions} проверок.`;
   } else {
-    progressLabel.textContent = "Проверка завершена.";
+    progressLabel.textContent = "Все проверки урока выполнены.";
   }
 }
 
@@ -1169,25 +1091,6 @@ document.addEventListener("click", (event) => {
     return;
   }
 
-  const practiceSubmit = event.target.closest("[data-practice-submit]");
-  if (practiceSubmit) {
-    const practiceFields = getPracticeFields();
-    const missingFields = practiceFields
-      .filter((field) => !String(state.practiceAnswers[field.key] || "").trim())
-      .map((field) => field.label);
-
-    if (missingFields.length > 0) {
-      state.practiceValidated = false;
-      state.practiceFeedback = `${courseData.sections[0].practiceErrorPrefix} ${missingFields.join(", ")}.`;
-    } else {
-      state.practiceValidated = true;
-      state.practiceFeedback = courseData.sections[0].practiceSuccessText;
-    }
-
-    renderActiveSection();
-    return;
-  }
-
   const startButton = event.target.closest("#start-learning");
   if (startButton) {
     setActiveSection("lesson-1");
@@ -1199,14 +1102,6 @@ document.addEventListener("click", (event) => {
     setActiveSection("review");
     return;
   }
-});
-
-document.addEventListener("input", (event) => {
-  const practiceInput = event.target.closest("[data-practice-input]");
-  if (!practiceInput) {
-    return;
-  }
-  state.practiceAnswers[practiceInput.dataset.practiceInput] = practiceInput.value;
 });
 
 renderNavigation();
