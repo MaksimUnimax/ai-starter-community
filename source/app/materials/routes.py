@@ -32,12 +32,12 @@ LESSON_TEST_ROOT = Path(__file__).resolve().parent / "course_content" / "drafts"
 LESSON_TEST_PREVIEW_HTML = """
   <section
     style="max-width: 1280px; margin: 16px auto 0; padding: 16px 20px; border: 1px solid #e8ded0; border-radius: 18px; background: linear-gradient(180deg, #fffdf8 0%, #fff9f0 100%); color: #231f1a;"
-    aria-label="Тестовая версия урока"
+    aria-label="Тестовая версия курса"
   >
-    <p style="margin: 0 0 8px; text-transform: uppercase; letter-spacing: 0.15em; font-size: 0.74rem; color: #c2410c; font-weight: 700;">Тестовая версия урока</p>
+    <p style="margin: 0 0 8px; text-transform: uppercase; letter-spacing: 0.15em; font-size: 0.74rem; color: #c2410c; font-weight: 700;">Тестовая версия курса</p>
     <h1 style="margin: 0; font-family: Georgia, serif; font-size: clamp(1.8rem, 3vw, 2.4rem); line-height: 1.1;">Работа с ИИ</h1>
-    <h2 style="margin: 10px 0 0; font-family: Georgia, serif; font-size: clamp(1.1rem, 2vw, 1.55rem); line-height: 1.2;">Как мы работаем: ChatGPT проектирует, Codex выполняет, пользователь проверяет</h2>
-    <p style="margin: 10px 0 0; color: #766f66;">Открыт первый урок курса. Здесь можно пройти навигацию, карточки, мини-проверку и прогресс прямо в приложении.</p>
+    <h2 style="margin: 10px 0 0; font-family: Georgia, serif; font-size: clamp(1.1rem, 2vw, 1.55rem); line-height: 1.2;">Как разрабатывать с помощью ChatGPT и Codex</h2>
+    <p style="margin: 10px 0 0; color: #766f66;">Открыта тестовая версия курса из 9 уроков. Ниже показана карта курса и первый шаг работы.</p>
   </section>
 """
 

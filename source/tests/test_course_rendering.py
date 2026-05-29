@@ -144,23 +144,36 @@ def test_materials_and_lesson_pages_render_course_content(client, test_settings)
     assert "/materials" in lesson_response.text
 
 
-def test_lesson_test_page_is_served_by_the_app(client, test_settings):
-    _prepare_verified_user(client, test_settings, "lesson-test@example.com", "lessontest")
+def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
+    _prepare_verified_user(client, test_settings, "course-map@example.com", "coursemapproof")
 
     materials_response = client.get("/materials")
     assert materials_response.status_code == 200
     assert "/materials/drafts/dair-smoke-20260529/" in materials_response.text
-    assert "Открыть тестовую версию урока" in materials_response.text
+    assert "Открыть тестовую версию курса" in materials_response.text
 
     page_response = client.get("/materials/drafts/dair-smoke-20260529/")
     assert page_response.status_code == 200
     assert "Работа с ИИ" in page_response.text
-    assert "Как мы работаем" in page_response.text
-    assert "ChatGPT" in page_response.text
-    assert "Codex" in page_response.text
-    assert "Тестовая версия урока" in page_response.text
-    assert "Начать урок" in page_response.text
-    assert "Перейти к проверке" in page_response.text
+    assert "Как разрабатывать с помощью ChatGPT и Codex" in page_response.text
+    assert "Тестовая версия курса" in page_response.text
+    assert "Карта курса" in page_response.text
+    assert "Как теперь можно делать проекты без знания кода" in page_response.text
+    assert "Кто что делает: пользователь, ChatGPT и Codex" in page_response.text
+    assert "Почему проект начинается с документов" in page_response.text
+    assert "Как начинать новый диалог после перерыва" in page_response.text
+    assert "Как обновляется документация во время работы" in page_response.text
+    assert "Зачем нужны ТЗ и roadmap" in page_response.text
+    assert "Git простыми словами" in page_response.text
+    assert "Как дать Codex право отправлять проект в GitHub" in page_response.text
+    assert "Как идёт один безопасный шаг разработки" in page_response.text
+    assert "Что значит отчёт Codex" in page_response.text
+    assert "deploy key" in page_response.text
+    assert "публичный ключ" in page_response.text
+    assert "приватный ключ" in page_response.text
+    assert "Allow write access" in page_response.text
+    assert "Начать курс" in page_response.text
+    assert "Открыть урок 9" in page_response.text
     assert "Структура урока" in page_response.text
     assert "Прогресс" in page_response.text
     assert 'href="styles.css"' in page_response.text
@@ -182,6 +195,7 @@ def test_lesson_test_page_is_served_by_the_app(client, test_settings):
     assert "text/css" in styles_response.headers["content-type"]
     assert ".page-shell" in styles_response.text
     assert ".lesson-nav" in styles_response.text
+    assert ".course-map" in styles_response.text
 
     script_response = client.get("/materials/drafts/dair-smoke-20260529/script.js")
     assert script_response.status_code == 200
@@ -191,6 +205,14 @@ def test_lesson_test_page_is_served_by_the_app(client, test_settings):
     assert "flashcards" in script_response.text
     assert "quiz" in script_response.text
     assert "checkpoint-list" in script_response.text
+    assert "Как разрабатывать с помощью ChatGPT и Codex" in script_response.text
+    assert "Как теперь можно делать проекты без знания кода" in script_response.text
+    assert "Git простыми словами" in script_response.text
+    assert "Как дать Codex право отправлять проект в GitHub" in script_response.text
+    assert "deploy key" in script_response.text
+    assert "публичный ключ" in script_response.text
+    assert "приватный ключ" in script_response.text
+    assert "Allow write access" in script_response.text
     assert "DAIR smoke artifact" not in script_response.text
     assert "Draft test page" not in script_response.text
     assert "SKILL.md" not in script_response.text
