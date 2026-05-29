@@ -1138,6 +1138,44 @@ const state = {
   answeredQuestions: {}
 };
 
+const labelTranslations = {
+  "LESSON INTRO": "Вступление",
+  "LEARNING OUTCOME": "После урока вы сможете",
+  "KEY CONCEPTS": "Ключевые понятия",
+  "HOW IT WORKS": "Как это работает",
+  "WHAT THE USER DOES": "Что делает пользователь",
+  "WHAT CHATGPT DOES": "Что делает ChatGPT",
+  "WHAT CODEX DOES": "Что делает Codex",
+  "WORKING EXAMPLE": "Рабочий пример",
+  "KNOWLEDGE CHECK": "Проверка знаний",
+  "LESSON RESULT": "Главный вывод урока",
+  "NEXT LESSON": "Следующий урок",
+  "FINAL COURSE RESULT": "Итог курса",
+  "WHY DOCUMENTS MATTER": "Почему документы важны",
+  "WHAT DOCUMENTS STORE": "Что хранится в документах",
+  "WHAT DOCUMENTS SHOULD NOT STORE": "Что не нужно хранить в документах",
+  "WHAT CAN BE LOST": "Что может потеряться",
+  "HOW TO START": "Как начать новый диалог",
+  "WHAT CHATGPT SHOULD DO": "Что должен сделать ChatGPT",
+  "WHAT NOT TO DO": "Что нельзя делать",
+  "WHEN TO UPDATE DOCUMENTS": "Когда обновлять документацию",
+  "WHAT NOT TO DOCUMENT": "Что не нужно фиксировать в документации",
+  "HOW DOCUMENTS ARE UPDATED": "Как обновляются документы",
+  "BAD EXAMPLE": "Плохой пример",
+  "WHY IT MATTERS": "Почему это важно",
+  "WHAT TECHNICAL SPECIFICATION CONTAINS": "Что входит в техническое задание",
+  "WHAT ROADMAP CONTAINS": "Что входит в дорожную карту",
+  "USER ROLE": "Роль пользователя",
+  "WHAT USER SHOULD KNOW": "Что должен понимать пользователь",
+  "WHAT CODEX REPORT SHOULD INCLUDE": "Что должен содержать отчёт Codex",
+  "WHAT IS A SAFE STEP": "Что такое безопасный шаг",
+  "SAFE STEP PROCESS": "Как проходит безопасный шаг",
+  "WHAT CODEX REPORT IS": "Что такое отчёт Codex",
+  "WHAT CHATGPT DOES WITH REPORT": "Что делает ChatGPT с отчётом",
+  "WHAT USER DOES": "Что делает пользователь",
+  "DECISIONS AFTER REPORT": "Решения после отчёта"
+};
+
 const lessonNavTitles = {
   "lesson-1": "Проектная работа с ИИ",
   "lesson-2": "Роли пользователя, ChatGPT и Codex",
@@ -1164,6 +1202,24 @@ function escapeHTML(value) {
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
     .replaceAll("\"", "&quot;");
+}
+
+function translateLabel(label, fallback = "") {
+  const raw = String(label || fallback).trim();
+  const normalized = raw.endsWith(":") ? raw.slice(0, -1).trim() : raw;
+  return labelTranslations[normalized] || normalized;
+}
+
+function translateLessonMarkup(html) {
+  let translated = String(html || "");
+  for (const [source, target] of Object.entries(labelTranslations)) {
+    const pattern = new RegExp(
+      `(<span class="block-label">)${source}(\\s*:?)(</span>)`,
+      "g"
+    );
+    translated = translated.replace(pattern, `$1${target}$3`);
+  }
+  return translated;
 }
 
 function renderNavigation() {
@@ -1249,7 +1305,7 @@ function renderQuiz(section, quizList = getSectionQuizList(section), label = sec
 
   return `
     <div class="module-grid">
-      <div class="section-kicker">${escapeHTML(label)}</div>
+      <div class="section-kicker">${escapeHTML(translateLabel(label, "Проверка знаний"))}</div>
       <div class="quiz-list">
         ${quizList
           .map((quiz, quizIndex) => {
@@ -1310,7 +1366,7 @@ function renderIntro(section) {
 
   return `
     <section class="callout">
-      <span class="block-label">${escapeHTML(section.introLabel || "Вступление")}</span>
+      <span class="block-label">${escapeHTML(translateLabel(section.introLabel, "Вступление"))}</span>
       ${section.intro.map((paragraph) => `<p>${escapeHTML(paragraph)}</p>`).join("")}
     </section>
   `;
@@ -1328,7 +1384,7 @@ function renderOutcome(section) {
 
   return `
     <section class="callout">
-      <span class="block-label">${escapeHTML(section.learningOutcomeLabel || "После урока вы сможете")}</span>
+      <span class="block-label">${escapeHTML(translateLabel(section.learningOutcomeLabel, "После урока вы сможете"))}</span>
       ${body}
     </section>
   `;
@@ -1338,10 +1394,10 @@ function renderStructuredLesson(section) {
   const intro = renderIntro(section);
   const outcome = renderOutcome(section);
   const quizList = getSectionQuizList(section);
-  const quiz = renderQuiz(section, quizList, section.quizLabel || "KNOWLEDGE CHECK:");
-  const resultTitle = section.finalResultTitle || section.resultTitle;
+  const quiz = renderQuiz(section, quizList, translateLabel(section.quizLabel, "Проверка знаний"));
+  const resultTitle = translateLabel(section.finalResultTitle || section.resultTitle, "Главный вывод урока");
   const resultText = section.finalResultText || section.resultText;
-  const nextTitle = section.nextStepTitle || "Следующий шаг";
+  const nextTitle = translateLabel(section.nextStepTitle, "Следующий урок");
   const nextText = section.nextStepText;
   const nextButton = section.nextStepButtonLabel;
   const finalResult = section.finalResultText
@@ -1383,7 +1439,7 @@ function renderStructuredLesson(section) {
       <div class="section-body">
         ${intro}
         ${outcome}
-        ${section.contentHtml || ""}
+        ${translateLessonMarkup(section.contentHtml || "")}
         ${quiz}
         ${lessonResult}
         ${finalResult}
@@ -1409,19 +1465,19 @@ function renderLessonOne(section) {
 
       <div class="section-body">
         <section class="callout">
-          <span class="block-label">Вступление</span>
+          <span class="block-label">${escapeHTML(translateLabel("LESSON INTRO", "Вступление"))}</span>
           ${section.intro.map((paragraph) => `<p>${escapeHTML(paragraph)}</p>`).join("")}
         </section>
 
         <section class="callout">
-          <span class="block-label">${escapeHTML(section.learningOutcomeTitle)}</span>
+          <span class="block-label">${escapeHTML(translateLabel(section.learningOutcomeTitle, "После урока вы сможете"))}</span>
           <ul>
             ${section.learningOutcome.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}
           </ul>
         </section>
 
         <section class="callout">
-          <span class="block-label">${escapeHTML(section.conceptsTitle)}</span>
+          <span class="block-label">${escapeHTML(translateLabel(section.conceptsTitle, "Ключевые понятия"))}</span>
           <div class="definition-stack">
             ${section.concepts
               .map(
@@ -1437,7 +1493,7 @@ function renderLessonOne(section) {
         </section>
 
         <section class="callout">
-          <span class="block-label">${escapeHTML(section.courseUsageTitle)}</span>
+          <span class="block-label">${escapeHTML(translateLabel(section.courseUsageTitle, "Как это работает"))}</span>
           <div class="definition-stack">
             ${section.courseUsage
               .map(
@@ -1453,7 +1509,7 @@ function renderLessonOne(section) {
         </section>
 
         <section class="callout">
-          <span class="block-label">${escapeHTML(section.processTitle)}</span>
+          <span class="block-label">${escapeHTML(translateLabel(section.processTitle, "Как это работает"))}</span>
           <div class="process-flow">
             ${section.processSteps
               .map(
@@ -1470,12 +1526,12 @@ function renderLessonOne(section) {
         </section>
 
         <section class="callout">
-          <span class="block-label">${escapeHTML(section.importantExplanationTitle)}</span>
+          <span class="block-label">${escapeHTML(translateLabel(section.importantExplanationTitle, "Почему это важно"))}</span>
           <p>${escapeHTML(section.importantExplanation)}</p>
         </section>
 
         <section class="callout">
-          <span class="block-label">${escapeHTML(section.workingExampleTitle)}</span>
+          <span class="block-label">${escapeHTML(translateLabel(section.workingExampleTitle, "Рабочий пример"))}</span>
           <div class="definition-stack">
             ${section.workingExampleBlocks
               .map(
@@ -1494,13 +1550,13 @@ function renderLessonOne(section) {
         ${quiz}
 
         <section class="callout">
-          <span class="block-label">${escapeHTML(section.finalTakeawayTitle)}</span>
+          <span class="block-label">${escapeHTML(translateLabel(section.finalTakeawayTitle, "Главный вывод урока"))}</span>
           <p>${escapeHTML(section.finalTakeaway)}</p>
         </section>
 
         <section class="next-step-card">
           <div>
-            <span class="block-label">${escapeHTML(section.nextStepTitle)}</span>
+            <span class="block-label">${escapeHTML(translateLabel(section.nextStepTitle, "Следующий урок"))}</span>
             <p>${escapeHTML(section.nextStepText)}</p>
           </div>
           <button class="primary-button" type="button" data-section="lesson-2">${escapeHTML(section.nextStepButtonLabel)}</button>

@@ -172,6 +172,40 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Что изучаем" in page_response.text
     assert "Зачем это нужно" in page_response.text
     assert "Где это применяется" in page_response.text
+    for english_label in [
+        "LESSON INTRO",
+        "LEARNING OUTCOME",
+        "KEY CONCEPTS",
+        "WHAT THE USER DOES",
+        "WHAT CHATGPT DOES",
+        "WHAT CODEX DOES",
+        "WORKING EXAMPLE",
+        "KNOWLEDGE CHECK",
+        "LESSON RESULT",
+        "NEXT LESSON",
+        "WHY DOCUMENTS MATTER",
+        "WHAT DOCUMENTS STORE",
+        "WHAT DOCUMENTS SHOULD NOT STORE",
+        "WHAT CAN BE LOST",
+        "HOW TO START",
+        "WHAT NOT TO DO",
+        "WHEN TO UPDATE DOCUMENTS",
+        "WHAT NOT TO DOCUMENT",
+        "HOW DOCUMENTS ARE UPDATED",
+        "BAD EXAMPLE",
+        "WHY IT MATTERS",
+        "WHAT TECHNICAL SPECIFICATION CONTAINS",
+        "WHAT ROADMAP CONTAINS",
+        "USER ROLE",
+        "WHAT USER SHOULD KNOW",
+        "WHAT CODEX REPORT SHOULD INCLUDE",
+        "WHAT IS A SAFE STEP",
+        "SAFE STEP PROCESS",
+        "WHAT CODEX REPORT IS",
+        "WHAT CHATGPT DOES WITH REPORT",
+        "DECISIONS AFTER REPORT",
+    ]:
+        assert english_label not in page_response.text
     assert page_response.text.count("course-intro-part") == 3
     assert "Прогресс зависит от прохождения проверки знаний." in page_response.text
     assert "В этом курсе вы изучаете, как вести проектную работу с помощью ChatGPT и Codex без ручного написания кода." in page_response.text
@@ -311,6 +345,8 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "const courseData" in script_response.text
     assert "lesson-nav" in script_response.text
     assert "flashcards" in script_response.text
+    assert "labelTranslations" in script_response.text
+    assert "translateLessonMarkup" in script_response.text
     assert "Проверка знаний" in script_response.text
     assert "getSectionQuestionCount" in script_response.text
     assert "getSectionAnsweredCount" in script_response.text
@@ -346,7 +382,7 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Правильно:" in script_response.text
     assert "Проверки должны быть кликовыми." in script_response.text
     assert "После курса пользователь понимает, как вести проектную работу с ИИ" in script_response.text
-    assert "KNOWLEDGE CHECK:" in script_response.text
+    assert "Проверка знаний" in script_response.text
     assert "Тестовая версия курса" not in script_response.text
     assert "тестовая версия урока" not in script_response.text
     assert "DAIR smoke artifact" not in script_response.text
