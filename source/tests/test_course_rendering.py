@@ -170,26 +170,41 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Отчёт Codex" in page_response.text
     assert "Проектная работа с ИИ: роль пользователя, ChatGPT и Codex" in page_response.text
     assert "Вы не пишете код вручную, но управляете задачей, проверкой и принятием результата." in page_response.text
-    assert "Сделай мне ИИ-агента" in page_response.text
+    assert "Сделай мне сайт" in page_response.text
+    assert "Простую страницу сайта для записи на консультацию" in page_response.text
     assert "Пользователь — заказчик и владелец результата" in page_response.text
     assert "ChatGPT — ведущий программист" in page_response.text
     assert "Codex — исполнитель на сервере" in page_response.text
-    assert "Практика: опишите своего первого ИИ-агента" in page_response.text
+    assert "Схема процесса" in page_response.text
+    assert "Пользователь ставит цель" in page_response.text
+    assert "ChatGPT проектирует технический шаг" in page_response.text
+    assert "Codex выполняет задачу на сервере" in page_response.text
+    assert "Практика: опишите страницу сайта" in page_response.text
+    assert "Проверить практику" in page_response.text
     assert "Типичные ошибки" in page_response.text
     assert "Главный вывод урока" in page_response.text
+    assert "Следующий шаг" in page_response.text
+    assert "Перейти к уроку 2" in page_response.text
     assert "Пользователь ставит цель → ChatGPT проектирует технический шаг → Codex выполняет задачу на сервере → Codex возвращает отчёт → ChatGPT проверяет отчёт → пользователь смотрит результат и принимает решение." in page_response.text
     assert "Структура урока" in page_response.text
-    assert "Прогресс" in page_response.text
-    assert page_response.text.count('data-section="') == 9
+    assert "Прогресс по проверке урока" in page_response.text
+    assert "Пока ничего не проверено." in page_response.text
+    assert page_response.text.count('class="nav-button') == 9
     assert page_response.text.count("nav-title") == 9
+    assert page_response.text.count('data-practice-input="') == 6
     assert "lesson-strip" in page_response.text
     assert "lesson-progress" in page_response.text
     assert "lesson-shell" in page_response.text
+    assert "role-grid" in page_response.text
+    assert "process-flow" in page_response.text
+    assert "practice-grid" in page_response.text
+    assert "next-step-card" in page_response.text
     assert 'class="sidebar"' not in page_response.text
     assert 'class="workspace"' not in page_response.text
     assert 'class="hero-meta"' not in page_response.text
     assert 'class="course-map-card"' not in page_response.text
     assert 'class="course-overview"' not in page_response.text
+    assert 'checkpoint-list' not in page_response.text
     assert 'href="styles.css"' in page_response.text
     assert 'src="script.js"' in page_response.text
     assert "DAIR smoke artifact" not in page_response.text
@@ -203,13 +218,19 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Sources" not in page_response.text
     assert "/tmp/dair_smoke_20260529" not in page_response.text
     assert "file://" not in page_response.text
+    assert "Сделай мне ИИ-агента" not in page_response.text
+    assert "Опишите своего первого ИИ-агента" not in page_response.text
+    assert "ИИ-агент, который помогает начинать новую задачу" not in page_response.text
 
     styles_response = client.get("/materials/drafts/dair-smoke-20260529/styles.css")
     assert styles_response.status_code == 200
     assert "text/css" in styles_response.headers["content-type"]
     assert ".page-shell" in styles_response.text
     assert ".lesson-nav" in styles_response.text
-    assert ".course-map" in styles_response.text
+    assert ".role-grid" in styles_response.text
+    assert ".process-flow" in styles_response.text
+    assert ".practice-field" in styles_response.text
+    assert ".next-step-card" in styles_response.text
 
     script_response = client.get("/materials/drafts/dair-smoke-20260529/script.js")
     assert script_response.status_code == 200
@@ -218,17 +239,24 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "lesson-nav" in script_response.text
     assert "flashcards" in script_response.text
     assert "quiz" in script_response.text
-    assert "checkpoint-list" in script_response.text
     assert "Как разрабатывать с помощью ChatGPT и Codex" in script_response.text
     assert "Проектная работа с ИИ: роль пользователя, ChatGPT и Codex" in script_response.text
     assert "Вы не пишете код вручную, но управляете задачей, проверкой и принятием результата." in script_response.text
-    assert "Сделай мне ИИ-агента" in script_response.text
+    assert "Сделай мне сайт" in script_response.text
+    assert "Простую страницу сайта для записи на консультацию" in script_response.text
     assert "Пользователь — заказчик и владелец результата" in script_response.text
     assert "ChatGPT — ведущий программист" in script_response.text
     assert "Codex — исполнитель на сервере" in script_response.text
-    assert "Практика: опишите своего первого ИИ-агента" in script_response.text
+    assert "Схема процесса" in script_response.text
+    assert "Пользователь ставит цель" in script_response.text
+    assert "ChatGPT проектирует технический шаг" in script_response.text
+    assert "Codex выполняет задачу на сервере" in script_response.text
+    assert "Практика: опишите страницу сайта" in script_response.text
+    assert "Проверить практику" in script_response.text
     assert "Типичные ошибки" in script_response.text
     assert "Главный вывод урока" in script_response.text
+    assert "Следующий шаг" in script_response.text
+    assert "Перейти к уроку 2" in script_response.text
     assert "Пользователь ставит цель → ChatGPT проектирует технический шаг → Codex выполняет задачу на сервере → Codex возвращает отчёт → ChatGPT проверяет отчёт → пользователь смотрит результат и принимает решение." in script_response.text
     assert "Git простыми словами" in script_response.text
     assert "Как дать Codex право отправлять проект в GitHub" in script_response.text
@@ -245,6 +273,10 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Open review" not in script_response.text
     assert "Source notes" not in script_response.text
     assert "Sources" not in script_response.text
+    assert "checkpoint-list" not in script_response.text
+    assert "Сделай мне ИИ-агента" not in script_response.text
+    assert "Опишите своего первого ИИ-агента" not in script_response.text
+    assert "ИИ-агент, который помогает начинать новую задачу" not in script_response.text
 
 
 def test_materials_and_lesson_redirect_for_anonymous_user(client):
