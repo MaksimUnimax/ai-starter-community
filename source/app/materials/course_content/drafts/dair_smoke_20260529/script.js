@@ -686,15 +686,15 @@ function getLessonOneQuestionCount() {
   return 1 + reviewQuizCount;
 }
 
-function getLessonOneSolvedCount() {
+function getLessonOneAnsweredCount() {
   const questionCount = getLessonOneQuestionCount();
-  let solvedCount = 0;
+  let answeredCount = 0;
   for (let index = 0; index < questionCount; index += 1) {
-    if (state.solvedQuestions.has(quizKey("lesson-1", index))) {
-      solvedCount += 1;
+    if (state.answeredQuestions[quizKey("lesson-1", index)] !== undefined) {
+      answeredCount += 1;
     }
   }
-  return solvedCount;
+  return answeredCount;
 }
 
 function renderFlashcards(section) {
@@ -968,16 +968,18 @@ function renderSectionContent(section) {
 
 function updateProgress() {
   const totalQuestions = getLessonOneQuestionCount();
-  const solvedQuestions = getLessonOneSolvedCount();
-  const progress = totalQuestions === 0 ? 0 : Math.min(100, Math.round((solvedQuestions / totalQuestions) * 100));
+  const answeredQuestions = getLessonOneAnsweredCount();
+  const progress = totalQuestions === 0 ? 0 : Math.min(100, Math.round((answeredQuestions / totalQuestions) * 100));
 
   progressFill.style.width = `${progress}%`;
   progressValue.textContent = `${progress}%`;
 
   if (progress === 0) {
     progressLabel.textContent = "Пока ничего не проверено.";
+  } else if (answeredQuestions === 1) {
+    progressLabel.textContent = `Выполнена 1 из ${totalQuestions} проверок.`;
   } else if (progress < 100) {
-    progressLabel.textContent = `Выполнено ${solvedQuestions} из ${totalQuestions} проверок.`;
+    progressLabel.textContent = `Выполнено ${answeredQuestions} из ${totalQuestions} проверок.`;
   } else {
     progressLabel.textContent = "Все проверки урока выполнены.";
   }

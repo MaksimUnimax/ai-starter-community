@@ -64,17 +64,22 @@ a {
 }
 
 .course-head {
-  padding: 4px 2px 0;
+  padding: 12px 20px 4px;
+  text-align: center;
+  display: grid;
+  justify-items: center;
 }
 
 .course-head h1 {
-  margin-top: 6px;
+  margin-top: 0;
+  max-width: 24ch;
 }
 
 .course-headline {
   margin: 10px 0 0;
   font-size: 1.08rem;
   font-weight: 700;
+  max-width: 60ch;
 }
 
 .course-note {
@@ -91,25 +96,27 @@ a {
 }
 
 .course-intro {
-  padding: 28px;
+  padding: 22px 32px;
   display: grid;
-  gap: 16px;
+  gap: 12px;
 }
 
 .course-intro-body {
   display: grid;
-  gap: 22px;
+  gap: 12px;
 }
 
 .course-intro-part {
   display: grid;
-  gap: 8px;
-  padding-top: 4px;
+  gap: 6px;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #fff;
 }
 
 .course-intro-part + .course-intro-part {
-  border-top: 1px solid var(--border);
-  padding-top: 22px;
+  margin-top: 0;
 }
 
 .course-intro-part h3 {
@@ -117,16 +124,22 @@ a {
   font-family: "Palatino Linotype", "Book Antiqua", Georgia, serif;
   font-size: 1.04rem;
   line-height: 1.15;
+  text-align: center;
 }
 
 .course-intro-part p {
   margin: 0;
   max-width: 78ch;
-  line-height: 1.65;
+  line-height: 1.38;
 }
 
 .course-intro-part p + p {
-  margin-top: 8px;
+  margin-top: 6px;
+}
+
+.course-intro .section-heading {
+  margin-bottom: 8px;
+  text-align: center;
 }
 
 .hero {
@@ -663,7 +676,7 @@ h2 {
 .flashcard {
   min-height: 150px;
   position: relative;
-  background: linear-gradient(180deg, #fff 0%, #fff6ec 100%);
+  background: #fff;
   border: 1px solid var(--border);
   text-align: left;
   padding: 0;
@@ -705,11 +718,12 @@ h2 {
   word-break: normal;
   white-space: normal;
   backface-visibility: hidden;
+  background: #fff;
 }
 
 .flashcard-back {
   transform: rotateY(180deg);
-  background: linear-gradient(180deg, rgba(194, 65, 12, 0.08), rgba(194, 65, 12, 0.02));
+  background: #fff;
 }
 
 .flashcard-face strong {

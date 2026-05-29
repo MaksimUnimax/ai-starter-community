@@ -165,6 +165,7 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Зачем это нужно" in page_response.text
     assert "Где это применяется" in page_response.text
     assert page_response.text.count("course-intro-part") == 3
+    assert "Прогресс зависит от прохождения проверки знаний." in page_response.text
     assert "В этом курсе вы изучаете, как вести проектную работу с помощью ChatGPT и Codex без ручного написания кода." in page_response.text
     assert "Пользователю не нужно заранее знать программирование, дизайн, вёрстку, архитектуру, документацию или техническое задание." in page_response.text
     assert "Дальше ChatGPT помогает продумать задачу, подготовить документы, спланировать внешний вид" in page_response.text
@@ -215,7 +216,7 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Перейти к уроку 2" in page_response.text
     assert "Структура урока" in page_response.text
     assert "Прогресс по проверке урока" in page_response.text
-    assert "Прогресс зависит только от проверки знаний." in page_response.text
+    assert "Прогресс зависит от прохождения проверки знаний." in page_response.text
     assert "Пока ничего не проверено." in page_response.text
     assert "roadmap" not in page_response.text
     assert "deploy key" not in page_response.text
@@ -259,12 +260,19 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert styles_response.status_code == 200
     assert "text/css" in styles_response.headers["content-type"]
     assert ".page-shell" in styles_response.text
+    assert ".course-head {" in styles_response.text
+    assert "text-align: center;" in styles_response.text
     assert ".lesson-nav" in styles_response.text
     assert ".course-intro" in styles_response.text
+    assert ".course-intro-body" in styles_response.text
+    assert ".course-intro-part" in styles_response.text
+    assert ".course-intro .section-heading" in styles_response.text
+    assert "line-height: 1.38;" in styles_response.text
     assert ".definition-stack" in styles_response.text
     assert ".definition-card" in styles_response.text
     assert ".process-flow" in styles_response.text
     assert ".flashcard-face" in styles_response.text
+    assert "linear-gradient(180deg, #fff 0%, #fff6ec 100%)" not in styles_response.text
     assert ".next-step-card" in styles_response.text
     assert "textarea" not in styles_response.text
     assert "checkpoint-list" not in styles_response.text
@@ -276,6 +284,8 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "lesson-nav" in script_response.text
     assert "flashcards" in script_response.text
     assert "Проверка знаний" in script_response.text
+    assert "getLessonOneAnsweredCount" in script_response.text
+    assert 'state.answeredQuestions[quizKey("lesson-1", index)] !== undefined' in script_response.text
     assert "Как разрабатывать с помощью ChatGPT и Codex" in script_response.text
     assert "Проектная работа с ИИ: роль пользователя, ChatGPT и Codex" in script_response.text
     assert "Урок показывает первый принцип: простая идея превращается в план, а Codex выполняет конкретную техническую задачу." in script_response.text
@@ -317,6 +327,9 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "публичный ключ" in script_response.text
     assert "приватный ключ" in script_response.text
     assert "разрешение на запись" in script_response.text
+    assert "answeredQuestions === 1" in script_response.text
+    assert "Выполнено ${answeredQuestions} из ${totalQuestions} проверок." in script_response.text
+    assert "Все проверки урока выполнены." in script_response.text
     assert "scrollIntoView" not in script_response.text
     assert "Тестовая версия курса" not in script_response.text
     assert "тестовая версия урока" not in script_response.text
