@@ -98,6 +98,7 @@ def test_shared_header_css_adds_compact_mobile_nav_layout(client):
     assert "@media (max-width: 520px)" in response.text
     assert "grid-template-columns: 1fr;" in response.text
     assert ".top-nav .nav-settings-label {" in response.text
+    assert ".top-nav .nav-settings-label {\n    display: none;" not in response.text
 
 
 def test_login_and_register_pages(client):

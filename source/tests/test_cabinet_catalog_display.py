@@ -49,6 +49,7 @@ def test_cabinet_displays_course_shell_without_tariffs_or_payment_noise(client, 
     assert "/static/styles.css" in cabinet_response.text
     assert "Личный кабинет" in cabinet_response.text
     assert "Настройки" in cabinet_response.text
+    assert "⚙" not in cabinet_response.text
     assert 'href="/cabinet/settings"' in cabinet_response.text
     assert "Аккаунт" in cabinet_response.text
     assert "Логин: <strong>cabinetcatalog</strong>" in cabinet_response.text

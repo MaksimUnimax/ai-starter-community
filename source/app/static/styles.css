@@ -1580,10 +1580,6 @@ html { scroll-behavior: smooth; }
     grid-template-columns: 1fr;
   }
 
-  .top-nav .nav-settings-label {
-    display: none;
-  }
-
   .top-nav .nav-account-name,
   .top-nav .nav-account-email {
     max-width: 100%;

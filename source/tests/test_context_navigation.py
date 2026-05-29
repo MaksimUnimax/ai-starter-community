@@ -104,6 +104,7 @@ def test_authenticated_user_navigation_order_and_labels(client, test_settings):
         assert "navuser" in nav
         assert "nav-user@example.com" in nav
         assert "Настройки" in nav
+        assert "⚙" not in nav
         assert 'href="/cabinet/settings"' in nav
         assert 'method="post"' in nav
         assert 'action="/logout"' in nav
@@ -135,6 +136,7 @@ def test_authenticated_moderator_navigation_has_no_admin_panel(client, test_sett
         assert "navmoderator" in nav
         assert "nav-moderator@example.com" in nav
         assert "Настройки" in nav
+        assert "⚙" not in nav
         assert 'href="/cabinet/settings"' in nav
         assert 'method="post"' in nav
         assert 'action="/logout"' in nav
@@ -165,6 +167,7 @@ def test_authenticated_admin_navigation_includes_admin_panel(client, test_settin
         assert "navadmin" in nav
         assert "nav-admin@example.com" in nav
         assert "Настройки" in nav
+        assert "⚙" not in nav
         assert 'href="/cabinet/settings"' in nav
         assert 'method="post"' in nav
         assert 'action="/logout"' in nav
