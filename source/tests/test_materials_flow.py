@@ -135,12 +135,15 @@ def test_cabinet_contains_materials_link_and_locked_hint(client, test_settings):
     _prepare_and_login_verified_user(client, test_settings, "materials-cabinet@example.com", "materialscabinet")
     response = client.get("/cabinet")
     assert response.status_code == 200
-    assert "/materials" in response.text
-    assert "Перейти к материалам" in response.text
+    assert "Главная" in response.text
+    assert "Обучение" in response.text
+    assert "Перейти к обучению" in response.text
+    assert "/materials/drafts/dair-smoke-20260529/" in response.text
     assert "Логин: <strong>materialscabinet</strong>" in response.text
     assert "Email: materials-cabinet@example.com" in response.text
-    assert "Здесь появятся курсы, уроки и материалы по работе с ИИ." in response.text
-    assert "Сейчас раздел готовится." in response.text
+    assert "Здесь находится курс и материалы по работе с ИИ." in response.text
+    assert "Перейти к материалам" not in response.text
+    assert "Сейчас раздел готовится." not in response.text
     assert "Доступ к разделу «Работа с ИИ»" not in response.text
     assert "Раздел «Работа с ИИ» будет доступен после оплаты." not in response.text
 
@@ -167,7 +170,8 @@ def test_cabinet_access_labels_for_staff_and_paid_user(client, test_settings):
     assert paid_response.status_code == 200
     assert "Логин: <strong>cabinetpaid</strong>" in paid_response.text
     assert "Email: cabinet-paid@example.com" in paid_response.text
-    assert "Перейти к материалам" in paid_response.text
+    assert "Перейти к обучению" in paid_response.text
+    assert "/materials/drafts/dair-smoke-20260529/" in paid_response.text
 
     client.cookies.clear()
     _prepare_and_login_verified_user(client, test_settings, "cabinet-moderator@example.com", "cabinetmod", role="moderator")
@@ -175,7 +179,8 @@ def test_cabinet_access_labels_for_staff_and_paid_user(client, test_settings):
     assert moderator_response.status_code == 200
     assert "Логин: <strong>cabinetmod</strong>" in moderator_response.text
     assert "Email: cabinet-moderator@example.com" in moderator_response.text
-    assert "Перейти к материалам" in moderator_response.text
+    assert "Перейти к обучению" in moderator_response.text
+    assert "/materials/drafts/dair-smoke-20260529/" in moderator_response.text
 
     client.cookies.clear()
     _prepare_and_login_verified_user(client, test_settings, "cabinet-admin@example.com", "cabinetadm", role="admin")
@@ -183,7 +188,8 @@ def test_cabinet_access_labels_for_staff_and_paid_user(client, test_settings):
     assert admin_response.status_code == 200
     assert "Логин: <strong>cabinetadm</strong>" in admin_response.text
     assert "Email: cabinet-admin@example.com" in admin_response.text
-    assert "Перейти к материалам" in admin_response.text
+    assert "Перейти к обучению" in admin_response.text
+    assert "/materials/drafts/dair-smoke-20260529/" in admin_response.text
 
 
 def test_materials_redirects_unauthenticated_user_is_unchanged(client):

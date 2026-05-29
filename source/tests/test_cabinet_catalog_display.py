@@ -51,12 +51,12 @@ def test_cabinet_displays_course_shell_without_tariffs_or_payment_noise(client, 
     assert "Аккаунт" in cabinet_response.text
     assert "Логин: <strong>cabinetcatalog</strong>" in cabinet_response.text
     assert "Email: cabinet-catalog@example.com" in cabinet_response.text
-    assert "Личный кабинет" in cabinet_response.text
-    assert "Работа с ИИ" in cabinet_response.text
-    assert "Здесь появятся курсы, уроки и материалы по работе с ИИ." in cabinet_response.text
-    assert "Сейчас раздел готовится." in cabinet_response.text
-    assert "Перейти к материалам" in cabinet_response.text
-    assert "/materials" in cabinet_response.text
+    assert "Главная" in cabinet_response.text
+    assert "Обучение" in cabinet_response.text
+    assert "Работа с ИИ" not in cabinet_response.text
+    assert "Здесь находится курс и материалы по работе с ИИ." in cabinet_response.text
+    assert "Перейти к обучению" in cabinet_response.text
+    assert "/materials/drafts/dair-smoke-20260529/" in cabinet_response.text
     assert "Доступные тарифы" not in cabinet_response.text
     assert "Оплата" not in cabinet_response.text
     assert "Что дальше" not in cabinet_response.text

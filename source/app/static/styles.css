@@ -97,6 +97,21 @@ a:hover {
   margin: 0;
 }
 
+.top-nav .nav-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.top-nav .nav-links .nav-pill {
+  min-height: 40px;
+  padding: 8px 14px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
 .nav-link {
   display: inline-flex;
   align-items: center;

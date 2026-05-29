@@ -14,13 +14,14 @@
           <a class="nav-logo" href="/">OpenScript</a>
           <div class="nav-links">
             {% if current_user %}
-              <a href="/materials">Работа с ИИ</a>
-              <a href="/cabinet">Личный кабинет</a>
+              <a class="button button-secondary nav-pill" href="/">Главная</a>
+              <a class="button button-secondary nav-pill" href="/materials/drafts/dair-smoke-20260529/">Обучение</a>
+              <a class="button button-secondary nav-pill" href="/cabinet">Личный кабинет</a>
               {% if current_user.role == "admin" %}
-                <a href="/admin">Админ-панель</a>
+                <a class="button button-secondary nav-pill" href="/admin">Админ-панель</a>
               {% endif %}
               <form class="nav-form" method="post" action="/logout">
-                <button class="nav-link nav-button" type="submit">Выйти</button>
+                <button class="button button-secondary nav-pill" type="submit">Выйти</button>
               </form>
             {% else %}
               <a href="#what-you-get">Что вы получите</a>

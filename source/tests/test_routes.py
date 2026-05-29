@@ -67,11 +67,12 @@ def test_authenticated_landing_page_switches_to_account_and_learning_links(clien
     assert response.status_code == 200
     assert "Войти" not in response.text
     assert "Начать первый проект" not in response.text
+    assert "Работа с ИИ" not in response.text
+    assert "Обучение" in response.text
     assert "Личный кабинет" in response.text
-    assert "Работа с ИИ" in response.text
-    assert "Продолжить обучение" in response.text
+    assert "Перейти к обучению" in response.text
     assert "Выйти" in response.text
-    assert 'href="/materials"' in response.text
+    assert 'href="/materials/drafts/dair-smoke-20260529/"' in response.text
     assert 'href="/cabinet"' in response.text
     assert 'action="/logout"' in response.text
 

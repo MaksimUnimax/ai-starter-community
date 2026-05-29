@@ -1032,8 +1032,8 @@ a { color: inherit; }
 </head>
 <body>
 {% if current_user %}
-  {% set primary_cta_href = '/materials' %}
-  {% set primary_cta_label = 'Продолжить обучение' %}
+  {% set primary_cta_href = '/materials/drafts/dair-smoke-20260529/' %}
+  {% set primary_cta_label = 'Перейти к обучению' %}
   {% set secondary_cta_href = '/cabinet' %}
   {% set secondary_cta_label = 'Личный кабинет' %}
 {% else %}
@@ -1048,7 +1048,7 @@ a { color: inherit; }
     <a href="/" class="nav-logo">OpenScript</a>
     <div class="nav-links">
       {% if current_user %}
-        <a href="/materials">Работа с ИИ</a>
+        <a href="/materials/drafts/dair-smoke-20260529/">Обучение</a>
         <a href="/cabinet">Личный кабинет</a>
         {% if current_user.role == 'admin' %}
           <a href="/admin">Админ-панель</a>

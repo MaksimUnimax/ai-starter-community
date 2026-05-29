@@ -348,10 +348,11 @@ def test_route_flow_login_cabinet_logout_still_works(client, test_settings):
     assert "routeuser" in cabinet_response.text
     assert "Логин: <strong>routeuser</strong>" in cabinet_response.text
     assert "Email: route@example.com" in cabinet_response.text
-    assert "Работа с ИИ" in cabinet_response.text
-    assert "Здесь появятся курсы, уроки и материалы по работе с ИИ." in cabinet_response.text
-    assert "Сейчас раздел готовится." in cabinet_response.text
-    assert "Перейти к материалам" in cabinet_response.text
+    assert "Главная" in cabinet_response.text
+    assert "Обучение" in cabinet_response.text
+    assert "Здесь находится курс и материалы по работе с ИИ." in cabinet_response.text
+    assert "Перейти к обучению" in cabinet_response.text
+    assert "/materials/drafts/dair-smoke-20260529/" in cabinet_response.text
     assert "Доступные тарифы" not in cabinet_response.text
     assert "Оплата" not in cabinet_response.text
     assert "Выйти" in cabinet_response.text
@@ -498,14 +499,16 @@ def test_cabinet_shows_logout_button_and_access_text(client, test_settings):
     assert "cabinetux" in cabinet_response.text
     assert "Логин: <strong>cabinetux</strong>" in cabinet_response.text
     assert "Email: cabinetux@example.com" in cabinet_response.text
-    assert "Здесь появятся курсы, уроки и материалы по работе с ИИ." in cabinet_response.text
-    assert "Сейчас раздел готовится." in cabinet_response.text
-    assert "Перейти к материалам" in cabinet_response.text
+    assert "Главная" in cabinet_response.text
+    assert "Обучение" in cabinet_response.text
+    assert "Здесь находится курс и материалы по работе с ИИ." in cabinet_response.text
+    assert "Перейти к обучению" in cabinet_response.text
+    assert "/materials/drafts/dair-smoke-20260529/" in cabinet_response.text
     assert "Доступные тарифы" not in cabinet_response.text
     assert "Оплата" not in cabinet_response.text
     assert "Выйти" in cabinet_response.text
     assert "/static/styles.css" in cabinet_response.text
-    assert "Работа с ИИ" in cabinet_response.text
+    assert "Работа с ИИ" not in cabinet_response.text
 
 
 def test_password_hash_is_not_plaintext_and_session_revocation(test_settings):
