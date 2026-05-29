@@ -112,6 +112,10 @@ a:hover {
   white-space: nowrap;
 }
 
+.top-nav .logout-form {
+  margin: 0;
+}
+
 .nav-link {
   display: inline-flex;
   align-items: center;
@@ -1377,6 +1381,61 @@ html { scroll-behavior: smooth; }
     filter: sepia(0.04) saturate(1.45) contrast(1.45) brightness(0.86);
   }
 
+  .top-nav {
+    padding: 10px 12px;
+    gap: 10px;
+  }
+
+  .top-nav .nav-inner {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .top-nav .nav-logo {
+    text-align: center;
+    font-size: 1.08rem;
+    line-height: 1.1;
+  }
+
+  .top-nav .nav-links {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    justify-content: stretch;
+    align-items: stretch;
+  }
+
+  .top-nav .nav-links .nav-pill,
+  .top-nav .nav-links a,
+  .top-nav .nav-links button,
+  .top-nav .nav-links .button,
+  .top-nav .nav-links .logout-form {
+    width: 100%;
+  }
+
+  .top-nav .nav-links .nav-pill,
+  .top-nav .nav-links a,
+  .top-nav .nav-links button {
+    min-height: 38px;
+    padding: 10px 12px;
+    font-size: 0.92rem;
+    line-height: 1.15;
+    text-align: center;
+    white-space: normal;
+  }
+
+  .top-nav .nav-form {
+    width: 100%;
+  }
+
+  .top-nav .nav-form > .button {
+    width: 100%;
+  }
+
   .public-landing-page .hero-title {
     font-size: clamp(2rem, 10vw, 3rem);
   }
@@ -1432,6 +1491,12 @@ html { scroll-behavior: smooth; }
 
   .public-landing-page .btn {
     width: 100%;
+  }
+}
+
+@media (max-width: 520px) {
+  .top-nav .nav-links {
+    grid-template-columns: 1fr;
   }
 }
 
