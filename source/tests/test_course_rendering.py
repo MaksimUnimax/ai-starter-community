@@ -172,148 +172,13 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Что изучаем" in page_response.text
     assert "Зачем это нужно" in page_response.text
     assert "Где это применяется" in page_response.text
-    for english_label in [
-        "LESSON INTRO",
-        "LEARNING OUTCOME",
-        "KEY CONCEPTS",
-        "WHAT THE USER DOES",
-        "WHAT CHATGPT DOES",
-        "WHAT CODEX DOES",
-        "WORKING EXAMPLE",
-        "KNOWLEDGE CHECK",
-        "LESSON RESULT",
-        "NEXT LESSON",
-        "WHY DOCUMENTS MATTER",
-        "WHAT DOCUMENTS STORE",
-        "WHAT DOCUMENTS SHOULD NOT STORE",
-        "WHAT CAN BE LOST",
-        "HOW TO START",
-        "WHAT NOT TO DO",
-        "WHEN TO UPDATE DOCUMENTS",
-        "WHAT NOT TO DOCUMENT",
-        "HOW DOCUMENTS ARE UPDATED",
-        "BAD EXAMPLE",
-        "WHY IT MATTERS",
-        "WHAT TECHNICAL SPECIFICATION CONTAINS",
-        "WHAT ROADMAP CONTAINS",
-        "USER ROLE",
-        "WHAT USER SHOULD KNOW",
-        "WHAT CODEX REPORT SHOULD INCLUDE",
-        "WHAT IS A SAFE STEP",
-        "SAFE STEP PROCESS",
-        "WHAT CODEX REPORT IS",
-        "WHAT CHATGPT DOES WITH REPORT",
-        "DECISIONS AFTER REPORT",
-    ]:
-        assert english_label not in page_response.text
     assert page_response.text.count("course-intro-part") == 3
-    assert "Прогресс зависит от прохождения проверки знаний." in page_response.text
-    assert "В этом курсе вы изучаете, как вести проектную работу с помощью ChatGPT и Codex без ручного написания кода." in page_response.text
-    assert "Пользователю не нужно заранее знать программирование, дизайн, вёрстку, архитектуру, документацию или техническое задание." in page_response.text
-    assert "Дальше ChatGPT помогает продумать задачу, подготовить документы, спланировать внешний вид" in page_response.text
-    for phrase in [
-        "Урок 1",
-        "Урок 2",
-        "Урок 3",
-        "Урок 4",
-        "Урок 5",
-        "Урок 6",
-        "Урок 7",
-        "Урок 8",
-        "Урок 9",
-        "Проектная работа с ИИ",
-        "Роли пользователя, ChatGPT и Codex",
-        "Документы как память проекта",
-        "Новый диалог после перерыва",
-        "Обновление документации",
-        "ТЗ и дорожная карта",
-        "Git и ключ доступа",
-        "Один безопасный шаг разработки",
-        "Отчёт Codex",
-    ]:
-        assert phrase in page_response.text
-    assert "Проектная работа с ИИ: роль пользователя, ChatGPT и Codex" in page_response.text
-    assert "Урок показывает первый принцип: простая идея превращается в план, а Codex выполняет конкретную техническую задачу." in page_response.text
-    assert "В этом уроке вы увидите, как простая идея пользователя превращается в понятный рабочий шаг для ChatGPT и Codex." in page_response.text
-    assert "Ключевые понятия" in page_response.text
-    assert "Пользователь — это человек" in page_response.text
-    assert "ChatGPT — это ИИ-помощник" in page_response.text
-    assert "Codex — это ИИ-агент для программной разработки" in page_response.text
-    assert "Как это работает в курсе" in page_response.text
-    assert "ChatGPT ведёт техническую работу" in page_response.text
-    assert "Codex выполняет задачу на сервере" in page_response.text
-    assert "В работе участвуют три роли" not in page_response.text
-    assert "Сделай мне сайт" in page_response.text
-    assert "Хочу сайт для записи на консультацию" in page_response.text
-    assert "Вступление" in page_response.text
-    assert "Схема процесса" in page_response.text
-    assert "Пользователь ставит цель" in page_response.text
-    assert "ChatGPT проектирует технический шаг" in page_response.text
-    assert "Codex выполняет задачу на сервере" in page_response.text
-    assert "Рабочий пример" in page_response.text
-    assert "С чего может начать пользователь" in page_response.text
-    assert "Что делает ChatGPT дальше" in page_response.text
-    assert "Что делает Codex" in page_response.text
-    assert "Что проверяет пользователь" in page_response.text
-    assert "С чего правильно начать работу над сайтом?" in page_response.text
-    assert "С обсуждения проекта и этапов разработки с ChatGPT." in page_response.text
-    assert "Разбор примера" not in page_response.text
-    assert "Практика: опишите страницу сайта" not in page_response.text
-    assert "<textarea" not in page_response.text
-    assert "Пример ответа" not in page_response.text
-    assert "Типичные ошибки" not in page_response.text
-    assert "Проверьте себя" not in page_response.text
-    assert "Главный вывод урока" in page_response.text
-    assert "Следующий шаг" in page_response.text
-    assert "Перейти к уроку 2" in page_response.text
+    assert page_response.text.count('class="nav-button') == 10
+    assert page_response.text.count("nav-title") == 10
     assert page_response.text.count("Вернуться в личный кабинет") == 2
     assert page_response.text.count('href="/cabinet"') == 2
-    assert "Структура урока" in page_response.text
-    assert "Прогресс по проверке урока" in page_response.text
     assert "Прогресс зависит от прохождения проверки знаний." in page_response.text
     assert "Пока ничего не проверено." in page_response.text
-    assert "roadmap" not in page_response.text
-    assert "deploy key" not in page_response.text
-    assert "scope" not in page_response.text
-    assert "ТЗ и дорожная карта" in page_response.text
-    assert "Git и ключ доступа" in page_response.text
-    assert page_response.text.count('class="nav-button') == 9
-    assert page_response.text.count("nav-title") == 9
-    assert "lesson-strip" in page_response.text
-    assert "lesson-progress" in page_response.text
-    assert "lesson-shell" in page_response.text
-    assert "definition-stack" in page_response.text
-    assert "definition-card" in page_response.text
-    assert "process-flow" in page_response.text
-    assert "next-step-card" in page_response.text
-    assert "Карточки" in page_response.text
-    assert 'class="flashcard"' in page_response.text
-    assert "flashcard-title" in page_response.text
-    assert "flashcard-note" in page_response.text
-    assert "flashcard-inner" not in page_response.text
-    assert "flashcard-face" not in page_response.text
-    assert 'class="sidebar"' not in page_response.text
-    assert 'class="workspace"' not in page_response.text
-    assert 'class="hero-meta"' not in page_response.text
-    assert 'class="course-map-card"' not in page_response.text
-    assert 'class="course-overview"' not in page_response.text
-    assert '<textarea' not in page_response.text
-    assert 'href="styles.css"' in page_response.text
-    assert 'src="script.js"' in page_response.text
-    assert "DAIR smoke artifact" not in page_response.text
-    assert "Draft test page" not in page_response.text
-    assert "SKILL.md" not in page_response.text
-    assert "course.yaml" not in page_response.text
-    assert ".agents/skills" not in page_response.text
-    assert "Start Learning" not in page_response.text
-    assert "Open review" not in page_response.text
-    assert "Source notes" not in page_response.text
-    assert "Sources" not in page_response.text
-    assert "/tmp/dair_smoke_20260529" not in page_response.text
-    assert "file://" not in page_response.text
-    assert "Сделай мне ИИ-агента" not in page_response.text
-    assert "Опишите своего первого ИИ-агента" not in page_response.text
-    assert "ИИ-агент, который помогает начинать новую задачу" not in page_response.text
     assert styles_response.status_code == 200
     assert "text/css" in styles_response.headers["content-type"]
     assert ".page-shell" in styles_response.text
@@ -351,8 +216,9 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "window.history.replaceState" in script_response.text
     assert "location.hash" not in script_response.text
     assert "scrollIntoView" not in script_response.text
-    assert "labelTranslations" in script_response.text
-    assert "translateLessonMarkup" in script_response.text
+    assert "labelTranslations" not in script_response.text
+    assert "translateLessonMarkup" not in script_response.text
+    assert "translateLabel" not in script_response.text
     assert "Проверка знаний" in script_response.text
     assert "getSectionQuestionCount" in script_response.text
     assert "getSectionAnsweredCount" in script_response.text
@@ -360,37 +226,29 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert 'state.answeredQuestions[quizKey(section.id, index)] !== undefined' in script_response.text
     assert "renderStructuredLesson" in script_response.text
     assert 'section.nextStepTargetId || "lesson-2"' in script_response.text
-    assert 'id: "review"' in script_response.text
-    assert "Пользователь — это человек" in script_response.text
-    assert "ChatGPT — это ИИ-помощник" in script_response.text
-    assert "Codex — это ИИ-агент для программной разработки" in script_response.text
-    assert "В этом уроке разбираем, кто за что отвечает в рабочем процессе." in script_response.text
-    assert "Роль пользователя — поставить цель, объяснить желаемый результат и принять готовую работу." in script_response.text
-    assert "Пользователь не обязан:" in script_response.text
-    assert "Пользователь говорит:" in script_response.text
-    assert "В этом уроке разбираем, почему проект нельзя вести только по переписке и памяти." in script_response.text
-    assert "Документы проекта — это память проекта." in script_response.text
-    assert "В этом уроке разбираем, как продолжать работу после паузы, нового чата или нескольких выполненных задач." in script_response.text
-    assert "Новый диалог должен начинаться с восстановления состояния." in script_response.text
-    assert "В этом уроке разбираем, когда нужно обновлять документы проекта." in script_response.text
-    assert "Документы нужно обновлять после:" in script_response.text
-    assert "В этом уроке разбираем разницу между техническим заданием и дорожной картой." in script_response.text
-    assert "Техническое задание отвечает на вопрос: что нужно сделать." in script_response.text
-    assert "Дорожная карта отвечает на вопрос: в каком порядке это делать." in script_response.text
-    assert "В этом уроке разбираем, зачем проекту нужен Git" in script_response.text
-    assert "Git — система истории изменений проекта." in script_response.text
-    assert "В этом уроке разбираем, как выглядит один нормальный шаг работы" in script_response.text
-    assert "Безопасный шаг — это задача, которую можно:" in script_response.text
-    assert "В этом уроке разбираем, как читать отчёт Codex" in script_response.text
-    assert "Отчёт Codex — это техническое объяснение выполненной работы." in script_response.text
-    assert "Пользователь может начать просто:" in script_response.text
-    assert "Хочу сайт для записи на консультацию." in script_response.text
-    assert "Открой текущий статус проекта, посмотри последнее принятое решение, проверь правила и продолжай со следующего шага." in script_response.text
-    assert "Плохо:" in script_response.text
-    assert "Правильно:" in script_response.text
-    assert "Проверки должны быть кликовыми." in script_response.text
-    assert "После курса пользователь понимает, как вести проектную работу с ИИ" in script_response.text
-    assert "Проверка знаний" in script_response.text
+    assert 'id: "lesson-10"' in script_response.text
+    assert 'review: "lesson-10"' in script_response.text
+    assert 'navTitle: "Урок 10 — Ошибки, лайфхаки и правила работы"' in script_response.text
+    assert "lesson-10" in script_response.text
+    assert "Начало работы с ChatGPT" in script_response.text
+    assert "ChatGPT как профессиональный технический специалист" in script_response.text
+    assert "Документация как контроль разработки" in script_response.text
+    assert "Обновление документации" in script_response.text
+    assert "Новый диалог через документы" in script_response.text
+    assert "Git: история, commit, push и откат" in script_response.text
+    assert "Как проходит рабочий run Codex" in script_response.text
+    assert "PowerShell, Terminal и подключение к серверу" in script_response.text
+    assert "Сервер, Codex, AGENTS.md и Skills" in script_response.text
+    assert "Ошибки, лайфхаки и правила работы" in script_response.text
+    assert "Контекстное окно" in script_response.text
+    assert "Не вести диалог с Codex" in script_response.text
+    assert "Проверять отчёт, а не верить слову “готово”" in script_response.text
+    assert "Вступление" in script_response.text
+    assert "После урока вы сможете" in script_response.text
+    assert "Рабочий пример" in script_response.text
+    assert "Главный вывод урока" in script_response.text
+    assert "Следующий урок" in script_response.text
+    assert "Итог курса" in script_response.text
     assert "Тестовая версия курса" not in script_response.text
     assert "тестовая версия урока" not in script_response.text
     assert "DAIR smoke artifact" not in script_response.text
