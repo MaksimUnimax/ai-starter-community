@@ -95,6 +95,11 @@ def test_shared_stylesheet_uses_main_page_theme(client):
     assert "--bg: #faf6f1;" in response.text
     assert "--primary: #c45c26;" in response.text
     assert "font-family: var(--font-display);" in response.text
+    assert ".learning-card-note," in response.text
+    assert "width: min(60ch, 100%);" in response.text
+    assert "margin-left: auto;" in response.text
+    assert "margin-right: auto;" in response.text
+    assert "text-align: center;" in response.text
 
 
 def test_materials_shows_locked_state_without_access(client, test_settings):

@@ -576,7 +576,9 @@ button:hover {
 .learning-card-note,
 .learning-card-lock {
   margin: 0;
-  max-width: 60ch;
+  width: min(60ch, 100%);
+  margin-left: auto;
+  margin-right: auto;
   text-align: center;
 }
 
