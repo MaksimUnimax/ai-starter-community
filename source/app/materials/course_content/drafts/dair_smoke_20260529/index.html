@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Работа с ИИ — тестовая версия урока</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="hero panel">
+      <div class="hero-copy">
+        <p class="eyebrow">Тестовая версия урока</p>
+        <h1>Работа с ИИ</h1>
+        <p class="lede">
+          Первый урок курса открыт прямо в приложении. Здесь можно пройти навигацию,
+          карточки, мини-проверку и прогресс без лишних технических деталей.
+        </p>
+        <div class="hero-actions">
+          <button class="primary-button" id="start-learning" type="button">Начать урок</button>
+          <button class="ghost-button" id="open-review" type="button">Перейти к проверке</button>
+        </div>
+      </div>
+
+      <aside class="hero-meta">
+        <div class="meta-card">
+          <span class="meta-label">Аудитория</span>
+          <strong>Новички без опыта программирования</strong>
+        </div>
+        <div class="meta-card">
+          <span class="meta-label">Язык</span>
+          <strong>Русский</strong>
+        </div>
+        <div class="meta-card">
+          <span class="meta-label">Статус</span>
+          <strong>Тестовая версия первого урока</strong>
+        </div>
+      </aside>
+    </header>
+
+    <main class="workspace">
+      <aside class="sidebar">
+        <section class="panel">
+          <div class="section-heading">
+            <p class="eyebrow">Навигация</p>
+            <h2>Структура урока</h2>
+          </div>
+          <nav class="lesson-nav" id="lesson-nav" aria-label="Навигация по курсу"></nav>
+        </section>
+
+        <section class="panel progress-panel">
+          <div class="section-heading">
+            <p class="eyebrow">Прогресс</p>
+            <h2>Проверка урока</h2>
+          </div>
+          <div class="progress-meter" aria-label="Прогресс курса">
+            <div class="progress-track">
+              <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="progress-copy">
+              <strong id="progress-value">0%</strong>
+              <span id="progress-label">Пока открыт только обзор.</span>
+            </div>
+          </div>
+          <ul class="checkpoint-list" id="checkpoint-list"></ul>
+        </section>
+
+      </aside>
+
+      <section class="stage">
+        <article class="panel course-overview">
+          <div class="section-heading">
+            <p class="eyebrow">Обзор урока</p>
+            <h2>Что есть в этой тестовой версии</h2>
+          </div>
+          <p>
+            Это тестовая версия первого урока курса. Она показывает роли ChatGPT, Codex и
+            пользователя, даёт практическое задание и позволяет проверить понимание прямо в
+            приложении.
+          </p>
+          <div class="summary-grid">
+            <div>
+              <span class="summary-label">Фокус</span>
+              <strong>Роли, навигация, самопроверка</strong>
+            </div>
+            <div>
+              <span class="summary-label">Формат</span>
+              <strong>Тестовая версия урока</strong>
+            </div>
+            <div>
+              <span class="summary-label">Статус</span>
+              <strong>Не полный курс, а проверочный первый урок</strong>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel lesson-shell">
+          <div id="active-section" aria-live="polite"></div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

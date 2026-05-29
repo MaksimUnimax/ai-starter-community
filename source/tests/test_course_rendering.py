@@ -144,13 +144,13 @@ def test_materials_and_lesson_pages_render_course_content(client, test_settings)
     assert "/materials" in lesson_response.text
 
 
-def test_dair_smoke_test_page_is_served_by_the_app(client, test_settings):
-    _prepare_verified_user(client, test_settings, "dair-smoke@example.com", "dairsmoke")
+def test_lesson_test_page_is_served_by_the_app(client, test_settings):
+    _prepare_verified_user(client, test_settings, "lesson-test@example.com", "lessontest")
 
     materials_response = client.get("/materials")
     assert materials_response.status_code == 200
     assert "/materials/drafts/dair-smoke-20260529/" in materials_response.text
-    assert "Открыть тестовую страницу" in materials_response.text
+    assert "Открыть тестовую версию урока" in materials_response.text
 
     page_response = client.get("/materials/drafts/dair-smoke-20260529/")
     assert page_response.status_code == 200
@@ -158,8 +158,22 @@ def test_dair_smoke_test_page_is_served_by_the_app(client, test_settings):
     assert "Как мы работаем" in page_response.text
     assert "ChatGPT" in page_response.text
     assert "Codex" in page_response.text
+    assert "Тестовая версия урока" in page_response.text
+    assert "Начать урок" in page_response.text
+    assert "Перейти к проверке" in page_response.text
+    assert "Структура урока" in page_response.text
+    assert "Прогресс" in page_response.text
     assert 'href="styles.css"' in page_response.text
     assert 'src="script.js"' in page_response.text
+    assert "DAIR smoke artifact" not in page_response.text
+    assert "Draft test page" not in page_response.text
+    assert "SKILL.md" not in page_response.text
+    assert "course.yaml" not in page_response.text
+    assert ".agents/skills" not in page_response.text
+    assert "Start Learning" not in page_response.text
+    assert "Open review" not in page_response.text
+    assert "Source notes" not in page_response.text
+    assert "Sources" not in page_response.text
     assert "/tmp/dair_smoke_20260529" not in page_response.text
     assert "file://" not in page_response.text
 
@@ -177,6 +191,15 @@ def test_dair_smoke_test_page_is_served_by_the_app(client, test_settings):
     assert "flashcards" in script_response.text
     assert "quiz" in script_response.text
     assert "checkpoint-list" in script_response.text
+    assert "DAIR smoke artifact" not in script_response.text
+    assert "Draft test page" not in script_response.text
+    assert "SKILL.md" not in script_response.text
+    assert "course.yaml" not in script_response.text
+    assert ".agents/skills" not in script_response.text
+    assert "Start Learning" not in script_response.text
+    assert "Open review" not in script_response.text
+    assert "Source notes" not in script_response.text
+    assert "Sources" not in script_response.text
 
 
 def test_materials_and_lesson_redirect_for_anonymous_user(client):

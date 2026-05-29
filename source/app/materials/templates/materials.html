@@ -21,13 +21,13 @@
         </section>
       </div>
 
-      {% if dair_smoke_test_url %}
+      {% if lesson_test_url %}
         <section class="card stack">
-          <p class="muted">Тестовая страница</p>
-          <h2 class="section-title">DAIR smoke artifact</h2>
-          <p class="form-help">Локальная страница для браузерной проверки курса внутри приложения. Это draft/test route, не production-интеграция.</p>
+          <p class="muted">Тестовая версия урока</p>
+          <h2 class="section-title">Работа с ИИ</h2>
+          <p class="form-help">Открой первый урок прямо в приложении и проверь навигацию, карточки, проверку знаний и прогресс.</p>
           <div class="actions">
-            <a class="button button-secondary" href="{{ dair_smoke_test_url }}">Открыть тестовую страницу</a>
+            <a class="button button-secondary" href="{{ lesson_test_url }}">Открыть тестовую версию урока</a>
           </div>
         </section>
       {% endif %}
