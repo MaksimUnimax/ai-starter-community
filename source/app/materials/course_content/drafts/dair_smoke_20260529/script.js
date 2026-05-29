@@ -14,207 +14,148 @@ const courseData = {
       description:
         "В этом уроке мы разбираем первую и самую важную мысль курса: для работы над проектом не обязательно писать код вручную, но нужно понимать, как организована работа.",
       intro: [
-        "Если пользователь просто говорит “Сделай мне сайт”, этого недостаточно. Не ясно, для кого страница нужна, какая у неё цель, какие блоки должны быть на ней и как проверить результат.",
+        "Если пользователь просто говорит “сделай мне ИИ-агента”, этого недостаточно. Не ясно, для чего агент нужен, где он будет работать, что ему разрешено, что запрещено и как проверить результат.",
         "Правильная работа начинается не с кода, а с постановки задачи: что нужно получить, какие есть ограничения, кто проверяет результат и какой отчёт должен вернуть исполнитель."
       ],
       learningOutcomeTitle: "После урока вы сможете",
       learningOutcome: [
-        "Объяснить свою роль в разработке с ИИ.",
-        "Отличить роль ChatGPT от роли Codex.",
-        "Сформулировать первую безопасную задачу для страницы сайта.",
-        "Понять, почему результат проверяется по фактам, а не по обещанию “Готово”.",
-        "Подготовить основу для следующего шага разработки."
+        "объяснить свою роль в разработке с ИИ;",
+        "отличить роль ChatGPT от роли Codex;",
+        "сформулировать первую безопасную задачу для работы над ИИ-агентом;",
+        "понять, почему результат проверяется по фактам, а не по обещанию “готово”;",
+        "подготовить основу для следующего шага разработки."
       ],
       roleTitle: "В работе участвуют три роли",
       roles: [
         {
           name: "Пользователь",
-          definition:
-            "Пользователь — это человек, который хочет получить готовый результат: сайт, страницу, сервис, бота, автоматизацию или другой проект.",
+          label: "Пользователь — заказчик и владелец результата",
+          lead: "заказчик и владелец результата",
+          description:
+            "Он формулирует цель, объясняет, какой результат нужен, проверяет готовую работу и принимает решение: подходит или нужно исправлять."
         },
         {
           name: "ChatGPT",
-          definition:
-            "ChatGPT — это ИИ-помощник для диалога, анализа и планирования задачи. С ним можно обсудить идею, разобрать проблему, выбрать подход и подготовить понятное задание для технической работы."
+          label: "ChatGPT — ведущий программист, архитектор и технический руководитель",
+          lead: "ведущий программист, архитектор и технический руководитель",
+          description:
+            "Он разбирает задачу, выбирает подход, инструменты и языки, планирует архитектуру, делит работу на безопасные шаги, пишет точные задания для Codex, контролирует отчёты и проверяет ход работы."
         },
         {
           name: "Codex",
-          definition:
-            "Codex — это ИИ-агент для программной разработки. Он отличается от обычного чата тем, что работает с проектом: файлами, кодом, проверками и отчётом о выполненной задаче."
-        }
-      ],
-      courseUsageTitle: "Как это работает в курсе",
-      courseUsage: [
-        {
-          title: "Пользователь",
-          text:
-            "Пользователь задаёт цель и принимает результат. Он объясняет, что хочет получить, смотрит готовую работу и решает: подходит результат или нужно исправлять."
-        },
-        {
-          title: "ChatGPT",
-          text:
-            "ChatGPT ведёт техническую работу. Он выступает как ведущий программист и архитектор: разбирает задачу, выбирает подход, планирует безопасный шаг и готовит точное задание для Codex."
-        },
-        {
-          title: "Codex",
-          text:
-            "Codex выполняет задачу на сервере. Он работает в нужном репозитории, меняет только разрешённые файлы, запускает проверки и возвращает отчёт."
+          label: "Codex — исполнитель на сервере",
+          lead: "исполнитель на сервере",
+          description:
+            "Он работает на сервере в нужном репозитории, читает файлы проекта, вносит изменения, запускает проверки, делает commit/push, если это входит в задачу, и возвращает отчёт."
         }
       ],
       processTitle: "Схема процесса",
       processScheme:
-        "Сначала идёт постановка задачи, затем безопасный шаг, проверка отчёта и следующий шаг.",
+        "Пользователь ставит цель → ChatGPT проектирует технический шаг → Codex выполняет задачу на сервере → Codex возвращает отчёт → ChatGPT проверяет отчёт → пользователь смотрит результат и принимает решение.",
       processSteps: [
-        "Пользователь ставит цель.",
-        "ChatGPT проектирует технический шаг.",
-        "Codex выполняет задачу на сервере.",
-        "Codex возвращает отчёт.",
-        "ChatGPT проверяет отчёт.",
-        "Пользователь смотрит результат и принимает решение."
+        "Пользователь ставит цель",
+        "ChatGPT проектирует технический шаг",
+        "Codex выполняет задачу на сервере",
+        "Codex возвращает отчёт",
+        "ChatGPT проверяет отчёт",
+        "Пользователь смотрит результат и принимает решение"
       ],
       importantExplanationTitle: "Почему это важно",
       importantExplanation:
         "Работа без ручного написания кода не означает работу без контроля. Пользователь может не знать, как устроены файлы и команды, но он должен понимать, что именно нужно сделать и как будет проверяться результат.",
       badExampleTitle: "Плохая постановка задачи",
-      badExampleQuote: "Сделай мне сайт.",
+      badExampleQuote: "Сделай мне ИИ-агента.",
       badExampleReasons: [
-        "Не понятно, для кого сайт.",
-        "Не понятно, какая цель страницы.",
-        "Не понятно, какие блоки нужны.",
-        "Не понятно, где должна быть форма.",
-        "Не понятно, какие действия запрещены.",
-        "Не понятно, как проверить результат."
+        "не понятно, для чего агент нужен;",
+        "не понятно, кто будет им пользоваться;",
+        "не понятно, где он должен работать;",
+        "не понятно, что агент должен уметь;",
+        "не понятно, какие данные ему можно использовать;",
+        "не понятно, что агенту запрещено делать;",
+        "не понятно, как проверить, что агент работает правильно."
       ],
       goodExampleTitle: "Профессиональная постановка задачи",
       goodExampleIntro:
-        "Нужно спроектировать простую страницу сайта для записи на консультацию.",
+        "Нужно спроектировать первого ИИ-агента для работы с задачами пользователя.",
       goodExampleText:
-        "Страница должна объяснять услугу, показывать преимущества, отвечать на частые вопросы и вести пользователя к форме заявки.",
+        "Агент должен помогать пользователю разбирать задачу, задавать уточняющие вопросы, предлагать следующий безопасный шаг и формировать задание для Codex.",
       goodExampleLimit:
-        "На первом этапе не нужно подключать оплату, личный кабинет или сложную CRM.",
+        "На первом этапе агент не должен сам менять файлы, запускать команды или принимать решения за пользователя.",
       goodExampleQuestionsTitle: "Нужно описать",
       goodExampleQuestions: [
-        "Цель страницы.",
-        "Для кого страница.",
-        "Какие блоки должны быть на странице.",
-        "Какие данные пользователь оставляет в форме.",
-        "Что происходит после отправки заявки.",
-        "Что нельзя трогать на сайте.",
-        "Как проверить, что страница работает правильно."
+        "цель агента;",
+        "сценарии использования;",
+        "что агент получает на вход;",
+        "что агент возвращает на выход;",
+        "какие действия агенту запрещены;",
+        "как пользователь проверяет результат;",
+        "какие данные нужны для следующего шага разработки."
       ],
       goodExampleResult:
-        "Результат первого этапа — понятное описание страницы и структуры блоков, по которому потом можно дать Codex отдельную задачу на реализацию.",
+        "Результат должен быть не кодом сразу, а понятным техническим описанием агента, по которому потом можно будет дать Codex отдельную задачу на реализацию.",
       exampleBreakdownTitle: "Разбор примера",
       exampleBreakdown: [
         {
           label: "Цель",
-          text: "Получить заявку на консультацию."
+          text: "агент помогает пользователю вести проект."
         },
         {
-          label: "Аудитория",
-          text: "Человек, которому нужна услуга."
-        },
-        {
-          label: "Структура",
-          text: "Заголовок, описание, преимущества, вопросы, форма."
+          label: "Роль агента",
+          text: "разбирать задачу и готовить следующий безопасный шаг."
         },
         {
           label: "Ограничение",
-          text: "Не трогать оплату, личный кабинет и другие разделы."
+          text: "агент пока ничего не меняет сам."
+        },
+        {
+          label: "Результат",
+          text: "техническое описание, а не сразу код."
         },
         {
           label: "Проверка",
-          text: "Страница открывается, текст понятен, форма видна, путь пользователя логичен."
+          text: "пользователь может понять, что агент делает, чего не делает и зачем нужен."
         }
       ],
-      practiceActivities: [
-        {
-          prompt: "Для кого нужна страница?",
-          options: [
-            "Для человека, которому нужна консультация.",
-            "Для Codex, чтобы он сам выбрал цель.",
-            "Для случайного посетителя без понятной задачи."
-          ],
-          answerIndex: 0,
-          explanation: "Страница нужна человеку, который ищет консультацию и должен быстро понять, что он получит."
-        },
-        {
-          prompt: "Какая главная цель страницы?",
-          options: [
-            "Получить заявку на консультацию.",
-            "Показать все разделы сайта сразу.",
-            "Спрятать форму внизу без объяснения."
-          ],
-          answerIndex: 0,
-          explanation: "Главный результат страницы — понятная заявка от человека, которому нужна услуга."
-        },
-        {
-          prompt: "Какие блоки нужны на странице?",
-          options: [
-            "Заголовок, описание услуги, преимущества, частые вопросы, форма заявки.",
-            "Только одна кнопка без объяснения.",
-            "Личный кабинет, оплата, админка и CRM на первом шаге."
-          ],
-          answerIndex: 0,
-          explanation: "Страница должна объяснить услугу и логично привести к форме заявки."
-        },
-        {
-          prompt: "Что нельзя трогать в первом шаге?",
-          options: [
-            "Оплату, личный кабинет, админку и другие разделы.",
-            "Всё можно менять сразу.",
-            "Нужно удалить старые страницы без проверки."
-          ],
-          answerIndex: 0,
-          explanation: "Первый шаг должен быть безопасным и не затрагивать лишние части сайта."
-        },
-        {
-          prompt: "Как понять, что первый этап готов?",
-          options: [
-            "Страница открывается, текст понятен, форма видна, путь пользователя логичен.",
-            "Codex написал “готово”, но ничего не проверил.",
-            "Пользователь не открывал страницу."
-          ],
-          answerIndex: 0,
-          explanation: "Готовность подтверждается открытой страницей и понятным пользовательским путём."
-        }
+      practiceTitle: "Практика: опишите своего первого ИИ-агента",
+      practiceIntro: "Ответьте на шесть вопросов:",
+      practiceQuestions: [
+        "Для чего нужен агент?",
+        "Какую одну главную задачу он должен помогать решать?",
+        "Что пользователь будет давать агенту на вход?",
+        "Что агент должен возвращать на выход?",
+        "Какие действия агенту запрещены?",
+        "Как понять, что агент сработал правильно?"
       ],
-      practiceTitle: "Практика: соберите задачу для страницы сайта",
-      practiceIntro: "Выберите один ответ для каждого вопроса. После каждого выбора появится обратная связь.",
-      practiceHelper: "Заполните все поля. Затем нажмите кнопку проверки.",
-      practiceSuccessText:
-        "Практика заполнена. Теперь эту заготовку можно использовать для постановки задачи.",
-      practiceErrorPrefix: "Заполните поля:",
       exampleAnswerTitle: "Пример ответа",
       exampleAnswerParagraphs: [
-        "Мне нужна простая страница сайта для записи на консультацию.",
-        "Пользователь сразу понимает, что это за услуга и что он получит.",
-        "Понятное описание задачи может выглядеть так:"
+        "Мне нужен ИИ-агент, который помогает начинать новую задачу по проекту.",
+        "Пользователь пишет агенту, что хочет изменить или добавить.",
+        "Агент должен:"
       ],
       exampleAnswerBullets: [
-        "Кратко объяснить услугу;",
-        "Показать преимущества;",
-        "Ответить на частые вопросы;",
-        "Вести к форме заявки;",
-        "Проверить, что форма видна и путь пользователя понятен."
+        "кратко пересказать задачу;",
+        "найти, чего не хватает;",
+        "задать уточняющие вопросы;",
+        "предложить один следующий безопасный шаг;",
+        "подготовить черновик задания для ChatGPT или Codex."
       ],
       exampleAnswerFooter:
-        "На первом этапе не нужно подключать оплату, личный кабинет или сложную CRM. Результат считается правильным, если пользователь понял структуру страницы и следующий шаг.",
+        "Агенту запрещено: самому менять файлы; запускать команды; придумывать факты о проекте; читать секреты; делать несколько задач сразу. Результат считается правильным, если пользователь получил понятный следующий шаг и понимает, что делать дальше.",
       commonMistakesTitle: "Типичные ошибки",
       commonMistakes: [
-        "Просить “Сделай мне сайт” без описания цели.",
-        "Не указывать, для кого эта страница.",
-        "Не перечислять нужные блоки.",
-        "Не говорить, что нельзя трогать.",
-        "Не объяснять, как проверить результат."
+        "Просить “сделай агента” без описания задачи.",
+        "Давать агенту слишком много полномочий сразу.",
+        "Не указывать, что агенту запрещено.",
+        "Не определять, как пользователь проверит результат.",
+        "Просить Codex сразу писать код, когда сначала нужно техническое описание."
       ],
       selfCheckTitle: "Проверьте себя",
       selfCheck: [
-        "Я могу объяснить, для кого нужна страница.",
-        "Я могу назвать одну главную цель страницы.",
-        "Я понимаю, какие блоки должны быть на странице.",
-        "Я понимаю, какие данные нужны в форме.",
-        "Я указал, что нельзя трогать на сайте.",
+        "Я могу объяснить, зачем нужен мой агент.",
+        "Я могу назвать одну главную задачу агента.",
+        "Я понимаю, что агент получает на вход.",
+        "Я понимаю, что агент должен вернуть на выход.",
+        "Я указал, что агенту запрещено.",
         "Я понимаю, как проверить результат."
       ],
       flashcards: [
@@ -231,32 +172,32 @@ const courseData = {
           back: "Выполняет задачу на сервере в нужном репозитории и возвращает отчёт."
         },
         {
-          front: "Почему фраза “Сделай мне сайт” плохая?",
-          back: "В ней нет цели, аудитории, структуры, ограничений и проверки."
+          front: "Почему фраза “Сделай мне ИИ-агента” плохая?",
+          back: "В ней нет цели, ограничений, входных данных, результата и проверки."
         }
       ],
       quiz: {
-        prompt: "Что не так с задачей “Сделай мне сайт”?",
+        prompt: "Что не так с задачей “Сделай мне ИИ-агента”?",
         options: [
-          "Она не задаёт цель, аудиторию, структуру, ограничения и проверку.",
+          "Она слишком короткая и не задаёт цель, ограничения и проверку.",
           "Она идеально подходит для Codex.",
           "В ней уже есть все нужные требования."
         ],
         answerIndex: 0,
         explanation:
-          "Без цели, аудитории, структуры и проверки такую задачу нельзя безопасно передать в работу."
+          "Без цели, ограничений и проверки такую задачу нельзя безопасно передать в работу."
       },
       reviewQuiz: [
         {
-          prompt: "Что должен сделать ChatGPT перед задачей для Codex?",
+          prompt: "Кто проектирует технический шаг и контролирует ход работы?",
           options: [
-            "Разобрать задачу, выбрать подход, ограничить scope и подготовить точное задание.",
-            "Сразу писать большой код без обсуждения.",
-            "Попросить пользователя вручную собрать весь сайт."
+            "ChatGPT как ведущий программист и архитектор.",
+            "Codex сам выбирает всю архитектуру проекта.",
+            "Пользователь вручную пишет код."
           ],
           answerIndex: 0,
           explanation:
-            "ChatGPT должен сначала разложить задачу и только потом отдавать точную работу Codex."
+            "ChatGPT ведёт техническую работу как архитектор и технический руководитель."
         },
         {
           prompt: "Где работает Codex?",
@@ -270,13 +211,13 @@ const courseData = {
             "Codex выполняет задачи именно на сервере в конкретном репозитории."
         },
         {
-          prompt: "Что должен дать первый этап по странице сайта?",
+          prompt: "Что должен вернуть первый этап по ИИ-агенту?",
           options: [
-            "Понятное описание страницы и структуры блоков, а не сразу большой непроверенный код.",
             "Сразу большой готовый продукт без проверки.",
+            "Понятное техническое описание агента и следующий безопасный шаг.",
             "Секретные ключи и пароли."
           ],
-          answerIndex: 0,
+          answerIndex: 1,
           explanation:
             "Сначала нужен понятный проектный результат, по которому можно дать Codex точную задачу."
         }
@@ -284,12 +225,8 @@ const courseData = {
       finalTakeawayTitle: "Главный вывод урока",
       finalTakeaway:
         "Пользователь не пишет код вручную, но управляет целью и принимает результат. ChatGPT ведёт техническую работу как ведущий программист. Codex выполняет конкретную задачу на сервере и возвращает отчёт. Хорошая работа начинается с понятной постановки задачи, а не с просьбы “сделай всё”.",
-      nextStepTitle: "Следующий шаг",
-      nextStepText:
-        "В следующем уроке разберём роли пользователя, ChatGPT и Codex подробнее: кто принимает решения, кто проектирует техническую работу и кто выполняет задачу на сервере.",
-      nextStepButtonLabel: "Перейти к уроку 2",
       objectives: [
-        "Понять, как задавать работу для проекта.",
+        "Понять, как задавать работу с ИИ-агентом.",
         "Отличить роль пользователя, ChatGPT и Codex.",
         "Понять, почему нужен контроль и проверка."
       ],
@@ -300,9 +237,9 @@ const courseData = {
         "Отчёт и проверка"
       ],
       practicalTask:
-        "Опишите страницу сайта по шести вопросам из урока.",
+        "Опишите своего первого ИИ-агента по шести вопросам из урока.",
       expectedAnswer:
-        "Профессиональный ответ описывает цель, аудиторию, структуру, ограничения, проверку и следующий шаг, а не просит “сделать сайт” без деталей.",
+        "Профессиональный ответ описывает цель, вход, выход, ограничения, проверку и следующий шаг, а не просит “сделать агента” без деталей.",
       reviewNotes: [
         "В начале важнее постановка задачи, чем код.",
         "Пользователь отвечает за цель и проверку результата."
@@ -738,6 +675,12 @@ const courseData = {
       ]
     }
   ],
+  reviewChecklist: [
+    "Я понял, как делать проекты без ручного кода.",
+    "Я могу назвать роли пользователя, ChatGPT и Codex.",
+    "Я понимаю, зачем нужны документы, Git и deploy key.",
+    "Я вижу, как читается отчёт Codex и следующий шаг."
+  ]
 };
 
 const state = {
@@ -746,21 +689,7 @@ const state = {
   flippedCards: new Set(),
   solvedQuestions: new Set(),
   answeredQuestions: {},
-  practiceAnswers: {},
-  practiceValidated: false,
-  practiceFeedback: ""
-};
-
-const lessonNavTitles = {
-  "lesson-1": "Проектная работа с ИИ",
-  "lesson-2": "Роли пользователя, ChatGPT и Codex",
-  "lesson-3": "Документы как память проекта",
-  "lesson-4": "Новый диалог после перерыва",
-  "lesson-5": "Обновление документации",
-  "lesson-6": "ТЗ и roadmap",
-  "lesson-7": "Git и deploy key",
-  "lesson-8": "Один безопасный шаг разработки",
-  review: "Отчёт Codex"
+  checklist: new Set()
 };
 
 const navRoot = document.getElementById("lesson-nav");
@@ -768,6 +697,7 @@ const activeSectionRoot = document.getElementById("active-section");
 const progressFill = document.getElementById("progress-fill");
 const progressValue = document.getElementById("progress-value");
 const progressLabel = document.getElementById("progress-label");
+const checkpointList = document.getElementById("checkpoint-list");
 const startLearningButton = document.getElementById("start-learning");
 const openReviewButton = document.getElementById("open-review");
 
@@ -783,11 +713,10 @@ function renderNavigation() {
   navRoot.innerHTML = courseData.sections
     .map((section) => {
       const activeClass = section.id === state.activeSectionId ? "is-active" : "";
-      const navTitle = lessonNavTitles[section.id] || section.title;
       return `
         <button class="nav-button ${activeClass}" type="button" data-section="${section.id}">
-          <span class="nav-number">${escapeHTML(section.navLabel)}</span>
-          <span class="nav-title">${escapeHTML(navTitle)}</span>
+          <span class="nav-title">${escapeHTML(section.navLabel)}</span>
+          <span class="nav-meta">${escapeHTML(section.navMeta)}</span>
         </button>
       `;
     })
@@ -799,100 +728,7 @@ function flashcardKey(sectionId, index) {
 }
 
 function quizKey(sectionId, index) {
-  return `quiz:${sectionId}:${index}`;
-}
-
-function practiceKey(sectionId, index) {
-  return `practice:${sectionId}:${index}`;
-}
-
-function getLessonOneQuestionCount() {
-  const lessonOne = courseData.sections.find((section) => section.id === "lesson-1");
-  const practiceCount = lessonOne?.practiceActivities ? lessonOne.practiceActivities.length : 0;
-  const reviewQuizCount = lessonOne?.reviewQuiz ? lessonOne.reviewQuiz.length : 0;
-  return practiceCount + 1 + reviewQuizCount;
-}
-
-function getLessonOneSolvedCount() {
-  const lessonOne = courseData.sections.find((section) => section.id === "lesson-1");
-  const quizCount = 1 + (lessonOne?.reviewQuiz ? lessonOne.reviewQuiz.length : 0);
-  let solvedCount = 0;
-  const practiceCount = lessonOne?.practiceActivities ? lessonOne.practiceActivities.length : 0;
-  for (let index = 0; index < practiceCount; index += 1) {
-    if (state.solvedQuestions.has(practiceKey("lesson-1", index))) {
-      solvedCount += 1;
-    }
-  }
-  for (let index = 0; index < quizCount; index += 1) {
-    if (state.solvedQuestions.has(quizKey("lesson-1", index))) {
-      solvedCount += 1;
-    }
-  }
-  return solvedCount;
-}
-
-function renderChoiceList(section, items, kind, listTitle) {
-  if (!items || items.length === 0) {
-    return "";
-  }
-
-  return `
-    <section class="${kind}-group">
-      <div class="section-kicker">${escapeHTML(listTitle)}</div>
-      <div class="${kind}-list">
-        ${items
-          .map((item, index) => {
-            const questionKey = kind === "practice" ? practiceKey(section.id, index) : quizKey(section.id, index);
-            const selectedIndex =
-              state.answeredQuestions[questionKey] === undefined
-                ? null
-                : state.answeredQuestions[questionKey];
-            const solved = state.solvedQuestions.has(questionKey);
-            const answered = selectedIndex !== null;
-            const selectedCorrect = answered && selectedIndex === item.answerIndex;
-            const itemClass = kind === "practice" ? "practice-card" : "quiz-card";
-            const optionClass = kind === "practice" ? "practice-option" : "quiz-option";
-            return `
-              <div class="${itemClass}" data-choice-card="${questionKey}">
-                <strong>${escapeHTML(item.prompt)}</strong>
-                <div class="${kind === "practice" ? "practice-options" : "quiz-options"}">
-                  ${item.options
-                    .map((option, optionIndex) => {
-                      const isCorrect = answered && optionIndex === item.answerIndex;
-                      const isWrong = answered && selectedIndex === optionIndex && selectedIndex !== item.answerIndex;
-                      const classes = [optionClass];
-                      if (isCorrect) classes.push("is-correct");
-                      if (isWrong) classes.push("is-wrong");
-                      return `
-                        <button
-                          class="${classes.join(" ")}"
-                          type="button"
-                          data-choice="${questionKey}"
-                          data-option="${optionIndex}"
-                          ${solved ? "disabled" : ""}
-                        >
-                          ${escapeHTML(option)}
-                        </button>
-                      `;
-                    })
-                    .join("")}
-                </div>
-                <div class="feedback ${answered ? (selectedCorrect ? "is-success" : "is-error") : ""}">
-                  ${
-                    answered
-                      ? selectedCorrect
-                        ? `<strong>Верно.</strong> ${escapeHTML(item.explanation)}`
-                        : `<strong>Почти.</strong> ${escapeHTML(item.explanation)}`
-                      : "Выберите ответ, чтобы получить мгновенную обратную связь."
-                  }
-                </div>
-              </div>
-            `;
-          })
-          .join("")}
-      </div>
-    </section>
-  `;
+  return `${sectionId}:${index}`;
 }
 
 function renderFlashcards(section) {
@@ -929,14 +765,98 @@ function renderFlashcards(section) {
   `;
 }
 
-function renderQuiz(section, quizList = [section.quiz].filter(Boolean), listTitle = "Проверка знаний") {
+function renderQuiz(section, quizList = [section.quiz].filter(Boolean)) {
   if (quizList.length === 0) {
     return "";
   }
-  return renderChoiceList(section, quizList, "quiz", listTitle);
+
+  return `
+    <div class="module-grid">
+      <div class="section-kicker">Проверка знаний</div>
+      <div class="quiz-list">
+        ${quizList
+          .map((quiz, quizIndex) => {
+            const questionKey = quizKey(section.id, quizIndex);
+            const selectedIndex =
+              state.answeredQuestions[questionKey] === undefined
+                ? null
+                : state.answeredQuestions[questionKey];
+            const answered = selectedIndex !== null;
+            const selectedCorrect = answered && selectedIndex === quiz.answerIndex;
+            return `
+              <div class="quiz-card" data-quiz-card="${questionKey}">
+                <strong>${escapeHTML(quiz.prompt)}</strong>
+                <div class="quiz-options">
+                  ${quiz.options
+                    .map((option, optionIndex) => {
+                      const isCorrect = answered && optionIndex === quiz.answerIndex;
+                      const isWrong = answered && selectedIndex === optionIndex && selectedIndex !== quiz.answerIndex;
+                      const classes = ["quiz-option"];
+                      if (isCorrect) classes.push("is-correct");
+                      if (isWrong) classes.push("is-wrong");
+                      return `
+                        <button
+                          class="${classes.join(" ")}"
+                          type="button"
+                          data-quiz="${questionKey}"
+                          data-option="${optionIndex}"
+                          ${answered ? "disabled" : ""}
+                        >
+                          ${escapeHTML(option)}
+                        </button>
+                      `;
+                    })
+                    .join("")}
+                </div>
+                <div class="feedback" id="feedback-${questionKey}">
+                  ${
+                    answered
+                      ? selectedCorrect
+                        ? `<strong>Верно.</strong> ${escapeHTML(quiz.explanation)}`
+                        : `<strong>Почти.</strong> ${escapeHTML(quiz.explanation)}`
+                      : "Выбери ответ, чтобы получить мгновенную обратную связь."
+                  }
+                </div>
+              </div>
+            `;
+          })
+          .join("")}
+      </div>
+    </div>
+  `;
+}
+
+function renderReviewChecklist() {
+  return `
+    <div class="module-grid">
+      <div class="section-kicker">Прогресс / проверка</div>
+      <div class="review-box">
+        <strong>Проверка готовности урока</strong>
+        <div class="review-grid">
+          ${courseData.reviewChecklist
+            .map((item, index) => {
+              const key = `review-${index}`;
+              const checked = state.checklist.has(key) ? "checked" : "";
+              return `
+                <label class="review-item">
+                  <input type="checkbox" data-checkpoint="${key}" ${checked}>
+                  <span>${escapeHTML(item)}</span>
+                </label>
+              `;
+            })
+            .join("")}
+        </div>
+        <div class="review-status" id="review-status"></div>
+      </div>
+    </div>
+  `;
 }
 
 function renderLessonOne(section) {
+  const flashcards = renderFlashcards(section);
+  const quiz = renderQuiz(section, section.reviewQuiz ? [section.quiz, ...section.reviewQuiz] : [section.quiz]);
+  const processScheme = section.processScheme || section.processSteps.join(" → ");
+
   return `
     <article class="section-card lesson-one">
       <header class="section-header">
@@ -947,99 +867,81 @@ function renderLessonOne(section) {
       </header>
 
       <div class="section-body">
-        <section class="callout lesson-intro">
-          <span class="block-label">Вводная мысль</span>
+        <section class="callout">
+          <span class="block-label">Вступление</span>
           ${section.intro.map((paragraph) => `<p>${escapeHTML(paragraph)}</p>`).join("")}
         </section>
 
-        <section class="callout lesson-outcome">
-          <span class="block-label">${escapeHTML(section.learningOutcomeTitle)}</span>
-          <p class="centered-lead">Что вы сможете после урока:</p>
-          <ul class="centered-list">
-            ${section.learningOutcome.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}
-          </ul>
-        </section>
+        <section class="info-grid">
+          <div>
+            <span class="block-label">${escapeHTML(section.learningOutcomeTitle)}</span>
+            <ul>
+              ${section.learningOutcome.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}
+            </ul>
+          </div>
 
-        <section class="callout">
-          <span class="block-label">Ключевые понятия</span>
-          <div class="definition-stack">
-            ${section.roles
+          <div>
+            <span class="block-label">${escapeHTML(section.roleTitle)}</span>
+            <div class="summary-grid" style="margin-top: 12px;">
+              ${section.roles
               .map(
                 (role) => `
-                  <div class="definition-card">
-                    <span class="definition-name">${escapeHTML(role.name)}</span>
-                    <p><strong>${escapeHTML(role.definition)}</strong></p>
-                  </div>
-                `
-              )
-              .join("")}
-          </div>
-        </section>
-
-        <section class="callout">
-          <span class="block-label">${escapeHTML(section.courseUsageTitle)}</span>
-          <div class="definition-stack">
-            ${section.courseUsage
-              .map(
-                (item) => `
-                  <div class="definition-card">
-                    <span class="definition-name">${escapeHTML(item.title)}</span>
-                    <p>${escapeHTML(item.text)}</p>
-                  </div>
-                `
-              )
-              .join("")}
+                    <div>
+                      <span class="summary-label">${escapeHTML(role.name)}</span>
+                      <strong>${escapeHTML(role.label || `${role.name} — ${role.lead}`)}</strong>
+                      <p class="muted">${escapeHTML(role.description)}</p>
+                    </div>
+                  `
+                )
+                .join("")}
+            </div>
           </div>
         </section>
 
         <section class="callout">
           <span class="block-label">${escapeHTML(section.processTitle)}</span>
-          <div class="process-flow">
-            ${section.processSteps
-              .map(
-                (step, index) => `
-                  <div class="process-step">
-                    <span class="process-step-index">${index + 1}</span>
-                    <strong>${escapeHTML(step)}</strong>
-                  </div>
-                `
-              )
-              .join("")}
-          </div>
+          <p>${escapeHTML(processScheme)}</p>
+          <ol>
+            ${section.processSteps.map((step) => `<li>${escapeHTML(step)}</li>`).join("")}
+          </ol>
         </section>
 
         <section class="callout">
-          <span class="block-label">Рабочий пример</span>
-          <div class="example-grid">
-            <div class="example-card">
-              <span class="example-title">Плохой пример</span>
-              <p class="example-quote">“Сделай мне сайт.”</p>
-              <ul class="centered-list">
-                ${section.badExampleReasons.map((reason) => `<li>${escapeHTML(reason)}</li>`).join("")}
-              </ul>
-            </div>
-            <div class="example-card">
-              <span class="example-title">Профессиональный пример</span>
-              <p><strong>Простую страницу сайта для записи на консультацию нужно спроектировать.</strong></p>
-              <p>Страница должна объяснять услугу, показывать преимущества, отвечать на частые вопросы и вести пользователя к форме заявки.</p>
-              <p>На первом этапе не нужно подключать оплату, личный кабинет или сложную CRM.</p>
-              <ul class="centered-list">
-                ${section.goodExampleQuestions.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}
-              </ul>
-              <p class="muted">${escapeHTML(section.goodExampleResult)}</p>
-            </div>
+          <span class="block-label">${escapeHTML(section.importantExplanationTitle)}</span>
+          <p>${escapeHTML(section.importantExplanation)}</p>
+        </section>
+
+        <section class="info-grid">
+          <div>
+            <span class="block-label">${escapeHTML(section.badExampleTitle)}</span>
+            <p class="muted">“${escapeHTML(section.badExampleQuote)}”</p>
+            <ul>
+              ${section.badExampleReasons.map((reason) => `<li>${escapeHTML(reason)}</li>`).join("")}
+            </ul>
+          </div>
+
+          <div>
+            <span class="block-label">${escapeHTML(section.goodExampleTitle)}</span>
+            <p>${escapeHTML(section.goodExampleIntro)}</p>
+            <p>${escapeHTML(section.goodExampleText)}</p>
+            <p>${escapeHTML(section.goodExampleLimit)}</p>
+            <strong>${escapeHTML(section.goodExampleQuestionsTitle)}</strong>
+            <ul>
+              ${section.goodExampleQuestions.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}
+            </ul>
+            <p>${escapeHTML(section.goodExampleResult)}</p>
           </div>
         </section>
 
         <section class="callout">
           <span class="block-label">${escapeHTML(section.exampleBreakdownTitle)}</span>
-          <div class="breakdown-grid">
+          <div class="summary-grid" style="margin-top: 12px;">
             ${section.exampleBreakdown
               .map(
                 (item) => `
-                  <div class="breakdown-card">
-                    <span class="breakdown-title">${escapeHTML(item.label)}</span>
-                    <p>${escapeHTML(item.text)}</p>
+                  <div>
+                    <span class="summary-label">${escapeHTML(item.label)}</span>
+                    <strong>${escapeHTML(item.text)}</strong>
                   </div>
                 `
               )
@@ -1048,27 +950,42 @@ function renderLessonOne(section) {
         </section>
 
         <section class="callout">
-          <span class="block-label">Практика: соберите задачу для страницы сайта</span>
-          <p class="centered-lead">Выберите один ответ для каждого вопроса. После каждого выбора появится обратная связь.</p>
-          ${renderChoiceList(section, section.practiceActivities, "practice", "Практические выборы")}
+          <span class="block-label">${escapeHTML(section.practiceTitle)}</span>
+          <p>${escapeHTML(section.practiceIntro)}</p>
+          <ol>
+            ${section.practiceQuestions.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}
+          </ol>
         </section>
 
         <section class="callout">
-          <span class="block-label">Проверка знаний</span>
-          ${renderQuiz(section, [section.quiz, ...(section.reviewQuiz || [])], "Финальная проверка")}
+          <span class="block-label">${escapeHTML(section.exampleAnswerTitle)}</span>
+          ${section.exampleAnswerParagraphs.map((paragraph) => `<p>${escapeHTML(paragraph)}</p>`).join("")}
+          <ul>
+            ${section.exampleAnswerBullets.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}
+          </ul>
+          <p>${escapeHTML(section.exampleAnswerFooter)}</p>
         </section>
+
+        <section class="callout">
+          <span class="block-label">${escapeHTML(section.commonMistakesTitle)}</span>
+          <ol>
+            ${section.commonMistakes.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}
+          </ol>
+        </section>
+
+        <section class="callout">
+          <span class="block-label">${escapeHTML(section.selfCheckTitle)}</span>
+          <ul>
+            ${section.selfCheck.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}
+          </ul>
+        </section>
+
+        ${flashcards}
+        ${quiz}
 
         <section class="callout">
           <span class="block-label">${escapeHTML(section.finalTakeawayTitle)}</span>
           <p>${escapeHTML(section.finalTakeaway)}</p>
-        </section>
-
-        <section class="next-step-card">
-          <div>
-            <span class="block-label">${escapeHTML(section.nextStepTitle)}</span>
-            <p>${escapeHTML(section.nextStepText)}</p>
-          </div>
-          <button class="primary-button" type="button" data-section="lesson-2">${escapeHTML(section.nextStepButtonLabel)}</button>
         </section>
       </div>
     </article>
@@ -1082,6 +999,7 @@ function renderSectionContent(section) {
 
   const flashcards = renderFlashcards(section);
   const quiz = renderQuiz(section, section.reviewQuiz ? [section.quiz, ...section.reviewQuiz] : [section.quiz]);
+  const review = section.id === "review" ? renderReviewChecklist() : "";
 
   return `
     <article class="section-card">
@@ -1127,36 +1045,62 @@ function renderSectionContent(section) {
           </ul>
         </section>
 
+        ${review}
       </div>
     </article>
   `;
 }
 
 function updateProgress() {
-  const totalQuestions = getLessonOneQuestionCount();
-  const solvedQuestions = getLessonOneSolvedCount();
-  const progress = totalQuestions === 0 ? 0 : Math.round((solvedQuestions / totalQuestions) * 100);
+  const totalSections = courseData.sections.length;
+  const totalQuestions = courseData.sections.reduce((sum, section) => {
+    const standardQuiz = section.quiz ? 1 : 0;
+    const reviewQuiz = section.reviewQuiz ? section.reviewQuiz.length : 0;
+    return sum + standardQuiz + reviewQuiz;
+  }, 0);
+  const totalChecklist = courseData.reviewChecklist.length;
+  const visitedScore = (state.visitedSections.size / totalSections) * 50;
+  const quizScore = totalQuestions === 0 ? 0 : (state.solvedQuestions.size / totalQuestions) * 30;
+  const reviewScore = totalChecklist === 0 ? 0 : (state.checklist.size / totalChecklist) * 20;
+  const progress = Math.min(100, Math.round(visitedScore + quizScore + reviewScore));
 
   progressFill.style.width = `${progress}%`;
   progressValue.textContent = `${progress}%`;
 
-  if (progress === 0) {
-    progressLabel.textContent = "Пока нет правильных ответов.";
+  if (progress < 35) {
+    progressLabel.textContent = "Пока открыт обзор и базовая структура.";
+  } else if (progress < 70) {
+    progressLabel.textContent = "Урок открыт, но ещё не все проверки пройдены.";
   } else if (progress < 100) {
-    progressLabel.textContent = `Выполнено ${solvedQuestions} из ${totalQuestions} проверок.`;
+    progressLabel.textContent = "Осталось завершить проверку.";
   } else {
-    progressLabel.textContent = "Все проверки урока выполнены.";
+    progressLabel.textContent = "Проверка завершена.";
+  }
+
+  checkpointList.innerHTML = courseData.reviewChecklist
+    .map((item, index) => {
+      const key = `review-${index}`;
+      const checked = state.checklist.has(key);
+      return `
+        <li>
+          <input type="checkbox" data-checkpoint="${key}" ${checked ? "checked" : ""}>
+          <span>${escapeHTML(item)}</span>
+        </li>
+      `;
+    })
+    .join("");
+
+  const reviewStatus = document.getElementById("review-status");
+  if (reviewStatus) {
+    reviewStatus.textContent = `${state.checklist.size} из ${totalChecklist} пунктов проверки отмечено.`;
   }
 }
 
 function renderActiveSection() {
-  const scrollX = window.scrollX;
-  const scrollY = window.scrollY;
   const section = courseData.sections.find((item) => item.id === state.activeSectionId) || courseData.sections[0];
   activeSectionRoot.innerHTML = renderSectionContent(section);
   renderNavigation();
   updateProgress();
-  window.scrollTo(scrollX, scrollY);
 }
 
 function setActiveSection(sectionId) {
@@ -1166,26 +1110,6 @@ function setActiveSection(sectionId) {
 }
 
 document.addEventListener("click", (event) => {
-  const choiceButton = event.target.closest("[data-choice]");
-  if (choiceButton) {
-    const questionKey = choiceButton.dataset.choice;
-    const [kind, sectionId, quizIndexText] = questionKey.split(":");
-    const choiceIndex = Number(choiceButton.dataset.option);
-    const section = courseData.sections.find((item) => item.id === sectionId);
-    const items = kind === "practice"
-      ? section.practiceActivities || []
-      : section.reviewQuiz
-        ? [section.quiz, ...section.reviewQuiz]
-        : [section.quiz];
-    const question = items[Number(quizIndexText)];
-    state.answeredQuestions[questionKey] = choiceIndex;
-    if (choiceIndex === question.answerIndex) {
-      state.solvedQuestions.add(questionKey);
-    }
-    renderActiveSection();
-    return;
-  }
-
   const navButton = event.target.closest("[data-section]");
   if (navButton) {
     setActiveSection(navButton.dataset.section);
@@ -1201,6 +1125,22 @@ document.addEventListener("click", (event) => {
     return;
   }
 
+  const quizButton = event.target.closest("[data-quiz]");
+  if (quizButton) {
+    const questionKey = quizButton.dataset.quiz;
+    const [sectionId, quizIndexText] = questionKey.split(":");
+    const quizIndex = Number(quizIndexText);
+    const section = courseData.sections.find((item) => item.id === sectionId);
+    const quiz = section.reviewQuiz ? [section.quiz, ...section.reviewQuiz][quizIndex] : section.quiz;
+    const selectedIndex = Number(quizButton.dataset.option);
+    state.answeredQuestions[questionKey] = selectedIndex;
+    if (selectedIndex === quiz.answerIndex) {
+      state.solvedQuestions.add(questionKey);
+    }
+    renderActiveSection();
+    return;
+  }
+
   const startButton = event.target.closest("#start-learning");
   if (startButton) {
     setActiveSection("lesson-1");
@@ -1212,6 +1152,21 @@ document.addEventListener("click", (event) => {
     setActiveSection("review");
     return;
   }
+});
+
+document.addEventListener("change", (event) => {
+  const checkpoint = event.target.closest("[data-checkpoint]");
+  if (!checkpoint) {
+    return;
+  }
+
+  if (checkpoint.checked) {
+    state.checklist.add(checkpoint.dataset.checkpoint);
+  } else {
+    state.checklist.delete(checkpoint.dataset.checkpoint);
+  }
+
+  updateProgress();
 });
 
 renderNavigation();
