@@ -80,6 +80,14 @@ def test_materials_redirects_unauthenticated_user(client):
     assert response.headers["location"] == "/login"
 
 
+def test_shared_stylesheet_uses_main_page_theme(client):
+    response = client.get("/static/styles.css")
+    assert response.status_code == 200
+    assert "--bg: #faf6f1;" in response.text
+    assert "--primary: #c45c26;" in response.text
+    assert "font-family: var(--font-display);" in response.text
+
+
 def test_materials_shows_locked_state_without_access(client, test_settings):
     _prepare_and_login_verified_user(client, test_settings, "materials-locked@example.com", "materialslocked")
     response = client.get("/materials")
