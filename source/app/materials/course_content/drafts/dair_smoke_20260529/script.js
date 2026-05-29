@@ -1279,6 +1279,10 @@ function getSectionQuestionCount(section) {
   return getSectionQuizList(section).length;
 }
 
+function getSectionQuiz(section, index) {
+  return getSectionQuizList(section)[index];
+}
+
 function getSectionAnsweredCount(section) {
   const questionCount = getSectionQuestionCount(section);
   let answeredCount = 0;
@@ -1653,7 +1657,10 @@ document.addEventListener("click", (event) => {
     const [sectionId, quizIndexText] = questionKey.split(":");
     const quizIndex = Number(quizIndexText);
     const section = courseData.sections.find((item) => item.id === sectionId);
-    const quiz = section.reviewQuiz ? [section.quiz, ...section.reviewQuiz][quizIndex] : section.quiz;
+    const quiz = section ? getSectionQuiz(section, quizIndex) : null;
+    if (!quiz) {
+      return;
+    }
     const selectedIndex = Number(quizButton.dataset.option);
     state.answeredQuestions[questionKey] = selectedIndex;
     if (selectedIndex === quiz.answerIndex) {

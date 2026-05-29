@@ -356,6 +356,7 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Проверка знаний" in script_response.text
     assert "getSectionQuestionCount" in script_response.text
     assert "getSectionAnsweredCount" in script_response.text
+    assert "getSectionQuiz(section, quizIndex)" in script_response.text
     assert 'state.answeredQuestions[quizKey(section.id, index)] !== undefined' in script_response.text
     assert "renderStructuredLesson" in script_response.text
     assert 'section.nextStepTargetId || "lesson-2"' in script_response.text
