@@ -103,6 +103,7 @@ a:hover {
   gap: 8px;
   align-items: center;
   justify-content: flex-end;
+  min-width: 0;
 }
 
 .top-nav .nav-links .nav-pill {
@@ -110,6 +111,58 @@ a:hover {
   padding: 8px 14px;
   line-height: 1;
   white-space: nowrap;
+}
+
+.top-nav .nav-account {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-left: auto;
+  min-width: 0;
+}
+
+.top-nav .nav-account-info {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  text-align: right;
+}
+
+.top-nav .nav-account-name {
+  color: var(--text);
+  font-weight: 700;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+
+.top-nav .nav-account-email {
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 260px;
+}
+
+.top-nav .nav-account-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.top-nav .nav-settings {
+  min-height: 40px;
+  padding: 8px 12px;
+}
+
+.top-nav .nav-settings-label {
+  display: inline;
 }
 
 .top-nav .logout-form {
@@ -1436,6 +1489,46 @@ html { scroll-behavior: smooth; }
     width: 100%;
   }
 
+  .top-nav .nav-account {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    margin-left: 0;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+
+  .top-nav .nav-account-info {
+    width: 100%;
+    text-align: left;
+  }
+
+  .top-nav .nav-account-name,
+  .top-nav .nav-account-email {
+    max-width: 100%;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    overflow-wrap: anywhere;
+  }
+
+  .top-nav .nav-account-actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .top-nav .nav-account-actions .nav-settings,
+  .top-nav .nav-account-actions .nav-form {
+    width: 100%;
+  }
+
+  .top-nav .nav-account-actions .nav-settings {
+    justify-content: center;
+  }
+
   .public-landing-page .hero-title {
     font-size: clamp(2rem, 10vw, 3rem);
   }
@@ -1497,6 +1590,14 @@ html { scroll-behavior: smooth; }
 @media (max-width: 520px) {
   .top-nav .nav-links {
     grid-template-columns: 1fr;
+  }
+
+  .top-nav .nav-account-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .top-nav .nav-settings-label {
+    display: none;
   }
 }
 

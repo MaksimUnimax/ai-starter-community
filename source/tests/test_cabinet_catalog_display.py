@@ -48,6 +48,8 @@ def test_cabinet_displays_course_shell_without_tariffs_or_payment_noise(client, 
     assert cabinet_response.status_code == 200
     assert "/static/styles.css" in cabinet_response.text
     assert "Личный кабинет" in cabinet_response.text
+    assert "Настройки" in cabinet_response.text
+    assert 'href="/cabinet/settings"' in cabinet_response.text
     assert "Аккаунт" in cabinet_response.text
     assert "Логин: <strong>cabinetcatalog</strong>" in cabinet_response.text
     assert "Email: cabinet-catalog@example.com" in cabinet_response.text
@@ -57,6 +59,7 @@ def test_cabinet_displays_course_shell_without_tariffs_or_payment_noise(client, 
     assert "Здесь находится курс и материалы по работе с ИИ." in cabinet_response.text
     assert "Перейти к обучению" in cabinet_response.text
     assert "/materials/drafts/dair-smoke-20260529/" in cabinet_response.text
+    assert cabinet_response.text.index("<h2 class=\"section-title\">Обучение</h2>") < cabinet_response.text.index("<h2 class=\"section-title\">Аккаунт</h2>")
     assert "Доступные тарифы" not in cabinet_response.text
     assert "Оплата" not in cabinet_response.text
     assert "Что дальше" not in cabinet_response.text

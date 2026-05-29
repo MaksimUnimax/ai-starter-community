@@ -366,6 +366,121 @@ def test_route_flow_login_cabinet_logout_still_works(client, test_settings):
     assert cabinet_after_logout.headers["location"] == "/login"
 
 
+def test_cabinet_settings_page_and_password_change_flow(client, test_settings):
+    user = register_user(
+        email="settings@example.com",
+        login="settingsuser",
+        password="Secret123",
+        repeat_password="Secret123",
+        settings=test_settings,
+    )
+    verification_row = _fetch_one(
+        test_settings,
+        "SELECT * FROM email_outbox WHERE recipient_email = ? AND template_key = ? ORDER BY id DESC LIMIT 1",
+        (user.email, "email_verification"),
+    )
+    verify_token = _extract_token_from_link(verification_row["body_text"])
+    verify_email(verify_token, settings=test_settings)
+
+    anon_settings_page = client.get("/cabinet/settings", follow_redirects=False)
+    assert anon_settings_page.status_code == 303
+    assert anon_settings_page.headers["location"] == "/login"
+
+    anon_submit = client.post(
+        "/cabinet/settings/password",
+        data={
+            "current_password": "Secret123",
+            "password": "NewSecret123",
+            "repeat_password": "NewSecret123",
+        },
+        follow_redirects=False,
+    )
+    assert anon_submit.status_code == 303
+    assert anon_submit.headers["location"] == "/login"
+
+    login_response = client.post(
+        "/login",
+        data={"email_or_login": "settings@example.com", "password": "Secret123"},
+        follow_redirects=False,
+    )
+    assert login_response.status_code == 303
+
+    settings_page = client.get("/cabinet/settings")
+    assert settings_page.status_code == 200
+    assert "Настройки" in settings_page.text
+    assert "Смена пароля" in settings_page.text
+    assert 'name="current_password"' in settings_page.text
+    assert 'name="password"' in settings_page.text
+    assert 'name="repeat_password"' in settings_page.text
+    assert '/cabinet/settings/password' in settings_page.text
+    assert 'href="/cabinet"' in settings_page.text
+
+    row_before = _fetch_one(
+        test_settings,
+        "SELECT password_hash FROM users WHERE email = ?",
+        (user.email,),
+    )
+    assert row_before is not None
+    password_hash_before = row_before["password_hash"]
+
+    wrong_current_response = client.post(
+        "/cabinet/settings/password",
+        data={
+            "current_password": "WrongSecret123",
+            "password": "NewSecret123",
+            "repeat_password": "NewSecret123",
+        },
+    )
+    assert wrong_current_response.status_code == 200
+    assert "Текущий пароль неверный." in wrong_current_response.text
+    assert _fetch_one(
+        test_settings,
+        "SELECT password_hash FROM users WHERE email = ?",
+        (user.email,),
+    )["password_hash"] == password_hash_before
+
+    mismatch_response = client.post(
+        "/cabinet/settings/password",
+        data={
+            "current_password": "Secret123",
+            "password": "NewSecret123",
+            "repeat_password": "NewSecret124",
+        },
+    )
+    assert mismatch_response.status_code == 200
+    assert "Новые пароли не совпадают." in mismatch_response.text
+    assert _fetch_one(
+        test_settings,
+        "SELECT password_hash FROM users WHERE email = ?",
+        (user.email,),
+    )["password_hash"] == password_hash_before
+
+    success_response = client.post(
+        "/cabinet/settings/password",
+        data={
+            "current_password": "Secret123",
+            "password": "NewSecret123",
+            "repeat_password": "NewSecret123",
+        },
+        follow_redirects=False,
+    )
+    assert success_response.status_code == 303
+    assert success_response.headers["location"] == "/cabinet/settings?success=1"
+
+    success_page = client.get("/cabinet/settings?success=1")
+    assert success_page.status_code == 200
+    assert "Пароль изменён." in success_page.text
+
+    with pytest.raises(UnauthorizedError):
+        authenticate_user("settings@example.com", "Secret123", settings=test_settings)
+    assert authenticate_user("settings@example.com", "NewSecret123", settings=test_settings).id == user.id
+    assert _fetch_one(
+        test_settings,
+        "SELECT password_hash FROM users WHERE email = ?",
+        (user.email,),
+    )["password_hash"] != password_hash_before
+
+
 def test_route_flow_login_by_login_and_password_reset(client, test_settings):
     register_user(
         email="loginroute@example.com",

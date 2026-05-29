@@ -98,10 +98,14 @@ def test_authenticated_user_navigation_order_and_labels(client, test_settings):
         assert "Главная" in nav
         assert "Обучение" in nav
         assert "Личный кабинет" in nav
+        assert "navuser" in nav
+        assert "nav-user@example.com" in nav
+        assert "Настройки" in nav
+        assert 'href="/cabinet/settings"' in nav
         assert "Выйти" in nav
 
     cabinet_nav = _nav_block(cabinet.text)
-    assert cabinet_nav.index("Главная") < cabinet_nav.index("Обучение") < cabinet_nav.index("Личный кабинет") < cabinet_nav.index("Выйти")
+    assert cabinet_nav.index("Главная") < cabinet_nav.index("Обучение") < cabinet_nav.index("Личный кабинет") < cabinet_nav.index("Настройки") < cabinet_nav.index("Выйти")
 
 
 def test_authenticated_moderator_navigation_has_no_admin_panel(client, test_settings):
@@ -120,6 +124,10 @@ def test_authenticated_moderator_navigation_has_no_admin_panel(client, test_sett
         assert "Главная" in nav
         assert "Обучение" in nav
         assert "Личный кабинет" in nav
+        assert "navmoderator" in nav
+        assert "nav-moderator@example.com" in nav
+        assert "Настройки" in nav
+        assert 'href="/cabinet/settings"' in nav
         assert "Выйти" in nav
 
 
@@ -141,7 +149,11 @@ def test_authenticated_admin_navigation_includes_admin_panel(client, test_settin
         assert "Обучение" in nav
         assert "Личный кабинет" in nav
         assert "Админ-панель" in nav
+        assert "navadmin" in nav
+        assert "nav-admin@example.com" in nav
+        assert "Настройки" in nav
+        assert 'href="/cabinet/settings"' in nav
         assert "Выйти" in nav
 
     cabinet_nav = _nav_block(cabinet.text)
-    assert cabinet_nav.index("Главная") < cabinet_nav.index("Обучение") < cabinet_nav.index("Личный кабинет") < cabinet_nav.index("Админ-панель") < cabinet_nav.index("Выйти")
+    assert cabinet_nav.index("Главная") < cabinet_nav.index("Обучение") < cabinet_nav.index("Личный кабинет") < cabinet_nav.index("Админ-панель") < cabinet_nav.index("Настройки") < cabinet_nav.index("Выйти")

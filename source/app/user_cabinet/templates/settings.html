@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="card stack">
+    <div class="stack">
+      <p class="muted">Личный кабинет</p>
+      <h1 class="section-title">Настройки</h1>
+      <p>Аккаунт: <strong>{{ user_login or user_email or "Аккаунт" }}</strong></p>
+      <p>Email: {{ user_email or user_login or "Аккаунт" }}</p>
+    </div>
+
+    {% if success %}
+      <div class="alert alert-info">{{ notice or "Пароль изменён." }}</div>
+    {% endif %}
+    {% if error %}
+      <div class="alert alert-error">{{ error }}</div>
+    {% endif %}
+
+    <div class="stack">
+      <h2 class="section-title">Смена пароля</h2>
+      <p class="form-help">Минимум 8 символов, без пробелов внутри. Пробелы по краям будут убраны.</p>
+      <form class="form" method="post" action="/cabinet/settings/password">
+        <label class="form-row">
+          <span>Текущий пароль</span>
+          <input class="input" type="password" name="current_password" autocomplete="current-password">
+        </label>
+        <label class="form-row">
+          <span>Новый пароль</span>
+          <input class="input" type="password" name="password" autocomplete="new-password">
+        </label>
+        <label class="form-row">
+          <span>Повтор нового пароля</span>
+          <input class="input" type="password" name="repeat_password" autocomplete="new-password">
+        </label>
+        <button class="button button-primary" type="submit">Сменить пароль</button>
+      </form>
+    </div>
+
+    <div class="actions">
+      <a class="button button-secondary" href="/cabinet">Вернуться в личный кабинет</a>
+    </div>
+  </section>
+{% endblock %}

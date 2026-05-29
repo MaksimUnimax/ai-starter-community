@@ -2,23 +2,20 @@
 
 {% block content %}
   <section class="card stack">
+    <h2 class="section-title">Обучение</h2>
+    <p>Здесь находится курс и материалы по работе с ИИ.</p>
+    <div class="actions">
+      <a class="button button-primary" href="/materials/drafts/dair-smoke-20260529/">Перейти к обучению</a>
+    </div>
+  </section>
+
+  <section class="card stack">
     <div class="stack">
       <p class="muted">Личный кабинет</p>
       <h1 class="section-title">Личный кабинет</h1>
       <h2 class="section-title">Аккаунт</h2>
       <p>Логин: <strong>{{ user_login }}</strong></p>
       <p>Email: {{ user_email }}</p>
-    </div>
-    <form method="post" action="/logout">
-      <button class="button button-secondary" type="submit">Выйти</button>
-    </form>
-  </section>
-
-  <section class="card stack">
-    <h2 class="section-title">Обучение</h2>
-    <p>Здесь находится курс и материалы по работе с ИИ.</p>
-    <div class="actions">
-      <a class="button button-primary" href="/materials/drafts/dair-smoke-20260529/">Перейти к обучению</a>
     </div>
   </section>
 {% endblock %}

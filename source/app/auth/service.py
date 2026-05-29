@@ -654,3 +654,37 @@ def reset_password(
         if user_row is None:
             raise AuthError("reset user lookup failed")
         return _public_user_from_row(user_row)
+
+
+def change_password(
+    *,
+    user_id: int,
+    current_password: str,
+    new_password: str,
+    repeat_password: str,
+    settings: Settings | None = None,
+) -> UserPublic:
+    resolved = _settings(settings)
+    with _connection(resolved) as connection:
+        row = connection.execute("SELECT * FROM users WHERE id = ?", (int(user_id),)).fetchone()
+        if row is None:
+            raise NotFoundError("user not found")
+        if not bool(row["is_active"]):
+            raise UnauthorizedError("user is not active")
+        try:
+            current_password_ok = verify_password(current_password, str(row["password_hash"]))
+        except ValueError as exc:
+            raise ValidationError(str(exc)) from exc
+        if not current_password_ok:
+            raise UnauthorizedError("invalid credentials")
+        normalized_password = _passwords_match(new_password, repeat_password)
+        new_password_hash = hash_password(normalized_password)
+        now_iso = utc_now_iso()
+        connection.execute(
+            "UPDATE users SET password_hash = ?, updated_at = ? WHERE id = ?",
+            (new_password_hash, now_iso, int(row["id"])),
+        )
+        updated = connection.execute("SELECT * FROM users WHERE id = ?", (int(row["id"]),)).fetchone()
+        if updated is None:
+            raise AuthError("password change user lookup failed")
+        return _public_user_from_row(updated)
