@@ -145,6 +145,7 @@ def test_cabinet_contains_materials_link_and_locked_hint(client, test_settings):
     response = client.get("/cabinet")
     assert response.status_code == 200
     assert "Главная" in response.text
+    assert "Обучающий блок" in response.text
     assert "Обучение" in response.text
     assert "Перейти к обучению" in response.text
     assert "Обучающий проект" in response.text
@@ -154,7 +155,7 @@ def test_cabinet_contains_materials_link_and_locked_hint(client, test_settings):
     assert 'href="/cabinet/learning/project-file"' not in response.text
     assert "Логин: <strong>materialscabinet</strong>" in response.text
     assert "Email: materials-cabinet@example.com" in response.text
-    assert "Здесь находится курс и материалы по работе с ИИ." in response.text
+    assert "Пройдите обучение, затем скачайте файл, вставьте в чат ChatGPT и следуйте его инструкциям." in response.text
     assert "Раздел «Работа с ИИ» будет доступен после оплаты." not in response.text
 
 

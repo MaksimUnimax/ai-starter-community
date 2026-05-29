@@ -532,6 +532,13 @@ button:hover {
 
 .learning-card {
   gap: 20px;
+  text-align: center;
+  align-items: center;
+}
+
+.learning-card-title {
+  color: var(--accent-strong);
+  text-align: center;
 }
 
 .learning-grid {
@@ -539,25 +546,38 @@ button:hover {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
   align-items: stretch;
+  width: 100%;
 }
 
 .learning-column {
   display: flex;
   flex-direction: column;
   gap: 14px;
+  align-items: center;
   min-width: 0;
   padding: 20px;
   border: 1px solid var(--border);
   border-radius: 20px;
   background: var(--surface-alt);
+  text-align: center;
 }
 
 .learning-column .section-title {
   font-size: clamp(1.4rem, 2vw, 1.8rem);
+  color: var(--accent-strong);
+  text-align: center;
 }
 
 .learning-button {
-  align-self: flex-start;
+  align-self: center;
+  min-width: min(100%, 240px);
+}
+
+.learning-card-note,
+.learning-card-lock {
+  margin: 0;
+  max-width: 60ch;
+  text-align: center;
 }
 
 .learning-card .button:disabled,

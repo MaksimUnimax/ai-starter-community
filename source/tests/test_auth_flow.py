@@ -349,11 +349,12 @@ def test_route_flow_login_cabinet_logout_still_works(client, test_settings):
     assert "Логин: <strong>routeuser</strong>" in cabinet_response.text
     assert "Email: route@example.com" in cabinet_response.text
     assert "Главная" in cabinet_response.text
+    assert "Обучающий блок" in cabinet_response.text
     assert "Обучение" in cabinet_response.text
     assert "Обучающий проект" in cabinet_response.text
-    assert "Здесь находится курс и материалы по работе с ИИ." in cabinet_response.text
     assert "Перейти к обучению" in cabinet_response.text
     assert "Скачать файл" in cabinet_response.text
+    assert "Пройдите обучение, затем скачайте файл, вставьте в чат ChatGPT и следуйте его инструкциям." in cabinet_response.text
     assert "Доступ откроется после оплаты." in cabinet_response.text
     assert 'href="/materials/drafts/dair-smoke-20260529/"' not in cabinet_response.text
     assert 'href="/cabinet/learning/project-file"' not in cabinet_response.text
@@ -619,11 +620,12 @@ def test_cabinet_shows_logout_button_and_access_text(client, test_settings):
     assert "Логин: <strong>cabinetux</strong>" in cabinet_response.text
     assert "Email: cabinetux@example.com" in cabinet_response.text
     assert "Главная" in cabinet_response.text
+    assert "Обучающий блок" in cabinet_response.text
     assert "Обучение" in cabinet_response.text
     assert "Обучающий проект" in cabinet_response.text
-    assert "Здесь находится курс и материалы по работе с ИИ." in cabinet_response.text
     assert "Перейти к обучению" in cabinet_response.text
     assert "Скачать файл" in cabinet_response.text
+    assert "Пройдите обучение, затем скачайте файл, вставьте в чат ChatGPT и следуйте его инструкциям." in cabinet_response.text
     assert "Доступ откроется после оплаты." in cabinet_response.text
     assert 'href="/materials/drafts/dair-smoke-20260529/"' not in cabinet_response.text
     assert 'href="/cabinet/learning/project-file"' not in cabinet_response.text

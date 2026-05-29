@@ -31,6 +31,7 @@ def _prepare_verified_user(
     email: str,
     login: str = "lessonuser",
     grant_access: bool = False,
+    role: str = "user",
 ):
     register_user(
         email=email,
@@ -41,12 +42,15 @@ def _prepare_verified_user(
     )
     token = _extract_token_from_db(test_settings, email)
     verify_email(token, settings=test_settings)
-    if grant_access:
+    if role != "user" or grant_access:
         with _connect(test_settings) as conn:
-            conn.execute(
-                "UPDATE users SET materials_access_granted_at = CURRENT_TIMESTAMP WHERE email = ?",
-                (email,),
-            )
+            if role != "user":
+                conn.execute("UPDATE users SET role = ? WHERE email = ?", (role, email))
+            if grant_access:
+                conn.execute(
+                    "UPDATE users SET materials_access_granted_at = CURRENT_TIMESTAMP WHERE email = ?",
+                    (email,),
+                )
             conn.commit()
     user = authenticate_user(email, "Secret123", settings=test_settings)
     session_token = create_session(user.id, settings=test_settings)
@@ -325,6 +329,16 @@ def test_git_backed_course_map_page_requires_learning_access(client, test_settin
     assert authorized_script.status_code == 200
     assert "Работа с ИИ" in authorized_page.text
     assert "application/javascript" in authorized_script.headers["content-type"]
+
+    client.cookies.clear()
+    _prepare_verified_user(client, test_settings, "course-admin@example.com", "courseadmin", role="admin")
+    admin_page = client.get("/materials/drafts/dair-smoke-20260529/")
+    admin_styles = client.get("/materials/drafts/dair-smoke-20260529/styles.css")
+    admin_script = client.get("/materials/drafts/dair-smoke-20260529/script.js")
+
+    assert admin_page.status_code == 200
+    assert admin_styles.status_code == 200
+    assert admin_script.status_code == 200
 
 
 def test_materials_and_lesson_redirect_for_anonymous_user(client):

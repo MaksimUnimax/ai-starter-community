@@ -2,10 +2,10 @@
 
 {% block content %}
   <section class="card stack learning-card">
+    <h2 class="section-title learning-card-title">Обучающий блок</h2>
     <div class="learning-grid">
       <div class="learning-column">
         <h2 class="section-title">Обучение</h2>
-        <p>Здесь находится курс и материалы по работе с ИИ.</p>
         {% if learning_access %}
           <a class="button button-primary learning-button" href="{{ learning_course_url }}">Перейти к обучению</a>
         {% else %}
@@ -15,17 +15,16 @@
 
       <div class="learning-column">
         <h2 class="section-title">Обучающий проект</h2>
-        <p>Файл с заданием для старта проекта, документации, Git и структуры работы.</p>
         {% if learning_access %}
           <a class="button button-secondary learning-button" href="{{ learning_download_url }}">Скачать файл</a>
         {% else %}
           <button class="button button-secondary learning-button" type="button" disabled>Скачать файл</button>
         {% endif %}
-        <p class="form-help">Скачайте файл, вставьте в чат ChatGPT и следуйте инструкциям ИИ.</p>
       </div>
     </div>
+    <p class="form-help learning-card-note">Пройдите обучение, затем скачайте файл, вставьте в чат ChatGPT и следуйте его инструкциям.</p>
     {% if not learning_access %}
-      <p class="form-help">Доступ откроется после оплаты.</p>
+      <p class="form-help learning-card-lock">Доступ откроется после оплаты.</p>
     {% endif %}
   </section>
 

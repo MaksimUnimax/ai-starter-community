@@ -57,17 +57,18 @@ def test_cabinet_displays_course_shell_without_tariffs_or_payment_noise(client, 
     assert "Логин: <strong>cabinetcatalog</strong>" in cabinet_response.text
     assert "Email: cabinet-catalog@example.com" in cabinet_response.text
     assert "Главная" in cabinet_response.text
+    assert "Обучающий блок" in cabinet_response.text
     assert "Обучение" in cabinet_response.text
     assert "Работа с ИИ" not in cabinet_response.text
     assert "Обучающий проект" in cabinet_response.text
-    assert "Здесь находится курс и материалы по работе с ИИ." in cabinet_response.text
     assert "Перейти к обучению" in cabinet_response.text
     assert "Скачать файл" in cabinet_response.text
+    assert "Пройдите обучение, затем скачайте файл, вставьте в чат ChatGPT и следуйте его инструкциям." in cabinet_response.text
     assert "Доступ откроется после оплаты." in cabinet_response.text
     assert 'href="/materials/drafts/dair-smoke-20260529/"' not in cabinet_response.text
     assert 'href="/cabinet/learning/project-file"' not in cabinet_response.text
     assert "raw.githubusercontent.com" not in cabinet_response.text
-    assert cabinet_response.text.index("<h2 class=\"section-title\">Обучение</h2>") < cabinet_response.text.index("<h2 class=\"section-title\">Аккаунт</h2>")
+    assert cabinet_response.text.index("Обучающий блок") < cabinet_response.text.index("Аккаунт")
     assert "Доступные тарифы" not in cabinet_response.text
     assert "Оплата" not in cabinet_response.text
     assert "Что дальше" not in cabinet_response.text
@@ -100,6 +101,7 @@ def test_cabinet_shows_active_learning_links_when_access_granted(client, test_se
 
     cabinet_response = client.get("/cabinet")
     assert cabinet_response.status_code == 200
+    assert "Обучающий блок" in cabinet_response.text
     assert "Обучение" in cabinet_response.text
     assert "Обучающий проект" in cabinet_response.text
     assert "Доступ откроется после оплаты." not in cabinet_response.text
@@ -107,4 +109,28 @@ def test_cabinet_shows_active_learning_links_when_access_granted(client, test_se
     assert 'href="/cabinet/learning/project-file"' in cabinet_response.text
     assert "Перейти к обучению" in cabinet_response.text
     assert "Скачать файл" in cabinet_response.text
+    assert "Пройдите обучение, затем скачайте файл, вставьте в чат ChatGPT и следуйте его инструкциям." in cabinet_response.text
     assert "raw.githubusercontent.com" not in cabinet_response.text
+
+    client.cookies.clear()
+    _verify_registered_user(client, test_settings, "cabinet-admin-access@example.com", "cabinetadminaccess")
+    token = _extract_token_from_db(test_settings, "cabinet-admin-access@example.com")
+    verify_email(token, settings=test_settings)
+    with sqlite3.connect(test_settings.database_path) as conn:
+        conn.execute(
+            "UPDATE users SET role = 'admin' WHERE email = ?",
+            ("cabinet-admin-access@example.com",),
+        )
+        conn.commit()
+    login_response = client.post(
+        "/login",
+        data={"email_or_login": "cabinet-admin-access@example.com", "password": "Secret123"},
+        follow_redirects=False,
+    )
+    assert login_response.status_code == 303
+    admin_response = client.get("/cabinet")
+    assert admin_response.status_code == 200
+    assert "Обучающий блок" in admin_response.text
+    assert "Доступ откроется после оплаты." not in admin_response.text
+    assert 'href="/materials/drafts/dair-smoke-20260529/"' in admin_response.text
+    assert 'href="/cabinet/learning/project-file"' in admin_response.text
