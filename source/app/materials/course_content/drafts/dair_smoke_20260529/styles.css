@@ -243,7 +243,7 @@ h2 {
 
 .lesson-nav {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 10px;
 }
 
@@ -253,9 +253,9 @@ h2 {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
   gap: 4px;
-  text-align: left;
+  text-align: center;
   padding: 12px 14px;
   background: #fff;
   border: 1px solid var(--border);
@@ -274,8 +274,8 @@ h2 {
 .nav-button .nav-title {
   display: block;
   font-weight: 700;
-  line-height: 1.2;
-  font-size: 0.95rem;
+  line-height: 1.3;
+  font-size: 0.94rem;
   overflow-wrap: anywhere;
 }
 
@@ -321,14 +321,6 @@ h2 {
   font-size: 1.05rem;
 }
 
-.checkpoint-list {
-  margin: 14px 0 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  gap: 8px;
-}
-
 .lesson-strip,
 .lesson-progress,
 .lesson-shell {
@@ -339,24 +331,6 @@ h2 {
 .lesson-progress,
 .lesson-shell {
   width: 100%;
-}
-
-.lesson-progress .checkpoint-list {
-  margin-top: 10px;
-}
-
-.checkpoint-list li {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--muted);
-  font-size: 0.94rem;
-}
-
-.checkpoint-list input {
-  width: 16px;
-  height: 16px;
-  accent-color: var(--accent);
 }
 
 .source-cards {
@@ -467,7 +441,7 @@ h2 {
 }
 
 .lesson-shell {
-  overflow: hidden;
+  overflow: visible;
 }
 
 .section-card {
@@ -500,6 +474,41 @@ h2 {
   gap: 20px;
 }
 
+.lesson-intro p {
+  margin: 0 auto 10px;
+  max-width: 74ch;
+  text-align: left;
+}
+
+.lesson-outcome {
+  text-align: center;
+}
+
+.centered-lead {
+  margin: 0 auto;
+  max-width: 64ch;
+  text-align: center;
+  font-weight: 700;
+}
+
+.centered-list {
+  margin: 10px auto 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+  max-width: 68ch;
+  text-align: center;
+}
+
+.lesson-one .centered-list {
+  padding-left: 0;
+}
+
+.centered-list li {
+  margin: 0;
+}
+
 .role-grid,
 .example-grid,
 .breakdown-grid,
@@ -513,45 +522,109 @@ h2 {
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
-.role-card,
-.example-card,
-.breakdown-card,
-.process-step {
+.definition-stack {
+  display: grid;
+  gap: 12px;
+}
+
+.definition-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 18px;
+  border-radius: var(--radius);
+  background: #fff;
+  border: 1px solid var(--border);
+  min-height: 120px;
+  text-align: center;
+}
+
+.example-card {
   display: grid;
   gap: 8px;
   padding: 16px;
   border-radius: var(--radius);
   background: #fff;
   border: 1px solid var(--border);
+  min-width: 0;
+  overflow-wrap: break-word;
 }
 
-.role-card strong,
-.example-card strong,
-.breakdown-card strong,
-.process-step strong {
-  line-height: 1.35;
+.breakdown-card,
+.process-step,
+.practice-card,
+.quiz-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 18px;
+  border-radius: 16px;
+  background: #fff;
+  border: 1px solid var(--border);
+  min-width: 0;
+  overflow-wrap: break-word;
+  height: auto;
+  box-sizing: border-box;
+  text-align: center;
 }
 
-.role-card p,
-.example-card p,
-.breakdown-card p {
+.definition-name,
+.breakdown-title {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  justify-content: center;
+  min-height: 24px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+}
+
+.definition-card p,
+.process-step strong,
+.breakdown-card p,
+.practice-card strong,
+.quiz-card strong {
   margin: 0;
+  max-width: 64ch;
+}
+
+.example-card .example-title,
+.example-card .example-quote,
+.example-card p {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.example-card .example-title,
+.example-card .example-quote {
+  text-align: center;
 }
 
 .example-grid {
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: 1fr;
 }
 
 .breakdown-grid {
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
 }
 
 .process-flow {
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
 }
 
 .process-step {
-  align-content: start;
+  align-content: center;
+  text-align: center;
+  min-height: 120px;
 }
 
 .process-step-index {
@@ -575,7 +648,7 @@ h2 {
 }
 
 .practice-grid {
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: 1fr;
   margin-top: 12px;
 }
 
@@ -592,22 +665,42 @@ h2 {
   margin-bottom: 10px;
 }
 
-.practice-field textarea {
-  width: 100%;
-  min-height: 108px;
-  border-radius: calc(var(--radius) - 2px);
-  border: 1px solid var(--border);
-  padding: 12px 13px;
-  font: inherit;
-  color: var(--text);
-  background: #fff;
-  resize: vertical;
+.practice-list,
+.quiz-list {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr;
 }
 
-.practice-field textarea:focus {
-  outline: none;
-  box-shadow: var(--focus);
-  border-color: rgba(194, 65, 12, 0.35);
+.practice-card,
+.quiz-card {
+  gap: 12px;
+}
+
+.practice-options,
+.quiz-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  width: 100%;
+}
+
+.practice-option,
+.quiz-option {
+  width: 100%;
+  min-height: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 16px;
+  line-height: 1.35;
+  white-space: normal;
+  box-sizing: border-box;
+  overflow-wrap: break-word;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #fff;
 }
 
 .practice-button {
@@ -620,6 +713,7 @@ h2 {
   border-radius: var(--radius);
   border: 1px solid var(--border);
   background: var(--accent-soft);
+  text-align: center;
 }
 
 .practice-feedback.is-success {
@@ -641,10 +735,9 @@ h2 {
 }
 
 .next-step-card {
-  display: flex;
-  gap: 16px;
-  justify-content: space-between;
-  align-items: center;
+  display: grid;
+  gap: 12px;
+  justify-items: center;
   padding: 16px;
   border-radius: var(--radius);
   border: 1px solid rgba(194, 65, 12, 0.2);
@@ -657,7 +750,7 @@ h2 {
 }
 
 .next-step-card .primary-button {
-  align-self: flex-start;
+  align-self: center;
   white-space: normal;
 }
 
@@ -732,6 +825,8 @@ h2 {
   inset: 0;
   display: grid;
   align-content: center;
+  justify-items: center;
+  text-align: center;
   backface-visibility: hidden;
   padding: 16px;
 }
@@ -755,29 +850,15 @@ h2 {
 }
 
 .quiz-list {
-  display: grid;
   gap: 14px;
 }
 
 .quiz-card {
-  padding: 16px;
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  background: #fff;
+  padding: 18px;
 }
 
 .quiz-options {
-  display: grid;
-  gap: 10px;
   margin-top: 12px;
-}
-
-.quiz-option {
-  width: 100%;
-  text-align: left;
-  padding: 12px 14px;
-  border: 1px solid var(--border);
-  background: #fff;
 }
 
 .quiz-option.is-correct {
@@ -796,6 +877,7 @@ h2 {
   border-radius: var(--radius);
   border: 1px solid var(--border);
   background: var(--accent-soft);
+  text-align: center;
 }
 
 .review-box {
@@ -854,6 +936,10 @@ h2 {
   .summary-grid,
   .info-grid {
     grid-template-columns: 1fr;
+  }
+
+  .lesson-nav {
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   }
 }
 

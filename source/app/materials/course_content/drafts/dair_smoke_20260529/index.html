@@ -45,7 +45,7 @@
         </div>
         <div class="progress-copy">
           <strong id="progress-value">0%</strong>
-          <span id="progress-label">Пока ничего не проверено.</span>
+          <span id="progress-label">Пока нет правильных ответов.</span>
         </div>
       </div>
       <p class="muted">Прогресс зависит только от проверки урока: quiz и практика.</p>
@@ -53,277 +53,255 @@
 
     <article class="panel lesson-shell">
       <div id="active-section" aria-live="polite">
-            <article class="section-card lesson-one">
-              <header class="section-header">
-                <p class="eyebrow">Урок 1</p>
-                <h3>Проектная работа с ИИ: роль пользователя, ChatGPT и Codex</h3>
-                <p class="muted">Вы не пишете код вручную, но управляете задачей, проверкой и принятием результата.</p>
-                <p class="muted">
-                  В этом уроке мы разбираем первую и самую важную мысль курса: для работы над проектом не обязательно писать код вручную, но нужно понимать, как организована работа.
-                </p>
-              </header>
+        <article class="section-card lesson-one">
+          <header class="section-header">
+            <p class="eyebrow">Урок 1</p>
+            <h3>Проектная работа с ИИ: роль пользователя, ChatGPT и Codex</h3>
+            <p class="muted">Вы не пишете код вручную, но управляете задачей, проверкой и принятием результата.</p>
+            <p class="muted">В этом уроке мы разбираем первую и самую важную мысль курса: для работы над проектом не обязательно писать код вручную, но нужно понимать, как организована работа.</p>
+          </header>
 
-              <div class="section-body">
-                <section class="callout">
-                  <span class="block-label">Вступление</span>
-                  <p>Если пользователь просто говорит “Сделай мне сайт”, этого недостаточно. Не ясно, для кого страница нужна, какая у неё цель, какие блоки должны быть на ней и как проверить результат.</p>
-                  <p>Правильная работа начинается не с кода, а с постановки задачи: что нужно получить, какие есть ограничения, кто проверяет результат и какой отчёт должен вернуть исполнитель.</p>
-                </section>
+          <div class="section-body">
+            <section class="callout lesson-intro">
+              <span class="block-label">Вводная мысль</span>
+              <p>Если пользователь просто говорит “Сделай мне сайт”, этого недостаточно. Не ясно, для кого страница нужна, какая у неё цель, какие блоки должны быть на ней и как проверить результат.</p>
+              <p>Правильная работа начинается не с кода, а с постановки задачи: что нужно получить, какие есть ограничения, кто проверяет результат и какой отчёт должен вернуть исполнитель.</p>
+            </section>
 
-                <section class="info-grid">
-                  <div>
-                    <span class="block-label">После урока вы сможете</span>
-                    <ul>
-                      <li>Объяснить свою роль в разработке с ИИ.</li>
-                      <li>Отличить роль ChatGPT от роли Codex.</li>
-                      <li>Сформулировать первую безопасную задачу для страницы сайта.</li>
-                      <li>Понять, почему результат проверяется по фактам, а не по обещанию “Готово”.</li>
-                      <li>Подготовить основу для следующего шага разработки.</li>
-                    </ul>
-                  </div>
-                  <div>
-                    <span class="block-label">В работе участвуют три роли</span>
-                    <div class="role-grid">
-                      <div class="role-card">
-                        <span class="summary-label">Пользователь</span>
-                        <strong>Пользователь — заказчик и владелец результата</strong>
-                        <p class="muted">Он формулирует цель, объясняет, какой результат нужен, проверяет готовую работу и принимает решение: подходит или нужно исправлять.</p>
-                      </div>
-                      <div class="role-card">
-                        <span class="summary-label">ChatGPT</span>
-                        <strong>ChatGPT — ведущий программист, архитектор и технический руководитель</strong>
-                        <p class="muted">Он разбирает задачу, выбирает подход, инструменты и языки, планирует архитектуру, делит работу на безопасные шаги, пишет точные задания для Codex, контролирует отчёты и проверяет ход работы.</p>
-                      </div>
-                      <div class="role-card">
-                        <span class="summary-label">Codex</span>
-                        <strong>Codex — исполнитель на сервере</strong>
-                        <p class="muted">Он работает на сервере в нужном репозитории, читает файлы проекта, вносит изменения, запускает проверки, делает commit/push, если это входит в задачу, и возвращает отчёт.</p>
-                      </div>
-                    </div>
-                  </div>
-                </section>
+            <section class="callout lesson-outcome">
+              <span class="block-label">После урока вы сможете</span>
+              <p class="centered-lead">Что вы сможете после урока:</p>
+              <ul class="centered-list">
+                <li>Объяснить свою роль в разработке с ИИ.</li>
+                <li>Отличить роль ChatGPT от роли Codex.</li>
+                <li>Сформулировать первую безопасную задачу для страницы сайта.</li>
+                <li>Понять, почему результат проверяется по фактам, а не по обещанию “Готово”.</li>
+                <li>Подготовить основу для следующего шага разработки.</li>
+              </ul>
+            </section>
 
-                <section class="callout">
-                  <span class="block-label">Схема процесса</span>
-                  <div class="process-flow">
-                    <div class="process-step"><span class="process-step-index">1</span><strong>Пользователь ставит цель.</strong></div>
-                    <div class="process-step"><span class="process-step-index">2</span><strong>ChatGPT проектирует технический шаг.</strong></div>
-                    <div class="process-step"><span class="process-step-index">3</span><strong>Codex выполняет задачу на сервере.</strong></div>
-                    <div class="process-step"><span class="process-step-index">4</span><strong>Codex возвращает отчёт.</strong></div>
-                    <div class="process-step"><span class="process-step-index">5</span><strong>ChatGPT проверяет отчёт.</strong></div>
-                    <div class="process-step"><span class="process-step-index">6</span><strong>Пользователь смотрит результат и принимает решение.</strong></div>
-                  </div>
-                  <p class="process-summary">Пользователь ставит цель → ChatGPT проектирует технический шаг → Codex выполняет задачу на сервере → Codex возвращает отчёт → ChatGPT проверяет отчёт → пользователь смотрит результат и принимает решение.</p>
-                </section>
-
-                <section class="callout">
-                  <span class="block-label">Почему это важно</span>
-                  <p>Работа без ручного написания кода не означает работу без контроля. Пользователь может не знать, как устроены файлы и команды, но он должен понимать, что именно нужно сделать и как будет проверяться результат.</p>
-                </section>
-
-                <section class="info-grid">
-                  <div>
-                    <span class="block-label">Плохая постановка задачи</span>
-                    <p class="muted">“Сделай мне сайт.”</p>
-                    <ul>
-                      <li>Не понятно, для кого сайт.</li>
-                      <li>Не понятно, какая цель страницы.</li>
-                      <li>Не понятно, какие блоки нужны.</li>
-                      <li>Не понятно, где должна быть форма.</li>
-                      <li>Не понятно, какие действия запрещены.</li>
-                      <li>Не понятно, как проверить результат.</li>
-                    </ul>
-                  </div>
-                  <div>
-                    <span class="block-label">Профессиональная постановка задачи</span>
-                    <p>Простую страницу сайта для записи на консультацию нужно спроектировать.</p>
-                    <p>Страница должна объяснять услугу, показывать преимущества, отвечать на частые вопросы и вести пользователя к форме заявки.</p>
-                    <p>На первом этапе не нужно подключать оплату, личный кабинет или сложную CRM.</p>
-                    <strong>Нужно описать</strong>
-                    <ul>
-                      <li>Цель страницы.</li>
-                      <li>Для кого страница.</li>
-                      <li>Какие блоки должны быть на странице.</li>
-                      <li>Какие данные пользователь оставляет в форме.</li>
-                      <li>Что происходит после отправки заявки.</li>
-                      <li>Что нельзя трогать на сайте.</li>
-                      <li>Как проверить, что страница работает правильно.</li>
-                    </ul>
-                    <p>Результат первого этапа — понятное описание страницы и структуры блоков, по которому потом можно дать Codex отдельную задачу на реализацию.</p>
-                  </div>
-                </section>
-
-                <section class="callout">
-                  <span class="block-label">Разбор примера</span>
-                  <div class="breakdown-grid" style="margin-top: 12px;">
-                    <div class="breakdown-card"><span class="summary-label">Цель</span><strong>Получить заявку на консультацию.</strong></div>
-                    <div class="breakdown-card"><span class="summary-label">Аудитория</span><strong>Человек, которому нужна услуга.</strong></div>
-                    <div class="breakdown-card"><span class="summary-label">Структура</span><strong>Заголовок, описание, преимущества, вопросы, форма.</strong></div>
-                    <div class="breakdown-card"><span class="summary-label">Ограничение</span><strong>Не трогать оплату, личный кабинет и другие разделы.</strong></div>
-                    <div class="breakdown-card"><span class="summary-label">Проверка</span><strong>Страница открывается, текст понятен, форма видна, путь пользователя логичен.</strong></div>
-                  </div>
-                </section>
-
-                <section class="callout">
-                  <span class="block-label">Практика: опишите страницу сайта</span>
-                  <p>Ответьте на шесть вопросов и заполните поля ниже:</p>
-                  <div class="practice-grid">
-                    <label class="practice-field"><span>Для кого нужна страница?</span><textarea rows="3" placeholder="Кратко и по делу" data-practice-input="audience"></textarea></label>
-                    <label class="practice-field"><span>Какую одну главную цель она должна решать?</span><textarea rows="3" placeholder="Кратко и по делу" data-practice-input="goal"></textarea></label>
-                    <label class="practice-field"><span>Какие 3–5 блоков должны быть на странице?</span><textarea rows="3" placeholder="Кратко и по делу" data-practice-input="blocks"></textarea></label>
-                    <label class="practice-field"><span>Какие данные пользователь должен оставить в форме?</span><textarea rows="3" placeholder="Кратко и по делу" data-practice-input="form"></textarea></label>
-                    <label class="practice-field"><span>Что нельзя трогать на сайте?</span><textarea rows="3" placeholder="Кратко и по делу" data-practice-input="forbidden"></textarea></label>
-                    <label class="practice-field"><span>Как понять, что страница работает правильно?</span><textarea rows="3" placeholder="Кратко и по делу" data-practice-input="check"></textarea></label>
-                  </div>
-                  <p class="muted">Заполните все поля. Затем нажмите кнопку проверки.</p>
-                  <button class="primary-button practice-button" type="button" data-practice-submit>Проверить практику</button>
-                  <div class="practice-feedback">Пока ничего не проверено.</div>
-                </section>
-
-                <section class="callout">
-                  <span class="block-label">Пример ответа</span>
-                  <p>Мне нужна простая страница сайта для записи на консультацию.</p>
-                  <p>Пользователь сразу понимает, что это за услуга и что он получит.</p>
-                  <p>Понятное описание задачи может выглядеть так:</p>
-                  <ul>
-                    <li>Кратко объяснить услугу;</li>
-                    <li>Показать преимущества;</li>
-                    <li>Ответить на частые вопросы;</li>
-                    <li>Вести к форме заявки;</li>
-                    <li>Проверить, что форма видна и путь пользователя понятен.</li>
-                  </ul>
-                  <p>На первом этапе не нужно подключать оплату, личный кабинет или сложную CRM. Результат считается правильным, если пользователь понял структуру страницы и следующий шаг.</p>
-                </section>
-
-                <section class="callout">
-                  <span class="block-label">Типичные ошибки</span>
-                  <ol>
-                    <li>Просить “Сделай мне сайт” без описания цели.</li>
-                    <li>Не указывать, для кого эта страница.</li>
-                    <li>Не перечислять нужные блоки.</li>
-                    <li>Не говорить, что нельзя трогать.</li>
-                    <li>Не объяснять, как проверить результат.</li>
-                  </ol>
-                </section>
-
-                <section class="callout">
-                  <span class="block-label">Проверьте себя</span>
-                  <ul>
-                    <li>Я могу объяснить, для кого нужна страница.</li>
-                    <li>Я могу назвать одну главную цель страницы.</li>
-                    <li>Я понимаю, какие блоки должны быть на странице.</li>
-                    <li>Я понимаю, какие данные нужны в форме.</li>
-                    <li>Я указал, что нельзя трогать на сайте.</li>
-                    <li>Я понимаю, как проверить результат.</li>
-                  </ul>
-                </section>
-
-                <section class="module-grid">
-                  <div class="section-kicker">Карточки</div>
-                  <div class="flashcard-grid">
-                    <button class="flashcard is-flipped" type="button" aria-label="Перевернуть карточку">
-                      <span class="flashcard-inner">
-                        <span class="flashcard-face flashcard-front">
-                          <strong>Что делает пользователь?</strong>
-                          <span>Нажми, чтобы увидеть ответ</span>
-                        </span>
-                        <span class="flashcard-face flashcard-back">
-                          <strong>Формулирует цель, проверяет результат и принимает решение.</strong>
-                          <span class="flashcard-note">Карточка перевёрнута в тестовой версии урока.</span>
-                        </span>
-                      </span>
-                    </button>
-                    <button class="flashcard is-flipped" type="button" aria-label="Перевернуть карточку">
-                      <span class="flashcard-inner">
-                        <span class="flashcard-face flashcard-front">
-                          <strong>Что делает ChatGPT?</strong>
-                          <span>Нажми, чтобы увидеть ответ</span>
-                        </span>
-                        <span class="flashcard-face flashcard-back">
-                          <strong>Ведёт техническую работу: проектирует шаг, выбирает подход, готовит задание и проверяет отчёт.</strong>
-                          <span class="flashcard-note">Карточка перевёрнута в тестовой версии урока.</span>
-                        </span>
-                      </span>
-                    </button>
-                    <button class="flashcard is-flipped" type="button" aria-label="Перевернуть карточку">
-                      <span class="flashcard-inner">
-                        <span class="flashcard-face flashcard-front">
-                          <strong>Что делает Codex?</strong>
-                          <span>Нажми, чтобы увидеть ответ</span>
-                        </span>
-                        <span class="flashcard-face flashcard-back">
-                          <strong>Выполняет задачу на сервере в нужном репозитории и возвращает отчёт.</strong>
-                          <span class="flashcard-note">Карточка перевёрнута в тестовой версии урока.</span>
-                        </span>
-                      </span>
-                    </button>
-                    <button class="flashcard is-flipped" type="button" aria-label="Перевернуть карточку">
-                      <span class="flashcard-inner">
-                        <span class="flashcard-face flashcard-front">
-                          <strong>Почему фраза “Сделай мне сайт” плохая?</strong>
-                          <span>Нажми, чтобы увидеть ответ</span>
-                        </span>
-                        <span class="flashcard-face flashcard-back">
-                          <strong>В ней нет цели, аудитории, структуры, ограничений и проверки.</strong>
-                          <span class="flashcard-note">Карточка перевёрнута в тестовой версии урока.</span>
-                        </span>
-                      </span>
-                    </button>
-                  </div>
-                </section>
-
-                <section class="module-grid">
-                  <div class="section-kicker">Проверка знаний</div>
-                  <div class="quiz-list">
-                    <div class="quiz-card">
-                      <strong>Что не так с задачей “Сделай мне сайт”?</strong>
-                      <div class="quiz-options">
-                        <button class="quiz-option is-correct" type="button">Она не задаёт цель, аудиторию, структуру, ограничения и проверку.</button>
-                        <button class="quiz-option" type="button">Она идеально подходит для Codex.</button>
-                        <button class="quiz-option" type="button">В ней уже есть все нужные требования.</button>
-                      </div>
-                    </div>
-                    <div class="quiz-card">
-                      <strong>Что должен сделать ChatGPT перед задачей для Codex?</strong>
-                      <div class="quiz-options">
-                        <button class="quiz-option is-correct" type="button">Разобрать задачу, выбрать подход, ограничить scope и подготовить точное задание.</button>
-                        <button class="quiz-option" type="button">Сразу писать большой код без обсуждения.</button>
-                        <button class="quiz-option" type="button">Попросить пользователя вручную собрать весь сайт.</button>
-                      </div>
-                    </div>
-                    <div class="quiz-card">
-                      <strong>Где работает Codex?</strong>
-                      <div class="quiz-options">
-                        <button class="quiz-option is-correct" type="button">На сервере в нужном репозитории проекта.</button>
-                        <button class="quiz-option" type="button">Только в браузере пользователя.</button>
-                        <button class="quiz-option" type="button">В документах без доступа к проекту.</button>
-                      </div>
-                    </div>
-                    <div class="quiz-card">
-                      <strong>Что должен дать первый этап по странице сайта?</strong>
-                      <div class="quiz-options">
-                        <button class="quiz-option is-correct" type="button">Понятное описание страницы и структуры блоков, а не сразу большой непроверенный код.</button>
-                        <button class="quiz-option" type="button">Сразу большой готовый продукт без проверки.</button>
-                        <button class="quiz-option" type="button">Секретные ключи и пароли.</button>
-                      </div>
-                    </div>
-                  </div>
-                </section>
-
-                <section class="callout">
-                  <span class="block-label">Главный вывод урока</span>
-                  <p>Пользователь не пишет код вручную, но управляет целью и принимает результат. ChatGPT ведёт техническую работу как ведущий программист. Codex выполняет конкретную задачу на сервере и возвращает отчёт. Хорошая работа начинается с понятной постановки задачи, а не с просьбы “сделай всё”.</p>
-                </section>
-
-                <section class="next-step-card">
-                  <div>
-                    <span class="block-label">Следующий шаг</span>
-                    <p>В следующем уроке разберём роли пользователя, ChatGPT и Codex подробнее: кто принимает решения, кто проектирует техническую работу и кто выполняет задачу на сервере.</p>
-                  </div>
-                  <button class="primary-button" type="button" data-section="lesson-2">Перейти к уроку 2</button>
-                </section>
+            <section class="callout">
+              <span class="block-label">Ключевые понятия</span>
+              <div class="definition-stack">
+                <div class="definition-card">
+                  <span class="definition-name">Пользователь</span>
+                  <p><strong>Пользователь — это человек, который хочет получить готовый результат: сайт, страницу, сервис, бота, автоматизацию или другой проект.</strong></p>
+                </div>
+                <div class="definition-card">
+                  <span class="definition-name">ChatGPT</span>
+                  <p><strong>ChatGPT — это ИИ-помощник для диалога, анализа и планирования задачи. С ним можно обсудить идею, разобрать проблему, выбрать подход и подготовить понятное задание для технической работы.</strong></p>
+                </div>
+                <div class="definition-card">
+                  <span class="definition-name">Codex</span>
+                  <p><strong>Codex — это ИИ-агент для программной разработки. Он отличается от обычного чата тем, что работает с проектом: файлами, кодом, проверками и отчётом о выполненной задаче.</strong></p>
+                </div>
               </div>
-            </article>
+            </section>
+
+            <section class="callout">
+              <span class="block-label">Как это работает в курсе</span>
+              <div class="definition-stack">
+                <div class="definition-card">
+                  <span class="definition-name">Пользователь</span>
+                  <p>Пользователь задаёт цель и принимает результат. Он объясняет, что хочет получить, смотрит готовую работу и решает: подходит результат или нужно исправлять.</p>
+                </div>
+                <div class="definition-card">
+                  <span class="definition-name">ChatGPT</span>
+                  <p>ChatGPT ведёт техническую работу. Он выступает как ведущий программист и архитектор: разбирает задачу, выбирает подход, планирует безопасный шаг и готовит точное задание для Codex.</p>
+                </div>
+                <div class="definition-card">
+                  <span class="definition-name">Codex</span>
+                  <p>Codex выполняет задачу на сервере. Он работает в нужном репозитории, меняет только разрешённые файлы, запускает проверки и возвращает отчёт.</p>
+                </div>
+              </div>
+            </section>
+
+            <section class="callout">
+              <span class="block-label">Схема процесса</span>
+              <div class="process-flow">
+                <div class="process-step"><span class="process-step-index">1</span><strong>Пользователь ставит цель.</strong></div>
+                <div class="process-step"><span class="process-step-index">2</span><strong>ChatGPT проектирует технический шаг.</strong></div>
+                <div class="process-step"><span class="process-step-index">3</span><strong>Codex выполняет задачу на сервере.</strong></div>
+                <div class="process-step"><span class="process-step-index">4</span><strong>Codex возвращает отчёт.</strong></div>
+                <div class="process-step"><span class="process-step-index">5</span><strong>ChatGPT проверяет отчёт.</strong></div>
+                <div class="process-step"><span class="process-step-index">6</span><strong>Пользователь смотрит результат и принимает решение.</strong></div>
+              </div>
+            </section>
+
+            <section class="callout">
+              <span class="block-label">Рабочий пример</span>
+              <div class="example-grid">
+                <div class="example-card">
+                  <span class="example-title">Плохой пример</span>
+                  <p class="example-quote">“Сделай мне сайт.”</p>
+                  <ul class="centered-list">
+                    <li>Не понятно, для кого сайт.</li>
+                    <li>Не понятно, какая цель страницы.</li>
+                    <li>Не понятно, какие блоки нужны.</li>
+                    <li>Не понятно, где должна быть форма.</li>
+                    <li>Не понятно, какие действия запрещены.</li>
+                    <li>Не понятно, как проверить результат.</li>
+                  </ul>
+                </div>
+                <div class="example-card">
+                  <span class="example-title">Профессиональный пример</span>
+                  <p><strong>Нужно спроектировать простую страницу сайта для записи на консультацию.</strong></p>
+                  <p>Страница должна объяснять услугу, показывать преимущества, отвечать на частые вопросы и вести пользователя к форме заявки.</p>
+                  <p>На первом этапе не нужно подключать оплату, личный кабинет или сложную CRM.</p>
+                  <ul class="centered-list">
+                    <li>Цель страницы.</li>
+                    <li>Для кого страница.</li>
+                    <li>Какие блоки должны быть на странице.</li>
+                    <li>Какие данные пользователь оставляет в форме.</li>
+                    <li>Что происходит после отправки заявки.</li>
+                    <li>Что нельзя трогать на сайте.</li>
+                    <li>Как проверить, что страница работает правильно.</li>
+                  </ul>
+                  <p class="muted">Результат первого этапа — понятное описание страницы и структуры блоков, по которому потом можно дать Codex отдельную задачу на реализацию.</p>
+                </div>
+              </div>
+            </section>
+
+            <section class="callout">
+              <span class="block-label">Разбор примера</span>
+              <div class="breakdown-grid">
+                <div class="breakdown-card">
+                  <span class="breakdown-title">Цель</span>
+                  <p>Получить заявку на консультацию.</p>
+                </div>
+                <div class="breakdown-card">
+                  <span class="breakdown-title">Аудитория</span>
+                  <p>Человек, которому нужна услуга.</p>
+                </div>
+                <div class="breakdown-card">
+                  <span class="breakdown-title">Структура</span>
+                  <p>Заголовок, описание, преимущества, вопросы, форма.</p>
+                </div>
+                <div class="breakdown-card">
+                  <span class="breakdown-title">Ограничение</span>
+                  <p>Не трогать оплату, личный кабинет и другие разделы.</p>
+                </div>
+                <div class="breakdown-card">
+                  <span class="breakdown-title">Проверка</span>
+                  <p>Страница открывается, текст понятен, форма видна, путь пользователя логичен.</p>
+                </div>
+              </div>
+            </section>
+
+            <section class="callout">
+              <span class="block-label">Практика: соберите задачу для страницы сайта</span>
+              <p class="centered-lead">Выберите один ответ для каждого вопроса. После каждого выбора появится обратная связь.</p>
+              <section class="practice-group">
+                <div class="section-kicker">Практические выборы</div>
+                <div class="practice-list">
+                  <div class="practice-card" data-choice-card="practice:lesson-1:0">
+                    <strong>Для кого нужна страница?</strong>
+                    <div class="practice-options">
+                      <button class="practice-option" type="button" data-choice="practice:lesson-1:0" data-option="0">Для человека, которому нужна консультация.</button>
+                      <button class="practice-option" type="button" data-choice="practice:lesson-1:0" data-option="1">Для Codex, чтобы он сам выбрал цель.</button>
+                      <button class="practice-option" type="button" data-choice="practice:lesson-1:0" data-option="2">Для случайного посетителя без понятной задачи.</button>
+                    </div>
+                    <div class="feedback">Выберите ответ, чтобы получить мгновенную обратную связь.</div>
+                  </div>
+                  <div class="practice-card" data-choice-card="practice:lesson-1:1">
+                    <strong>Какая главная цель страницы?</strong>
+                    <div class="practice-options">
+                      <button class="practice-option" type="button" data-choice="practice:lesson-1:1" data-option="0">Получить заявку на консультацию.</button>
+                      <button class="practice-option" type="button" data-choice="practice:lesson-1:1" data-option="1">Показать все разделы сайта сразу.</button>
+                      <button class="practice-option" type="button" data-choice="practice:lesson-1:1" data-option="2">Спрятать форму внизу без объяснения.</button>
+                    </div>
+                    <div class="feedback">Выберите ответ, чтобы получить мгновенную обратную связь.</div>
+                  </div>
+                  <div class="practice-card" data-choice-card="practice:lesson-1:2">
+                    <strong>Какие блоки нужны на странице?</strong>
+                    <div class="practice-options">
+                      <button class="practice-option" type="button" data-choice="practice:lesson-1:2" data-option="0">Заголовок, описание услуги, преимущества, частые вопросы, форма заявки.</button>
+                      <button class="practice-option" type="button" data-choice="practice:lesson-1:2" data-option="1">Только одна кнопка без объяснения.</button>
+                      <button class="practice-option" type="button" data-choice="practice:lesson-1:2" data-option="2">Личный кабинет, оплата, админка и CRM на первом шаге.</button>
+                    </div>
+                    <div class="feedback">Выберите ответ, чтобы получить мгновенную обратную связь.</div>
+                  </div>
+                  <div class="practice-card" data-choice-card="practice:lesson-1:3">
+                    <strong>Что нельзя трогать в первом шаге?</strong>
+                    <div class="practice-options">
+                      <button class="practice-option" type="button" data-choice="practice:lesson-1:3" data-option="0">Оплату, личный кабинет, админку и другие разделы.</button>
+                      <button class="practice-option" type="button" data-choice="practice:lesson-1:3" data-option="1">Всё можно менять сразу.</button>
+                      <button class="practice-option" type="button" data-choice="practice:lesson-1:3" data-option="2">Нужно удалить старые страницы без проверки.</button>
+                    </div>
+                    <div class="feedback">Выберите ответ, чтобы получить мгновенную обратную связь.</div>
+                  </div>
+                  <div class="practice-card" data-choice-card="practice:lesson-1:4">
+                    <strong>Как понять, что первый этап готов?</strong>
+                    <div class="practice-options">
+                      <button class="practice-option" type="button" data-choice="practice:lesson-1:4" data-option="0">Страница открывается, текст понятен, форма видна, путь пользователя логичен.</button>
+                      <button class="practice-option" type="button" data-choice="practice:lesson-1:4" data-option="1">Codex написал “готово”, но ничего не проверил.</button>
+                      <button class="practice-option" type="button" data-choice="practice:lesson-1:4" data-option="2">Пользователь не открывал страницу.</button>
+                    </div>
+                    <div class="feedback">Выберите ответ, чтобы получить мгновенную обратную связь.</div>
+                  </div>
+                </div>
+              </section>
+            </section>
+
+            <section class="callout">
+              <span class="block-label">Проверка знаний</span>
+              <section class="quiz-group">
+                <div class="section-kicker">Финальная проверка</div>
+                <div class="quiz-list">
+                  <div class="quiz-card" data-choice-card="quiz:lesson-1:0">
+                    <strong>Что не так с задачей “Сделай мне сайт”?</strong>
+                    <div class="quiz-options">
+                      <button class="quiz-option" type="button" data-choice="quiz:lesson-1:0" data-option="0">Она не задаёт цель, аудиторию, структуру, ограничения и проверку.</button>
+                      <button class="quiz-option" type="button" data-choice="quiz:lesson-1:0" data-option="1">Она идеально подходит для Codex.</button>
+                      <button class="quiz-option" type="button" data-choice="quiz:lesson-1:0" data-option="2">В ней уже есть все нужные требования.</button>
+                    </div>
+                    <div class="feedback">Выберите ответ, чтобы получить мгновенную обратную связь.</div>
+                  </div>
+                  <div class="quiz-card" data-choice-card="quiz:lesson-1:1">
+                    <strong>Что должен сделать ChatGPT перед задачей для Codex?</strong>
+                    <div class="quiz-options">
+                      <button class="quiz-option" type="button" data-choice="quiz:lesson-1:1" data-option="0">Разобрать задачу, выбрать подход, ограничить scope и подготовить точное задание.</button>
+                      <button class="quiz-option" type="button" data-choice="quiz:lesson-1:1" data-option="1">Сразу писать большой код без обсуждения.</button>
+                      <button class="quiz-option" type="button" data-choice="quiz:lesson-1:1" data-option="2">Попросить пользователя вручную собрать весь сайт.</button>
+                    </div>
+                    <div class="feedback">Выберите ответ, чтобы получить мгновенную обратную связь.</div>
+                  </div>
+                  <div class="quiz-card" data-choice-card="quiz:lesson-1:2">
+                    <strong>Где работает Codex?</strong>
+                    <div class="quiz-options">
+                      <button class="quiz-option" type="button" data-choice="quiz:lesson-1:2" data-option="0">На сервере в нужном репозитории проекта.</button>
+                      <button class="quiz-option" type="button" data-choice="quiz:lesson-1:2" data-option="1">Только в браузере пользователя.</button>
+                      <button class="quiz-option" type="button" data-choice="quiz:lesson-1:2" data-option="2">В документах без доступа к проекту.</button>
+                    </div>
+                    <div class="feedback">Выберите ответ, чтобы получить мгновенную обратную связь.</div>
+                  </div>
+                  <div class="quiz-card" data-choice-card="quiz:lesson-1:3">
+                    <strong>Что должен дать первый этап по странице сайта?</strong>
+                    <div class="quiz-options">
+                      <button class="quiz-option" type="button" data-choice="quiz:lesson-1:3" data-option="0">Понятное описание страницы и структуры блоков, а не сразу большой непроверенный код.</button>
+                      <button class="quiz-option" type="button" data-choice="quiz:lesson-1:3" data-option="1">Сразу большой готовый продукт без проверки.</button>
+                      <button class="quiz-option" type="button" data-choice="quiz:lesson-1:3" data-option="2">Секретные ключи и пароли.</button>
+                    </div>
+                    <div class="feedback">Выберите ответ, чтобы получить мгновенную обратную связь.</div>
+                  </div>
+                </div>
+              </section>
+            </section>
+
+            <section class="callout">
+              <span class="block-label">Главный вывод урока</span>
+              <p>Пользователь не пишет код вручную, но управляет целью и принимает результат. ChatGPT ведёт техническую работу как ведущий программист. Codex выполняет конкретную задачу на сервере и возвращает отчёт. Хорошая работа начинается с понятной постановки задачи, а не с просьбы “сделай всё”.</p>
+            </section>
+
+            <section class="next-step-card">
+              <div>
+                <span class="block-label">Следующий шаг</span>
+                <p>В следующем уроке разберём роли пользователя, ChatGPT и Codex подробнее: кто принимает решения, кто проектирует техническую работу и кто выполняет задачу на сервере.</p>
+              </div>
+              <button class="primary-button" type="button" data-section="lesson-2">Перейти к уроку 2</button>
+            </section>
+          </div>
+        </article>
       </div>
     </article>
   </div>

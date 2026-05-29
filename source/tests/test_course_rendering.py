@@ -171,40 +171,53 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Проектная работа с ИИ: роль пользователя, ChatGPT и Codex" in page_response.text
     assert "Вы не пишете код вручную, но управляете задачей, проверкой и принятием результата." in page_response.text
     assert "Сделай мне сайт" in page_response.text
-    assert "Простую страницу сайта для записи на консультацию" in page_response.text
-    assert "Пользователь — заказчик и владелец результата" in page_response.text
-    assert "ChatGPT — ведущий программист" in page_response.text
-    assert "Codex — исполнитель на сервере" in page_response.text
+    assert "Нужно спроектировать простую страницу сайта для записи на консультацию." in page_response.text
+    assert "Ключевые понятия" in page_response.text
+    assert "Пользователь — это человек, который хочет получить готовый результат: сайт, страницу, сервис, бота, автоматизацию или другой проект." in page_response.text
+    assert "ChatGPT — это ИИ-помощник для диалога, анализа и планирования задачи. С ним можно обсудить идею, разобрать проблему, выбрать подход и подготовить понятное задание для технической работы." in page_response.text
+    assert "Codex — это ИИ-агент для программной разработки. Он отличается от обычного чата тем, что работает с проектом: файлами, кодом, проверками и отчётом о выполненной задаче." in page_response.text
+    assert "Как это работает в курсе" in page_response.text
+    assert "Пользователь задаёт цель и принимает результат." in page_response.text
+    assert "ChatGPT ведёт техническую работу." in page_response.text
+    assert "Codex выполняет задачу на сервере." in page_response.text
+    assert "Вводная мысль" in page_response.text
     assert "Схема процесса" in page_response.text
     assert "Пользователь ставит цель" in page_response.text
     assert "ChatGPT проектирует технический шаг" in page_response.text
     assert "Codex выполняет задачу на сервере" in page_response.text
-    assert "Практика: опишите страницу сайта" in page_response.text
-    assert "Проверить практику" in page_response.text
-    assert "Типичные ошибки" in page_response.text
+    assert "Пользователь ставит цель → ChatGPT проектирует технический шаг → Codex выполняет задачу на сервере → Codex возвращает отчёт → ChatGPT проверяет отчёт → пользователь смотрит результат и принимает решение." not in page_response.text
+    assert "Рабочий пример" in page_response.text
+    assert "Разбор примера" in page_response.text
+    assert "Практика: соберите задачу для страницы сайта" in page_response.text
+    assert "practice-options" in page_response.text
+    assert "quiz-options" in page_response.text
     assert "Главный вывод урока" in page_response.text
     assert "Следующий шаг" in page_response.text
     assert "Перейти к уроку 2" in page_response.text
-    assert "Пользователь ставит цель → ChatGPT проектирует технический шаг → Codex выполняет задачу на сервере → Codex возвращает отчёт → ChatGPT проверяет отчёт → пользователь смотрит результат и принимает решение." in page_response.text
     assert "Структура урока" in page_response.text
     assert "Прогресс по проверке урока" in page_response.text
-    assert "Пока ничего не проверено." in page_response.text
+    assert "Пока нет правильных ответов." in page_response.text
     assert page_response.text.count('class="nav-button') == 9
     assert page_response.text.count("nav-title") == 9
-    assert page_response.text.count('data-practice-input="') == 6
     assert "lesson-strip" in page_response.text
     assert "lesson-progress" in page_response.text
     assert "lesson-shell" in page_response.text
-    assert "role-grid" in page_response.text
+    assert "definition-stack" in page_response.text
+    assert "definition-card" in page_response.text
     assert "process-flow" in page_response.text
-    assert "practice-grid" in page_response.text
+    assert "process-step" in page_response.text
+    assert "breakdown-grid" in page_response.text
+    assert "practice-list" in page_response.text
+    assert "quiz-list" in page_response.text
     assert "next-step-card" in page_response.text
+    assert "example-card" in page_response.text
     assert 'class="sidebar"' not in page_response.text
     assert 'class="workspace"' not in page_response.text
     assert 'class="hero-meta"' not in page_response.text
     assert 'class="course-map-card"' not in page_response.text
     assert 'class="course-overview"' not in page_response.text
     assert 'checkpoint-list' not in page_response.text
+    assert "<textarea" not in page_response.text
     assert 'href="styles.css"' in page_response.text
     assert 'src="script.js"' in page_response.text
     assert "DAIR smoke artifact" not in page_response.text
@@ -227,10 +240,13 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "text/css" in styles_response.headers["content-type"]
     assert ".page-shell" in styles_response.text
     assert ".lesson-nav" in styles_response.text
-    assert ".role-grid" in styles_response.text
+    assert ".definition-stack" in styles_response.text
+    assert ".definition-card" in styles_response.text
     assert ".process-flow" in styles_response.text
-    assert ".practice-field" in styles_response.text
+    assert ".practice-list" in styles_response.text
+    assert ".quiz-list" in styles_response.text
     assert ".next-step-card" in styles_response.text
+    assert ".centered-list" in styles_response.text
 
     script_response = client.get("/materials/drafts/dair-smoke-20260529/script.js")
     assert script_response.status_code == 200
@@ -243,21 +259,26 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Проектная работа с ИИ: роль пользователя, ChatGPT и Codex" in script_response.text
     assert "Вы не пишете код вручную, но управляете задачей, проверкой и принятием результата." in script_response.text
     assert "Сделай мне сайт" in script_response.text
-    assert "Простую страницу сайта для записи на консультацию" in script_response.text
-    assert "Пользователь — заказчик и владелец результата" in script_response.text
-    assert "ChatGPT — ведущий программист" in script_response.text
-    assert "Codex — исполнитель на сервере" in script_response.text
+    assert "Нужно спроектировать простую страницу сайта для записи на консультацию." in script_response.text
+    assert "Ключевые понятия" in script_response.text
+    assert "Пользователь — это человек, который хочет получить готовый результат: сайт, страницу, сервис, бота, автоматизацию или другой проект." in script_response.text
+    assert "ChatGPT — это ИИ-помощник для диалога, анализа и планирования задачи. С ним можно обсудить идею, разобрать проблему, выбрать подход и подготовить понятное задание для технической работы." in script_response.text
+    assert "Codex — это ИИ-агент для программной разработки. Он отличается от обычного чата тем, что работает с проектом: файлами, кодом, проверками и отчётом о выполненной задаче." in script_response.text
+    assert "Как это работает в курсе" in script_response.text
+    assert "Пользователь задаёт цель и принимает результат." in script_response.text
+    assert "ChatGPT ведёт техническую работу." in script_response.text
+    assert "Codex выполняет задачу на сервере." in script_response.text
     assert "Схема процесса" in script_response.text
     assert "Пользователь ставит цель" in script_response.text
     assert "ChatGPT проектирует технический шаг" in script_response.text
     assert "Codex выполняет задачу на сервере" in script_response.text
-    assert "Практика: опишите страницу сайта" in script_response.text
-    assert "Проверить практику" in script_response.text
-    assert "Типичные ошибки" in script_response.text
+    assert "Практика: соберите задачу для страницы сайта" in script_response.text
+    assert "practice-options" in script_response.text
+    assert "quiz-options" in script_response.text
     assert "Главный вывод урока" in script_response.text
     assert "Следующий шаг" in script_response.text
     assert "Перейти к уроку 2" in script_response.text
-    assert "Пользователь ставит цель → ChatGPT проектирует технический шаг → Codex выполняет задачу на сервере → Codex возвращает отчёт → ChatGPT проверяет отчёт → пользователь смотрит результат и принимает решение." in script_response.text
+    assert "Разбор примера" in script_response.text
     assert "Git простыми словами" in script_response.text
     assert "Как дать Codex право отправлять проект в GitHub" in script_response.text
     assert "deploy key" in script_response.text
@@ -274,9 +295,12 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Source notes" not in script_response.text
     assert "Sources" not in script_response.text
     assert "checkpoint-list" not in script_response.text
+    assert "Пользователь ставит цель → ChatGPT проектирует технический шаг → Codex выполняет задачу на сервере → Codex возвращает отчёт → ChatGPT проверяет отчёт → пользователь смотрит результат и принимает решение." not in script_response.text
     assert "Сделай мне ИИ-агента" not in script_response.text
     assert "Опишите своего первого ИИ-агента" not in script_response.text
     assert "ИИ-агент, который помогает начинать новую задачу" not in script_response.text
+    assert "textarea" not in script_response.text
+    assert "scrollIntoView" not in script_response.text
 
 
 def test_materials_and_lesson_redirect_for_anonymous_user(client):

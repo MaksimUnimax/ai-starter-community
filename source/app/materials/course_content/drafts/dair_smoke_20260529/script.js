@@ -29,29 +29,41 @@ const courseData = {
       roles: [
         {
           name: "Пользователь",
-          label: "Пользователь — заказчик и владелец результата",
-          lead: "заказчик и владелец результата",
-          description:
-            "Он формулирует цель, объясняет, какой результат нужен, проверяет готовую работу и принимает решение: подходит или нужно исправлять."
+          definition:
+            "Пользователь — это человек, который хочет получить готовый результат: сайт, страницу, сервис, бота, автоматизацию или другой проект.",
         },
         {
           name: "ChatGPT",
-          label: "ChatGPT — ведущий программист, архитектор и технический руководитель",
-          lead: "ведущий программист, архитектор и технический руководитель",
-          description:
-            "Он разбирает задачу, выбирает подход, инструменты и языки, планирует архитектуру, делит работу на безопасные шаги, пишет точные задания для Codex, контролирует отчёты и проверяет ход работы."
+          definition:
+            "ChatGPT — это ИИ-помощник для диалога, анализа и планирования задачи. С ним можно обсудить идею, разобрать проблему, выбрать подход и подготовить понятное задание для технической работы."
         },
         {
           name: "Codex",
-          label: "Codex — исполнитель на сервере",
-          lead: "исполнитель на сервере",
-          description:
-            "Он работает на сервере в нужном репозитории, читает файлы проекта, вносит изменения, запускает проверки, делает commit/push, если это входит в задачу, и возвращает отчёт."
+          definition:
+            "Codex — это ИИ-агент для программной разработки. Он отличается от обычного чата тем, что работает с проектом: файлами, кодом, проверками и отчётом о выполненной задаче."
+        }
+      ],
+      courseUsageTitle: "Как это работает в курсе",
+      courseUsage: [
+        {
+          title: "Пользователь",
+          text:
+            "Пользователь задаёт цель и принимает результат. Он объясняет, что хочет получить, смотрит готовую работу и решает: подходит результат или нужно исправлять."
+        },
+        {
+          title: "ChatGPT",
+          text:
+            "ChatGPT ведёт техническую работу. Он выступает как ведущий программист и архитектор: разбирает задачу, выбирает подход, планирует безопасный шаг и готовит точное задание для Codex."
+        },
+        {
+          title: "Codex",
+          text:
+            "Codex выполняет задачу на сервере. Он работает в нужном репозитории, меняет только разрешённые файлы, запускает проверки и возвращает отчёт."
         }
       ],
       processTitle: "Схема процесса",
       processScheme:
-        "Пользователь ставит цель → ChatGPT проектирует технический шаг → Codex выполняет задачу на сервере → Codex возвращает отчёт → ChatGPT проверяет отчёт → пользователь смотрит результат и принимает решение.",
+        "Сначала идёт постановка задачи, затем безопасный шаг, проверка отчёта и следующий шаг.",
       processSteps: [
         "Пользователь ставит цель.",
         "ChatGPT проектирует технический шаг.",
@@ -75,7 +87,7 @@ const courseData = {
       ],
       goodExampleTitle: "Профессиональная постановка задачи",
       goodExampleIntro:
-        "Простую страницу сайта для записи на консультацию нужно спроектировать.",
+        "Нужно спроектировать простую страницу сайта для записи на консультацию.",
       goodExampleText:
         "Страница должна объяснять услугу, показывать преимущества, отвечать на частые вопросы и вести пользователя к форме заявки.",
       goodExampleLimit:
@@ -115,28 +127,64 @@ const courseData = {
           text: "Страница открывается, текст понятен, форма видна, путь пользователя логичен."
         }
       ],
-      practiceTitle: "Практика: опишите страницу сайта",
-      practiceIntro: "Ответьте на шесть вопросов и заполните поля ниже:",
-      practiceFields: [
-        { key: "audience", label: "Для кого нужна страница?" },
-        { key: "goal", label: "Какую одну главную цель она должна решать?" },
-        { key: "blocks", label: "Какие 3–5 блоков должны быть на странице?" },
-        { key: "form", label: "Какие данные пользователь должен оставить в форме?" },
-        { key: "forbidden", label: "Что нельзя трогать на сайте?" },
-        { key: "check", label: "Как понять, что страница работает правильно?" }
+      practiceActivities: [
+        {
+          prompt: "Для кого нужна страница?",
+          options: [
+            "Для человека, которому нужна консультация.",
+            "Для Codex, чтобы он сам выбрал цель.",
+            "Для случайного посетителя без понятной задачи."
+          ],
+          answerIndex: 0,
+          explanation: "Страница нужна человеку, который ищет консультацию и должен быстро понять, что он получит."
+        },
+        {
+          prompt: "Какая главная цель страницы?",
+          options: [
+            "Получить заявку на консультацию.",
+            "Показать все разделы сайта сразу.",
+            "Спрятать форму внизу без объяснения."
+          ],
+          answerIndex: 0,
+          explanation: "Главный результат страницы — понятная заявка от человека, которому нужна услуга."
+        },
+        {
+          prompt: "Какие блоки нужны на странице?",
+          options: [
+            "Заголовок, описание услуги, преимущества, частые вопросы, форма заявки.",
+            "Только одна кнопка без объяснения.",
+            "Личный кабинет, оплата, админка и CRM на первом шаге."
+          ],
+          answerIndex: 0,
+          explanation: "Страница должна объяснить услугу и логично привести к форме заявки."
+        },
+        {
+          prompt: "Что нельзя трогать в первом шаге?",
+          options: [
+            "Оплату, личный кабинет, админку и другие разделы.",
+            "Всё можно менять сразу.",
+            "Нужно удалить старые страницы без проверки."
+          ],
+          answerIndex: 0,
+          explanation: "Первый шаг должен быть безопасным и не затрагивать лишние части сайта."
+        },
+        {
+          prompt: "Как понять, что первый этап готов?",
+          options: [
+            "Страница открывается, текст понятен, форма видна, путь пользователя логичен.",
+            "Codex написал “готово”, но ничего не проверил.",
+            "Пользователь не открывал страницу."
+          ],
+          answerIndex: 0,
+          explanation: "Готовность подтверждается открытой страницей и понятным пользовательским путём."
+        }
       ],
+      practiceTitle: "Практика: соберите задачу для страницы сайта",
+      practiceIntro: "Выберите один ответ для каждого вопроса. После каждого выбора появится обратная связь.",
       practiceHelper: "Заполните все поля. Затем нажмите кнопку проверки.",
       practiceSuccessText:
         "Практика заполнена. Теперь эту заготовку можно использовать для постановки задачи.",
       practiceErrorPrefix: "Заполните поля:",
-      practiceQuestions: [
-        "Для кого нужна страница?",
-        "Какую одну главную цель она должна решать?",
-        "Какие 3–5 блоков должны быть на странице?",
-        "Какие данные пользователь должен оставить в форме?",
-        "Что нельзя трогать на сайте?",
-        "Как понять, что страница работает правильно?"
-      ],
       exampleAnswerTitle: "Пример ответа",
       exampleAnswerParagraphs: [
         "Мне нужна простая страница сайта для записи на консультацию.",
@@ -751,19 +799,31 @@ function flashcardKey(sectionId, index) {
 }
 
 function quizKey(sectionId, index) {
-  return `${sectionId}:${index}`;
+  return `quiz:${sectionId}:${index}`;
+}
+
+function practiceKey(sectionId, index) {
+  return `practice:${sectionId}:${index}`;
 }
 
 function getLessonOneQuestionCount() {
   const lessonOne = courseData.sections.find((section) => section.id === "lesson-1");
+  const practiceCount = lessonOne?.practiceActivities ? lessonOne.practiceActivities.length : 0;
   const reviewQuizCount = lessonOne?.reviewQuiz ? lessonOne.reviewQuiz.length : 0;
-  return 1 + reviewQuizCount;
+  return practiceCount + 1 + reviewQuizCount;
 }
 
 function getLessonOneSolvedCount() {
-  const questionCount = getLessonOneQuestionCount();
+  const lessonOne = courseData.sections.find((section) => section.id === "lesson-1");
+  const quizCount = 1 + (lessonOne?.reviewQuiz ? lessonOne.reviewQuiz.length : 0);
   let solvedCount = 0;
-  for (let index = 0; index < questionCount; index += 1) {
+  const practiceCount = lessonOne?.practiceActivities ? lessonOne.practiceActivities.length : 0;
+  for (let index = 0; index < practiceCount; index += 1) {
+    if (state.solvedQuestions.has(practiceKey("lesson-1", index))) {
+      solvedCount += 1;
+    }
+  }
+  for (let index = 0; index < quizCount; index += 1) {
     if (state.solvedQuestions.has(quizKey("lesson-1", index))) {
       solvedCount += 1;
     }
@@ -771,18 +831,67 @@ function getLessonOneSolvedCount() {
   return solvedCount;
 }
 
-function getPracticeFields() {
-  const lessonOne = courseData.sections.find((section) => section.id === "lesson-1");
-  return lessonOne?.practiceFields || [];
-}
+function renderChoiceList(section, items, kind, listTitle) {
+  if (!items || items.length === 0) {
+    return "";
+  }
 
-function renderPracticeField(field) {
-  const value = state.practiceAnswers[field.key] || "";
   return `
-    <label class="practice-field">
-      <span>${escapeHTML(field.label)}</span>
-      <textarea data-practice-input="${escapeHTML(field.key)}" rows="3" placeholder="Кратко и по делу">${escapeHTML(value)}</textarea>
-    </label>
+    <section class="${kind}-group">
+      <div class="section-kicker">${escapeHTML(listTitle)}</div>
+      <div class="${kind}-list">
+        ${items
+          .map((item, index) => {
+            const questionKey = kind === "practice" ? practiceKey(section.id, index) : quizKey(section.id, index);
+            const selectedIndex =
+              state.answeredQuestions[questionKey] === undefined
+                ? null
+                : state.answeredQuestions[questionKey];
+            const solved = state.solvedQuestions.has(questionKey);
+            const answered = selectedIndex !== null;
+            const selectedCorrect = answered && selectedIndex === item.answerIndex;
+            const itemClass = kind === "practice" ? "practice-card" : "quiz-card";
+            const optionClass = kind === "practice" ? "practice-option" : "quiz-option";
+            return `
+              <div class="${itemClass}" data-choice-card="${questionKey}">
+                <strong>${escapeHTML(item.prompt)}</strong>
+                <div class="${kind === "practice" ? "practice-options" : "quiz-options"}">
+                  ${item.options
+                    .map((option, optionIndex) => {
+                      const isCorrect = answered && optionIndex === item.answerIndex;
+                      const isWrong = answered && selectedIndex === optionIndex && selectedIndex !== item.answerIndex;
+                      const classes = [optionClass];
+                      if (isCorrect) classes.push("is-correct");
+                      if (isWrong) classes.push("is-wrong");
+                      return `
+                        <button
+                          class="${classes.join(" ")}"
+                          type="button"
+                          data-choice="${questionKey}"
+                          data-option="${optionIndex}"
+                          ${solved ? "disabled" : ""}
+                        >
+                          ${escapeHTML(option)}
+                        </button>
+                      `;
+                    })
+                    .join("")}
+                </div>
+                <div class="feedback ${answered ? (selectedCorrect ? "is-success" : "is-error") : ""}">
+                  ${
+                    answered
+                      ? selectedCorrect
+                        ? `<strong>Верно.</strong> ${escapeHTML(item.explanation)}`
+                        : `<strong>Почти.</strong> ${escapeHTML(item.explanation)}`
+                      : "Выберите ответ, чтобы получить мгновенную обратную связь."
+                  }
+                </div>
+              </div>
+            `;
+          })
+          .join("")}
+      </div>
+    </section>
   `;
 }
 
@@ -820,78 +929,14 @@ function renderFlashcards(section) {
   `;
 }
 
-function renderQuiz(section, quizList = [section.quiz].filter(Boolean)) {
+function renderQuiz(section, quizList = [section.quiz].filter(Boolean), listTitle = "Проверка знаний") {
   if (quizList.length === 0) {
     return "";
   }
-
-  return `
-    <div class="module-grid">
-      <div class="section-kicker">Проверка знаний</div>
-      <div class="quiz-list">
-        ${quizList
-          .map((quiz, quizIndex) => {
-            const questionKey = quizKey(section.id, quizIndex);
-            const selectedIndex =
-              state.answeredQuestions[questionKey] === undefined
-                ? null
-                : state.answeredQuestions[questionKey];
-            const answered = selectedIndex !== null;
-            const selectedCorrect = answered && selectedIndex === quiz.answerIndex;
-            return `
-              <div class="quiz-card" data-quiz-card="${questionKey}">
-                <strong>${escapeHTML(quiz.prompt)}</strong>
-                <div class="quiz-options">
-                  ${quiz.options
-                    .map((option, optionIndex) => {
-                      const isCorrect = answered && optionIndex === quiz.answerIndex;
-                      const isWrong = answered && selectedIndex === optionIndex && selectedIndex !== quiz.answerIndex;
-                      const classes = ["quiz-option"];
-                      if (isCorrect) classes.push("is-correct");
-                      if (isWrong) classes.push("is-wrong");
-                      return `
-                        <button
-                          class="${classes.join(" ")}"
-                          type="button"
-                          data-quiz="${questionKey}"
-                          data-option="${optionIndex}"
-                          ${answered ? "disabled" : ""}
-                        >
-                          ${escapeHTML(option)}
-                        </button>
-                      `;
-                    })
-                    .join("")}
-                </div>
-                <div class="feedback" id="feedback-${questionKey}">
-                  ${
-                    answered
-                      ? selectedCorrect
-                        ? `<strong>Верно.</strong> ${escapeHTML(quiz.explanation)}`
-                        : `<strong>Почти.</strong> ${escapeHTML(quiz.explanation)}`
-                      : "Выбери ответ, чтобы получить мгновенную обратную связь."
-                  }
-                </div>
-              </div>
-            `;
-          })
-          .join("")}
-      </div>
-    </div>
-  `;
+  return renderChoiceList(section, quizList, "quiz", listTitle);
 }
 
 function renderLessonOne(section) {
-  const flashcards = renderFlashcards(section);
-  const quiz = renderQuiz(section, section.reviewQuiz ? [section.quiz, ...section.reviewQuiz] : [section.quiz]);
-  const processScheme = section.processScheme || section.processSteps.join(" → ");
-  const practiceFields = getPracticeFields();
-  const practiceFeedback = `<div class="practice-feedback ${
-    state.practiceFeedback ? (state.practiceValidated ? "is-success" : "is-error") : ""
-  }">${
-    escapeHTML(state.practiceFeedback || "Пока ничего не проверено.")
-  }</div>`;
-
   return `
     <article class="section-card lesson-one">
       <header class="section-header">
@@ -902,34 +947,48 @@ function renderLessonOne(section) {
       </header>
 
       <div class="section-body">
-        <section class="callout">
-          <span class="block-label">Вступление</span>
+        <section class="callout lesson-intro">
+          <span class="block-label">Вводная мысль</span>
           ${section.intro.map((paragraph) => `<p>${escapeHTML(paragraph)}</p>`).join("")}
         </section>
 
-        <section class="info-grid">
-          <div>
-            <span class="block-label">${escapeHTML(section.learningOutcomeTitle)}</span>
-            <ul>
-              ${section.learningOutcome.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}
-            </ul>
-          </div>
+        <section class="callout lesson-outcome">
+          <span class="block-label">${escapeHTML(section.learningOutcomeTitle)}</span>
+          <p class="centered-lead">Что вы сможете после урока:</p>
+          <ul class="centered-list">
+            ${section.learningOutcome.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}
+          </ul>
+        </section>
 
-          <div>
-            <span class="block-label">${escapeHTML(section.roleTitle)}</span>
-            <div class="role-grid">
-              ${section.roles
-                .map(
-                  (role) => `
-                    <div class="role-card">
-                      <span class="summary-label">${escapeHTML(role.name)}</span>
-                      <strong>${escapeHTML(role.label || `${role.name} — ${role.lead}`)}</strong>
-                      <p class="muted">${escapeHTML(role.description)}</p>
-                    </div>
-                  `
-                )
-                .join("")}
-            </div>
+        <section class="callout">
+          <span class="block-label">Ключевые понятия</span>
+          <div class="definition-stack">
+            ${section.roles
+              .map(
+                (role) => `
+                  <div class="definition-card">
+                    <span class="definition-name">${escapeHTML(role.name)}</span>
+                    <p><strong>${escapeHTML(role.definition)}</strong></p>
+                  </div>
+                `
+              )
+              .join("")}
+          </div>
+        </section>
+
+        <section class="callout">
+          <span class="block-label">${escapeHTML(section.courseUsageTitle)}</span>
+          <div class="definition-stack">
+            ${section.courseUsage
+              .map(
+                (item) => `
+                  <div class="definition-card">
+                    <span class="definition-name">${escapeHTML(item.title)}</span>
+                    <p>${escapeHTML(item.text)}</p>
+                  </div>
+                `
+              )
+              .join("")}
           </div>
         </section>
 
@@ -947,33 +1006,28 @@ function renderLessonOne(section) {
               )
               .join("")}
           </div>
-          <p class="process-summary">${escapeHTML(processScheme)}</p>
         </section>
 
         <section class="callout">
-          <span class="block-label">${escapeHTML(section.importantExplanationTitle)}</span>
-          <p>${escapeHTML(section.importantExplanation)}</p>
-        </section>
-
-        <section class="example-grid">
-          <div class="example-card">
-            <span class="block-label">${escapeHTML(section.badExampleTitle)}</span>
-            <p class="muted">“${escapeHTML(section.badExampleQuote)}”</p>
-            <ul>
-              ${section.badExampleReasons.map((reason) => `<li>${escapeHTML(reason)}</li>`).join("")}
-            </ul>
-          </div>
-
-          <div class="example-card">
-            <span class="block-label">${escapeHTML(section.goodExampleTitle)}</span>
-            <p>${escapeHTML(section.goodExampleIntro)}</p>
-            <p>${escapeHTML(section.goodExampleText)}</p>
-            <p>${escapeHTML(section.goodExampleLimit)}</p>
-            <strong>${escapeHTML(section.goodExampleQuestionsTitle)}</strong>
-            <ul>
-              ${section.goodExampleQuestions.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}
-            </ul>
-            <p>${escapeHTML(section.goodExampleResult)}</p>
+          <span class="block-label">Рабочий пример</span>
+          <div class="example-grid">
+            <div class="example-card">
+              <span class="example-title">Плохой пример</span>
+              <p class="example-quote">“Сделай мне сайт.”</p>
+              <ul class="centered-list">
+                ${section.badExampleReasons.map((reason) => `<li>${escapeHTML(reason)}</li>`).join("")}
+              </ul>
+            </div>
+            <div class="example-card">
+              <span class="example-title">Профессиональный пример</span>
+              <p><strong>Простую страницу сайта для записи на консультацию нужно спроектировать.</strong></p>
+              <p>Страница должна объяснять услугу, показывать преимущества, отвечать на частые вопросы и вести пользователя к форме заявки.</p>
+              <p>На первом этапе не нужно подключать оплату, личный кабинет или сложную CRM.</p>
+              <ul class="centered-list">
+                ${section.goodExampleQuestions.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}
+              </ul>
+              <p class="muted">${escapeHTML(section.goodExampleResult)}</p>
+            </div>
           </div>
         </section>
 
@@ -984,8 +1038,8 @@ function renderLessonOne(section) {
               .map(
                 (item) => `
                   <div class="breakdown-card">
-                    <span class="summary-label">${escapeHTML(item.label)}</span>
-                    <strong>${escapeHTML(item.text)}</strong>
+                    <span class="breakdown-title">${escapeHTML(item.label)}</span>
+                    <p>${escapeHTML(item.text)}</p>
                   </div>
                 `
               )
@@ -994,41 +1048,15 @@ function renderLessonOne(section) {
         </section>
 
         <section class="callout">
-          <span class="block-label">${escapeHTML(section.practiceTitle)}</span>
-          <p>${escapeHTML(section.practiceIntro)}</p>
-          <div class="practice-grid">
-            ${practiceFields.map((field) => renderPracticeField(field)).join("")}
-          </div>
-          <p class="muted">${escapeHTML(section.practiceHelper)}</p>
-          <button class="primary-button practice-button" type="button" data-practice-submit>Проверить практику</button>
-          ${practiceFeedback}
+          <span class="block-label">Практика: соберите задачу для страницы сайта</span>
+          <p class="centered-lead">Выберите один ответ для каждого вопроса. После каждого выбора появится обратная связь.</p>
+          ${renderChoiceList(section, section.practiceActivities, "practice", "Практические выборы")}
         </section>
 
         <section class="callout">
-          <span class="block-label">${escapeHTML(section.exampleAnswerTitle)}</span>
-          ${section.exampleAnswerParagraphs.map((paragraph) => `<p>${escapeHTML(paragraph)}</p>`).join("")}
-          <ul>
-            ${section.exampleAnswerBullets.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}
-          </ul>
-          <p>${escapeHTML(section.exampleAnswerFooter)}</p>
+          <span class="block-label">Проверка знаний</span>
+          ${renderQuiz(section, [section.quiz, ...(section.reviewQuiz || [])], "Финальная проверка")}
         </section>
-
-        <section class="callout">
-          <span class="block-label">${escapeHTML(section.commonMistakesTitle)}</span>
-          <ol>
-            ${section.commonMistakes.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}
-          </ol>
-        </section>
-
-        <section class="callout">
-          <span class="block-label">${escapeHTML(section.selfCheckTitle)}</span>
-          <ul>
-            ${section.selfCheck.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}
-          </ul>
-        </section>
-
-        ${flashcards}
-        ${quiz}
 
         <section class="callout">
           <span class="block-label">${escapeHTML(section.finalTakeawayTitle)}</span>
@@ -1107,37 +1135,57 @@ function renderSectionContent(section) {
 function updateProgress() {
   const totalQuestions = getLessonOneQuestionCount();
   const solvedQuestions = getLessonOneSolvedCount();
-  const quizScore = totalQuestions === 0 ? 0 : (solvedQuestions / totalQuestions) * 80;
-  const practiceScore = state.practiceValidated ? 20 : 0;
-  const progress = Math.min(100, Math.round(quizScore + practiceScore));
+  const progress = totalQuestions === 0 ? 0 : Math.round((solvedQuestions / totalQuestions) * 100);
 
   progressFill.style.width = `${progress}%`;
   progressValue.textContent = `${progress}%`;
 
   if (progress === 0) {
-    progressLabel.textContent = "Пока ничего не проверено.";
+    progressLabel.textContent = "Пока нет правильных ответов.";
   } else if (progress < 100) {
-    progressLabel.textContent = "Идёт проверка урока.";
+    progressLabel.textContent = `Выполнено ${solvedQuestions} из ${totalQuestions} проверок.`;
   } else {
-    progressLabel.textContent = "Проверка завершена.";
+    progressLabel.textContent = "Все проверки урока выполнены.";
   }
 }
 
 function renderActiveSection() {
+  const scrollX = window.scrollX;
+  const scrollY = window.scrollY;
   const section = courseData.sections.find((item) => item.id === state.activeSectionId) || courseData.sections[0];
   activeSectionRoot.innerHTML = renderSectionContent(section);
   renderNavigation();
   updateProgress();
+  window.scrollTo(scrollX, scrollY);
 }
 
 function setActiveSection(sectionId) {
   state.activeSectionId = sectionId;
   state.visitedSections.add(sectionId);
   renderActiveSection();
-  activeSectionRoot.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 document.addEventListener("click", (event) => {
+  const choiceButton = event.target.closest("[data-choice]");
+  if (choiceButton) {
+    const questionKey = choiceButton.dataset.choice;
+    const [kind, sectionId, quizIndexText] = questionKey.split(":");
+    const choiceIndex = Number(choiceButton.dataset.option);
+    const section = courseData.sections.find((item) => item.id === sectionId);
+    const items = kind === "practice"
+      ? section.practiceActivities || []
+      : section.reviewQuiz
+        ? [section.quiz, ...section.reviewQuiz]
+        : [section.quiz];
+    const question = items[Number(quizIndexText)];
+    state.answeredQuestions[questionKey] = choiceIndex;
+    if (choiceIndex === question.answerIndex) {
+      state.solvedQuestions.add(questionKey);
+    }
+    renderActiveSection();
+    return;
+  }
+
   const navButton = event.target.closest("[data-section]");
   if (navButton) {
     setActiveSection(navButton.dataset.section);
@@ -1153,41 +1201,6 @@ document.addEventListener("click", (event) => {
     return;
   }
 
-  const quizButton = event.target.closest("[data-quiz]");
-  if (quizButton) {
-    const questionKey = quizButton.dataset.quiz;
-    const [sectionId, quizIndexText] = questionKey.split(":");
-    const quizIndex = Number(quizIndexText);
-    const section = courseData.sections.find((item) => item.id === sectionId);
-    const quiz = section.reviewQuiz ? [section.quiz, ...section.reviewQuiz][quizIndex] : section.quiz;
-    const selectedIndex = Number(quizButton.dataset.option);
-    state.answeredQuestions[questionKey] = selectedIndex;
-    if (selectedIndex === quiz.answerIndex) {
-      state.solvedQuestions.add(questionKey);
-    }
-    renderActiveSection();
-    return;
-  }
-
-  const practiceSubmit = event.target.closest("[data-practice-submit]");
-  if (practiceSubmit) {
-    const practiceFields = getPracticeFields();
-    const missingFields = practiceFields
-      .filter((field) => !String(state.practiceAnswers[field.key] || "").trim())
-      .map((field) => field.label);
-
-    if (missingFields.length > 0) {
-      state.practiceValidated = false;
-      state.practiceFeedback = `${courseData.sections[0].practiceErrorPrefix} ${missingFields.join(", ")}.`;
-    } else {
-      state.practiceValidated = true;
-      state.practiceFeedback = courseData.sections[0].practiceSuccessText;
-    }
-
-    renderActiveSection();
-    return;
-  }
-
   const startButton = event.target.closest("#start-learning");
   if (startButton) {
     setActiveSection("lesson-1");
@@ -1199,14 +1212,6 @@ document.addEventListener("click", (event) => {
     setActiveSection("review");
     return;
   }
-});
-
-document.addEventListener("input", (event) => {
-  const practiceInput = event.target.closest("[data-practice-input]");
-  if (!practiceInput) {
-    return;
-  }
-  state.practiceAnswers[practiceInput.dataset.practiceInput] = practiceInput.value;
 });
 
 renderNavigation();
