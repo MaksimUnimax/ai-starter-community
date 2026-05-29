@@ -159,6 +159,15 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Тестовая версия курса" in page_response.text
     assert "Урок 1" in page_response.text
     assert "Урок 9" in page_response.text
+    assert "Проектная работа с ИИ" in page_response.text
+    assert "Роли пользователя, ChatGPT и Codex" in page_response.text
+    assert "Документы как память проекта" in page_response.text
+    assert "Новый диалог после перерыва" in page_response.text
+    assert "Обновление документации" in page_response.text
+    assert "ТЗ и roadmap" in page_response.text
+    assert "Git и deploy key" in page_response.text
+    assert "Один безопасный шаг разработки" in page_response.text
+    assert "Отчёт Codex" in page_response.text
     assert "Проектная работа с ИИ: роль пользователя, ChatGPT и Codex" in page_response.text
     assert "Вы не пишете код вручную, но управляете задачей, проверкой и принятием результата." in page_response.text
     assert "Сделай мне ИИ-агента" in page_response.text
@@ -172,6 +181,7 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Структура урока" in page_response.text
     assert "Прогресс" in page_response.text
     assert page_response.text.count('data-section="') == 9
+    assert page_response.text.count("nav-title") == 9
     assert "lesson-strip" in page_response.text
     assert "lesson-progress" in page_response.text
     assert "lesson-shell" in page_response.text

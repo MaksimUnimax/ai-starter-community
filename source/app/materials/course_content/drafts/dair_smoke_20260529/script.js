@@ -692,6 +692,18 @@ const state = {
   checklist: new Set()
 };
 
+const lessonNavTitles = {
+  "lesson-1": "Проектная работа с ИИ",
+  "lesson-2": "Роли пользователя, ChatGPT и Codex",
+  "lesson-3": "Документы как память проекта",
+  "lesson-4": "Новый диалог после перерыва",
+  "lesson-5": "Обновление документации",
+  "lesson-6": "ТЗ и roadmap",
+  "lesson-7": "Git и deploy key",
+  "lesson-8": "Один безопасный шаг разработки",
+  review: "Отчёт Codex"
+};
+
 const navRoot = document.getElementById("lesson-nav");
 const activeSectionRoot = document.getElementById("active-section");
 const progressFill = document.getElementById("progress-fill");
@@ -713,9 +725,11 @@ function renderNavigation() {
   navRoot.innerHTML = courseData.sections
     .map((section) => {
       const activeClass = section.id === state.activeSectionId ? "is-active" : "";
+      const navTitle = lessonNavTitles[section.id] || section.title;
       return `
         <button class="nav-button ${activeClass}" type="button" data-section="${section.id}">
-          <span class="nav-title">${escapeHTML(section.navLabel)}</span>
+          <span class="nav-number">${escapeHTML(section.navLabel)}</span>
+          <span class="nav-title">${escapeHTML(navTitle)}</span>
         </button>
       `;
     })
