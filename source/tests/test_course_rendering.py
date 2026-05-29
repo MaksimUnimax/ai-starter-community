@@ -164,6 +164,7 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Что изучаем" in page_response.text
     assert "Зачем это нужно" in page_response.text
     assert "Где это применяется" in page_response.text
+    assert page_response.text.count("course-intro-part") == 3
     assert "В этом курсе вы изучаете, как вести проектную работу с помощью ChatGPT и Codex без ручного написания кода." in page_response.text
     assert "Пользователю не нужно заранее знать программирование, дизайн, вёрстку, архитектуру, документацию или техническое задание." in page_response.text
     assert "Дальше ChatGPT помогает продумать задачу, подготовить документы, спланировать внешний вид" in page_response.text
@@ -202,7 +203,7 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Что делает Codex" in page_response.text
     assert "Что проверяет пользователь" in page_response.text
     assert "С чего правильно начать работу над сайтом?" in page_response.text
-    assert "С поэтапного обсуждения с ChatGPT" in page_response.text
+    assert "С обсуждения проекта и этапов разработки с ChatGPT." in page_response.text
     assert "Разбор примера" not in page_response.text
     assert "Практика: опишите страницу сайта" not in page_response.text
     assert "<textarea" not in page_response.text
@@ -274,7 +275,7 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "const courseData" in script_response.text
     assert "lesson-nav" in script_response.text
     assert "flashcards" in script_response.text
-    assert "quiz" in script_response.text
+    assert "Проверка знаний" in script_response.text
     assert "Как разрабатывать с помощью ChatGPT и Codex" in script_response.text
     assert "Проектная работа с ИИ: роль пользователя, ChatGPT и Codex" in script_response.text
     assert "Урок показывает первый принцип: простая идея превращается в план, а Codex выполняет конкретную техническую задачу." in script_response.text
@@ -299,7 +300,8 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Практика: опишите страницу сайта" not in script_response.text
     assert "<textarea" not in script_response.text
     assert "С чего правильно начать работу над сайтом?" in script_response.text
-    assert "С поэтапного обсуждения с ChatGPT" in script_response.text
+    assert "С обсуждения проекта и этапов разработки с ChatGPT." in script_response.text
+    assert "Разобрать задачу, выбрать подход, ограничить границы задачи и подготовить точное задание." in script_response.text
     assert "Пример ответа" not in script_response.text
     assert "Типичные ошибки" not in script_response.text
     assert "Проверьте себя" not in script_response.text

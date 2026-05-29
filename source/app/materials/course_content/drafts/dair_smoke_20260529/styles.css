@@ -91,35 +91,41 @@ a {
 }
 
 .course-intro {
-  padding: 20px;
+  padding: 28px;
   display: grid;
   gap: 16px;
 }
 
-.course-intro-stack {
+.course-intro-body {
   display: grid;
-  gap: 18px;
+  gap: 22px;
 }
 
-.course-intro-block {
+.course-intro-part {
   display: grid;
   gap: 8px;
+  padding-top: 4px;
 }
 
-.course-intro-block h3 {
+.course-intro-part + .course-intro-part {
+  border-top: 1px solid var(--border);
+  padding-top: 22px;
+}
+
+.course-intro-part h3 {
   margin: 0;
   font-family: "Palatino Linotype", "Book Antiqua", Georgia, serif;
   font-size: 1.04rem;
   line-height: 1.15;
 }
 
-.course-intro-block p {
+.course-intro-part p {
   margin: 0;
   max-width: 78ch;
-  line-height: 1.6;
+  line-height: 1.65;
 }
 
-.course-intro-block p + p {
+.course-intro-part p + p {
   margin-top: 8px;
 }
 
