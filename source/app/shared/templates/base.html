@@ -11,30 +11,24 @@
     <div class="page-shell">
       <header class="top-nav" aria-label="Основная навигация">
         <div class="nav-inner">
-          <a class="nav-logo" href="/">OpenScript</a>
-          <div class="nav-links">
+          <div class="nav-brand-row">
+            <a class="nav-logo" href="/">OpenScript</a>
             {% if current_user %}
-              <a class="button button-secondary nav-pill" href="/">Главная</a>
-              <a class="button button-secondary nav-pill" href="/materials/drafts/dair-smoke-20260529/">Обучение</a>
-              <a class="button button-secondary nav-pill" href="/cabinet">Личный кабинет</a>
-              {% if current_user.role == "admin" %}
-                <a class="button button-secondary nav-pill" href="/admin">Админ-панель</a>
-              {% endif %}
-            {% else %}
-              <a href="#what-you-get">Что вы получите</a>
-              <a href="#first-project">Первый проект</a>
-              <a href="#how-it-works">Как проходит работа</a>
-              <a href="#pricing">Цена</a>
-              <a href="/login">Войти</a>
-            {% endif %}
-          </div>
-          {% if current_user %}
-            <div class="nav-account">
-              <div class="nav-account-info" aria-label="Текущий аккаунт">
+              <div class="nav-account-compact" aria-label="Текущий аккаунт">
                 <span class="nav-account-name">{{ current_user.login or current_user.email or "Аккаунт" }}</span>
                 <span class="nav-account-email">{{ current_user.email or current_user.login or "Аккаунт" }}</span>
               </div>
-              <div class="nav-account-actions">
+            {% endif %}
+          </div>
+          <div class="nav-menu-row">
+            <nav class="nav-links" aria-label="Навигация">
+              {% if current_user %}
+                <a class="button button-secondary nav-pill" href="/">Главная</a>
+                <a class="button button-secondary nav-pill" href="/materials/drafts/dair-smoke-20260529/">Обучение</a>
+                <a class="button button-secondary nav-pill" href="/cabinet">Личный кабинет</a>
+                {% if current_user.role == "admin" %}
+                  <a class="button button-secondary nav-pill" href="/admin">Админ-панель</a>
+                {% endif %}
                 <a class="button button-secondary nav-pill nav-settings" href="/cabinet/settings" title="Настройки" aria-label="Настройки">
                   <span aria-hidden="true">⚙</span>
                   <span class="nav-settings-label">Настройки</span>
@@ -42,9 +36,15 @@
                 <form class="nav-form" method="post" action="/logout">
                   <button class="button button-secondary nav-pill" type="submit">Выйти</button>
                 </form>
-              </div>
-            </div>
-          {% endif %}
+              {% else %}
+                <a href="#what-you-get">Что вы получите</a>
+                <a href="#first-project">Первый проект</a>
+                <a href="#how-it-works">Как проходит работа</a>
+                <a href="#pricing">Цена</a>
+                <a href="/login">Войти</a>
+              {% endif %}
+            </nav>
+          </div>
         </div>
       </header>
       <main class="page-content">

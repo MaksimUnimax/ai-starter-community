@@ -81,19 +81,20 @@ def test_shared_header_css_adds_compact_mobile_nav_layout(client):
     response = client.get("/static/styles.css")
     assert response.status_code == 200
     assert ".top-nav .logout-form {" in response.text
-    assert ".top-nav .nav-account {" in response.text
-    assert ".top-nav .nav-account-info {" in response.text
-    assert ".top-nav .nav-account-actions {" in response.text
+    assert ".top-nav .nav-brand-row {" in response.text
+    assert ".top-nav .nav-menu-row {" in response.text
+    assert ".top-nav .nav-account-compact {" in response.text
+    assert ".top-nav .nav-account-email {" in response.text
     assert ".top-nav .nav-settings {" in response.text
     assert "@media (max-width: 720px)" in response.text
     assert ".top-nav .nav-inner {" in response.text
     assert "flex-direction: column;" in response.text
+    assert ".top-nav .nav-brand-row {" in response.text
     assert ".top-nav .nav-links {" in response.text
     assert "grid-template-columns: repeat(2, minmax(0, 1fr));" in response.text
     assert ".top-nav .nav-links .nav-pill," in response.text
     assert "min-height: 38px;" in response.text
     assert ".top-nav .nav-form > .button {" in response.text
-    assert ".top-nav .nav-account-actions .nav-settings {" in response.text
     assert "@media (max-width: 520px)" in response.text
     assert "grid-template-columns: 1fr;" in response.text
     assert ".top-nav .nav-settings-label {" in response.text

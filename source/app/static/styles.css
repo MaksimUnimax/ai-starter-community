@@ -65,10 +65,8 @@ a:hover {
 
 .top-nav {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px 16px;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 12px;
   padding: 10px 18px;
   margin-bottom: 20px;
   background: rgba(255, 254, 252, 0.92);
@@ -93,6 +91,32 @@ a:hover {
   color: var(--primary);
 }
 
+.top-nav .nav-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.top-nav .nav-brand-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  min-width: 0;
+}
+
+.top-nav .nav-menu-row {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+}
+
+.top-nav .nav-menu-row .nav-links {
+  justify-content: flex-start;
+}
+
 .nav-form {
   margin: 0;
 }
@@ -102,7 +126,8 @@ a:hover {
   flex-wrap: wrap;
   gap: 8px;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: flex-start;
+  width: 100%;
   min-width: 0;
 }
 
@@ -113,20 +138,12 @@ a:hover {
   white-space: nowrap;
 }
 
-.top-nav .nav-account {
+.top-nav .nav-account-compact {
   display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-left: auto;
-  min-width: 0;
-}
-
-.top-nav .nav-account-info {
-  display: grid;
+  flex-direction: column;
+  align-items: flex-end;
   gap: 2px;
   min-width: 0;
-  text-align: right;
 }
 
 .top-nav .nav-account-name {
@@ -147,13 +164,6 @@ a:hover {
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 260px;
-}
-
-.top-nav .nav-account-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
 }
 
 .top-nav .nav-settings {
@@ -1441,16 +1451,25 @@ html { scroll-behavior: smooth; }
 
   .top-nav .nav-inner {
     width: 100%;
-    display: flex;
+    gap: 10px;
+  }
+
+  .top-nav .nav-brand-row {
     flex-direction: column;
     align-items: stretch;
-    gap: 10px;
+    gap: 8px;
   }
 
   .top-nav .nav-logo {
     text-align: center;
     font-size: 1.08rem;
     line-height: 1.1;
+  }
+
+  .top-nav .nav-account-compact {
+    width: 100%;
+    text-align: center;
+    align-items: center;
   }
 
   .top-nav .nav-links {
@@ -1489,21 +1508,6 @@ html { scroll-behavior: smooth; }
     width: 100%;
   }
 
-  .top-nav .nav-account {
-    width: 100%;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
-    margin-left: 0;
-    padding-top: 10px;
-    border-top: 1px solid var(--border);
-  }
-
-  .top-nav .nav-account-info {
-    width: 100%;
-    text-align: left;
-  }
-
   .top-nav .nav-account-name,
   .top-nav .nav-account-email {
     max-width: 100%;
@@ -1511,22 +1515,6 @@ html { scroll-behavior: smooth; }
     overflow: visible;
     text-overflow: clip;
     overflow-wrap: anywhere;
-  }
-
-  .top-nav .nav-account-actions {
-    width: 100%;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-  }
-
-  .top-nav .nav-account-actions .nav-settings,
-  .top-nav .nav-account-actions .nav-form {
-    width: 100%;
-  }
-
-  .top-nav .nav-account-actions .nav-settings {
-    justify-content: center;
   }
 
   .public-landing-page .hero-title {
@@ -1592,12 +1580,14 @@ html { scroll-behavior: smooth; }
     grid-template-columns: 1fr;
   }
 
-  .top-nav .nav-account-actions {
-    grid-template-columns: 1fr;
-  }
-
   .top-nav .nav-settings-label {
     display: none;
+  }
+
+  .top-nav .nav-account-name,
+  .top-nav .nav-account-email {
+    max-width: 100%;
+    overflow-wrap: anywhere;
   }
 }
 

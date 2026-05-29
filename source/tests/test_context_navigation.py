@@ -91,6 +91,9 @@ def test_authenticated_user_navigation_order_and_labels(client, test_settings):
 
     for body in (landing.text, cabinet.text):
         nav = _nav_block(body)
+        assert "nav-brand-row" in nav
+        assert "nav-menu-row" in nav
+        assert "nav-account-compact" in nav
         assert "Войти" not in nav
         assert "Начать первый проект" not in nav
         assert "Регистрация" not in nav
@@ -102,6 +105,8 @@ def test_authenticated_user_navigation_order_and_labels(client, test_settings):
         assert "nav-user@example.com" in nav
         assert "Настройки" in nav
         assert 'href="/cabinet/settings"' in nav
+        assert 'method="post"' in nav
+        assert 'action="/logout"' in nav
         assert "Выйти" in nav
 
     cabinet_nav = _nav_block(cabinet.text)
@@ -119,6 +124,9 @@ def test_authenticated_moderator_navigation_has_no_admin_panel(client, test_sett
 
     for body in (landing.text, cabinet.text):
         nav = _nav_block(body)
+        assert "nav-brand-row" in nav
+        assert "nav-menu-row" in nav
+        assert "nav-account-compact" in nav
         assert "Войти" not in nav
         assert "Админ-панель" not in nav
         assert "Главная" in nav
@@ -128,6 +136,8 @@ def test_authenticated_moderator_navigation_has_no_admin_panel(client, test_sett
         assert "nav-moderator@example.com" in nav
         assert "Настройки" in nav
         assert 'href="/cabinet/settings"' in nav
+        assert 'method="post"' in nav
+        assert 'action="/logout"' in nav
         assert "Выйти" in nav
 
 
@@ -142,6 +152,9 @@ def test_authenticated_admin_navigation_includes_admin_panel(client, test_settin
 
     for body in (landing.text, cabinet.text):
         nav = _nav_block(body)
+        assert "nav-brand-row" in nav
+        assert "nav-menu-row" in nav
+        assert "nav-account-compact" in nav
         assert "Войти" not in nav
         assert "Начать первый проект" not in nav
         assert "Регистрация" not in nav
@@ -153,6 +166,8 @@ def test_authenticated_admin_navigation_includes_admin_panel(client, test_settin
         assert "nav-admin@example.com" in nav
         assert "Настройки" in nav
         assert 'href="/cabinet/settings"' in nav
+        assert 'method="post"' in nav
+        assert 'action="/logout"' in nav
         assert "Выйти" in nav
 
     cabinet_nav = _nav_block(cabinet.text)
