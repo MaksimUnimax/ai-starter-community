@@ -227,6 +227,8 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Главный вывод урока" in page_response.text
     assert "Следующий шаг" in page_response.text
     assert "Перейти к уроку 2" in page_response.text
+    assert page_response.text.count("Вернуться в личный кабинет") == 2
+    assert page_response.text.count('href="/cabinet"') == 2
     assert "Структура урока" in page_response.text
     assert "Прогресс по проверке урока" in page_response.text
     assert "Прогресс зависит от прохождения проверки знаний." in page_response.text

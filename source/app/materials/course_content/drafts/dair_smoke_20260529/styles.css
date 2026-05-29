@@ -70,6 +70,17 @@ a {
   justify-items: center;
 }
 
+.course-head-actions {
+  margin-top: 12px;
+}
+
+.course-head-actions .ghost-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
 .course-head h1 {
   margin-top: 0;
   max-width: 24ch;
@@ -640,6 +651,21 @@ h2 {
 .next-step-card .primary-button {
   align-self: flex-start;
   white-space: normal;
+}
+
+.next-step-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.next-step-actions .ghost-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
 }
 
 .info-grid ul,
