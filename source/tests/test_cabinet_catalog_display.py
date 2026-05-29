@@ -64,6 +64,7 @@ def test_cabinet_displays_course_shell_without_tariffs_or_payment_noise(client, 
     assert "Перейти к обучению" in cabinet_response.text
     assert "Скачать файл" in cabinet_response.text
     assert "Пройдите обучение, затем скачайте файл, вставьте в чат ChatGPT и следуйте его инструкциям." in cabinet_response.text
+    assert cabinet_response.text.count('class="button button-primary learning-button"') == 2
     assert "Доступ откроется после оплаты." in cabinet_response.text
     assert 'href="/materials/drafts/dair-smoke-20260529/"' not in cabinet_response.text
     assert 'href="/cabinet/learning/project-file"' not in cabinet_response.text
@@ -110,6 +111,7 @@ def test_cabinet_shows_active_learning_links_when_access_granted(client, test_se
     assert "Перейти к обучению" in cabinet_response.text
     assert "Скачать файл" in cabinet_response.text
     assert "Пройдите обучение, затем скачайте файл, вставьте в чат ChatGPT и следуйте его инструкциям." in cabinet_response.text
+    assert cabinet_response.text.count('class="button button-primary learning-button"') == 2
     assert "raw.githubusercontent.com" not in cabinet_response.text
 
     client.cookies.clear()

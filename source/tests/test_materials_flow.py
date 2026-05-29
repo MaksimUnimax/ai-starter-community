@@ -156,6 +156,7 @@ def test_cabinet_contains_materials_link_and_locked_hint(client, test_settings):
     assert "Обучающий проект" in response.text
     assert "Скачать файл" in response.text
     assert "Доступ откроется после оплаты." in response.text
+    assert response.text.count('class="button button-primary learning-button"') == 2
     assert 'href="/materials/drafts/dair-smoke-20260529/"' not in response.text
     assert 'href="/cabinet/learning/project-file"' not in response.text
     assert "Логин: <strong>materialscabinet</strong>" in response.text
