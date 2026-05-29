@@ -159,7 +159,12 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert page_response.status_code == 200
     assert "Работа с ИИ" in page_response.text
     assert "Как разрабатывать с помощью ChatGPT и Codex" in page_response.text
-    assert page_response.text.count('class="course-head"') == 1
+    assert page_response.text.count('class="course-head hero"') == 1
+    assert "/static/images/human_ai_hero_background_v2.png" in page_response.text
+    assert "/static/images/mobile_vitruvian_NO_SQUARES_transparent.webp" in page_response.text
+    assert "hero-bg-desktop" in page_response.text
+    assert "hero-bg-mobile" in page_response.text
+    assert "На главную" in page_response.text
     assert "Тестовая версия курса" not in page_response.text
     assert "тестовая версия урока" not in page_response.text
     assert "Курс показывает, как вести проектную работу с ИИ без ручного написания кода: от простой идеи до проверенного результата." in page_response.text
@@ -286,7 +291,7 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert ".course-intro-part" in styles_response.text
     assert ".course-intro .section-heading" in styles_response.text
     assert "text-align: center;" in styles_response.text
-    assert "line-height: 1.34;" in styles_response.text
+    assert "line-height: 1.45;" in styles_response.text
     assert ".definition-stack" in styles_response.text
     assert ".definition-card" in styles_response.text
     assert ".process-flow" in styles_response.text
