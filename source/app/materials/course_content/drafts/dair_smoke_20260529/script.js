@@ -1,7 +1,7 @@
 const courseData = {
   title: "Работа с ИИ",
   courseTitle: "Как разрабатывать с помощью ChatGPT и Codex",
-  subtitle: "Тестовая версия курса",
+  subtitle: "Курс",
   sections: [
     {
       id: "lesson-1",
@@ -98,38 +98,6 @@ const courseData = {
           ]
         }
       ],
-      exampleAnswerTitle: "Пример ответа",
-      exampleAnswerParagraphs: [
-        "Мне нужна простая страница сайта для записи на консультацию.",
-        "Пользователь сразу понимает, что это за услуга и что он получит.",
-        "Понятное описание задачи может выглядеть так:"
-      ],
-      exampleAnswerBullets: [
-        "Кратко объяснить услугу;",
-        "Показать преимущества;",
-        "Ответить на частые вопросы;",
-        "Вести к форме заявки;",
-        "Проверить, что форма видна и путь пользователя понятен."
-      ],
-      exampleAnswerFooter:
-        "На первом этапе не нужно подключать оплату, личный кабинет или сложную CRM. Результат считается правильным, если пользователь понял структуру страницы и следующий шаг.",
-      commonMistakesTitle: "Типичные ошибки",
-      commonMistakes: [
-        "Просить “Сделай мне сайт” без описания цели.",
-        "Не указывать, для кого эта страница.",
-        "Не перечислять нужные блоки.",
-        "Не говорить, что нельзя трогать.",
-        "Не объяснять, как проверить результат."
-      ],
-      selfCheckTitle: "Проверьте себя",
-      selfCheck: [
-        "Я могу объяснить, для кого нужна страница.",
-        "Я могу назвать одну главную цель страницы.",
-        "Я понимаю, какие блоки должны быть на странице.",
-        "Я понимаю, какие данные нужны в форме.",
-        "Я указал, что нельзя трогать на сайте.",
-        "Я понимаю, как проверить результат."
-      ],
       flashcards: [
         {
           front: "Что делает пользователь?",
@@ -183,15 +151,15 @@ const courseData = {
             "Codex выполняет задачи именно на сервере в конкретном репозитории."
         },
         {
-          prompt: "Что должен дать первый этап по странице сайта?",
+          prompt: "С чего правильно начать работу над сайтом?",
           options: [
-            "Понятное описание страницы и структуры блоков, а не сразу большой непроверенный код.",
-            "Сразу большой готовый продукт без проверки.",
-            "Секретные ключи и пароли."
+            "С поэтапного обсуждения с ChatGPT: что нужно получить, для кого это делается, какие есть ограничения и как проверять результат.",
+            "Сразу просить Codex написать большой код без обсуждения.",
+            "Самостоятельно заранее подготовить дизайн, вёрстку и техническое задание."
           ],
           answerIndex: 0,
           explanation:
-            "Сначала нужен понятный проектный результат, по которому можно дать Codex точную задачу."
+            "Сначала ChatGPT помогает уточнить задачу, а уже потом появляется точное задание для Codex."
         }
       ],
       finalTakeawayTitle: "Главный вывод урока",
@@ -751,7 +719,7 @@ function renderFlashcards(section) {
                   </span>
                   <span class="flashcard-face flashcard-back">
                     <strong>${escapeHTML(card.back)}</strong>
-                    <span class="flashcard-note">Карточка перевёрнута в тестовой версии урока.</span>
+                    <span class="flashcard-note">Нажмите ещё раз, чтобы вернуться.</span>
                   </span>
                 </span>
               </button>
@@ -919,29 +887,6 @@ function renderLessonOne(section) {
               )
               .join("")}
           </div>
-        </section>
-
-        <section class="callout">
-          <span class="block-label">${escapeHTML(section.exampleAnswerTitle)}</span>
-          ${section.exampleAnswerParagraphs.map((paragraph) => `<p>${escapeHTML(paragraph)}</p>`).join("")}
-          <ul>
-            ${section.exampleAnswerBullets.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}
-          </ul>
-          <p>${escapeHTML(section.exampleAnswerFooter)}</p>
-        </section>
-
-        <section class="callout">
-          <span class="block-label">${escapeHTML(section.commonMistakesTitle)}</span>
-          <ol>
-            ${section.commonMistakes.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}
-          </ol>
-        </section>
-
-        <section class="callout">
-          <span class="block-label">${escapeHTML(section.selfCheckTitle)}</span>
-          <ul>
-            ${section.selfCheck.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}
-          </ul>
         </section>
 
         ${flashcards}

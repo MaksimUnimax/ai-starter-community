@@ -150,13 +150,16 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     materials_response = client.get("/materials")
     assert materials_response.status_code == 200
     assert "/materials/drafts/dair-smoke-20260529/" in materials_response.text
-    assert "Открыть тестовую версию курса" in materials_response.text
+    assert "Открыть карту курса" in materials_response.text
 
     page_response = client.get("/materials/drafts/dair-smoke-20260529/")
     assert page_response.status_code == 200
     assert "Работа с ИИ" in page_response.text
     assert "Как разрабатывать с помощью ChatGPT и Codex" in page_response.text
-    assert "Тестовая версия курса" in page_response.text
+    assert page_response.text.count('class="course-head"') == 1
+    assert "Тестовая версия курса" not in page_response.text
+    assert "тестовая версия урока" not in page_response.text
+    assert "Курс показывает, как вести проектную работу с ИИ без ручного написания кода: от простой идеи до проверенного результата." in page_response.text
     assert "Вступление к курсу" in page_response.text
     assert "Что изучаем" in page_response.text
     assert "Зачем это нужно" in page_response.text
@@ -198,10 +201,14 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Что делает ChatGPT дальше" in page_response.text
     assert "Что делает Codex" in page_response.text
     assert "Что проверяет пользователь" in page_response.text
+    assert "С чего правильно начать работу над сайтом?" in page_response.text
+    assert "С поэтапного обсуждения с ChatGPT" in page_response.text
     assert "Разбор примера" not in page_response.text
     assert "Практика: опишите страницу сайта" not in page_response.text
     assert "<textarea" not in page_response.text
-    assert "Типичные ошибки" in page_response.text
+    assert "Пример ответа" not in page_response.text
+    assert "Типичные ошибки" not in page_response.text
+    assert "Проверьте себя" not in page_response.text
     assert "Главный вывод урока" in page_response.text
     assert "Следующий шаг" in page_response.text
     assert "Перейти к уроку 2" in page_response.text
@@ -212,6 +219,8 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "roadmap" not in page_response.text
     assert "deploy key" not in page_response.text
     assert "scope" not in page_response.text
+    assert "ТЗ и дорожная карта" in page_response.text
+    assert "Git и ключ доступа" in page_response.text
     assert page_response.text.count('class="nav-button') == 9
     assert page_response.text.count("nav-title") == 9
     assert "lesson-strip" in page_response.text
@@ -289,7 +298,11 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Разбор примера" not in script_response.text
     assert "Практика: опишите страницу сайта" not in script_response.text
     assert "<textarea" not in script_response.text
-    assert "Типичные ошибки" in script_response.text
+    assert "С чего правильно начать работу над сайтом?" in script_response.text
+    assert "С поэтапного обсуждения с ChatGPT" in script_response.text
+    assert "Пример ответа" not in script_response.text
+    assert "Типичные ошибки" not in script_response.text
+    assert "Проверьте себя" not in script_response.text
     assert "Главный вывод урока" in script_response.text
     assert "Следующий шаг" in script_response.text
     assert "Перейти к уроку 2" in script_response.text
@@ -299,11 +312,12 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "roadmap" not in script_response.text
     assert "deploy key" not in script_response.text
     assert "scope" not in script_response.text
-    assert "Allow write access" not in script_response.text
     assert "публичный ключ" in script_response.text
     assert "приватный ключ" in script_response.text
     assert "разрешение на запись" in script_response.text
     assert "scrollIntoView" not in script_response.text
+    assert "Тестовая версия курса" not in script_response.text
+    assert "тестовая версия урока" not in script_response.text
     assert "DAIR smoke artifact" not in script_response.text
     assert "Draft test page" not in script_response.text
     assert "SKILL.md" not in script_response.text

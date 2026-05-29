@@ -96,6 +96,33 @@ a {
   gap: 16px;
 }
 
+.course-intro-stack {
+  display: grid;
+  gap: 18px;
+}
+
+.course-intro-block {
+  display: grid;
+  gap: 8px;
+}
+
+.course-intro-block h3 {
+  margin: 0;
+  font-family: "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  font-size: 1.04rem;
+  line-height: 1.15;
+}
+
+.course-intro-block p {
+  margin: 0;
+  max-width: 78ch;
+  line-height: 1.6;
+}
+
+.course-intro-block p + p {
+  margin-top: 8px;
+}
+
 .hero {
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.8fr);
