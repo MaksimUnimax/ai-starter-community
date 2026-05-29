@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import sqlite3
+
 from app.auth.service import register_user, verify_email
 
 
@@ -57,9 +59,14 @@ def test_cabinet_displays_course_shell_without_tariffs_or_payment_noise(client, 
     assert "Главная" in cabinet_response.text
     assert "Обучение" in cabinet_response.text
     assert "Работа с ИИ" not in cabinet_response.text
+    assert "Обучающий проект" in cabinet_response.text
     assert "Здесь находится курс и материалы по работе с ИИ." in cabinet_response.text
     assert "Перейти к обучению" in cabinet_response.text
-    assert "/materials/drafts/dair-smoke-20260529/" in cabinet_response.text
+    assert "Скачать файл" in cabinet_response.text
+    assert "Доступ откроется после оплаты." in cabinet_response.text
+    assert 'href="/materials/drafts/dair-smoke-20260529/"' not in cabinet_response.text
+    assert 'href="/cabinet/learning/project-file"' not in cabinet_response.text
+    assert "raw.githubusercontent.com" not in cabinet_response.text
     assert cabinet_response.text.index("<h2 class=\"section-title\">Обучение</h2>") < cabinet_response.text.index("<h2 class=\"section-title\">Аккаунт</h2>")
     assert "Доступные тарифы" not in cabinet_response.text
     assert "Оплата" not in cabinet_response.text
@@ -70,3 +77,34 @@ def test_cabinet_displays_course_shell_without_tariffs_or_payment_noise(client, 
     assert "Стартовый доступ" not in cabinet_response.text
     assert "Оплата будет подключена позже." not in cabinet_response.text
     assert "Последний платёж" not in cabinet_response.text
+
+
+def test_cabinet_shows_active_learning_links_when_access_granted(client, test_settings):
+    _verify_registered_user(client, test_settings, "cabinet-access@example.com", "cabinetaccess")
+    token = _extract_token_from_db(test_settings, "cabinet-access@example.com")
+    verify_email(token, settings=test_settings)
+
+    with sqlite3.connect(test_settings.database_path) as conn:
+        conn.execute(
+            "UPDATE users SET materials_access_granted_at = CURRENT_TIMESTAMP WHERE email = ?",
+            ("cabinet-access@example.com",),
+        )
+        conn.commit()
+
+    login_response = client.post(
+        "/login",
+        data={"email_or_login": "cabinet-access@example.com", "password": "Secret123"},
+        follow_redirects=False,
+    )
+    assert login_response.status_code == 303
+
+    cabinet_response = client.get("/cabinet")
+    assert cabinet_response.status_code == 200
+    assert "Обучение" in cabinet_response.text
+    assert "Обучающий проект" in cabinet_response.text
+    assert "Доступ откроется после оплаты." not in cabinet_response.text
+    assert 'href="/materials/drafts/dair-smoke-20260529/"' in cabinet_response.text
+    assert 'href="/cabinet/learning/project-file"' in cabinet_response.text
+    assert "Перейти к обучению" in cabinet_response.text
+    assert "Скачать файл" in cabinet_response.text
+    assert "raw.githubusercontent.com" not in cabinet_response.text

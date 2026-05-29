@@ -2,8 +2,8 @@
 
 from pathlib import Path
 
-from fastapi import APIRouter, Form, Request
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi import APIRouter, Form, HTTPException, Request
+from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from jinja2 import ChoiceLoader, FileSystemLoader
 
@@ -16,6 +16,7 @@ from app.auth.service import (
     get_current_user_from_cookies,
 )
 from app.core.config import get_settings
+from app.materials.service import user_has_materials_access
 
 router = APIRouter()
 templates = Jinja2Templates(directory=str(Path(__file__).resolve().parent / "templates"))
@@ -25,6 +26,10 @@ templates.env.loader = ChoiceLoader(
         FileSystemLoader(str(Path(__file__).resolve().parents[1] / "shared" / "templates")),
     ]
 )
+LEARNING_COURSE_URL = "/materials/drafts/dair-smoke-20260529/"
+LEARNING_PROJECT_DOWNLOAD_URL = "/cabinet/learning/project-file"
+LEARNING_PROJECT_FILE_NAME = "02_СТАРТ_ПРОЕКТА_GIT_ДОКУМЕНТАЦИЯ_СТРУКТУРА.md"
+LEARNING_PROJECT_FILE_PATH = Path(__file__).resolve().parent / "private_files" / LEARNING_PROJECT_FILE_NAME
 
 
 def _template(request: Request, template_name: str, **context) -> HTMLResponse:
@@ -67,6 +72,7 @@ def cabinet_page(request: Request):
     settings, user, redirect_response = _require_authenticated_user(request)
     if redirect_response is not None:
         return redirect_response
+    learning_access = user_has_materials_access(user)
 
     return _template(
         request,
@@ -74,6 +80,9 @@ def cabinet_page(request: Request):
         title="Личный кабинет",
         user_email=user.email,
         user_login=user.login,
+        learning_access=learning_access,
+        learning_course_url=LEARNING_COURSE_URL if learning_access else None,
+        learning_download_url=LEARNING_PROJECT_DOWNLOAD_URL if learning_access else None,
     )
 
 
@@ -103,6 +112,22 @@ def cabinet_settings_page(request: Request):
 def cabinet_settings_head(request: Request):
     response = cabinet_settings_page(request)
     return response
+
+
+@router.get("/cabinet/learning/project-file")
+def cabinet_learning_project_file(request: Request):
+    settings, user, redirect_response = _require_authenticated_user(request)
+    if redirect_response is not None:
+        return redirect_response
+    if not user_has_materials_access(user):
+        raise HTTPException(status_code=403, detail="learning access required")
+    if not LEARNING_PROJECT_FILE_PATH.is_file():
+        raise HTTPException(status_code=404, detail="learning project file not found")
+    return FileResponse(
+        path=str(LEARNING_PROJECT_FILE_PATH),
+        filename=LEARNING_PROJECT_FILE_NAME,
+        media_type="text/markdown; charset=utf-8",
+    )
 
 
 @router.post("/cabinet/settings/password", response_class=HTMLResponse)

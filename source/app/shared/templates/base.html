@@ -24,7 +24,11 @@
             <nav class="nav-links" aria-label="Навигация">
               {% if current_user %}
                 <a class="button button-secondary nav-pill" href="/">Главная</a>
-                <a class="button button-secondary nav-pill" href="/materials/drafts/dair-smoke-20260529/">Обучение</a>
+                {% if current_user.materials_access_granted or current_user.role in ["admin", "moderator"] %}
+                  <a class="button button-secondary nav-pill" href="/materials/drafts/dair-smoke-20260529/">Обучение</a>
+                {% else %}
+                  <button class="button button-secondary nav-pill" type="button" disabled>Обучение</button>
+                {% endif %}
                 <a class="button button-secondary nav-pill" href="/cabinet">Личный кабинет</a>
                 {% if current_user.role == "admin" %}
                   <a class="button button-secondary nav-pill" href="/admin">Админ-панель</a>

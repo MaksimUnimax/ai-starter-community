@@ -1,12 +1,32 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <section class="card stack">
-    <h2 class="section-title">Обучение</h2>
-    <p>Здесь находится курс и материалы по работе с ИИ.</p>
-    <div class="actions">
-      <a class="button button-primary" href="/materials/drafts/dair-smoke-20260529/">Перейти к обучению</a>
+  <section class="card stack learning-card">
+    <div class="learning-grid">
+      <div class="learning-column">
+        <h2 class="section-title">Обучение</h2>
+        <p>Здесь находится курс и материалы по работе с ИИ.</p>
+        {% if learning_access %}
+          <a class="button button-primary learning-button" href="{{ learning_course_url }}">Перейти к обучению</a>
+        {% else %}
+          <button class="button button-primary learning-button" type="button" disabled>Перейти к обучению</button>
+        {% endif %}
+      </div>
+
+      <div class="learning-column">
+        <h2 class="section-title">Обучающий проект</h2>
+        <p>Файл с заданием для старта проекта, документации, Git и структуры работы.</p>
+        {% if learning_access %}
+          <a class="button button-secondary learning-button" href="{{ learning_download_url }}">Скачать файл</a>
+        {% else %}
+          <button class="button button-secondary learning-button" type="button" disabled>Скачать файл</button>
+        {% endif %}
+        <p class="form-help">Скачайте файл, вставьте в чат ChatGPT и следуйте инструкциям ИИ.</p>
+      </div>
     </div>
+    {% if not learning_access %}
+      <p class="form-help">Доступ откроется после оплаты.</p>
+    {% endif %}
   </section>
 
   <section class="card stack">

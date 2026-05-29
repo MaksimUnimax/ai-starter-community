@@ -25,7 +25,13 @@ def _extract_token_from_db(test_settings, email: str) -> str:
     return match.group(1)
 
 
-def _prepare_verified_user(client, test_settings, email: str, login: str = "lessonuser"):
+def _prepare_verified_user(
+    client,
+    test_settings,
+    email: str,
+    login: str = "lessonuser",
+    grant_access: bool = False,
+):
     register_user(
         email=email,
         login=login,
@@ -35,6 +41,13 @@ def _prepare_verified_user(client, test_settings, email: str, login: str = "less
     )
     token = _extract_token_from_db(test_settings, email)
     verify_email(token, settings=test_settings)
+    if grant_access:
+        with _connect(test_settings) as conn:
+            conn.execute(
+                "UPDATE users SET materials_access_granted_at = CURRENT_TIMESTAMP WHERE email = ?",
+                (email,),
+            )
+            conn.commit()
     user = authenticate_user(email, "Secret123", settings=test_settings)
     session_token = create_session(user.id, settings=test_settings)
     client.cookies.set(test_settings.session_cookie_name, session_token)
@@ -120,7 +133,7 @@ answer_ref: ../answers/01-kak-my-rabotaem.md
 
 
 def test_materials_and_lesson_pages_render_course_content(client, test_settings):
-    _prepare_verified_user(client, test_settings, "course-render@example.com", "courserender")
+    _prepare_verified_user(client, test_settings, "course-render@example.com", "courserender", grant_access=True)
 
     materials_response = client.get("/materials")
     assert materials_response.status_code == 200
@@ -145,7 +158,7 @@ def test_materials_and_lesson_pages_render_course_content(client, test_settings)
 
 
 def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
-    _prepare_verified_user(client, test_settings, "course-map@example.com", "coursemapproof")
+    _prepare_verified_user(client, test_settings, "course-map@example.com", "coursemapproof", grant_access=True)
 
     materials_response = client.get("/materials")
     assert materials_response.status_code == 200
@@ -272,6 +285,46 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Зачем нужны ТЗ и дорожная карта" not in script_response.text
     assert "Как идёт один безопасный шаг разработки" not in script_response.text
     assert "Что значит отчёт Codex" not in script_response.text
+
+
+def test_git_backed_course_map_page_requires_learning_access(client, test_settings):
+    anon_page = client.get("/materials/drafts/dair-smoke-20260529/", follow_redirects=False)
+    anon_styles = client.get("/materials/drafts/dair-smoke-20260529/styles.css", follow_redirects=False)
+    anon_script = client.get("/materials/drafts/dair-smoke-20260529/script.js", follow_redirects=False)
+
+    assert anon_page.status_code == 303
+    assert anon_page.headers["location"] == "/login"
+    assert anon_styles.status_code == 303
+    assert anon_styles.headers["location"] == "/login"
+    assert anon_script.status_code == 303
+    assert anon_script.headers["location"] == "/login"
+
+    _prepare_verified_user(client, test_settings, "course-lock@example.com", "courselock")
+
+    locked_page = client.get("/materials/drafts/dair-smoke-20260529/", follow_redirects=False)
+    locked_styles = client.get("/materials/drafts/dair-smoke-20260529/styles.css", follow_redirects=False)
+    locked_script = client.get("/materials/drafts/dair-smoke-20260529/script.js", follow_redirects=False)
+
+    assert locked_page.status_code == 403
+    assert locked_styles.status_code == 403
+    assert locked_script.status_code == 403
+
+    with _connect(test_settings) as conn:
+        conn.execute(
+            "UPDATE users SET materials_access_granted_at = CURRENT_TIMESTAMP WHERE email = ?",
+            ("course-lock@example.com",),
+        )
+        conn.commit()
+
+    authorized_page = client.get("/materials/drafts/dair-smoke-20260529/")
+    authorized_styles = client.get("/materials/drafts/dair-smoke-20260529/styles.css")
+    authorized_script = client.get("/materials/drafts/dair-smoke-20260529/script.js")
+
+    assert authorized_page.status_code == 200
+    assert authorized_styles.status_code == 200
+    assert authorized_script.status_code == 200
+    assert "Работа с ИИ" in authorized_page.text
+    assert "application/javascript" in authorized_script.headers["content-type"]
 
 
 def test_materials_and_lesson_redirect_for_anonymous_user(client):

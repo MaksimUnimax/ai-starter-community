@@ -1,9 +1,18 @@
 from __future__ import annotations
 
+import hashlib
 import sqlite3
+from urllib.parse import unquote
 
 from app.auth.service import authenticate_user, create_session, register_user, verify_email
+from app.materials.routes import LESSON_TEST_SCRIPT_URL, LESSON_TEST_STYLES_URL, LESSON_TEST_URL
+from app.materials.service import user_has_materials_access
 from app.shared.db import get_database_path, initialize_database
+from app.user_cabinet.routes import (
+    LEARNING_PROJECT_DOWNLOAD_URL,
+    LEARNING_PROJECT_FILE_PATH,
+    LEARNING_PROJECT_FILE_NAME,
+)
 
 
 def _connect(settings):
@@ -138,13 +147,14 @@ def test_cabinet_contains_materials_link_and_locked_hint(client, test_settings):
     assert "Главная" in response.text
     assert "Обучение" in response.text
     assert "Перейти к обучению" in response.text
-    assert "/materials/drafts/dair-smoke-20260529/" in response.text
+    assert "Обучающий проект" in response.text
+    assert "Скачать файл" in response.text
+    assert "Доступ откроется после оплаты." in response.text
+    assert 'href="/materials/drafts/dair-smoke-20260529/"' not in response.text
+    assert 'href="/cabinet/learning/project-file"' not in response.text
     assert "Логин: <strong>materialscabinet</strong>" in response.text
     assert "Email: materials-cabinet@example.com" in response.text
     assert "Здесь находится курс и материалы по работе с ИИ." in response.text
-    assert "Перейти к материалам" not in response.text
-    assert "Сейчас раздел готовится." not in response.text
-    assert "Доступ к разделу «Работа с ИИ»" not in response.text
     assert "Раздел «Работа с ИИ» будет доступен после оплаты." not in response.text
 
 
@@ -171,7 +181,9 @@ def test_cabinet_access_labels_for_staff_and_paid_user(client, test_settings):
     assert "Логин: <strong>cabinetpaid</strong>" in paid_response.text
     assert "Email: cabinet-paid@example.com" in paid_response.text
     assert "Перейти к обучению" in paid_response.text
-    assert "/materials/drafts/dair-smoke-20260529/" in paid_response.text
+    assert "Скачать файл" in paid_response.text
+    assert 'href="/materials/drafts/dair-smoke-20260529/"' in paid_response.text
+    assert 'href="/cabinet/learning/project-file"' in paid_response.text
 
     client.cookies.clear()
     _prepare_and_login_verified_user(client, test_settings, "cabinet-moderator@example.com", "cabinetmod", role="moderator")
@@ -180,7 +192,9 @@ def test_cabinet_access_labels_for_staff_and_paid_user(client, test_settings):
     assert "Логин: <strong>cabinetmod</strong>" in moderator_response.text
     assert "Email: cabinet-moderator@example.com" in moderator_response.text
     assert "Перейти к обучению" in moderator_response.text
-    assert "/materials/drafts/dair-smoke-20260529/" in moderator_response.text
+    assert "Скачать файл" in moderator_response.text
+    assert 'href="/materials/drafts/dair-smoke-20260529/"' in moderator_response.text
+    assert 'href="/cabinet/learning/project-file"' in moderator_response.text
 
     client.cookies.clear()
     _prepare_and_login_verified_user(client, test_settings, "cabinet-admin@example.com", "cabinetadm", role="admin")
@@ -189,7 +203,49 @@ def test_cabinet_access_labels_for_staff_and_paid_user(client, test_settings):
     assert "Логин: <strong>cabinetadm</strong>" in admin_response.text
     assert "Email: cabinet-admin@example.com" in admin_response.text
     assert "Перейти к обучению" in admin_response.text
-    assert "/materials/drafts/dair-smoke-20260529/" in admin_response.text
+    assert "Скачать файл" in admin_response.text
+    assert 'href="/materials/drafts/dair-smoke-20260529/"' in admin_response.text
+    assert 'href="/cabinet/learning/project-file"' in admin_response.text
+
+
+def test_learning_access_helper_and_project_download_route(client, test_settings):
+    client.cookies.clear()
+    anonymous_response = client.get(LEARNING_PROJECT_DOWNLOAD_URL, follow_redirects=False)
+    assert anonymous_response.status_code == 303
+    assert anonymous_response.headers["location"] == "/login"
+
+    _prepare_and_login_verified_user(client, test_settings, "learning-locked@example.com", "learninglocked")
+    locked_response = client.get(LEARNING_PROJECT_DOWNLOAD_URL, follow_redirects=False)
+    assert locked_response.status_code == 403
+    assert user_has_materials_access(authenticate_user("learning-locked@example.com", "Secret123", settings=test_settings)) is False
+
+    with _connect(test_settings) as conn:
+        conn.execute(
+            "UPDATE users SET materials_access_granted_at = CURRENT_TIMESTAMP WHERE email = ?",
+            ("learning-locked@example.com",),
+        )
+        conn.commit()
+
+    unlocked_user = authenticate_user("learning-locked@example.com", "Secret123", settings=test_settings)
+    assert user_has_materials_access(unlocked_user) is True
+
+    client.cookies.clear()
+    session_token = create_session(unlocked_user.id, settings=test_settings)
+    client.cookies.set(test_settings.session_cookie_name, session_token)
+    download_response = client.get(LEARNING_PROJECT_DOWNLOAD_URL)
+    assert download_response.status_code == 200
+    assert "attachment" in download_response.headers.get("content-disposition", "").lower()
+    assert LEARNING_PROJECT_FILE_NAME in unquote(download_response.headers.get("content-disposition", ""))
+    assert hashlib.sha256(download_response.content).hexdigest() == hashlib.sha256(LEARNING_PROJECT_FILE_PATH.read_bytes()).hexdigest()
+    assert LEARNING_PROJECT_FILE_PATH.is_file()
+    assert "/static/" not in str(LEARNING_PROJECT_FILE_PATH)
+
+    client.cookies.clear()
+    _prepare_and_login_verified_user(client, test_settings, "learning-admin@example.com", "learningadmin", role="admin")
+    assert user_has_materials_access(authenticate_user("learning-admin@example.com", "Secret123", settings=test_settings)) is True
+    admin_download_response = client.get(LEARNING_PROJECT_DOWNLOAD_URL)
+    assert admin_download_response.status_code == 200
+    assert hashlib.sha256(admin_download_response.content).hexdigest() == hashlib.sha256(LEARNING_PROJECT_FILE_PATH.read_bytes()).hexdigest()
 
 
 def test_materials_redirects_unauthenticated_user_is_unchanged(client):

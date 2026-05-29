@@ -18,6 +18,7 @@ from app.materials.course_loader import (
     render_markdown,
     LessonNotFoundError,
 )
+from app.materials.service import user_has_materials_access
 
 router = APIRouter()
 templates = Jinja2Templates(directory=str(Path(__file__).resolve().parent / "templates"))
@@ -28,7 +29,19 @@ templates.env.loader = ChoiceLoader(
     ]
 )
 LESSON_TEST_URL = "/materials/drafts/dair-smoke-20260529/"
+LESSON_TEST_STYLES_URL = "/materials/drafts/dair-smoke-20260529/styles.css"
+LESSON_TEST_SCRIPT_URL = "/materials/drafts/dair-smoke-20260529/script.js"
 LESSON_TEST_ROOT = Path(__file__).resolve().parent / "course_content" / "drafts" / "dair_smoke_20260529"
+
+
+def _require_learning_access(request: Request):
+    settings = get_settings()
+    user = get_current_user_from_cookies(request.cookies, settings=settings)
+    if user is None:
+        return None, RedirectResponse(url="/login", status_code=303)
+    if not user_has_materials_access(user):
+        raise HTTPException(status_code=403, detail="learning access required")
+    return user, None
 
 
 def _read_lesson_test_asset(filename: str) -> str:
@@ -104,23 +117,28 @@ def lesson_head(request: Request, slug: str):
 
 @router.get(LESSON_TEST_URL, response_class=HTMLResponse)
 def lesson_test_page(request: Request):
-    settings = get_settings()
-    user = get_current_user_from_cookies(request.cookies, settings=settings)
-    if user is None:
-        return RedirectResponse(url="/login", status_code=303)
+    _, redirect_response = _require_learning_access(request)
+    if redirect_response is not None:
+        return redirect_response
     return HTMLResponse(_read_lesson_test_asset("index.html"))
 
 
-@router.get("/materials/drafts/dair-smoke-20260529/styles.css")
-def lesson_test_styles():
+@router.get(LESSON_TEST_STYLES_URL)
+def lesson_test_styles(request: Request):
+    _, redirect_response = _require_learning_access(request)
+    if redirect_response is not None:
+        return redirect_response
     return Response(
         _read_lesson_test_asset("styles.css"),
         media_type="text/css; charset=utf-8",
     )
 
 
-@router.get("/materials/drafts/dair-smoke-20260529/script.js")
-def lesson_test_script():
+@router.get(LESSON_TEST_SCRIPT_URL)
+def lesson_test_script(request: Request):
+    _, redirect_response = _require_learning_access(request)
+    if redirect_response is not None:
+        return redirect_response
     return Response(
         _read_lesson_test_asset("script.js"),
         media_type="application/javascript; charset=utf-8",
