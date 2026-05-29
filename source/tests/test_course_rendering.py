@@ -144,6 +144,41 @@ def test_materials_and_lesson_pages_render_course_content(client, test_settings)
     assert "/materials" in lesson_response.text
 
 
+def test_dair_smoke_test_page_is_served_by_the_app(client, test_settings):
+    _prepare_verified_user(client, test_settings, "dair-smoke@example.com", "dairsmoke")
+
+    materials_response = client.get("/materials")
+    assert materials_response.status_code == 200
+    assert "/materials/drafts/dair-smoke-20260529/" in materials_response.text
+    assert "Открыть тестовую страницу" in materials_response.text
+
+    page_response = client.get("/materials/drafts/dair-smoke-20260529/")
+    assert page_response.status_code == 200
+    assert "Работа с ИИ" in page_response.text
+    assert "Как мы работаем" in page_response.text
+    assert "ChatGPT" in page_response.text
+    assert "Codex" in page_response.text
+    assert 'href="styles.css"' in page_response.text
+    assert 'src="script.js"' in page_response.text
+    assert "/tmp/dair_smoke_20260529" not in page_response.text
+    assert "file://" not in page_response.text
+
+    styles_response = client.get("/materials/drafts/dair-smoke-20260529/styles.css")
+    assert styles_response.status_code == 200
+    assert "text/css" in styles_response.headers["content-type"]
+    assert ".page-shell" in styles_response.text
+    assert ".lesson-nav" in styles_response.text
+
+    script_response = client.get("/materials/drafts/dair-smoke-20260529/script.js")
+    assert script_response.status_code == 200
+    assert "application/javascript" in script_response.headers["content-type"]
+    assert "const courseData" in script_response.text
+    assert "lesson-nav" in script_response.text
+    assert "flashcards" in script_response.text
+    assert "quiz" in script_response.text
+    assert "checkpoint-list" in script_response.text
+
+
 def test_materials_and_lesson_redirect_for_anonymous_user(client):
     materials_response = client.get("/materials", follow_redirects=False)
     lesson_response = client.get("/materials/lessons/kak-my-rabotaem-chatgpt-codex-user", follow_redirects=False)

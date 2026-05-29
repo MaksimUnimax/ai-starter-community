@@ -20,6 +20,17 @@
           <p class="muted">Уроки идут по одному, с готовыми ответами и проверкой результата.</p>
         </section>
       </div>
+
+      {% if dair_smoke_test_url %}
+        <section class="card stack">
+          <p class="muted">Тестовая страница</p>
+          <h2 class="section-title">DAIR smoke artifact</h2>
+          <p class="form-help">Локальная страница для браузерной проверки курса внутри приложения. Это draft/test route, не production-интеграция.</p>
+          <div class="actions">
+            <a class="button button-secondary" href="{{ dair_smoke_test_url }}">Открыть тестовую страницу</a>
+          </div>
+        </section>
+      {% endif %}
     </div>
 
     <section class="stack">

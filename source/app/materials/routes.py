@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from fastapi import APIRouter, HTTPException, Request
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, Response
 from fastapi.templating import Jinja2Templates
 from jinja2 import ChoiceLoader, FileSystemLoader
 
@@ -27,6 +27,26 @@ templates.env.loader = ChoiceLoader(
         FileSystemLoader(str(Path(__file__).resolve().parents[1] / "shared" / "templates")),
     ]
 )
+DAIR_SMOKE_TEST_URL = "/materials/drafts/dair-smoke-20260529/"
+DAIR_SMOKE_DRAFT_ROOT = Path(__file__).resolve().parent / "course_content" / "drafts" / "dair_smoke_20260529"
+DAIR_SMOKE_PREVIEW_HTML = """
+  <section
+    style="max-width: 1280px; margin: 16px auto 0; padding: 16px 20px; border: 1px solid #e8ded0; border-radius: 18px; background: linear-gradient(180deg, #fffdf8 0%, #fff9f0 100%); color: #231f1a;"
+    aria-label="DAIR smoke draft preview"
+  >
+    <p style="margin: 0 0 8px; text-transform: uppercase; letter-spacing: 0.15em; font-size: 0.74rem; color: #c2410c; font-weight: 700;">Draft test page</p>
+    <h1 style="margin: 0; font-family: Georgia, serif; font-size: clamp(1.8rem, 3vw, 2.4rem); line-height: 1.1;">Работа с ИИ</h1>
+    <h2 style="margin: 10px 0 0; font-family: Georgia, serif; font-size: clamp(1.1rem, 2vw, 1.55rem); line-height: 1.2;">Как мы работаем: ChatGPT проектирует, Codex выполняет, пользователь проверяет</h2>
+    <p style="margin: 10px 0 0; color: #766f66;">ChatGPT проектирует шаг, Codex выполняет точную задачу, пользователь проверяет результат и приносит отчёт обратно.</p>
+  </section>
+"""
+
+
+def _read_dair_smoke_asset(filename: str) -> str:
+    path = DAIR_SMOKE_DRAFT_ROOT / filename
+    if not path.is_file():
+        raise HTTPException(status_code=404, detail=f"Missing DAIR smoke artifact file: {filename}")
+    return path.read_text(encoding="utf-8")
 
 
 def _template(request: Request, template_name: str, **context) -> HTMLResponse:
@@ -55,6 +75,7 @@ def materials_page(request: Request):
         lessons=list_lessons(),
         user_email=user.email,
         user_login=user.login,
+        dair_smoke_test_url=DAIR_SMOKE_TEST_URL,
     )
 
 
@@ -90,3 +111,29 @@ def lesson_page(request: Request, slug: str):
 @router.head("/materials/lessons/{slug}")
 def lesson_head(request: Request, slug: str):
     return lesson_page(request, slug)
+
+
+@router.get(DAIR_SMOKE_TEST_URL, response_class=HTMLResponse)
+def dair_smoke_test_page(request: Request):
+    settings = get_settings()
+    user = get_current_user_from_cookies(request.cookies, settings=settings)
+    if user is None:
+        return RedirectResponse(url="/login", status_code=303)
+    html = _read_dair_smoke_asset("index.html").replace("<body>", f"<body>{DAIR_SMOKE_PREVIEW_HTML}", 1)
+    return HTMLResponse(html)
+
+
+@router.get("/materials/drafts/dair-smoke-20260529/styles.css")
+def dair_smoke_test_styles():
+    return Response(
+        _read_dair_smoke_asset("styles.css"),
+        media_type="text/css; charset=utf-8",
+    )
+
+
+@router.get("/materials/drafts/dair-smoke-20260529/script.js")
+def dair_smoke_test_script():
+    return Response(
+        _read_dair_smoke_asset("script.js"),
+        media_type="application/javascript; charset=utf-8",
+    )
