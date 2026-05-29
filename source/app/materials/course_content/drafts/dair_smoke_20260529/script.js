@@ -709,19 +709,11 @@ function renderFlashcards(section) {
         ${section.flashcards
           .map((card, index) => {
             const key = flashcardKey(section.id, index);
-            const flipped = state.flippedCards.has(key) ? "is-flipped" : "";
+            const revealed = state.flippedCards.has(key) ? "is-revealed" : "";
             return `
-              <button class="flashcard ${flipped}" type="button" data-flashcard="${key}" aria-label="Перевернуть карточку">
-                <span class="flashcard-inner">
-                  <span class="flashcard-face flashcard-front">
-                    <strong>${escapeHTML(card.front)}</strong>
-                    <span>Нажми, чтобы увидеть ответ</span>
-                  </span>
-                  <span class="flashcard-face flashcard-back">
-                    <strong>${escapeHTML(card.back)}</strong>
-                    <span class="flashcard-note">Нажмите ещё раз, чтобы вернуться.</span>
-                  </span>
-                </span>
+              <button class="flashcard ${revealed}" type="button" data-flashcard="${key}" aria-label="Перевернуть карточку">
+                <strong class="flashcard-title">${escapeHTML(revealed ? card.back : card.front)}</strong>
+                <span class="flashcard-note">${revealed ? "Нажмите ещё раз, чтобы вернуться." : "Нажми, чтобы увидеть ответ"}</span>
               </button>
             `;
           })

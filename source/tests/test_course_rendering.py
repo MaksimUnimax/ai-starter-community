@@ -233,6 +233,11 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "process-flow" in page_response.text
     assert "next-step-card" in page_response.text
     assert "Карточки" in page_response.text
+    assert 'class="flashcard"' in page_response.text
+    assert "flashcard-title" in page_response.text
+    assert "flashcard-note" in page_response.text
+    assert "flashcard-inner" not in page_response.text
+    assert "flashcard-face" not in page_response.text
     assert 'class="sidebar"' not in page_response.text
     assert 'class="workspace"' not in page_response.text
     assert 'class="hero-meta"' not in page_response.text
@@ -267,12 +272,14 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert ".course-intro-body" in styles_response.text
     assert ".course-intro-part" in styles_response.text
     assert ".course-intro .section-heading" in styles_response.text
+    assert "text-align: center;" in styles_response.text
     assert "line-height: 1.38;" in styles_response.text
     assert ".definition-stack" in styles_response.text
     assert ".definition-card" in styles_response.text
     assert ".process-flow" in styles_response.text
-    assert ".flashcard-face" in styles_response.text
     assert "linear-gradient(180deg, #fff 0%, #fff6ec 100%)" not in styles_response.text
+    assert ".flashcard.is-revealed" in styles_response.text
+    assert ".flashcard-title" in styles_response.text
     assert ".next-step-card" in styles_response.text
     assert "textarea" not in styles_response.text
     assert "checkpoint-list" not in styles_response.text
@@ -311,6 +318,8 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "<textarea" not in script_response.text
     assert "С чего правильно начать работу над сайтом?" in script_response.text
     assert "С обсуждения проекта и этапов разработки с ChatGPT." in script_response.text
+    assert "is-revealed" in script_response.text
+    assert "flashcard-title" in script_response.text
     assert "Разобрать задачу, выбрать подход, ограничить границы задачи и подготовить точное задание." in script_response.text
     assert "Пример ответа" not in script_response.text
     assert "Типичные ошибки" not in script_response.text
