@@ -1,19 +1,79 @@
+from __future__ import annotations
+
+import re
+import sqlite3
+
+from app.auth.service import authenticate_user, create_session, register_user, verify_email
+from app.shared.db import get_database_path
+
+
+def _connect(settings):
+    conn = sqlite3.connect(str(get_database_path(settings)))
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def _extract_verify_token(settings, email: str) -> str:
+    with _connect(settings) as conn:
+        row = conn.execute(
+            "SELECT body_text FROM email_outbox WHERE recipient_email = ? AND template_key = ? ORDER BY id DESC LIMIT 1",
+            (email, "email_verification"),
+        ).fetchone()
+    assert row is not None
+    match = re.search(r"/verify-email/([A-Za-z0-9_-]+)", row["body_text"])
+    assert match
+    return match.group(1)
+
+
+def _make_authenticated_user(client, test_settings, email: str = "landing@example.com", login: str = "landinguser"):
+    register_user(
+        email=email,
+        login=login,
+        password="Secret123",
+        repeat_password="Secret123",
+        settings=test_settings,
+    )
+    token = _extract_verify_token(test_settings, email)
+    verify_email(token, settings=test_settings)
+    user = authenticate_user(email, "Secret123", settings=test_settings)
+    session_token = create_session(user.id, settings=test_settings)
+    client.cookies.set(test_settings.session_cookie_name, session_token)
+
+
 def test_landing_page(client):
     response = client.get("/")
     assert response.status_code == 200
     assert "OpenScript — Первый ИИ-бот без опыта" in response.text
     assert "Создайте первого ИИ-бота без опыта в программировании" in response.text
     assert "Начать первый проект" in response.text
+    assert "Войти" in response.text
     assert "Вы покупаете не курс, а первый управляемый опыт разработки" in response.text
     assert "Стартовый месяц OpenScript — 4 990 ₽" in response.text
     assert "Вопросы перед стартом" in response.text
     assert 'href="#how-it-works"' in response.text
+    assert 'href="/login"' in response.text
     assert "Юридическая информация" in response.text
     assert "ИП Ягофаров М.Р." in response.text
     assert "Индивидуальный предприниматель Ягофаров Максим Ринатович" not in response.text
     assert "ИНН: 741705866660" in response.text
     assert "ОГРНИП: 320745600093211" in response.text
     assert "OpenScripts@yandex.com" in response.text
+
+
+def test_authenticated_landing_page_switches_to_account_and_learning_links(client, test_settings):
+    _make_authenticated_user(client, test_settings)
+
+    response = client.get("/")
+    assert response.status_code == 200
+    assert "Войти" not in response.text
+    assert "Начать первый проект" not in response.text
+    assert "Личный кабинет" in response.text
+    assert "Работа с ИИ" in response.text
+    assert "Продолжить обучение" in response.text
+    assert "Выйти" in response.text
+    assert 'href="/materials"' in response.text
+    assert 'href="/cabinet"' in response.text
+    assert 'action="/logout"' in response.text
 
 
 def test_login_and_register_pages(client):

@@ -150,6 +150,28 @@ a { color: inherit; }
   color: #fff;
 }
 
+.nav-form {
+  margin: 0;
+}
+
+.nav-links .nav-button {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+  border-radius: 999px;
+  color: var(--muted);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.nav-links .nav-button:hover {
+  background: var(--bg);
+  color: var(--fg);
+}
+
 .hero {
   position: relative;
   overflow: hidden;
@@ -1009,17 +1031,39 @@ a { color: inherit; }
 </style>
 </head>
 <body>
+{% if current_user %}
+  {% set primary_cta_href = '/materials' %}
+  {% set primary_cta_label = 'Продолжить обучение' %}
+  {% set secondary_cta_href = '/cabinet' %}
+  {% set secondary_cta_label = 'Личный кабинет' %}
+{% else %}
+  {% set primary_cta_href = '/login' %}
+  {% set primary_cta_label = 'Начать первый проект' %}
+  {% set secondary_cta_href = '#pricing' %}
+  {% set secondary_cta_label = 'Посмотреть, что входит' %}
+{% endif %}
 
 <nav class="nav">
   <div class="container nav-inner">
     <a href="/" class="nav-logo">OpenScript</a>
     <div class="nav-links">
-      <a href="#what-you-get">Что вы получите</a>
-      <a href="#first-project">Первый проект</a>
-      <a href="#how-it-works">Как проходит работа</a>
-      <a href="#pricing">Цена</a>
-      <a href="/login">Войти</a>
-      <a href="{{ start_href }}" class="nav-cta">Начать первый проект</a>
+      {% if current_user %}
+        <a href="/materials">Работа с ИИ</a>
+        <a href="/cabinet">Личный кабинет</a>
+        {% if current_user.role == 'admin' %}
+          <a href="/admin">Админ-панель</a>
+        {% endif %}
+        <form class="nav-form" method="post" action="/logout">
+          <button class="nav-button" type="submit">Выйти</button>
+        </form>
+      {% else %}
+        <a href="#what-you-get">Что вы получите</a>
+        <a href="#first-project">Первый проект</a>
+        <a href="#how-it-works">Как проходит работа</a>
+        <a href="#pricing">Цена</a>
+        <a href="/login">Войти</a>
+        <a href="{{ primary_cta_href }}" class="nav-cta">{{ primary_cta_label }}</a>
+      {% endif %}
     </div>
   </div>
 </nav>
@@ -1037,8 +1081,8 @@ a { color: inherit; }
       <h1 class="hero-title">Создайте первого ИИ-бота без опыта в программировании</h1>
       <p class="hero-lead">OpenScript проводит вас через первый реальный проект с ИИ-наставником: вы создаёте рабочий инструмент, понимаете процесс разработки и получаете метод, чтобы дальше самостоятельно делать своих ботов, автоматизаций и MVP без опыта в программировании.</p>
       <div class="hero-actions">
-        <a href="{{ start_href }}" class="btn btn-primary">Начать первый проект</a>
-        <a href="#pricing" class="btn btn-secondary">Посмотреть, что входит</a>
+        <a href="{{ primary_cta_href }}" class="btn btn-primary">{{ primary_cta_label }}</a>
+        <a href="{{ secondary_cta_href }}" class="btn btn-secondary">{{ secondary_cta_label }}</a>
       </div>
     </div>
   </div>
@@ -1222,7 +1266,8 @@ a { color: inherit; }
         </div>
       </div>
       <div class="pricing-actions">
-        <a href="{{ start_href }}" class="btn btn-primary">Начать первый проект</a>
+        <a href="{{ primary_cta_href }}" class="btn btn-primary">{{ primary_cta_label }}</a>
+        <a href="{{ secondary_cta_href }}" class="btn btn-secondary">{{ secondary_cta_label }}</a>
         <p class="pricing-note">После первого месяца вы сможете продолжать самостоятельно. Продление OpenScript не обязательно, но внешние инструменты, серверы и API при необходимости оплачиваются отдельно.</p>
       </div>
     </div>
@@ -1298,8 +1343,8 @@ a { color: inherit; }
       <h2 class="section-title">Начните с первого ИИ-бота — дальше сможете идти со своими идеями</h2>
       <p>OpenScript нужен, чтобы пройти стартовый барьер: создать первый рабочий инструмент, понять процесс разработки и получить метод, который можно применять дальше самостоятельно.</p>
       <div class="final-actions">
-        <a href="{{ start_href }}" class="btn btn-primary">Начать первый проект</a>
-        <a href="#pricing" class="btn btn-secondary">Посмотреть, что входит</a>
+        <a href="{{ primary_cta_href }}" class="btn btn-primary">{{ primary_cta_label }}</a>
+        <a href="{{ secondary_cta_href }}" class="btn btn-secondary">{{ secondary_cta_label }}</a>
       </div>
     </div>
   </div>
