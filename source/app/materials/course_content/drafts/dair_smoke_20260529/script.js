@@ -716,7 +716,6 @@ function renderNavigation() {
       return `
         <button class="nav-button ${activeClass}" type="button" data-section="${section.id}">
           <span class="nav-title">${escapeHTML(section.navLabel)}</span>
-          <span class="nav-meta">${escapeHTML(section.navMeta)}</span>
         </button>
       `;
     })

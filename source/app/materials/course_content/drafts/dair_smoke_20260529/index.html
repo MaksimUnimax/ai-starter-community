@@ -8,153 +8,51 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="page-shell">
-    <header class="hero panel">
-      <div class="hero-copy">
-        <p class="eyebrow">Тестовая версия курса</p>
-        <h1>Работа с ИИ</h1>
-        <p class="lede">
-          Тестовая версия курса «Как разрабатывать с помощью ChatGPT и Codex».
-          Здесь можно открыть карту из 9 уроков, пройти навигацию, карточки и проверку знаний.
-        </p>
-        <div class="hero-actions">
-          <button class="primary-button" id="start-learning" type="button">Начать курс</button>
-          <button class="ghost-button" id="open-review" type="button">Открыть урок 9</button>
-        </div>
-      </div>
-
-      <aside class="hero-meta">
-        <div class="meta-card">
-          <span class="meta-label">Аудитория</span>
-          <strong>Новички без опыта программирования</strong>
-        </div>
-        <div class="meta-card">
-          <span class="meta-label">Язык</span>
-          <strong>Русский</strong>
-        </div>
-        <div class="meta-card">
-          <span class="meta-label">Статус</span>
-          <strong>Тестовая версия курса</strong>
-        </div>
-      </aside>
+  <div class="page-shell lesson-page">
+    <header class="course-head">
+      <p class="eyebrow">Тестовая версия курса</p>
+      <h1>Работа с ИИ</h1>
+      <p class="course-headline">Как разрабатывать с помощью ChatGPT и Codex</p>
+      <p class="course-note">Открыт полный маршрут из 9 уроков. Навигация и проверка знаний остаются интерактивными.</p>
     </header>
 
-    <section class="panel stack">
+    <section class="panel lesson-strip">
       <div class="section-heading">
-        <p class="eyebrow">Карта курса</p>
-        <h2>Как разрабатывать с помощью ChatGPT и Codex</h2>
+        <p class="eyebrow">Уроки</p>
+        <h2>Структура урока</h2>
       </div>
-      <p class="form-help">
-        Курс состоит из 9 уроков. Он остаётся тестовой версией, но уже показывает
-        полный учебный маршрут и тему deploy key внутри урока про Git.
-      </p>
-      <div class="course-map">
-        <article class="course-map-card">
-          <span class="course-map-number">1</span>
-          <h3>Как теперь можно делать проекты без знания кода</h3>
-          <p>Пользователь не пишет код вручную, но должен понимать процесс.</p>
-        </article>
-        <article class="course-map-card">
-          <span class="course-map-number">2</span>
-          <h3>Кто что делает: пользователь, ChatGPT и Codex</h3>
-          <p>Разводим роли и понимаем, кто за что отвечает.</p>
-        </article>
-        <article class="course-map-card">
-          <span class="course-map-number">3</span>
-          <h3>Почему проект начинается с документов</h3>
-          <p>Документы работают как память проекта.</p>
-        </article>
-        <article class="course-map-card">
-          <span class="course-map-number">4</span>
-          <h3>Как начинать новый диалог после перерыва</h3>
-          <p>Сначала восстанавливаем контекст, потом продолжаем работу.</p>
-        </article>
-        <article class="course-map-card">
-          <span class="course-map-number">5</span>
-          <h3>Как обновляется документация во время работы</h3>
-          <p>Документы обновляются после важных решений и результатов.</p>
-        </article>
-        <article class="course-map-card">
-          <span class="course-map-number">6</span>
-          <h3>Зачем нужны ТЗ и roadmap</h3>
-          <p>ТЗ говорит, что строим. Roadmap говорит, в каком порядке.</p>
-        </article>
-        <article class="course-map-card">
-          <span class="course-map-number">7</span>
-          <h3>Git простыми словами</h3>
-          <p>Как дать Codex право отправлять проект в GitHub: deploy key, публичный ключ, приватный ключ, Allow write access.</p>
-        </article>
-        <article class="course-map-card">
-          <span class="course-map-number">8</span>
-          <h3>Как идёт один безопасный шаг разработки</h3>
-          <p>User -> GPT -> Codex -> report -> GPT -> visual check -> docs update.</p>
-        </article>
-        <article class="course-map-card">
-          <span class="course-map-number">9</span>
-          <h3>Что значит отчёт Codex</h3>
-          <p>GPT объясняет отчёт, а пользователю не нужен глубокий технический разбор.</p>
-        </article>
-      </div>
+      <nav class="lesson-nav" id="lesson-nav" aria-label="Навигация по курсу">
+        <button class="nav-button is-active" type="button" data-section="lesson-1"><span class="nav-title">Урок 1</span></button>
+        <button class="nav-button" type="button" data-section="lesson-2"><span class="nav-title">Урок 2</span></button>
+        <button class="nav-button" type="button" data-section="lesson-3"><span class="nav-title">Урок 3</span></button>
+        <button class="nav-button" type="button" data-section="lesson-4"><span class="nav-title">Урок 4</span></button>
+        <button class="nav-button" type="button" data-section="lesson-5"><span class="nav-title">Урок 5</span></button>
+        <button class="nav-button" type="button" data-section="lesson-6"><span class="nav-title">Урок 6</span></button>
+        <button class="nav-button" type="button" data-section="lesson-7"><span class="nav-title">Урок 7</span></button>
+        <button class="nav-button" type="button" data-section="lesson-8"><span class="nav-title">Урок 8</span></button>
+        <button class="nav-button" type="button" data-section="review"><span class="nav-title">Урок 9</span></button>
+      </nav>
     </section>
 
-    <main class="workspace">
-      <aside class="sidebar">
-        <section class="panel">
-          <div class="section-heading">
-            <p class="eyebrow">Навигация</p>
-            <h2>Структура урока</h2>
-          </div>
-          <nav class="lesson-nav" id="lesson-nav" aria-label="Навигация по курсу"></nav>
-        </section>
+    <section class="panel progress-panel lesson-progress">
+      <div class="section-heading">
+        <p class="eyebrow">Прогресс</p>
+        <h2>Проверка урока</h2>
+      </div>
+      <div class="progress-meter" aria-label="Прогресс курса">
+        <div class="progress-track">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <div class="progress-copy">
+          <strong id="progress-value">0%</strong>
+          <span id="progress-label">Пока открыт только обзор.</span>
+        </div>
+      </div>
+      <ul class="checkpoint-list" id="checkpoint-list"></ul>
+    </section>
 
-        <section class="panel progress-panel">
-          <div class="section-heading">
-            <p class="eyebrow">Прогресс</p>
-            <h2>Проверка урока</h2>
-          </div>
-          <div class="progress-meter" aria-label="Прогресс курса">
-            <div class="progress-track">
-              <div class="progress-fill" id="progress-fill"></div>
-            </div>
-            <div class="progress-copy">
-              <strong id="progress-value">0%</strong>
-              <span id="progress-label">Пока открыт только обзор.</span>
-            </div>
-          </div>
-          <ul class="checkpoint-list" id="checkpoint-list"></ul>
-        </section>
-
-      </aside>
-
-      <section class="stage">
-        <article class="panel course-overview">
-          <div class="section-heading">
-            <p class="eyebrow">Обзор урока</p>
-            <h2>Что есть в этой тестовой версии</h2>
-          </div>
-          <p>
-            Это тестовая версия первого урока курса. Она показывает роли ChatGPT, Codex и
-            пользователя, даёт практическое задание и позволяет проверить понимание прямо в
-            приложении.
-          </p>
-          <div class="summary-grid">
-            <div>
-              <span class="summary-label">Фокус</span>
-              <strong>Роли, навигация, самопроверка</strong>
-            </div>
-            <div>
-              <span class="summary-label">Формат</span>
-              <strong>Тестовая версия урока</strong>
-            </div>
-            <div>
-              <span class="summary-label">Статус</span>
-              <strong>Не полный курс, а проверочный первый урок</strong>
-            </div>
-          </div>
-        </article>
-
-        <article class="panel lesson-shell">
-          <div id="active-section" aria-live="polite">
+    <article class="panel lesson-shell">
+      <div id="active-section" aria-live="polite">
             <article class="section-card lesson-one">
               <header class="section-header">
                 <p class="eyebrow">Урок 1</p>
@@ -416,10 +314,8 @@
                 </section>
               </div>
             </article>
-          </div>
-        </article>
-      </section>
-    </main>
+      </div>
+    </article>
   </div>
 
   <script src="script.js"></script>

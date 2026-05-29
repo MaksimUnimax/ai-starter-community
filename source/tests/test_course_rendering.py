@@ -157,6 +157,8 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Работа с ИИ" in page_response.text
     assert "Как разрабатывать с помощью ChatGPT и Codex" in page_response.text
     assert "Тестовая версия курса" in page_response.text
+    assert "Урок 1" in page_response.text
+    assert "Урок 9" in page_response.text
     assert "Проектная работа с ИИ: роль пользователя, ChatGPT и Codex" in page_response.text
     assert "Вы не пишете код вручную, но управляете задачей, проверкой и принятием результата." in page_response.text
     assert "Сделай мне ИИ-агента" in page_response.text
@@ -167,25 +169,17 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Типичные ошибки" in page_response.text
     assert "Главный вывод урока" in page_response.text
     assert "Пользователь ставит цель → ChatGPT проектирует технический шаг → Codex выполняет задачу на сервере → Codex возвращает отчёт → ChatGPT проверяет отчёт → пользователь смотрит результат и принимает решение." in page_response.text
-    assert "Карта курса" in page_response.text
-    assert "Как теперь можно делать проекты без знания кода" in page_response.text
-    assert "Кто что делает: пользователь, ChatGPT и Codex" in page_response.text
-    assert "Почему проект начинается с документов" in page_response.text
-    assert "Как начинать новый диалог после перерыва" in page_response.text
-    assert "Как обновляется документация во время работы" in page_response.text
-    assert "Зачем нужны ТЗ и roadmap" in page_response.text
-    assert "Git простыми словами" in page_response.text
-    assert "Как дать Codex право отправлять проект в GitHub" in page_response.text
-    assert "Как идёт один безопасный шаг разработки" in page_response.text
-    assert "Что значит отчёт Codex" in page_response.text
-    assert "deploy key" in page_response.text
-    assert "публичный ключ" in page_response.text
-    assert "приватный ключ" in page_response.text
-    assert "Allow write access" in page_response.text
-    assert "Начать курс" in page_response.text
-    assert "Открыть урок 9" in page_response.text
     assert "Структура урока" in page_response.text
     assert "Прогресс" in page_response.text
+    assert page_response.text.count('data-section="') == 9
+    assert "lesson-strip" in page_response.text
+    assert "lesson-progress" in page_response.text
+    assert "lesson-shell" in page_response.text
+    assert 'class="sidebar"' not in page_response.text
+    assert 'class="workspace"' not in page_response.text
+    assert 'class="hero-meta"' not in page_response.text
+    assert 'class="course-map-card"' not in page_response.text
+    assert 'class="course-overview"' not in page_response.text
     assert 'href="styles.css"' in page_response.text
     assert 'src="script.js"' in page_response.text
     assert "DAIR smoke artifact" not in page_response.text
