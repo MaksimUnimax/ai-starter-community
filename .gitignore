@@ -31,3 +31,7 @@ backups/*
 !backups/.gitkeep
 docs/*
 !docs/.gitkeep
+staging/data/*
+!staging/data/.gitkeep
+staging/runtime/*
+!staging/runtime/.gitkeep
