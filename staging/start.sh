@@ -53,6 +53,15 @@ elif command -v lsof &>/dev/null; then
   fi
 fi
 
+# Use project virtual environment if it exists
+VENV_PYTHON="$APP_ROOT/source/.venv/bin/python"
+PYTHON_BIN="${PYTHON:-}"
+if [ -z "$PYTHON_BIN" ] && [ -x "$VENV_PYTHON" ]; then
+  PYTHON_BIN="$VENV_PYTHON"
+elif [ -z "$PYTHON_BIN" ]; then
+  PYTHON_BIN="python"
+fi
+
 cd "$APP_ROOT/source"
 
 echo "=========================================="
@@ -65,11 +74,12 @@ echo " Base URL:      $BASE_URL"
 echo " Database:      $DATABASE_PATH"
 echo " Session:       $SESSION_COOKIE_NAME"
 echo " Email mode:    $EMAIL_MODE"
+echo " Python:        $PYTHON_BIN"
 echo "------------------------------------------"
 echo " Press Ctrl+C to stop."
 echo "=========================================="
 
-exec python -m uvicorn app.main:app \
+exec "$PYTHON_BIN" -m uvicorn app.main:app \
   --host "$APP_HOST" \
   --port "$APP_PORT" \
   --log-level info
