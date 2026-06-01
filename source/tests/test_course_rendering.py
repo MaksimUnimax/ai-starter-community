@@ -190,8 +190,8 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Зачем это нужно" in page_response.text
     assert "Где это применяется" in page_response.text
     assert page_response.text.count("course-intro-part") == 3
-    assert page_response.text.count('class="nav-button') == 10
-    assert page_response.text.count("nav-title") == 10
+    assert page_response.text.count('class="nav-button') == 9
+    assert page_response.text.count("nav-title") == 9
     assert page_response.text.count("Вернуться в личный кабинет") == 2
     assert page_response.text.count('href="/cabinet"') == 2
     assert "Прогресс зависит от прохождения проверки знаний." in page_response.text
@@ -243,20 +243,19 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert 'state.answeredQuestions[quizKey(section.id, index)] !== undefined' in script_response.text
     assert "renderStructuredLesson" in script_response.text
     assert 'section.nextStepTargetId || "lesson-2"' in script_response.text
-    assert 'id: "lesson-10"' in script_response.text
-    assert 'review: "lesson-10"' in script_response.text
-    assert 'navTitle: "Урок 10 — Ошибки, лайфхаки и правила работы"' in script_response.text
-    assert "lesson-10" in script_response.text
-    assert "Начало работы с ChatGPT" in script_response.text
+    assert 'id: "lesson-9"' in script_response.text
+    assert 'review: "lesson-9"' in script_response.text
+    assert 'navTitle: "Урок 9 — Частые ошибки, лайфхаки и правила работы"' in script_response.text
+    assert "lesson-10" not in script_response.text
+    assert "Документы проекта: ТЗ, roadmap, правила и контекст" in script_response.text
+    assert "Старт проекта: подготовка документов с ChatGPT и push в Git" in script_response.text
     assert "ChatGPT как профессиональный технический специалист" in script_response.text
-    assert "Документация как контроль разработки" in script_response.text
-    assert "Обновление документации" in script_response.text
-    assert "Новый диалог через документы" in script_response.text
     assert "Git: история, commit, push и откат" in script_response.text
-    assert "Как проходит рабочий run Codex" in script_response.text
+    assert "Старт работы и рабочие run’ы Codex" in script_response.text
     assert "PowerShell, Terminal и подключение к серверу" in script_response.text
     assert "Сервер, Codex, AGENTS.md и Skills" in script_response.text
     assert "Ошибки, лайфхаки и правила работы" in script_response.text
+    assert "Обновление документации и новый диалог" in script_response.text
     assert "Контекстное окно" in script_response.text
     assert "Не вести диалог с Codex" in script_response.text
     assert "Проверять отчёт, а не верить слову “готово”" in script_response.text
