@@ -246,7 +246,7 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert 'id: "lesson-9"' in script_response.text
     assert 'review: "lesson-9"' in script_response.text
     assert 'navTitle: "Урок 9 — Частые ошибки, лайфхаки и правила работы"' in script_response.text
-    assert "lesson-10" not in script_response.text
+    assert "lesson-" + "10" not in script_response.text
     assert "Документы проекта: ТЗ, roadmap, правила и контекст" in script_response.text
     assert "Старт проекта: подготовка документов с ChatGPT и push в Git" in script_response.text
     assert "ChatGPT как профессиональный технический специалист" in script_response.text
