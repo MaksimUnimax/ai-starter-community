@@ -153,7 +153,7 @@ const courseData = {
             "ТЗ",
             "Stop-point"
           ],
-          answerIndex: 1,
+          answerIndex: 0,
           explanation:
             "ТЗ описывает, что мы строим, зачем это нужно, какие есть ограничения и критерии готовности."
         },
@@ -280,7 +280,7 @@ const courseData = {
             "Удаление проекта",
             "Проверка дизайна"
           ],
-          answerIndex: 1,
+          answerIndex: 0,
           explanation:
             "Push отправляет commit из локального репозитория в удалённый репозиторий."
         },
@@ -406,7 +406,7 @@ const courseData = {
             "Полная переделка всего проекта",
             "Любая команда без проверки"
           ],
-          answerIndex: 1,
+          answerIndex: 0,
           explanation:
             "Первый безопасный шаг должен быть маленьким и проверяемым."
         },
@@ -535,7 +535,7 @@ const courseData = {
             "Личный кабинет курса",
             "Название урока"
           ],
-          answerIndex: 1,
+          answerIndex: 0,
           explanation:
             "Terminal или PowerShell — это окно для ввода команд."
         },
