@@ -153,7 +153,7 @@ const courseData = {
             "ТЗ",
             "Stop-point"
           ],
-          answerIndex: 0,
+          answerIndex: 1,
           explanation:
             "ТЗ описывает, что мы строим, зачем это нужно, какие есть ограничения и критерии готовности."
         },
