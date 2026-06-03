@@ -556,7 +556,7 @@ Git нужен не только для истории.
 
 Пользователь получает документы и инструкцию.
 
-Рабочие документы в repo создаёт Codex по prompt’у от ChatGPT.
+Рабочие документы в Git repo создаёт Codex по prompt’у от ChatGPT.
 
 ChatGPT вставляет тексты документов в prompt для Codex, а Codex создаёт Markdown-файлы в repo, делает commit и push.
 
@@ -576,7 +576,7 @@ ChatGPT вставляет тексты документов в prompt для Co
 
 После стартовой документации stop-point должен быть:
 
-Стартовая документация создана. Следующий безопасный шаг — создать или подготовить Git repo, настроить доступ Codex через SSH deploy key и создать рабочие документы в repo через Codex.
+Стартовая документация создана. Следующий безопасный шаг — создать или подготовить Git repo, настроить доступ Codex через SSH deploy key и создать рабочие документы в Git repo через Codex.
 
 ## module_map.md
 
@@ -616,7 +616,7 @@ ChatGPT вставляет тексты документов в prompt для Co
 Объясни подробно:
 
 1. Что созданные Markdown-документы нужно сохранить себе как запасную копию.
-2. Что рабочие документы в Git repo будет создавать Codex по prompt’у от ChatGPT.
+2. Что рабочие документы в Git repo создаёт Codex по prompt’у от ChatGPT.
 3. Что пользователь не должен вручную раскладывать документы по папкам repo.
 4. Что если у пользователя нет GitHub-аккаунта, нужно зарегистрироваться на GitHub.
 5. Что нужно создать новый GitHub repo или подготовить существующий repo.
@@ -630,8 +630,8 @@ ChatGPT вставляет тексты документов в prompt для Co
 13. Что пользователь добавляет публичный ключ в GitHub repo:
     Settings -> Deploy keys -> Add deploy key.
 14. Что нужно включить Allow write access.
-15. Что после добавления ключа пользователь возвращается в ChatGPT и пишет, что ключ добавлен.
-16. Что ChatGPT даст Codex prompt на проверку доступа.
+15. Что после добавления ключа пользователь возвращается и пишет, что deploy key добавлен к рабочему repo.
+16. ChatGPT даёт Codex prompt на проверку доступа.
 17. Что потом ChatGPT даст Codex prompt, в котором будут тексты документов.
 18. Что Codex создаст Markdown-файлы в repo из текста prompt’а.
 19. Что Codex сделает commit и push.
@@ -641,8 +641,10 @@ ChatGPT вставляет тексты документов в prompt для Co
 Важно:
 
 - Codex не переносит скачанные файлы с компьютера пользователя.
-- Скачанные файлы — это копия для пользователя.
-- Рабочие файлы в repo создаются Codex из текста, который ChatGPT передаёт в prompt’е.`,
+- Скачанные Markdown-файлы остаются у пользователя как запасная копия.
+- Рабочие Markdown-файлы в Git repo создаёт Codex по prompt’у от ChatGPT.
+- ChatGPT вставляет тексты документов в prompt для Codex.
+- Codex создаёт Markdown-файлы прямо в repo.`,
       contentHtml: `
         <p><strong>Сначала документация, потом разработка</strong></p>
         <p>Проект нельзя начинать с просьбы: “Сделай весь проект”.</p>
@@ -671,6 +673,7 @@ ChatGPT вставляет тексты документов в prompt для Co
         <p><strong>Как можно начать</strong></p>
         <p>Чтобы не придумывать старт с нуля, в этом уроке есть готовый <strong>стартовый prompt</strong>.</p>
         <p>Его использовать не обязательно, но можно взять как безопасный пример начала проекта.</p>
+        <p><a href="#lesson-4-starter-prompt" data-starter-prompt-jump="lesson-4">Перейти к стартовому prompt</a></p>
         <p>Этот prompt можно:</p>
         <ul>
           <li>скопировать;</li>
@@ -688,8 +691,6 @@ ChatGPT вставляет тексты документов в prompt для Co
           <li><strong>module_map.md</strong>;</li>
           <li><strong>start_prompt_for_next_chat.md</strong>.</li>
         </ul>
-        <p><strong>next_steps.md</strong> создавать не нужно.</p>
-        <p>Инструкция “что делать дальше” пишется прямо в чат после документов.</p>
         <p><strong>Что происходит после документов</strong></p>
         <p>Скачанные Markdown-документы остаются у пользователя как запасная копия.</p>
         <p>Рабочие документы в <strong>Git repo</strong> будет создавать <strong>Codex</strong> по prompt’у от <strong>ChatGPT</strong>.</p>
@@ -697,13 +698,13 @@ ChatGPT вставляет тексты документов в prompt для Co
         <p>Важно: пользователь не раскладывает документы по папкам repo руками.</p>
         <p>Правильная логика такая:</p>
         <ul>
-          <li>ChatGPT создаёт тексты документов;</li>
+          <li><strong>ChatGPT</strong> создаёт тексты документов;</li>
           <li>пользователь сохраняет документы себе как копию;</li>
-          <li>ChatGPT готовит prompt для Codex;</li>
-          <li>в prompt для Codex вставляются тексты документов;</li>
-          <li>Codex создаёт Markdown-файлы в repo;</li>
+          <li><strong>ChatGPT</strong> готовит prompt для <strong>Codex</strong>;</li>
+          <li>в prompt для <strong>Codex</strong> вставляются тексты документов;</li>
+          <li><strong>Codex</strong> создаёт Markdown-файлы прямо в <strong>Git repo</strong>;</li>
           <li>Codex делает <strong>commit</strong> и <strong>push</strong>;</li>
-          <li>ChatGPT проверяет GitHub.</li>
+          <li><strong>ChatGPT</strong> проверяет <strong>GitHub</strong>.</li>
         </ul>
         <p><strong>GitHub и ключ доступа для Codex</strong></p>
         <p>Чтобы Codex смог сохранить документы в <strong>GitHub</strong>, серверу нужен доступ на запись в <strong>Git repo</strong>.</p>
@@ -714,16 +715,18 @@ ChatGPT вставляет тексты документов в prompt для Co
           <li>Codex показывает только <strong>публичный ключ</strong>;</li>
           <li>пользователь добавляет <strong>публичный ключ</strong> в <strong>GitHub</strong> repo;</li>
           <li>в GitHub нужно включить <strong>Allow write access</strong>;</li>
-          <li><strong>приватный ключ</strong> нельзя показывать, отправлять в чат или вставлять в <strong>GitHub</strong>.</li>
+          <li><strong>приватный ключ</strong> нельзя показывать, отправлять в чат, вставлять в <strong>GitHub</strong> или копировать куда-либо;</li>
+          <li>после добавления ключа пользователь возвращается и пишет, что deploy key добавлен к рабочему repo;</li>
+          <li><strong>ChatGPT</strong> даёт <strong>Codex</strong> prompt на проверку доступа;</li>
         </ul>
-        <p>После этого Codex сможет сделать <strong>push</strong> в <strong>Git repo</strong>, а <strong>ChatGPT</strong> проверит результат через <strong>GitHub</strong>.</p>
+        <p>После проверки доступа <strong>Codex</strong> делает <strong>push</strong> в <strong>Git repo</strong>, а <strong>ChatGPT</strong> проверяет результат через <strong>GitHub</strong>.</p>
         <p><strong>Пример стартового prompt’а</strong></p>
-        <p>Ниже есть готовый prompt для начала проекта.</p>
-        <p>Нажмите <strong>Смотреть prompt</strong>, чтобы открыть текст.</p>
+        <p>Ниже есть готовый prompt для начала проекта. Его можно скопировать или скачать как Markdown-файл.</p>
         <p><strong>Главный вывод</strong></p>
-        <p>Старт проекта — это не код.</p>
-        <p>Старт проекта — это документация, правила, roadmap, текущий статус и понятный следующий шаг.</p>
-        <p>Сначала <strong>ChatGPT</strong> создаёт основу проекта. Потом <strong>Codex</strong> выполняет технические задачи.</p>
+        <p>Старт проекта — это не просьба “сделай сайт”.</p>
+        <p>Старт проекта — это продумывание проекта и создание <strong>документации проекта</strong> через <strong>ChatGPT</strong>.</p>
+        <p>Сначала <strong>ChatGPT</strong> оформляет идею в понятные документы: цель, правила, roadmap, current status и следующий безопасный шаг.</p>
+        <p>Потом <strong>Codex</strong> выполняет точные технические задачи.</p>
       `,
       quizzes: [
         {
@@ -1427,7 +1430,8 @@ const state = {
   visitedSections: new Set(["lesson-1"]),
   flippedCards: new Set(),
   solvedQuestions: new Set(),
-  answeredQuestions: {}
+  answeredQuestions: {},
+  openStarterPromptIds: new Set()
 };
 
 const legacySectionAliases = {
@@ -1672,23 +1676,28 @@ function renderStarterPromptForm(section) {
 
   const textareaId = `${section.id}-starter-prompt`;
   const filename = section.starterPromptFilename || "start_project_documentation_prompt.md";
+  const isOpen = Boolean(state.openStarterPromptIds?.has(section.id));
 
   return `
-    <details class="callout" data-starter-prompt-panel="${section.id}">
-      <summary class="block-label" style="cursor: pointer;">Смотреть prompt</summary>
-      <p>Это готовый стартовый prompt. Его использовать не обязательно, но можно взять как безопасный пример начала проекта.</p>
+    <section class="callout" data-starter-prompt-panel="${section.id}" id="${section.id}-starter-prompt">
+      <span class="block-label">Пример стартового prompt’а</span>
+      <p>Ниже есть готовый prompt для начала проекта. Его можно скопировать или скачать как Markdown-файл.</p>
+      <p>
+        <button class="primary-button" type="button" data-starter-prompt-toggle="${section.id}">${isOpen ? "Скрыть prompt" : "Смотреть prompt"}</button>
+      </p>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 12px;">
+        <button class="primary-button" type="button" data-starter-prompt-copy="${section.id}">Скопировать prompt</button>
+        <button class="primary-button" type="button" data-starter-prompt-download="${section.id}" data-starter-prompt-filename="${escapeHTML(filename)}">Скачать .md</button>
+      </div>
       <textarea
         id="${textareaId}"
         readonly
         spellcheck="false"
         rows="28"
-        style="width: 100%; min-height: 420px; resize: vertical; overflow: auto; font: inherit; line-height: 1.5;"
+        ${isOpen ? "" : "hidden"}
+        style="width: 100%; min-height: 420px; resize: vertical; overflow: auto; font: inherit; line-height: 1.5; margin-top: 12px;"
       >${escapeHTML(section.starterPromptMarkdown)}</textarea>
-      <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 12px;">
-        <button class="primary-button" type="button" data-starter-prompt-copy="${section.id}">Скопировать prompt</button>
-        <button class="primary-button" type="button" data-starter-prompt-download="${section.id}" data-starter-prompt-filename="${escapeHTML(filename)}">Скачать .md</button>
-      </div>
-    </details>
+    </section>
   `;
 }
 
@@ -1832,6 +1841,42 @@ function setActiveSection(sectionId, options = {}) {
 }
 
 document.addEventListener("click", (event) => {
+  const starterPromptJump = event.target.closest("[data-starter-prompt-jump]");
+  if (starterPromptJump) {
+    event.preventDefault();
+    const sectionId = starterPromptJump.dataset.starterPromptJump;
+    const panel = document.querySelector(`[data-starter-prompt-panel="${sectionId}"]`);
+    const textarea = panel?.querySelector(`textarea[id="${sectionId}-starter-prompt"]`);
+    state.openStarterPromptIds.add(sectionId);
+    if (textarea) {
+      textarea.hidden = false;
+    }
+    const toggleButton = panel?.querySelector(`[data-starter-prompt-toggle="${sectionId}"]`);
+    if (toggleButton) {
+      toggleButton.textContent = "Скрыть prompt";
+    }
+    panel?.scrollIntoView({ behavior: "smooth", block: "start" });
+    return;
+  }
+
+  const starterPromptToggle = event.target.closest("[data-starter-prompt-toggle]");
+  if (starterPromptToggle) {
+    const sectionId = starterPromptToggle.dataset.starterPromptToggle;
+    const isOpen = state.openStarterPromptIds.has(sectionId);
+    const panel = document.querySelector(`[data-starter-prompt-panel="${sectionId}"]`);
+    const textarea = panel?.querySelector(`textarea[id="${sectionId}-starter-prompt"]`);
+    if (isOpen) {
+      state.openStarterPromptIds.delete(sectionId);
+    } else {
+      state.openStarterPromptIds.add(sectionId);
+    }
+    if (textarea) {
+      textarea.hidden = isOpen;
+    }
+    starterPromptToggle.textContent = isOpen ? "Смотреть prompt" : "Скрыть prompt";
+    return;
+  }
+
   const navButton = event.target.closest("[data-section]");
   if (navButton) {
     setActiveSection(navButton.dataset.section);
