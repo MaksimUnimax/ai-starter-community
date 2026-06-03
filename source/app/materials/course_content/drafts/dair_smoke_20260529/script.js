@@ -624,19 +624,23 @@ ChatGPT вставляет тексты документов в prompt для Co
 7. Что после создания repo пользователь присылает ссылку на repo в ChatGPT.
 8. Что ChatGPT подготовит отдельный prompt для Codex на подготовку project root и Git.
 9. Что для push в GitHub нужен отдельный SSH deploy key.
-10. Что ChatGPT подготовит prompt для Codex на создание deploy key на сервере.
-11. Что Codex должен показать только публичный ключ.
-12. Что Приватный ключ нельзя отправлять в чат, вставлять в GitHub или показывать.
-13. Что пользователь добавляет публичный ключ в GitHub repo:
+10. Что ChatGPT подготовит prompt для Codex на создание SSH deploy key для рабочего repo.
+11. Что Codex создаст на сервере пару ключей: приватный и публичный.
+12. Что приватный ключ остаётся на сервере и используется Codex локально через SSH config / IdentityFile для push в GitHub.
+13. Что Codex должен показать пользователю только публичный ключ.
+14. Что пользователь копирует только публичный ключ.
+15. Что приватный ключ нельзя отправлять в чат, вставлять в GitHub, показывать пользователю или печатать в чат.
+16. Что пользователь добавляет публичный ключ в GitHub repo:
     Settings -> Deploy keys -> Add deploy key.
-14. Что нужно включить Allow write access.
-15. Что после добавления ключа пользователь возвращается и пишет, что deploy key добавлен к рабочему repo.
-16. ChatGPT даёт Codex prompt на проверку доступа.
-17. Что потом ChatGPT даст Codex prompt, в котором будут тексты документов.
-18. Что Codex создаст Markdown-файлы в repo из текста prompt’а.
-19. Что Codex сделает commit и push.
-20. Что ChatGPT проверит GitHub: commit, files, contents and absence of unrelated changes.
-21. Что только после этого можно переходить к первой технической разработке.
+17. Что нужно включить Allow write access.
+18. Что после добавления ключа пользователь возвращается в терминал/Codex и пишет только подтверждение: “Публичный deploy key добавлен к рабочему repo, Allow write access включён, можно проверять доступ”.
+19. Что ключ обратно в терминал/Codex не вставляют; в терминал/Codex пишут только подтверждение.
+20. Что ChatGPT даст Codex prompt на проверку доступа.
+21. Что потом ChatGPT даст Codex prompt, в котором будут тексты документов.
+22. Что Codex создаст Markdown-файлы в repo из текста prompt’а.
+23. Что Codex сделает commit и push.
+24. Что ChatGPT проверит GitHub: commit, files, contents and absence of unrelated changes.
+25. Что только после этого можно переходить к первой технической разработке.
 
 Важно:
 
@@ -644,7 +648,9 @@ ChatGPT вставляет тексты документов в prompt для Co
 - Скачанные Markdown-файлы остаются у пользователя как запасная копия.
 - Рабочие Markdown-файлы в Git repo создаёт Codex по prompt’у от ChatGPT.
 - ChatGPT вставляет тексты документов в prompt для Codex.
-- Codex создаёт Markdown-файлы прямо в repo.`,
+- Codex создаёт Markdown-файлы прямо в repo.
+- Приватный ключ остаётся на сервере и используется Codex локально для push.
+- Ключ обратно в терминал/Codex не вставляют; в терминал/Codex пишут только подтверждение.`,
       contentHtml: `
         <p><strong>Сначала документация, потом разработка</strong></p>
         <p>Проект нельзя начинать с просьбы: “Сделай весь проект”.</p>
@@ -693,8 +699,7 @@ ChatGPT вставляет тексты документов в prompt для Co
         </ul>
         <p><strong>Что происходит после документов</strong></p>
         <p>Скачанные Markdown-документы остаются у пользователя как запасная копия.</p>
-        <p>Рабочие документы в <strong>Git repo</strong> будет создавать <strong>Codex</strong> по prompt’у от <strong>ChatGPT</strong>.</p>
-        <p>Рабочие документы в <strong>Git repo</strong> создаются позже через <strong>Codex</strong>.</p>
+        <p>Рабочие документы в <strong>Git repo</strong> создаёт <strong>Codex</strong> по prompt’у от <strong>ChatGPT</strong>.</p>
         <p>Важно: пользователь не раскладывает документы по папкам repo руками.</p>
         <p>Правильная логика такая:</p>
         <ul>
@@ -709,17 +714,27 @@ ChatGPT вставляет тексты документов в prompt для Co
         <p><strong>GitHub и ключ доступа для Codex</strong></p>
         <p>Чтобы Codex смог сохранить документы в <strong>GitHub</strong>, серверу нужен доступ на запись в <strong>Git repo</strong>.</p>
         <p>Для этого используется отдельный <strong>SSH deploy key</strong>.</p>
-        <p>Простыми словами:</p>
+        <p>Codex создаёт на сервере пару ключей: приватный и публичный.</p>
+        <p>приватный ключ остаётся на сервере и используется Codex локально через SSH config / IdentityFile для push в GitHub.</p>
+        <p>Codex показывает в терминале только <strong>публичный ключ</strong>.</p>
+        <p>Порядок такой:</p>
         <ul>
-          <li>Codex создаёт ключ на сервере;</li>
-          <li>Codex показывает только <strong>публичный ключ</strong>;</li>
-          <li>пользователь добавляет <strong>публичный ключ</strong> в <strong>GitHub</strong> repo;</li>
+          <li><strong>ChatGPT</strong> даёт <strong>Codex</strong> точную задачу на создание <strong>SSH deploy key</strong> для рабочего repo;</li>
+          <li>Codex создаёт на сервере пару ключей: приватный и публичный;</li>
+          <li>приватный ключ остаётся на сервере;</li>
+          <li>Codex использует приватный ключ локально на сервере через SSH config / IdentityFile, чтобы делать push в GitHub;</li>
+          <li>приватный ключ нельзя показывать пользователю, отправлять в ChatGPT, вставлять в GitHub или печатать в чат;</li>
+          <li>Codex показывает в терминале только <strong>публичный ключ</strong>;</li>
+          <li>пользователь копирует только <strong>публичный ключ</strong>;</li>
+          <li>пользователь открывает GitHub repo: Settings -> Deploy keys -> Add deploy key;</li>
+          <li>пользователь вставляет туда <strong>публичный ключ</strong>;</li>
           <li>в GitHub нужно включить <strong>Allow write access</strong>;</li>
-          <li><strong>приватный ключ</strong> нельзя показывать, отправлять в чат, вставлять в <strong>GitHub</strong> или копировать куда-либо;</li>
-          <li>после добавления ключа пользователь возвращается и пишет, что deploy key добавлен к рабочему repo;</li>
+          <li>после добавления ключа пользователь возвращается в терминал/Codex и пишет только подтверждение: “Публичный deploy key добавлен к рабочему repo, Allow write access включён, можно проверять доступ”;</li>
+          <li>в терминал/Codex ключ обратно не вставляют;</li>
+          <li>в терминал/Codex пишут только подтверждение;</li>
           <li><strong>ChatGPT</strong> даёт <strong>Codex</strong> prompt на проверку доступа;</li>
         </ul>
-        <p>После проверки доступа <strong>Codex</strong> делает <strong>push</strong> в <strong>Git repo</strong>, а <strong>ChatGPT</strong> проверяет результат через <strong>GitHub</strong>.</p>
+        <p>Только после проверки доступа <strong>Codex</strong> делает <strong>push</strong> в <strong>Git repo</strong>, а <strong>ChatGPT</strong> проверяет результат через <strong>GitHub</strong>.</p>
         <p><strong>Пример стартового prompt’а</strong></p>
         <p>Ниже есть готовый prompt для начала проекта. Его можно скопировать или скачать как Markdown-файл.</p>
         <p><strong>Главный вывод</strong></p>
@@ -766,7 +781,7 @@ ChatGPT вставляет тексты документов в prompt для Co
           prompt: "Что можно показывать при настройке SSH deploy key?",
           options: ["Только публичный ключ", "Приватный ключ", "Пароли и токены"],
           answerIndex: 0,
-          explanation: "В GitHub добавляют только публичный ключ. Приватный ключ нельзя отправлять в чат, вставлять в GitHub или показывать."
+          explanation: "В GitHub добавляют только публичный ключ. Приватный ключ остаётся на сервере, используется Codex локально для push и не отправляется в чат."
         }
       ],
       resultTitle: "Главный вывод урока",
