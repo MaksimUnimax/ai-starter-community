@@ -281,6 +281,13 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "codex -C" not in script_response.text
     assert "искать лимиты через" not in script_response.text
     assert "принимать результат без отчёта" not in script_response.text
+    lesson5_start = script_response.text.index('id: "lesson-5"')
+    lesson6_start = script_response.text.index('id: "lesson-6"')
+    lesson5_section = script_response.text[lesson5_start:lesson6_start]
+    lesson5_agents_index = lesson5_section.index('label: "AGENTS.md"')
+    lesson5_skills_index = lesson5_section.index('label: "Skills"')
+    lesson5_errors_index = lesson5_section.index('label: "Частые ошибки"')
+    assert lesson5_agents_index < lesson5_skills_index < lesson5_errors_index
     assert "Какую модель выбирать для Codex" in script_response.text
     assert "Частые ошибки и правила безопасной работы" in script_response.text
     assert "Обновление документации и новый диалог" in script_response.text
@@ -315,6 +322,23 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Что значит отчёт Codex" not in script_response.text
     assert "Сервер, Codex, AGENTS.md и Skills" not in script_response.text
     assert "Codex, AGENTS.md и Skills" not in script_response.text
+    assert script_response.text.count("Зарегистрировать аккаунт GitHub") >= 2
+    lesson3_start = script_response.text.index('id: "lesson-3"')
+    lesson4_start = script_response.text.index('id: "lesson-4"')
+    lesson3_section = script_response.text[lesson3_start:lesson4_start]
+    lesson3_task_start = lesson3_section.index('label: "Практическое задание"')
+    lesson3_task_end = lesson3_section.index('label: "Итог"', lesson3_task_start)
+    lesson3_task_section = lesson3_section[lesson3_task_start:lesson3_task_end]
+    assert "Зарегистрировать аккаунт GitHub" in lesson3_task_section
+    assert "https://github.com/" in lesson3_task_section
+    assert "https://github.com/signup" in lesson3_task_section
+    assert "https://github.com/login" in lesson3_task_section
+    assert "К концу урока у ученика должен быть зарегистрированный и авторизованный аккаунт GitHub" in lesson3_task_section
+    assert "подтвердите email" in lesson3_task_section.lower()
+    assert "SSH-ключ" not in lesson3_task_section
+    assert "deploy key" not in lesson3_task_section
+    assert "GitHub CLI setup" not in lesson3_task_section
+    assert "создайте репозиторий" not in lesson3_task_section
 
 
 def test_git_backed_course_map_page_requires_learning_access(client, test_settings):
