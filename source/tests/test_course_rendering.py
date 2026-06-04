@@ -223,6 +223,11 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert ".flashcard.is-revealed" in styles_response.text
     assert ".flashcard-title" in styles_response.text
     assert ".next-step-card" in styles_response.text
+    assert ".starter-prompt-actions" in styles_response.text
+    assert ".starter-prompt-button" in styles_response.text
+    assert "grid-template-columns: repeat(3, minmax(0, 1fr));" in styles_response.text
+    assert "white-space: nowrap;" in styles_response.text
+    assert "grid-template-columns: 1fr;" in styles_response.text
     assert "textarea" not in styles_response.text
     assert "checkpoint-list" not in styles_response.text
     assert script_response.status_code == 200
@@ -360,6 +365,8 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Смотреть prompt" in script_response.text
     assert "Скопировать prompt" in script_response.text
     assert "Скачать .md" in script_response.text
+    assert 'class="starter-prompt-actions"' in script_response.text
+    assert 'class="primary-button starter-prompt-button"' in script_response.text
     lesson3_task_start = lesson3_section.index('label: "Практическое задание"')
     lesson3_task_end = lesson3_section.index('label: "Итог"', lesson3_task_start)
     lesson3_task_section = lesson3_section[lesson3_task_start:lesson3_task_end]

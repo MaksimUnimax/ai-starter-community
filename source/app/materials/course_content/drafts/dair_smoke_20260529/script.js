@@ -3014,12 +3014,10 @@ function renderStarterPromptForm(section) {
     <section class="callout" data-starter-prompt-panel="${section.id}" id="${section.id}-starter-prompt">
       <span class="block-label">Пример стартового prompt’а</span>
       <p>Ниже есть готовый prompt для начала проекта. Его можно скопировать или скачать как Markdown-файл.</p>
-      <p>
-        <button class="primary-button" type="button" data-starter-prompt-toggle="${section.id}">${isOpen ? "Скрыть prompt" : "Смотреть prompt"}</button>
-      </p>
-      <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 12px;">
-        <button class="primary-button" type="button" data-starter-prompt-copy="${section.id}">Скопировать prompt</button>
-        <button class="primary-button" type="button" data-starter-prompt-download="${section.id}" data-starter-prompt-filename="${escapeHTML(filename)}">Скачать .md</button>
+      <div class="starter-prompt-actions" role="group" aria-label="Действия со стартовым prompt">
+        <button class="primary-button starter-prompt-button" type="button" data-starter-prompt-toggle="${section.id}">${isOpen ? "Скрыть prompt" : "Смотреть prompt"}</button>
+        <button class="primary-button starter-prompt-button" type="button" data-starter-prompt-copy="${section.id}">Скопировать prompt</button>
+        <button class="primary-button starter-prompt-button" type="button" data-starter-prompt-download="${section.id}" data-starter-prompt-filename="${escapeHTML(filename)}">Скачать .md</button>
       </div>
       <textarea
         id="${textareaId}"

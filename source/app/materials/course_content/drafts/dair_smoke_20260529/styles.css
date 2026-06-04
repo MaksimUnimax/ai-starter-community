@@ -322,6 +322,21 @@ button:hover,
   transform: translateY(-1px);
 }
 
+.starter-prompt-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.starter-prompt-button {
+  width: 100%;
+  min-width: 0;
+  padding-inline: 12px;
+  white-space: nowrap;
+  text-align: center;
+}
+
 .btn-primary,
 .primary-button {
   background: var(--accent);
@@ -1007,6 +1022,10 @@ button:hover,
   .primary-button,
   .ghost-button {
     width: 100%;
+  }
+
+  .starter-prompt-actions {
+    grid-template-columns: 1fr;
   }
 
   .progress-copy {
