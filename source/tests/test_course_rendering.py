@@ -378,10 +378,12 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert lesson6_prompt_start < lesson6_practice_start
     assert "Запустить старт проекта через ChatGPT" in lesson6_section
     assert "В этой практике вы не пишете код и не проверяете <strong>GitHub</strong> как технический специалист." in lesson6_section
-    assert "Ваша задача — запустить проект правильно: дать <strong>ChatGPT</strong> стартовый <strong>prompt</strong>, отвечать простыми словами и довести проект до состояния, когда <strong>ChatGPT</strong> скажет, что основа готова для первого рабочего <strong>run Codex</strong>." in lesson6_section
+    assert "Ваша задача — правильно запустить проект: дать <strong>ChatGPT</strong> стартовый <strong>prompt</strong>, описать идею простыми словами и дойти до состояния, когда <strong>ChatGPT</strong> подтвердит, что основа готова для первого рабочего <strong>run Codex</strong>." in lesson6_section
     assert "<strong>Что нужно сделать</strong>" in lesson6_section
     assert "<strong>Важно</strong>" in lesson6_section
-    assert "Опишите вашу идею или проект." in lesson6_section
+    assert "<ol>" in lesson6_section
+    assert "<ul>" in lesson6_section
+    assert "Опишите вашу идею или проект простыми словами." in lesson6_section
     assert "Вам не нужно заранее знать технические ответы." in lesson6_section
     assert "не знаю" in lesson6_section
     assert "объясни простыми словами" in lesson6_section
@@ -400,6 +402,11 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "SSH deploy key" not in lesson6_section
     assert "deploy key" not in lesson6_section
     assert "Когда практика стартового проекта считается завершённой?" in lesson6_section
+    assert "2. Нажмите:" not in lesson6_section
+    assert "или скачайте prompt как Markdown-файл." not in lesson6_section
+    assert "или:" not in lesson6_section
+    assert "Опишите вашу идею/проект" not in lesson6_section
+    assert "Ваша задача — запустить проект правильно: дать ChatGPT стартовый prompt" not in lesson6_section
 
 
 def test_git_backed_course_map_page_requires_learning_access(client, test_settings):

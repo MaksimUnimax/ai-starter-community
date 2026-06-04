@@ -1870,27 +1870,23 @@ ChatGPT вставляет тексты документов в prompt для Co
           <span class="block-label">Практика</span>
           <h4>Запустить старт проекта через ChatGPT</h4>
           <p>В этой практике вы не пишете код и не проверяете <strong>GitHub</strong> как технический специалист.</p>
-          <p>Ваша задача — запустить проект правильно: дать <strong>ChatGPT</strong> стартовый <strong>prompt</strong>, отвечать простыми словами и довести проект до состояния, когда <strong>ChatGPT</strong> скажет, что основа готова для первого рабочего <strong>run Codex</strong>.</p>
+          <p>Ваша задача — правильно запустить проект: дать <strong>ChatGPT</strong> стартовый <strong>prompt</strong>, описать идею простыми словами и дойти до состояния, когда <strong>ChatGPT</strong> подтвердит, что основа готова для первого рабочего <strong>run Codex</strong>.</p>
           <p><strong>Что нужно сделать</strong></p>
           <ol>
             <li>Откройте блок со стартовым <strong>prompt</strong>.</li>
-            <li>Нажмите:</li>
-          </ol>
-          <p><strong>Скопировать prompt</strong></p>
-          <p>или скачайте <strong>prompt</strong> как <strong>Markdown-файл</strong>.</p>
-          <ol start="3">
+            <li>Нажмите <strong>Скопировать prompt</strong> или скачайте prompt как <strong>Markdown-файл</strong>.</li>
             <li>Откройте новый чат с <strong>ChatGPT</strong>.</li>
             <li>Вставьте стартовый <strong>prompt</strong> в <strong>ChatGPT</strong>.</li>
-            <li>Опишите вашу идею или проект.</li>
+            <li>Опишите вашу идею или проект простыми словами.</li>
           </ol>
           <p><strong>Важно</strong></p>
           <p>Вам не нужно заранее знать технические ответы.</p>
-          <p>Если <strong>ChatGPT</strong> спрашивает что-то непонятное, можно прямо написать:</p>
-          <p><strong>не знаю</strong></p>
-          <p>или:</p>
-          <p><strong>объясни простыми словами</strong></p>
-          <p>или:</p>
-          <p><strong>предложи лучший вариант для моего проекта</strong></p>
+          <p>Если <strong>ChatGPT</strong> спрашивает что-то непонятное, можно прямо написать один из вариантов:</p>
+          <ul>
+            <li><strong>не знаю</strong></li>
+            <li><strong>объясни простыми словами</strong></li>
+            <li><strong>предложи лучший вариант для моего проекта</strong></li>
+          </ul>
           <p><strong>ChatGPT</strong> должен объяснить варианты и помочь выбрать.</p>
           <p><strong>Какие вопросы может задавать ChatGPT</strong></p>
           <p><strong>ChatGPT</strong> может спрашивать:</p>
@@ -1921,8 +1917,7 @@ ChatGPT вставляет тексты документов в prompt для Co
             <li>объяснить, какие отчёты или ссылки нужно показать <strong>ChatGPT</strong> для проверки.</li>
           </ul>
           <p><strong>Что делает Codex на этом этапе</strong></p>
-          <p><strong>Codex</strong> не придумывает проект.</p>
-          <p><strong>Codex</strong> получает от <strong>ChatGPT</strong> точные технические задания.</p>
+          <p><strong>Codex</strong> не придумывает проект. Он получает от <strong>ChatGPT</strong> точные технические задания.</p>
           <p>Например, <strong>ChatGPT</strong> может подготовить для <strong>Codex</strong> задачу создать файлы документации, настроить структуру репозитория <strong>Git</strong>, сделать <strong>commit</strong> и <strong>push</strong>.</p>
           <p>После этого <strong>Codex</strong> возвращает отчёт.</p>
           <p><strong>Что делает ChatGPT после отчёта Codex</strong></p>
