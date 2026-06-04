@@ -192,6 +192,9 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert page_response.text.count("course-intro-part") == 3
     assert page_response.text.count('class="nav-button') == 9
     assert page_response.text.count("nav-title") == 9
+    assert "Codex, AGENTS.md, Skills, токены и роль модели" in page_response.text
+    assert "PowerShell, Terminal и подключение к серверу" in page_response.text
+    assert "Сервер, Codex, AGENTS.md и Skills" not in page_response.text
     assert page_response.text.count("Вернуться в личный кабинет") == 2
     assert page_response.text.count('href="/cabinet"') == 2
     assert "Прогресс зависит от прохождения проверки знаний." in page_response.text
@@ -232,7 +235,7 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "new URLSearchParams(window.location.search).get(\"lesson\")" in script_response.text
     assert "window.history.replaceState" in script_response.text
     assert "location.hash" not in script_response.text
-    assert "scrollIntoView" not in script_response.text
+    assert "scrollIntoView" in script_response.text
     assert "labelTranslations" not in script_response.text
     assert "translateLessonMarkup" not in script_response.text
     assert "translateLabel" not in script_response.text
@@ -245,26 +248,31 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert 'section.nextStepTargetId || "lesson-2"' in script_response.text
     assert 'id: "lesson-9"' in script_response.text
     assert 'review: "lesson-9"' in script_response.text
-    assert 'navTitle: "Урок 9 — Частые ошибки, лайфхаки и правила работы"' in script_response.text
+    assert 'navTitle: "Урок 9 — Частые ошибки и правила безопасной работы"' in script_response.text
     assert "lesson-" + "10" not in script_response.text
-    assert "Документы проекта: ТЗ, roadmap, правила и контекст" in script_response.text
-    assert "Старт проекта: подготовка документов с ChatGPT и push в Git" in script_response.text
-    assert "ChatGPT как профессиональный технический специалист" in script_response.text
+    assert "Документы проекта: техническое задание (ТЗ), roadmap, правила и контекст" in script_response.text
+    assert "Старт проекта: сначала документация, потом разработка" in script_response.text
+    assert "ChatGPT выступает как ведущий специалист" in script_response.text
     assert "Git: история, commit, push и откат" in script_response.text
     assert "Старт работы и рабочие run’ы Codex" in script_response.text
+    assert "Codex, AGENTS.md, Skills, токены и роль модели" in script_response.text
     assert "PowerShell, Terminal и подключение к серверу" in script_response.text
-    assert "Сервер, Codex, AGENTS.md и Skills" in script_response.text
-    assert "Ошибки, лайфхаки и правила работы" in script_response.text
+    assert "В следующем уроке разберём Codex, AGENTS.md, Skills, токены и роль модели." in script_response.text
+    assert "В следующем уроке разберём PowerShell, Terminal и подключение к серверу." in script_response.text
+    assert "В следующем уроке разберём старт работы и рабочие run’ы Codex." in script_response.text
+    assert "Какую модель выбирать для Codex" in script_response.text
+    assert "Частые ошибки и правила безопасной работы" in script_response.text
     assert "Обновление документации и новый диалог" in script_response.text
-    assert "Контекстное окно" in script_response.text
-    assert "Не вести диалог с Codex" in script_response.text
-    assert "Проверять отчёт, а не верить слову “готово”" in script_response.text
+    assert "Почему не нужно болтать с Codex" in script_response.text
+    assert "Что такое токены" in script_response.text
+    assert "Какую модель выбирать для Codex" in script_response.text
+    assert "Что такое токены" in script_response.text
+    assert "Что такое SSH" in script_response.text
     assert "Вступление" in script_response.text
     assert "После урока вы сможете" in script_response.text
     assert "Рабочий пример" in script_response.text
     assert "Главный вывод урока" in script_response.text
     assert "Следующий урок" in script_response.text
-    assert "Итог курса" in script_response.text
     assert "Тестовая версия курса" not in script_response.text
     assert "тестовая версия урока" not in script_response.text
     assert "DAIR smoke artifact" not in script_response.text
@@ -276,7 +284,7 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Open review" not in script_response.text
     assert "Source notes" not in script_response.text
     assert "Sources" not in script_response.text
-    assert "<textarea" not in script_response.text
+    assert "<textarea" in script_response.text
     assert "checkpoint-list" not in script_response.text
     assert "Сделай мне ИИ-агента" not in script_response.text
     assert "Опишите своего первого ИИ-агента" not in script_response.text
@@ -288,6 +296,8 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Зачем нужны ТЗ и дорожная карта" not in script_response.text
     assert "Как идёт один безопасный шаг разработки" not in script_response.text
     assert "Что значит отчёт Codex" not in script_response.text
+    assert "Сервер, Codex, AGENTS.md и Skills" not in script_response.text
+    assert "Codex, AGENTS.md и Skills" not in script_response.text
 
 
 def test_git_backed_course_map_page_requires_learning_access(client, test_settings):
