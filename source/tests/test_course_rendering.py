@@ -260,13 +260,26 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "В следующем уроке разберём Codex, AGENTS.md, Skills, токены и роль модели." in script_response.text
     assert "В следующем уроке разберём PowerShell, Terminal и подключение к серверу." in script_response.text
     assert "В следующем уроке разберём старт работы и рабочие run’ы Codex." in script_response.text
+    assert "В нашем методе работы" in script_response.text
+    assert "Как Codex тратит токены и ресурсы" in script_response.text
+    assert "Как оптимизировать расход Codex" in script_response.text
+    assert "Что такое permissions и как выставить допуск" in script_response.text
+    assert "5 основных команд Codex внутри terminal" in script_response.text
+    assert "/status" in script_response.text
+    assert "/model" in script_response.text
+    assert "/permissions" in script_response.text
+    assert "/skills" in script_response.text
+    assert "/plugins" in script_response.text
+    assert "token usage" in script_response.text
+    assert "Не искать это через отдельное меню настроек." in script_response.text
+    assert "Где работает Codex" not in script_response.text
+    assert "Пример правильной задачи для Codex" not in script_response.text
+    assert "Codex settings → Usage" not in script_response.text
+    assert "codex -C" not in script_response.text
+    assert "Что такое токены" not in script_response.text
     assert "Какую модель выбирать для Codex" in script_response.text
     assert "Частые ошибки и правила безопасной работы" in script_response.text
     assert "Обновление документации и новый диалог" in script_response.text
-    assert "Почему не нужно болтать с Codex" in script_response.text
-    assert "Что такое токены" in script_response.text
-    assert "Какую модель выбирать для Codex" in script_response.text
-    assert "Что такое токены" in script_response.text
     assert "Что такое SSH" in script_response.text
     assert "Вступление" in script_response.text
     assert "После урока вы сможете" in script_response.text
