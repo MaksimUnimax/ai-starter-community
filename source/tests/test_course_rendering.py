@@ -306,10 +306,29 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Какую модель выбирать для Codex" in script_response.text
     assert "Частые ошибки и правила безопасной работы" in script_response.text
     assert "Обновление документации и новый диалог" in script_response.text
-    assert "Что такое SSH" in script_response.text
+    assert "Зарегистрировать аккаунт GitHub" in script_response.text
+    assert "Что нельзя делать" not in lesson3_section
     assert "Вступление" in script_response.text
     assert "После урока вы сможете" in script_response.text
-    assert "Рабочий пример" in script_response.text
+    assert "Почему проект находится на удалённом сервере" in lesson5_section
+    assert "Сервер может работать 24/7" in lesson5_section
+    assert "К проекту можно позже дать доступ другим людям" in lesson5_section
+    assert "На сервере можно подготовить правильное окружение" in lesson5_section
+    assert "Codex живёт и работает там же" in lesson5_section
+    assert "Как открыть PowerShell на Windows" in lesson5_section
+    assert "Как открыть Terminal на macOS" in lesson5_section
+    assert "SSH-команду" in lesson5_section
+    assert "личного кабинета" in lesson5_section
+    assert "окно связи с сервером" in lesson5_section
+    assert "codex" in lesson5_section
+    assert "привет ты кто?" in lesson5_section
+    assert "Практическое задание" in lesson5_section
+    assert "Что важно для ученика" not in lesson5_section
+    assert "Безопасные команды" not in lesson5_section
+    assert "Опасные команды" not in lesson5_section
+    assert "Что нельзя показывать в чат" not in lesson5_section
+    assert "Секреты" not in lesson5_section
+    assert "Ученик" not in lesson5_section
     assert "Главный вывод урока" in script_response.text
     assert "Следующий урок" in script_response.text
     assert "Тестовая версия курса" not in script_response.text
