@@ -377,20 +377,26 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     lesson6_practice_start = lesson6_section.index("afterStarterPromptHtml")
     assert lesson6_prompt_start < lesson6_practice_start
     assert "Запустить старт проекта через ChatGPT" in lesson6_section
-    assert "В этой практике вы не пишете код и не проверяете GitHub как технический специалист" in lesson6_section
-    assert "Ваша задача — запустить проект правильно" in lesson6_section
-    assert "Это не экзамен" in lesson6_section
+    assert "В этой практике вы не пишете код и не проверяете <strong>GitHub</strong> как технический специалист." in lesson6_section
+    assert "Ваша задача — запустить проект правильно: дать <strong>ChatGPT</strong> стартовый <strong>prompt</strong>, отвечать простыми словами и довести проект до состояния, когда <strong>ChatGPT</strong> скажет, что основа готова для первого рабочего <strong>run Codex</strong>." in lesson6_section
+    assert "<strong>Что нужно сделать</strong>" in lesson6_section
+    assert "<strong>Важно</strong>" in lesson6_section
+    assert "Опишите вашу идею или проект." in lesson6_section
+    assert "Вам не нужно заранее знать технические ответы." in lesson6_section
     assert "не знаю" in lesson6_section
     assert "объясни простыми словами" in lesson6_section
     assert "предложи лучший вариант для моего проекта" in lesson6_section
-    assert "ChatGPT читает отчёт Codex, проверяет GitHub, commit, push, изменённые файлы и документацию" in lesson6_section
-    assert "Вам не нужно самостоятельно разбирать commit, push и отчёт как программисту" in lesson6_section
-    assert "Практика завершена не тогда, когда prompt просто вставлен в чат" in lesson6_section
+    assert "<strong>Какие вопросы может задавать ChatGPT</strong>" in lesson6_section
+    assert "<strong>Что делает ChatGPT на этом этапе</strong>" in lesson6_section
+    assert "<strong>Что делает Codex на этом этапе</strong>" in lesson6_section
+    assert "<strong>Что делает ChatGPT после отчёта Codex</strong>" in lesson6_section
+    assert "<strong>ChatGPT</strong> читает отчёт <strong>Codex</strong>, проверяет <strong>GitHub</strong>, <strong>commit</strong>, <strong>push</strong>, изменённые файлы и документацию, а потом объясняет вам простыми словами:" in lesson6_section
+    assert "Вам не нужно самостоятельно разбирать <strong>commit</strong>, <strong>push</strong> и отчёт как программисту." in lesson6_section
+    assert "Практика завершена не тогда, когда <strong>prompt</strong> просто вставлен в чат." in lesson6_section
+    assert "Практика завершена тогда, когда <strong>ChatGPT</strong> подтвердил, что основа проекта готова." in lesson6_section
+    assert "<strong>Критерий готовности</strong>" in lesson6_section
     assert "проектная основа создана, приложение и документация находятся в GitHub" in lesson6_section
-    assert "Что делать, если ChatGPT задаёт вопрос, на который вы не знаете ответ?" in lesson6_section
-    assert "Кто проверяет отчёт Codex, commit, push, GitHub и документацию?" in lesson6_section
-    assert "ChatGPT проверяет и объясняет результат простыми словами" in lesson6_section
-    assert "Когда ChatGPT подтвердил, что проектная основа готова" in lesson6_section
+    assert "Скопировать prompt" in lesson6_section
     assert "SSH deploy key" not in lesson6_section
     assert "deploy key" not in lesson6_section
     assert "Когда практика стартового проекта считается завершённой?" in lesson6_section
