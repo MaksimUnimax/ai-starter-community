@@ -1905,6 +1905,56 @@ ChatGPT вставляет тексты документов в prompt для Co
 - Codex создаёт Markdown-файлы прямо в repo.
 - Приватный ключ остаётся на сервере и используется Codex локально для push.
 - Ключ обратно в терминал/Codex не вставляют; в терминал/Codex пишут только подтверждение.`,
+      afterStarterPromptHtml: `
+        <section class="callout">
+          <span class="block-label">Практика</span>
+          <h4>Запустить старт проекта через ChatGPT</h4>
+          <p>В этом уроке практика не в том, чтобы сразу просить Codex писать код.</p>
+          <p>Практика — правильно запустить проект через ChatGPT, чтобы перед разработкой появилась понятная основа: цель, документы, правила, GitHub и следующий безопасный шаг.</p>
+          <p><strong>Что нужно сделать</strong></p>
+          <ol>
+            <li>Откройте блок со стартовым prompt.</li>
+            <li>Нажмите <strong>Скопировать prompt</strong> или скачайте prompt как Markdown-файл.</li>
+            <li>Откройте новый чат с ChatGPT.</li>
+            <li>Вставьте стартовый prompt в ChatGPT.</li>
+            <li>Отвечайте на вопросы ChatGPT по проекту.</li>
+          </ol>
+          <p>На этом этапе ChatGPT может уточнять:</p>
+          <ul>
+            <li>что вы хотите создать;</li>
+            <li>для кого нужен проект;</li>
+            <li>какой результат должен получиться;</li>
+            <li>какие функции нужны сначала;</li>
+            <li>какие ограничения есть;</li>
+            <li>какие документы нужно подготовить;</li>
+            <li>какой GitHub-репозиторий использовать;</li>
+            <li>где будет приложение;</li>
+            <li>где будет документация;</li>
+            <li>какой первый безопасный шаг можно дать Codex.</li>
+          </ul>
+          <p>Двигайтесь по указаниям ChatGPT до момента, когда проект готов к разработке.</p>
+          <p><strong>Что должно быть готово к концу практики</strong></p>
+          <p>Практика завершена не тогда, когда prompt просто вставлен в чат.</p>
+          <p>Практика завершена тогда, когда создана рабочая основа проекта:</p>
+          <ul>
+            <li>цель проекта описана простыми словами;</li>
+            <li>есть стартовая документация проекта;</li>
+            <li>есть правила работы;</li>
+            <li>есть roadmap или первый понятный план шагов;</li>
+            <li>есть current status или stop-point;</li>
+            <li>есть app/project repo для приложения или сайта;</li>
+            <li>есть docs repo или понятная структура документации;</li>
+            <li>приложение и документация находятся в Git/GitHub;</li>
+            <li>ChatGPT понимает, как вести проект дальше;</li>
+            <li>Codex получает роль технического исполнителя;</li>
+            <li>понятна связь: ChatGPT проектирует шаг → Codex выполняет run → GitHub хранит результат → пользователь проверяет итог;</li>
+            <li>определён следующий безопасный технический run.</li>
+          </ul>
+          <p><strong>Критерий готовности</strong></p>
+          <p>К концу практики у вас должна быть не просто идея, а подготовленный проект: GitHub хранит приложение и документацию, ChatGPT понимает правила и следующий шаг, Codex готов выполнять точные технические задания.</p>
+          <p>После этого можно переходить к следующему уроку и разбирать рабочие run’ы Codex.</p>
+        </section>
+      `,
       contentHtml: `
         <p><strong>Сначала документация, потом разработка</strong></p>
         <p>Проект нельзя начинать с просьбы: “Сделай весь проект”.</p>
@@ -2036,6 +2086,16 @@ ChatGPT вставляет тексты документов в prompt для Co
           options: ["Только публичный ключ", "Приватный ключ", "Пароли и токены"],
           answerIndex: 0,
           explanation: "В GitHub добавляют только публичный ключ. Приватный ключ остаётся на сервере, используется Codex локально для push и не отправляется в чат."
+        },
+        {
+          prompt: "Когда практика стартового проекта считается завершённой?",
+          options: [
+            "Когда prompt просто вставлен в ChatGPT",
+            "Когда приложение и документация находятся в GitHub, ChatGPT понимает правила проекта, Codex готов как исполнитель и определён следующий безопасный run",
+            "Когда Codex сам придумал весь проект без документов"
+          ],
+          answerIndex: 1,
+          explanation: "Практика завершена, когда подготовлена основа проекта: документы, GitHub, связь ChatGPT/GitHub/Codex и следующий безопасный шаг."
         }
       ],
       resultTitle: "Главный вывод урока",
@@ -3090,6 +3150,7 @@ function renderStructuredLesson(section) {
   const quizList = getSectionQuizList(section);
   const quiz = renderQuiz(section, quizList, section.quizLabel || "Проверка знаний");
   const starterPrompt = renderStarterPromptForm(section);
+  const afterStarterPrompt = section.afterStarterPromptHtml || "";
   const resultTitle = section.finalResultTitle || section.resultTitle || "Главный вывод урока";
   const resultText = section.finalResultText || section.resultText;
   const nextTitle = section.nextStepTitle || "Следующий урок";
@@ -3136,6 +3197,7 @@ function renderStructuredLesson(section) {
         ${outcome}
         ${renderLessonBlocks(section)}
         ${starterPrompt}
+        ${afterStarterPrompt}
         ${quiz}
         ${lessonResult}
         ${finalResult}

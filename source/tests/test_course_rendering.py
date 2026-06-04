@@ -357,6 +357,9 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Сервер, Codex, AGENTS.md и Skills" not in script_response.text
     assert "Codex, AGENTS.md и Skills" not in script_response.text
     assert script_response.text.count("Зарегистрировать аккаунт GitHub") >= 2
+    assert "Смотреть prompt" in script_response.text
+    assert "Скопировать prompt" in script_response.text
+    assert "Скачать .md" in script_response.text
     lesson3_task_start = lesson3_section.index('label: "Практическое задание"')
     lesson3_task_end = lesson3_section.index('label: "Итог"', lesson3_task_start)
     lesson3_task_section = lesson3_section[lesson3_task_start:lesson3_task_end]
@@ -370,6 +373,19 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "не отправляйте пароль в чат" not in lesson3_task_section
     assert "не отправляйте коды подтверждения в чат" not in lesson3_task_section
     assert "не используйте чужой аккаунт" not in lesson3_task_section
+    lesson6_prompt_start = lesson6_section.index('label: "Готовый prompt"')
+    lesson6_practice_start = lesson6_section.index("afterStarterPromptHtml")
+    assert lesson6_prompt_start < lesson6_practice_start
+    assert "Запустить старт проекта через ChatGPT" in lesson6_section
+    assert "Вставьте стартовый prompt в ChatGPT" in lesson6_section
+    assert "Практика завершена не тогда, когда prompt просто вставлен в чат" in lesson6_section
+    assert "приложение и документация находятся в Git/GitHub" in lesson6_section
+    assert "ChatGPT проектирует шаг" in lesson6_section
+    assert "Codex выполняет run" in lesson6_section
+    assert "GitHub хранит результат" in lesson6_section
+    assert "следующий безопасный технический run" in lesson6_section
+    assert "Когда практика стартового проекта считается завершённой?" in script_response.text
+    assert "Когда приложение и документация находятся в GitHub" in script_response.text
 
 
 def test_git_backed_course_map_page_requires_learning_access(client, test_settings):
