@@ -194,6 +194,7 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert page_response.text.count("nav-title") == 9
     assert "Codex, AGENTS.md, Skills, токены и роль модели" in page_response.text
     assert "PowerShell, Terminal и подключение к серверу" in page_response.text
+    assert "Процесс работы" in page_response.text
     assert "Сервер, Codex, AGENTS.md и Skills" not in page_response.text
     assert page_response.text.count("Вернуться в личный кабинет") == 2
     assert page_response.text.count('href="/cabinet"') == 2
@@ -227,9 +228,9 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert ".starter-prompt-button" in styles_response.text
     assert "display: flex;" in styles_response.text
     assert "flex-wrap: wrap;" in styles_response.text
-    assert "min-width: 180px;" in styles_response.text
-    assert "max-width: 180px;" in styles_response.text
-    assert "min-height: 44px;" in styles_response.text
+    assert "min-width: 148px;" in styles_response.text
+    assert "max-width: 148px;" in styles_response.text
+    assert "min-height: 36px;" in styles_response.text
     assert "white-space: nowrap;" in styles_response.text
     assert "width: 100%;" in styles_response.text
     assert "max-width: none;" in styles_response.text
@@ -264,7 +265,9 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Старт проекта: сначала документация, потом разработка" in script_response.text
     assert "ChatGPT выступает как ведущий специалист" in script_response.text
     assert "Git: история, commit, push и откат" in script_response.text
-    assert "Старт работы и рабочие run’ы Codex" in script_response.text
+    assert "Урок 7 — Процесс работы" in script_response.text
+    assert 'navTitle: "Урок 7 — Процесс работы"' in script_response.text
+    assert 'title: "Процесс работы"' in script_response.text
     assert "Codex, AGENTS.md, Skills, токены и роль модели" in script_response.text
     assert "PowerShell, Terminal и подключение к серверу" in script_response.text
     assert 'navTitle: "Урок 4 — Codex, AGENTS.md, Skills, токены и роль модели"' in script_response.text
@@ -307,8 +310,10 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Перейти к уроку 5" in lesson4_section
     assert "В следующем уроке разберём старт проекта: сначала документация, потом разработка." in lesson5_section
     assert "Перейти к уроку 6" in lesson5_section
-    assert "В следующем уроке разберём старт работы и рабочие run’ы Codex." in lesson6_section
+    assert "В следующем уроке разберём процесс работы: какие бывают run’ы Codex, зачем нужна пошаговость и как удерживать важные инструкции в контексте ChatGPT." in lesson6_section
     assert "Перейти к уроку 7" in lesson6_section
+    lesson8_start = script_response.text.index('id: "lesson-8"')
+    lesson7_section = script_response.text[lesson7_start:lesson8_start]
     lesson4_agents_index = lesson4_section.index('label: "AGENTS.md"')
     lesson4_skills_index = lesson4_section.index('label: "Skills"')
     lesson4_errors_index = lesson4_section.index('label: "Частые ошибки"')
@@ -339,6 +344,41 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Что нельзя показывать в чат" not in lesson5_section
     assert "Секреты" not in lesson5_section
     assert "Ученик" not in lesson5_section
+    assert "Run" in lesson7_section
+    assert "один рабочий запуск или одну итерацию работы" in lesson7_section
+    assert "Design run" in lesson7_section
+    assert "Fix run" in lesson7_section
+    assert "Proof run" in lesson7_section
+    assert "<strong>design run</strong> код не пишется" in lesson7_section
+    assert "В proof run код не пишется." in lesson7_section
+    assert "<strong>Codex</strong> стремится решить задачу с меньшими ресурсами" in lesson7_section
+    assert "контекстное окно" in lesson7_section
+    assert "Prefix-расширение" in lesson7_section
+    assert "Project Prefixer" in lesson7_section
+    assert "https://github.com/MaksimUnimax/openscript-agent-lab-student-kit" in lesson7_section
+    assert "Практика завершена, когда" in lesson7_section
+    assert "расширение установлено в браузер" in lesson7_section
+    assert "тестовое сообщение в <strong>ChatGPT</strong> отправилось с prefix перед текстом" in lesson7_section
+    assert "manifest.json" in lesson7_section
+    assert "content.js" in lesson7_section
+    assert "popup.html" in lesson7_section
+    assert "popup.css" in lesson7_section
+    assert "popup.js" in lesson7_section
+    assert "README.md" in lesson7_section
+    assert "chrome://extensions" in lesson7_section
+    assert "edge://extensions" in lesson7_section
+    assert "Developer mode" in lesson7_section
+    assert "Load unpacked" in lesson7_section
+    assert "Я не программист" in lesson7_section
+    assert "Что такое run в этом курсе?" in lesson7_section
+    assert "Что такое design run?" in lesson7_section
+    assert "Что такое fix run?" in lesson7_section
+    assert "Что такое proof run?" in lesson7_section
+    assert "Зачем нужно prefix-расширение?" in lesson7_section
+    assert "Что такое контекстное окно?" in lesson7_section
+    assert "ученик" not in lesson7_section
+    assert "ученику" not in lesson7_section
+    assert "ученика" not in lesson7_section
     assert "Главный вывод урока" in script_response.text
     assert "Следующий урок" in script_response.text
     assert "Тестовая версия курса" not in script_response.text
