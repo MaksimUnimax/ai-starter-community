@@ -97,8 +97,13 @@ const courseData = {
           <p><strong>ChatGPT</strong> — это языковая ИИ-система, с которой можно работать обычным языком: писать вопросы, описывать идеи, получать объяснения и связный текстовый ответ.</p>
           <p>В нашем методе <strong>ChatGPT</strong> работает как <strong>ведущий технический специалист</strong>. Он разбирает цель пользователя, собирает недостающие данные через вопросы, создаёт техническую документацию, проектирует работу, пишет инструкции для Codex, проверяет отчёты Codex и объясняет пользователю, что происходит в проекте.</p>
           <p>Что такое Codex</p>
-          <p><strong>Codex</strong> — это ИИ-инструмент для технического выполнения задач в проекте.</p>
-          <p>В нашем методе <strong>Codex</strong> является <strong>техническим исполнителем</strong>. Он получает конкретную задачу, работает с файлами и кодом, запускает проверки, фиксирует результат, если это входит в задачу, и возвращает отчёт.</p>
+          <p><strong>Codex</strong> — это <strong>Codex CLI</strong>.</p>
+          <p><strong>Codex CLI</strong> — это инструмент OpenAI для работы с кодом и файлами проекта через терминал.</p>
+          <p><strong>Терминал</strong> — это рабочее окно, через которое Codex запускается на сервере или компьютере проекта.</p>
+          <p><strong>Codex</strong> может читать файлы проекта, менять код, запускать проверки, смотреть ошибки, выполнять команды и готовить отчёт о выполненной работе.</p>
+          <p>Важно: <strong>Codex</strong> не является руководителем проекта.</p>
+          <p><strong>ChatGPT</strong> понимает цель, читает правила, проверяет документацию, следит за run’ами и пишет точное задание.</p>
+          <p><strong>Codex CLI</strong> выполняет это задание в проекте и возвращает отчёт.</p>
           <p>Чем ChatGPT отличается от Codex</p>
           <p><strong>ChatGPT</strong> ведёт техническую работу на уровне смысла и управления: создаёт документацию, проектирует шаг, пишет инструкции, проверяет отчёт и объясняет результат пользователю.</p>
           <p><strong>Codex</strong> выполняет техническую задачу внутри проекта: работает с файлами, кодом, проверками и отчётом.</p>
@@ -812,11 +817,8 @@ const courseData = {
       title: "Что такое Codex",
       html: `
         <p><strong>Codex</strong> — это <strong>Codex CLI</strong>.</p>
-        <p><strong>CLI</strong> читается как “си-эл-ай”.</p>
-        <p><strong>CLI</strong> — это способ работать с программой через командную строку. На Windows это обычно <strong>PowerShell</strong>, на macOS — <strong>Terminal</strong>.</p>
-        <p>Проще говоря, вы не нажимаете кнопки в обычном окне программы, а пишете команду в терминале. Например, команда <strong>codex</strong> запускает Codex.</p>
-        <p><strong>Codex CLI</strong> — это инструмент OpenAI для работы с кодом и файлами проекта.</p>
-        <p>Он открывается в терминале и может работать в выбранной папке проекта.</p>
+        <p><strong>Codex CLI</strong> — это инструмент OpenAI для работы с кодом и файлами проекта через терминал.</p>
+        <p><strong>Терминал</strong> — это рабочее окно, через которое Codex запускается на сервере или компьютере проекта.</p>
         <p><strong>Codex</strong> может:</p>
         <ul>
           <li>читать файлы проекта;</li>
@@ -828,7 +830,7 @@ const courseData = {
           <li>готовить отчёт о выполненной работе.</li>
         </ul>
         <p><strong>Важно:</strong> Codex не является руководителем проекта.</p>
-        <p>Codex не должен сам выбирать стратегию, менять план курса, придумывать архитектуру или решать, какой этап делать дальше.</p>
+        <p><strong>Codex</strong> не должен сам выбирать стратегию, менять план курса, придумывать архитектуру или решать, какой этап делать дальше.</p>
         <p>В нашей системе это делает <strong>ChatGPT</strong>.</p>
         <p><strong>ChatGPT</strong> понимает цель, читает правила, проверяет документацию, следит за run’ами и пишет точное задание.</p>
         <p><strong>Codex CLI</strong> выполняет это задание в проекте и возвращает отчёт.</p>
@@ -1122,11 +1124,11 @@ const courseData = {
     {
       prompt: "Что такое Codex в нашей схеме?",
       options: [
-        "Руководитель проекта, который сам выбирает следующий этап",
         "Технический исполнитель, который работает по точной задаче от ChatGPT",
+        "Руководитель проекта, который сам выбирает следующий этап",
         "Просто название урока"
       ],
-      answerIndex: 1,
+      answerIndex: 0,
       feedbackCorrect:
         "Верно. Codex выполняет технический run, а управление проектом остаётся у ChatGPT и пользователя.",
       feedbackIncorrect:
@@ -1135,11 +1137,11 @@ const courseData = {
     {
       prompt: "Что такое токены в работе Codex?",
       options: [
-        "Единицы ресурса, которые списываются и тратятся при работе модели",
         "Кнопки на странице курса",
+        "Единицы ресурса, которые списываются и тратятся при работе модели",
         "Название папки проекта"
       ],
-      answerIndex: 0,
+      answerIndex: 1,
       feedbackCorrect:
         "Верно. Токены — это единицы ресурса модели: они тратятся на prompt, файлы, логи, ответы, отчёт и внутреннюю работу модели.",
       feedbackIncorrect:
@@ -1148,11 +1150,11 @@ const courseData = {
     {
       prompt: "Через какую команду смотрят состояние Codex-сессии?",
       options: [
-        "/status",
         "/model",
-        "/plugins"
+        "/plugins",
+        "/status"
       ],
-      answerIndex: 0,
+      answerIndex: 2,
       feedbackCorrect:
         "Верно. Через /status смотрят состояние сессии, модель, permissions, контекст, token usage и доступную информацию по лимитам.",
       feedbackIncorrect:
@@ -1174,11 +1176,11 @@ const courseData = {
     {
       prompt: "Через какую команду выставляют допуск Codex?",
       options: [
-        "/permissions",
         "/plugins",
+        "/permissions",
         "/status"
       ],
-      answerIndex: 0,
+      answerIndex: 1,
       feedbackCorrect:
         "Верно. Допуск Codex настраивают через /permissions.",
       feedbackIncorrect:
@@ -1187,11 +1189,11 @@ const courseData = {
     {
       prompt: "Какая команда открывает Skills?",
       options: [
-        "/skills",
         "/model",
-        "/status"
+        "/status",
+        "/skills"
       ],
-      answerIndex: 0,
+      answerIndex: 2,
       feedbackCorrect:
         "Верно. Skills открывают через /skills.",
       feedbackIncorrect:
@@ -1443,11 +1445,11 @@ const courseData = {
     {
       prompt: "Почему проект лучше держать на удалённом сервере?",
       options: [
-        "Сервер может работать круглосуточно, хранить проект, иметь нужное окружение и быть доступным другим людям",
         "Потому что сервер не нужен Codex",
+        "Сервер может работать круглосуточно, хранить проект, иметь нужное окружение и быть доступным другим людям",
         "Потому что домашний компьютер всегда лучше сервера"
       ],
-      answerIndex: 0,
+      answerIndex: 1,
       feedbackCorrect:
         "Верно. Сервер даёт постоянную рабочую среду, доступность и место, где Codex работает рядом с проектом.",
       feedbackIncorrect:
@@ -1456,11 +1458,11 @@ const courseData = {
     {
       prompt: "Где нужно взять SSH-команду и пароль?",
       options: [
-        "В личном кабинете курса",
         "Придумать самостоятельно",
-        "Найти случайную команду в интернете"
+        "Найти случайную команду в интернете",
+        "В личном кабинете курса"
       ],
-      answerIndex: 0,
+      answerIndex: 2,
       feedbackCorrect:
         "Верно. SSH-команду и пароль нужно брать из личного кабинета курса.",
       feedbackIncorrect:
@@ -2282,7 +2284,7 @@ ChatGPT вставляет тексты документов в prompt для Co
             <p><strong>Что нужно сделать:</strong></p>
 
             <ol>
-              <li>Откройте блок “Prompt для создания расширения” ниже.</li>
+              <li>Откройте prompt для создания расширения ниже.</li>
               <li>Скопируйте prompt кнопкой “Скопировать prompt” или скачайте его кнопкой “Скачать .md”.</li>
               <li>Откройте новый чат с <strong>ChatGPT</strong>.</li>
               <li>Вставьте prompt в <strong>ChatGPT</strong>.</li>
@@ -2291,7 +2293,8 @@ ChatGPT вставляет тексты документов в prompt для Co
               <li>Сохраните один prefix-блок.</li>
               <li>Отправьте тестовое сообщение в <strong>ChatGPT</strong> и убедитесь, что prefix добавился перед текстом.</li>
             </ol>
-          `
+          `,
+          includeStarterPromptForm: true
         },
         {
           label: "Частые ошибки",
@@ -2326,6 +2329,7 @@ ChatGPT вставляет тексты документов в prompt для Co
           `
         }
       ],
+      starterPromptPlacement: "block",
       starterPromptLabel: "Prompt для создания расширения",
       starterPromptDescription: "Ниже есть prompt для практики. Его можно скопировать или скачать как Markdown-файл.",
       starterPromptActionsLabel: "Действия с prompt для практики",
@@ -2447,11 +2451,11 @@ Content script должен находить поле ввода ChatGPT.
         {
           prompt: "Зачем обычно делать один run на одну задачу?",
           options: [
-            "Чтобы сохранить контроль над Codex и не дать ему уйти от документации проекта",
             "Чтобы Codex вообще ничего не делал",
+            "Чтобы сохранить контроль над Codex и не дать ему уйти от документации проекта",
             "Чтобы GitHub заменил ChatGPT"
           ],
-          answerIndex: 0,
+          answerIndex: 1,
           feedbackCorrect:
             "Верно. Один run на одну задачу помогает контролировать Codex, проверять результат и не смешивать разные изменения.",
           feedbackIncorrect:
@@ -2460,11 +2464,11 @@ Content script должен находить поле ввода ChatGPT.
         {
           prompt: "Что такое design run?",
           options: [
-            "Run, где Codex показывает план решения, но не пишет код",
             "Run, где Codex сразу меняет production",
-            "Run, где пользователь вручную пишет весь код"
+            "Run, где пользователь вручную пишет весь код",
+            "Run, где Codex показывает план решения, но не пишет код"
           ],
-          answerIndex: 0,
+          answerIndex: 2,
           feedbackCorrect:
             "Верно. В design run Codex показывает, как собирается решать задачу, а ChatGPT сравнивает это с ТЗ и правилами.",
           feedbackIncorrect:
@@ -2486,11 +2490,11 @@ Content script должен находить поле ввода ChatGPT.
         {
           prompt: "Что такое proof run?",
           options: [
-            "Run для доказательства фактов: найти проблему или доказать, что fix сработал",
             "Run для написания всего проекта",
+            "Run для доказательства фактов: найти проблему или доказать, что fix сработал",
             "Run для хранения секретов"
           ],
-          answerIndex: 0,
+          answerIndex: 1,
           feedbackCorrect:
             "Верно. Proof run нужен, чтобы не чинить на догадках и принимать решения по фактам.",
           feedbackIncorrect:
@@ -2499,11 +2503,11 @@ Content script должен находить поле ввода ChatGPT.
         {
           prompt: "Зачем нужно prefix-расширение?",
           options: [
-            "Чтобы автоматически добавлять важные инструкции перед сообщением в ChatGPT",
             "Чтобы хранить пароли и токены",
-            "Чтобы Codex сам выбирал бизнес-цель проекта"
+            "Чтобы Codex сам выбирал бизнес-цель проекта",
+            "Чтобы автоматически добавлять важные инструкции перед сообщением в ChatGPT"
           ],
-          answerIndex: 0,
+          answerIndex: 2,
           feedbackCorrect:
             "Верно. Prefix-расширение помогает повторять важные правила, чтобы они не терялись в длинном контексте.",
           feedbackIncorrect:
@@ -2958,22 +2962,22 @@ Content script должен находить поле ввода ChatGPT.
         {
           prompt: "Почему опасна задача “переделай всё”?",
           options: [
-            "Нельзя безопасно проверить результат",
             "Потому что Git не нужен",
+            "Нельзя безопасно проверить результат",
             "Потому что ChatGPT не может объяснять"
           ],
-          answerIndex: 0,
+          answerIndex: 1,
           explanation:
             "Слишком широкую задачу сложно проверить и безопасно принять."
         },
         {
           prompt: "Что делать с важным новым правилом?",
           options: [
-            "Зафиксировать в документации",
             "Оставить только в эмоциях чата",
-            "Забыть после run"
+            "Забыть после run",
+            "Зафиксировать в документации"
           ],
-          answerIndex: 0,
+          answerIndex: 2,
           explanation:
             "Важное правило должно попасть в документацию, иначе оно потеряется."
         },
@@ -2991,11 +2995,11 @@ Content script должен находить поле ввода ChatGPT.
         {
           prompt: "Как правильно использовать Codex?",
           options: [
-            "Давать один конкретный технический шаг",
             "Вести длинный разговор обо всём проекте",
+            "Давать один конкретный технический шаг",
             "Просить его самому выбрать бизнес-цель"
           ],
-          answerIndex: 0,
+          answerIndex: 1,
           explanation:
             "Codex должен получать один конкретный технический шаг с границами и проверками."
         }
@@ -3104,11 +3108,16 @@ function renderLessonBlocks(section) {
         body = `${paragraphs}${items}`;
       }
 
+      const starterPrompt = block.includeStarterPromptForm && section.starterPromptPlacement === "block"
+        ? renderStarterPromptForm(section)
+        : "";
+
       return `
         <section class="callout lesson-content-block">
           ${label}
           ${title}
           ${body}
+          ${starterPrompt}
         </section>
       `;
     })
@@ -3278,10 +3287,10 @@ function renderStarterPromptForm(section) {
 
   const textareaId = `${section.id}-starter-prompt`;
   const filename = section.starterPromptFilename || "start_project_documentation_prompt.md";
-  const promptLabel = section.starterPromptLabel || "Пример стартового prompt’а";
+  const promptLabel = section.starterPromptLabel || "Prompt";
   const promptDescription =
-    section.starterPromptDescription || "Ниже есть готовый prompt для начала проекта. Его можно скопировать или скачать как Markdown-файл.";
-  const promptActionsLabel = section.starterPromptActionsLabel || "Действия со стартовым prompt";
+    section.starterPromptDescription || "Ниже есть prompt. Его можно скопировать или скачать как Markdown-файл.";
+  const promptActionsLabel = section.starterPromptActionsLabel || "Действия с prompt";
   const isOpen = Boolean(state.openStarterPromptIds?.has(section.id));
 
   return `
@@ -3344,7 +3353,7 @@ function renderStructuredLesson(section) {
   const outcome = renderOutcome(section);
   const quizList = getSectionQuizList(section);
   const quiz = renderQuiz(section, quizList, section.quizLabel || "Проверка знаний");
-  const starterPrompt = renderStarterPromptForm(section);
+  const starterPrompt = section.starterPromptPlacement === "block" ? "" : renderStarterPromptForm(section);
   const afterStarterPrompt = section.afterStarterPromptHtml || "";
   const resultTitle = section.finalResultTitle || section.resultTitle || "Главный вывод урока";
   const resultText = section.finalResultText || section.resultText;

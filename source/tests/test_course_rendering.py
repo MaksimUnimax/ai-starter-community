@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import re
 import sqlite3
+from collections import Counter
+from pathlib import Path
 
 from app.auth.service import authenticate_user, create_session, register_user, verify_email
 from app.materials.course_loader import get_lesson, list_lessons, load_course, render_markdown
@@ -11,6 +13,22 @@ def _connect(test_settings):
     conn = sqlite3.connect(str(test_settings.database_path))
     conn.row_factory = sqlite3.Row
     return conn
+
+
+SCRIPT_PATH = Path(__file__).resolve().parents[1] / "app/materials/course_content/drafts/dair_smoke_20260529/script.js"
+
+
+def _script_source() -> str:
+    return SCRIPT_PATH.read_text()
+
+
+def _lesson_section(script_text: str, lesson_id: str, next_lesson_id: str | None = None) -> str:
+    start = script_text.index(f'id: "{lesson_id}"')
+    if next_lesson_id is not None:
+        end = script_text.index(f'id: "{next_lesson_id}"', start)
+    else:
+        end = script_text.index("function renderNavigation()", start)
+    return script_text[start:end]
 
 
 def _extract_token_from_db(test_settings, email: str) -> str:
@@ -319,12 +337,18 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     lesson4_errors_index = lesson4_section.index('label: "Частые ошибки"')
     assert lesson4_agents_index < lesson4_skills_index < lesson4_errors_index
     assert "<strong>Codex</strong> — это <strong>Codex CLI</strong>." in script_response.text
-    assert "<strong>CLI</strong> читается как “си-эл-ай”." in script_response.text
-    assert "<strong>CLI</strong> — это способ работать с программой через командную строку. На Windows это обычно <strong>PowerShell</strong>, на macOS — <strong>Terminal</strong>." in script_response.text
-    assert "команда <strong>codex</strong> запускает Codex." in script_response.text
-    assert "Он открывается в терминале и может работать в выбранной папке проекта." in script_response.text
+    assert "<strong>Codex CLI</strong> — это инструмент OpenAI для работы с кодом и файлами проекта через терминал." in script_response.text
+    assert "<strong>Терминал</strong> — это рабочее окно, через которое Codex запускается на сервере или компьютере проекта." in script_response.text
+    assert "<li>читать файлы проекта;</li>" in script_response.text
+    assert "<li>запускать проверки;</li>" in script_response.text
+    assert "<li>готовить отчёт о выполненной работе.</li>" in script_response.text
+    assert "<strong>Важно:</strong> Codex не является руководителем проекта." in script_response.text
+    assert "<strong>Codex</strong> не должен сам выбирать стратегию, менять план курса, придумывать архитектуру или решать, какой этап делать дальше." in script_response.text
     assert "<strong>ChatGPT</strong> понимает цель, читает правила, проверяет документацию, следит за run’ами и пишет точное задание." in script_response.text
     assert "<strong>Codex CLI</strong> выполняет это задание в проекте и возвращает отчёт." in script_response.text
+    assert "CLI читается как" not in script_response.text
+    assert "вы не нажимаете кнопки" not in script_response.text
+    assert "Например, команда <strong>codex</strong> запускает Codex." not in script_response.text
     assert "Какую модель выбирать для Codex" in script_response.text
     assert "Частые ошибки и правила безопасной работы" in script_response.text
     assert "Обновление документации и новый диалог" in script_response.text
@@ -379,12 +403,14 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Load unpacked" in lesson7_section
     assert "Я не программист" in lesson7_section
     assert "Prompt для создания расширения" in lesson7_section
+    assert "Откройте prompt для создания расширения ниже." in lesson7_section
+    assert "includeStarterPromptForm: true" in lesson7_section
+    assert "starterPromptPlacement: \"block\"" in lesson7_section
     assert "starterPromptLabel: \"Prompt для создания расширения\"" in lesson7_section
     assert "starterPromptDescription: \"Ниже есть prompt для практики. Его можно скопировать или скачать как Markdown-файл.\"" in lesson7_section
     assert "starterPromptActionsLabel: \"Действия с prompt для практики\"" in lesson7_section
     assert "starterPromptFilename: \"prefix_extension_for_chatgpt_prompt.md\"" in lesson7_section
     assert "starterPromptMarkdown: `# Prompt для создания расширения" in lesson7_section
-    assert "Откройте блок “Prompt для создания расширения” ниже." in lesson7_section
     assert "Скопируйте prompt кнопкой “Скопировать prompt” или скачайте его кнопкой “Скачать .md”." in lesson7_section
     assert "Ошибка 3: писать код в design run." not in lesson7_section
     assert "Правильно: в <strong>design run</strong> код не пишется, только описывается план решения." not in lesson7_section
@@ -396,6 +422,7 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Что такое proof run?" in lesson7_section
     assert "Зачем нужно prefix-расширение?" in lesson7_section
     assert "Что такое контекстное окно?" in lesson7_section
+    assert 'block.includeStarterPromptForm && section.starterPromptPlacement === "block"' in script_response.text
     assert "ученик" not in lesson7_section
     assert "ученику" not in lesson7_section
     assert "ученика" not in lesson7_section
@@ -532,6 +559,27 @@ def test_git_backed_course_map_page_requires_learning_access(client, test_settin
     assert admin_page.status_code == 200
     assert admin_styles.status_code == 200
     assert admin_script.status_code == 200
+
+
+def test_quiz_answer_indices_are_shuffled_across_lessons():
+    script_text = _script_source()
+    global_counts = Counter(re.findall(r"answerIndex:\s*(\d+)", script_text))
+
+    assert global_counts["0"] > 0
+    assert global_counts["1"] > 0
+    assert global_counts["2"] > 0
+
+    lesson_bounds = [
+        ("lesson-4", "lesson-5"),
+        ("lesson-5", "lesson-6"),
+        ("lesson-7", "lesson-8"),
+        ("lesson-9", None),
+    ]
+
+    for lesson_id, next_lesson_id in lesson_bounds:
+        lesson_section = _lesson_section(script_text, lesson_id, next_lesson_id)
+        lesson_counts = Counter(re.findall(r"answerIndex:\s*(\d+)", lesson_section))
+        assert any(index != "0" for index in lesson_counts), lesson_id
 
 
 def test_materials_and_lesson_redirect_for_anonymous_user(client):
