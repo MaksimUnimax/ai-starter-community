@@ -265,6 +265,8 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "window.history.replaceState" in script_response.text
     assert "location.hash" not in script_response.text
     assert "scrollIntoView" in script_response.text
+    assert 'function scrollToActiveLesson()' in script_response.text
+    assert 'activeSectionRoot.querySelector(".section-card")' in script_response.text
     assert "labelTranslations" not in script_response.text
     assert "translateLessonMarkup" not in script_response.text
     assert "translateLabel" not in script_response.text
@@ -276,9 +278,11 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "renderStructuredLesson" in script_response.text
     assert 'section.nextStepTargetId || "lesson-2"' in script_response.text
     assert 'id: "lesson-9"' in script_response.text
+    assert 'id: "lesson-10"' in script_response.text
     assert 'review: "lesson-9"' in script_response.text
-    assert 'navTitle: "Урок 9 — Частые ошибки и правила безопасной работы"' in script_response.text
-    assert "lesson-" + "10" not in script_response.text
+    assert 'navTitle: "Урок 9 — Советы и правила безопасной работы"' in script_response.text
+    assert 'navTitle: "Финал курса"' in script_response.text
+    assert 'title: "Поздравляем, вы завершили вводный курс"' in script_response.text
     assert "Документы проекта: техническое задание (ТЗ), roadmap, правила и контекст" in script_response.text
     assert "Старт проекта: сначала документация, потом разработка" in script_response.text
     assert "ChatGPT выступает как ведущий специалист" in script_response.text
@@ -332,8 +336,11 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Перейти к уроку 7" in lesson6_section
     lesson8_start = script_response.text.index('id: "lesson-8"')
     lesson9_start = script_response.text.index('id: "lesson-9"')
+    lesson10_start = script_response.text.index('id: "lesson-10"')
     lesson7_section = script_response.text[lesson7_start:lesson8_start]
     lesson8_section = script_response.text[lesson8_start:lesson9_start]
+    lesson9_section = script_response.text[lesson9_start:lesson10_start]
+    lesson10_section = script_response.text[lesson10_start:script_response.text.index("const state", lesson10_start)]
     lesson4_agents_index = lesson4_section.index('label: "AGENTS.md"')
     lesson4_skills_index = lesson4_section.index('label: "Skills"')
     lesson4_errors_index = lesson4_section.index('label: "Частые ошибки"')
@@ -352,8 +359,30 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "вы не нажимаете кнопки" not in script_response.text
     assert "Например, команда <strong>codex</strong> запускает Codex." not in script_response.text
     assert "Какую модель выбирать для Codex" in script_response.text
-    assert "Частые ошибки и правила безопасной работы" in script_response.text
+    assert "Советы и правила безопасной работы" in script_response.text
     assert "Обновление документации и новый диалог" in script_response.text
+    assert "Совет 1" in lesson9_section
+    assert "Ошибка 1" not in lesson9_section
+    assert "Финальное правило" not in lesson9_section
+    assert "Проверяйте версию ChatGPT" in lesson9_section
+    assert "Thinking" in lesson9_section
+    assert "Instant" in lesson9_section
+    assert "Не используйте <strong>Instant</strong> для серьёзной проектной работы." in lesson9_section
+    assert "nextStepTargetId: \"lesson-10\"" in lesson9_section
+    assert "Завершить курс" in lesson9_section
+    assert "Поздравляем, вы завершили вводный курс" in lesson10_section
+    assert "создавать программы" in lesson10_section
+    assert "без знания языков программирования" in lesson10_section
+    assert "ChatGPT и Codex выбраны для старта" in lesson10_section
+    assert "Anthropic/Claude" in lesson10_section
+    assert "Qwen" in lesson10_section
+    assert "Kimi" in lesson10_section
+    assert "DeepSeek" in lesson10_section
+    assert "VPN" in lesson10_section
+    assert "Глупых вопросов не бывает" in lesson10_section
+    assert "Курс останется доступным" in lesson10_section
+    assert "Курс будет время от времени обновляться" in lesson10_section
+    assert "Это не юридическая консультация." in lesson10_section
     assert "Проект может идти много дней или недель." in lesson8_section
     assert "<strong>Документы проекта</strong> — это память проекта." in lesson8_section
     assert "<strong>Техническое задание</strong>" in lesson8_section
