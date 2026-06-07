@@ -210,6 +210,8 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert page_response.text.count("course-intro-part") == 3
     assert page_response.text.count('class="nav-button') == 9
     assert page_response.text.count("nav-title") == 9
+    assert "data-section-nav=\"true\"" in script_response.text
+    assert "data-section-next=\"true\"" in script_response.text
     assert "Codex, AGENTS.md, Skills, токены и роль модели" in page_response.text
     assert "PowerShell, Terminal и подключение к серверу" in page_response.text
     assert "Процесс работы" in page_response.text
@@ -267,6 +269,13 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "scrollIntoView" in script_response.text
     assert 'function scrollToActiveLesson()' in script_response.text
     assert 'activeSectionRoot.querySelector(".section-card")' in script_response.text
+    assert 'const progressPanelEyebrow = document.querySelector(".progress-panel .section-heading .eyebrow");' in script_response.text
+    assert 'const progressPanelTitle = document.querySelector(".progress-panel .section-heading h2");' in script_response.text
+    assert 'function isFinalCourseSection(section)' in script_response.text
+    assert 'function getCourseProgressSections()' in script_response.text
+    assert 'function getCompletedCourseSectionCount()' in script_response.text
+    assert '!isFinalCourseSection(section) && getSectionQuestionCount(section) > 0' in script_response.text
+    assert 'getSectionAnsweredCount(section) === getSectionQuestionCount(section)' in script_response.text
     assert "labelTranslations" not in script_response.text
     assert "translateLessonMarkup" not in script_response.text
     assert "translateLabel" not in script_response.text
@@ -277,6 +286,12 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert 'state.answeredQuestions[quizKey(section.id, index)] !== undefined' in script_response.text
     assert "renderStructuredLesson" in script_response.text
     assert 'section.nextStepTargetId || "lesson-2"' in script_response.text
+    assert 'const navButton = event.target.closest("[data-section-nav]");' in script_response.text
+    assert 'setActiveSection(navButton.dataset.section, { scroll: false });' in script_response.text
+    assert 'const nextButton = event.target.closest("[data-section-next]");' in script_response.text
+    assert 'setActiveSection(nextButton.dataset.section, { scroll: true });' in script_response.text
+    assert 'const sectionButton = event.target.closest("[data-section]");' in script_response.text
+    assert 'setActiveSection(sectionButton.dataset.section, { scroll: false });' in script_response.text
     assert 'id: "lesson-9"' in script_response.text
     assert 'id: "lesson-10"' in script_response.text
     assert 'review: "lesson-9"' in script_response.text
@@ -394,6 +409,15 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "выступает как программист, архитектор, аналитик" in lesson10_section
     assert "Вы не становитесь профессиональным разработчиком за один курс" not in lesson10_section
     assert "пока не знаете" not in lesson10_section
+    assert "Проверка курса" in script_response.text
+    assert "Проверка урока" in script_response.text
+    assert "Прогресс по проверке курса" in script_response.text
+    assert "Прогресс по проверке урока" in script_response.text
+    assert "Пока ни один урок не завершён." in script_response.text
+    assert "Завершено" in script_response.text
+    assert "уроков" in script_response.text
+    assert "Все уроки курса завершены." in script_response.text
+    assert "Все проверки урока выполнены." in script_response.text
     assert "Проект может идти много дней или недель." in lesson8_section
     assert "<strong>Документы проекта</strong> — это память проекта." in lesson8_section
     assert "<strong>Техническое задание</strong>" in lesson8_section

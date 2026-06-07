@@ -3388,11 +3388,17 @@ const legacySectionAliases = {
 
 const navRoot = document.getElementById("lesson-nav");
 const activeSectionRoot = document.getElementById("active-section");
+const progressPanelEyebrow = document.querySelector(".progress-panel .section-heading .eyebrow");
+const progressPanelTitle = document.querySelector(".progress-panel .section-heading h2");
 const progressFill = document.getElementById("progress-fill");
 const progressValue = document.getElementById("progress-value");
 const progressLabel = document.getElementById("progress-label");
 const startLearningButton = document.getElementById("start-learning");
 const openReviewButton = document.getElementById("open-review");
+
+function isFinalCourseSection(section) {
+  return section?.id === "lesson-10";
+}
 
 function isValidSectionId(sectionId) {
   return courseData.sections.some((section) => section.id === sectionId);
@@ -3426,7 +3432,7 @@ function renderNavigation() {
       const activeClass = section.id === state.activeSectionId ? "is-active" : "";
       const navTitle = section.navTitle || section.title;
       return `
-        <button class="nav-button ${activeClass}" type="button" data-section="${section.id}">
+        <button class="nav-button ${activeClass}" type="button" data-section="${section.id}" data-section-nav="true">
           <span class="nav-number">${escapeHTML(section.navLabel || section.eyebrow || "")}</span>
           <span class="nav-title">${escapeHTML(navTitle)}</span>
         </button>
@@ -3525,6 +3531,18 @@ function getSectionAnsweredCount(section) {
     }
   }
   return answeredCount;
+}
+
+function getCourseProgressSections() {
+  return courseData.sections.filter(
+    (section) => !isFinalCourseSection(section) && getSectionQuestionCount(section) > 0
+  );
+}
+
+function getCompletedCourseSectionCount() {
+  return getCourseProgressSections().reduce((completedCount, section) => {
+    return completedCount + (getSectionAnsweredCount(section) === getSectionQuestionCount(section) ? 1 : 0);
+  }, 0);
 }
 
 function renderFlashcards(section) {
@@ -3784,7 +3802,7 @@ function renderStructuredLesson(section) {
             <span class="block-label">${escapeHTML(nextTitle)}</span>
             <p>${escapeHTML(nextText)}</p>
           </div>
-          ${nextButton ? `<button class="primary-button" type="button" data-section="${escapeHTML(section.nextStepTargetId || "lesson-2")}">${escapeHTML(nextButton)}</button>` : ""}
+          ${nextButton ? `<button class="primary-button" type="button" data-section="${escapeHTML(section.nextStepTargetId || "lesson-2")}" data-section-next="true">${escapeHTML(nextButton)}</button>` : ""}
         </section>
       `
     : "";
@@ -3818,21 +3836,50 @@ function renderSectionContent(section) {
 
 function updateProgress() {
   const section = courseData.sections.find((item) => item.id === state.activeSectionId) || courseData.sections[0];
-  const totalQuestions = getSectionQuestionCount(section);
-  const answeredQuestions = getSectionAnsweredCount(section);
-  const progress = totalQuestions === 0 ? 0 : Math.min(100, Math.round((answeredQuestions / totalQuestions) * 100));
+  const finalCourseSection = isFinalCourseSection(section);
 
-  progressFill.style.width = `${progress}%`;
-  progressValue.textContent = `${progress}%`;
+  if (progressPanelEyebrow) {
+    progressPanelEyebrow.textContent = finalCourseSection ? "Прогресс по проверке курса" : "Прогресс по проверке урока";
+  }
+  if (progressPanelTitle) {
+    progressPanelTitle.textContent = finalCourseSection ? "Проверка курса" : "Проверка урока";
+  }
 
-  if (progress === 0) {
-    progressLabel.textContent = "Пока ничего не проверено.";
-  } else if (answeredQuestions === 1) {
-    progressLabel.textContent = `Выполнена 1 из ${totalQuestions} проверок.`;
-  } else if (progress < 100) {
-    progressLabel.textContent = `Выполнено ${answeredQuestions} из ${totalQuestions} проверок.`;
+  if (finalCourseSection) {
+    const totalCourseSections = getCourseProgressSections().length;
+    const completedCourseSections = getCompletedCourseSectionCount();
+    const progress =
+      totalCourseSections === 0
+        ? 0
+        : Math.min(100, Math.round((completedCourseSections / totalCourseSections) * 100));
+
+    progressFill.style.width = `${progress}%`;
+    progressValue.textContent = `${progress}%`;
+
+    if (progress === 0) {
+      progressLabel.textContent = "Пока ни один урок не завершён.";
+    } else if (progress < 100) {
+      progressLabel.textContent = `Завершено ${completedCourseSections} из ${totalCourseSections} уроков.`;
+    } else {
+      progressLabel.textContent = "Все уроки курса завершены.";
+    }
   } else {
-    progressLabel.textContent = "Все проверки урока выполнены.";
+    const totalQuestions = getSectionQuestionCount(section);
+    const answeredQuestions = getSectionAnsweredCount(section);
+    const progress = totalQuestions === 0 ? 0 : Math.min(100, Math.round((answeredQuestions / totalQuestions) * 100));
+
+    progressFill.style.width = `${progress}%`;
+    progressValue.textContent = `${progress}%`;
+
+    if (progress === 0) {
+      progressLabel.textContent = "Пока ничего не проверено.";
+    } else if (answeredQuestions === 1) {
+      progressLabel.textContent = `Выполнена 1 из ${totalQuestions} проверок.`;
+    } else if (progress < 100) {
+      progressLabel.textContent = `Выполнено ${answeredQuestions} из ${totalQuestions} проверок.`;
+    } else {
+      progressLabel.textContent = "Все проверки урока выполнены.";
+    }
   }
 }
 
@@ -3902,9 +3949,21 @@ document.addEventListener("click", (event) => {
     return;
   }
 
-  const navButton = event.target.closest("[data-section]");
+  const navButton = event.target.closest("[data-section-nav]");
   if (navButton) {
-    setActiveSection(navButton.dataset.section);
+    setActiveSection(navButton.dataset.section, { scroll: false });
+    return;
+  }
+
+  const nextButton = event.target.closest("[data-section-next]");
+  if (nextButton) {
+    setActiveSection(nextButton.dataset.section, { scroll: true });
+    return;
+  }
+
+  const sectionButton = event.target.closest("[data-section]");
+  if (sectionButton) {
+    setActiveSection(sectionButton.dataset.section, { scroll: false });
     return;
   }
 
