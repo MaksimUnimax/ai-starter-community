@@ -355,13 +355,26 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Частые ошибки и правила безопасной работы" in script_response.text
     assert "Обновление документации и новый диалог" in script_response.text
     assert "Проект может идти много дней или недель." in lesson8_section
-    assert "Документы проекта — это память проекта." in lesson8_section
-    assert "ChatGPT сам проверяет" in lesson8_section
-    assert "Пользователю не нужно вручную контролировать" in lesson8_section
-    assert "Prompt для обновления документов" in lesson8_section
-    assert "Prompt для нового диалога" in lesson8_section
+    assert "<strong>Документы проекта</strong> — это память проекта." in lesson8_section
+    assert "<strong>Техническое задание</strong>" in lesson8_section
+    assert "<strong>Roadmap</strong>" in lesson8_section
+    assert "<strong>Правила работы</strong>" in lesson8_section
+    assert "<strong>Current status</strong>" in lesson8_section
+    assert "<strong>Context</strong>" in lesson8_section
+    assert "<strong>Module map</strong>" in lesson8_section
+    assert "<strong>Stop-point</strong>" in lesson8_section
+    assert "<strong>ChatGPT</strong>" in lesson8_section
+    assert "<strong>Codex</strong>" in lesson8_section
+    assert "<strong>docs-update</strong>" in lesson8_section
+    assert "<strong>run</strong>" in lesson8_section
+    assert "<strong>commit</strong>" in lesson8_section
+    assert "<strong>stop-точка</strong>" in lesson8_section
+    assert "<strong>Prompt для обновления документов</strong>" in lesson8_section
+    assert "<strong>Prompt для нового диалога</strong>" in lesson8_section
     assert 'project_docs_update_prompt.md' in lesson8_section
     assert 'new_project_dialogue_prompt.md' in lesson8_section
+    assert "markdown: `# Prompt для обновления документов проекта" in lesson8_section
+    assert "markdown: `# Prompt для нового диалога по проекту" in lesson8_section
     assert lesson8_section.count("promptForm: {") == 2
     assert 'title: "Что нужно записывать"' not in lesson8_section
     assert 'title: "Что не нужно записывать"' not in lesson8_section
