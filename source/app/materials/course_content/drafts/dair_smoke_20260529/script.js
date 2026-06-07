@@ -2541,225 +2541,512 @@ Content script должен находить поле ввода ChatGPT.
       eyebrow: "Урок 8",
       title: "Обновление документации и новый диалог",
       description:
-        "В этом уроке разбираем, когда нужно обновлять документы и как новый диалог продолжает работу не по памяти, а по точной stop-точке.",
+        "В этом уроке разбираем, зачем обновлять документы проекта, как ChatGPT решает, что нужно записать, и как начать новый диалог с актуального контекста.",
       introLabel: "Вступление",
       intro: [
-        "Проект может идти много дней или недель. Если решения остаются только в чате, они теряются. Поэтому важные решения, ошибки, правила и stop-точки нужно фиксировать в документах."
+        "Проект может идти много дней или недель.",
+        "За это время появляются решения, ошибки, исправления, новые правила, проверки и stop-точки.",
+        "Если всё это остаётся только в переписке, проект начинает терять память.",
+        "Поэтому важное нужно переносить в документы проекта."
       ],
       learningOutcomeLabel: "После урока вы сможете",
       learningOutcome: [
-        "После урока вы сможете объяснить, когда нужно обновлять документы и зачем новый диалог должен начинаться с актуального контекста."
+        "После урока вы сможете объяснить, зачем обновлять документы проекта, как ChatGPT решает, что нужно записать, и как безопасно начать новый диалог без потери контекста."
       ],
       blocks: [
         {
           label: "Главная идея",
           title: "Документы — память проекта",
           html: `
-            <p><strong>Документы</strong> — это память проекта.</p>
-            <p>Если важное решение осталось только в чате, оно может потеряться.</p>
-            <p>Если <strong>stop-точка</strong> не записана, следующий диалог начнёт гадать.</p>
-          `
-        },
-        {
-          label: "Когда обновлять",
-          title: "Когда нужно обновлять документы",
-          html: `
-            <p><strong>Документы</strong> нужно обновлять, когда:</p>
+            <p>Документы проекта — это память проекта.</p>
+            <p>Они нужны не для красоты и не для отчёта “для галочки”.</p>
+            <p>Документы помогают сохранить то, что нельзя держать только в чате:</p>
             <ul>
-              <li>принято новое правило;</li>
-              <li>изменился порядок работы;</li>
-              <li>завершён важный этап;</li>
-              <li>исправлена важная ошибка;</li>
-              <li>изменилась структура курса;</li>
-              <li>появилась новая <strong>stop-точка</strong>;</li>
-              <li>изменился <strong>следующий шаг</strong>;</li>
-              <li>пользователь принял важное решение.</li>
-            </ul>
-          `
-        },
-        {
-          label: "Что записывать",
-          title: "Что нужно записывать",
-          html: `
-            <p>В <strong>документы</strong> нужно записывать:</p>
-            <ul>
-              <li>что изменилось;</li>
-              <li><strong>что доказано</strong>;</li>
-              <li><strong>что не доказано</strong>;</li>
-              <li>что теперь нельзя делать;</li>
+              <li>что мы строим;</li>
+              <li>какие решения уже приняты;</li>
+              <li>какие правила нельзя нарушать;</li>
+              <li>что уже сделано;</li>
+              <li>что уже проверено;</li>
+              <li>что сломалось и почему;</li>
+              <li>что было исправлено;</li>
+              <li>что пока не доказано;</li>
               <li>где остановились;</li>
               <li>какой следующий шаг безопасен.</li>
             </ul>
+            <p>Если важное решение осталось только в переписке, оно может потеряться.</p>
+            <p>Если stop-точка не записана, следующий диалог может начать гадать.</p>
+            <p>Документы нужны, чтобы ChatGPT, Codex и пользователь продолжали работу с одного и того же состояния.</p>
           `
         },
         {
-          label: "Что не записывать",
-          title: "Что не нужно записывать",
+          label: "Документы",
+          title: "Какие документы обычно есть в проекте",
           html: `
-            <p>Не нужно записывать:</p>
-            <ul>
-              <li>эмоции из переписки;</li>
-              <li>случайные идеи;</li>
-              <li>временный шум;</li>
-              <li>неутверждённые мысли;</li>
-              <li>секреты;</li>
-              <li>пароли;</li>
-              <li>токены.</li>
-            </ul>
+            <p>В разных проектах набор документов может отличаться, но обычно нужны несколько основных документов.</p>
+            <p>Техническое задание описывает, что мы строим и какой результат нужен.</p>
+            <p>Roadmap показывает порядок работы: что уже сделано, что сейчас в работе, что будет позже.</p>
+            <p>Правила работы фиксируют, как нельзя работать: например, нельзя трогать секреты, нельзя смешивать много задач в один run, нельзя принимать результат без проверки.</p>
+            <p>Current status показывает текущее состояние проекта: что доказано, что не доказано, где остановились и что можно делать дальше.</p>
+            <p>Context хранит важные решения из прошлых диалогов, чтобы новый диалог не начинался с нуля.</p>
+            <p>Module map показывает части проекта: какие модули есть и за что они отвечают.</p>
+            <p>Stop-point показывает точку остановки: на чём остановились и какой следующий шаг безопасен.</p>
+            <p>Вам не нужно помнить все эти названия наизусть.</p>
+            <p>В реальной работе ChatGPT сам проверяет, какие документы есть в проекте, какие нужно обновить и что именно должно попасть в каждый документ.</p>
           `
+        },
+        {
+          label: "Контроль",
+          title: "Что ChatGPT проверяет перед обновлением документов",
+          html: `
+            <p>Перед обновлением документов ChatGPT должен проверить, что действительно важно записать.</p>
+            <p>Обычно ChatGPT смотрит:</p>
+            <ul>
+              <li>что изменилось;</li>
+              <li>что принято пользователем;</li>
+              <li>что сделал Codex;</li>
+              <li>какой commit или результат появился;</li>
+              <li>какие проверки прошли;</li>
+              <li>какие ошибки найдены;</li>
+              <li>какие ошибки исправлены;</li>
+              <li>что доказано;</li>
+              <li>что не доказано;</li>
+              <li>что теперь запрещено делать;</li>
+              <li>где новая stop-точка;</li>
+              <li>какой следующий шаг безопасен.</li>
+            </ul>
+            <p>Пользователю не нужно вручную контролировать каждый пункт.</p>
+            <p>В нашей схеме ChatGPT сам следит, что нужно записать, а что записывать нельзя.</p>
+            <p>Пользователь может посмотреть, что именно ChatGPT собирается обновить, и принять или отклонить этот шаг.</p>
+            <p>В документы нельзя переносить:</p>
+            <ul>
+              <li>пароли;</li>
+              <li>токены;</li>
+              <li>приватные ключи;</li>
+              <li>.env и auth-файлы;</li>
+              <li>случайный шум из переписки;</li>
+              <li>эмоции;</li>
+              <li>неподтверждённые мысли;</li>
+              <li>идеи, которые пользователь не принял как решение.</li>
+            </ul>
+            <p>Главное правило простое: в документы попадают только важные решения, доказанные факты, правила, текущий статус и следующий безопасный шаг.</p>
+          `,
+          promptForm: {
+            id: "lesson-8-project-docs-update-prompt",
+            label: "Prompt для обновления документов",
+            description: "Ниже есть prompt для обновления документов проекта. Его можно скопировать или скачать как Markdown-файл.",
+            actionsLabel: "Действия с prompt для обновления документов",
+            filename: "project_docs_update_prompt.md",
+            markdown: `# Prompt для обновления документов проекта
+
+Ты — ChatGPT, ведущий технический специалист проекта.
+
+Мне нужно обновить документы проекта после текущего этапа работы.
+
+Я не программист, поэтому объясняй простыми словами и не требуй от меня вручную решать, какие документы нужно править.
+
+## Данные проекта
+
+Проект: [НАЗВАНИЕ ПРОЕКТА]
+
+Public docs repo: [ССЫЛКА НА ПУБЛИЧНЫЙ РЕПОЗИТОРИЙ ДОКУМЕНТОВ]
+
+Public app repo: [ССЫЛКА НА ПУБЛИЧНЫЙ РЕПОЗИТОРИЙ ПРИЛОЖЕНИЯ, ЕСЛИ ЕСТЬ]
+
+Локальный docs repo для Codex: [ПУТЬ К DOCS REPO НА СЕРВЕРЕ]
+
+Локальный app repo для Codex: [ПУТЬ К APP REPO НА СЕРВЕРЕ, ЕСЛИ ЕСТЬ]
+
+Папка документов проекта: [ПУТЬ К ДОКУМЕНТАМ ВНУТРИ DOCS REPO]
+
+Текущая рабочая ветка: [ВЕТКА, ЕСЛИ ЕСТЬ]
+
+## Что я передам ниже
+
+Ниже я передам один или несколько материалов:
+
+- отчёт Codex;
+- commit SHA;
+- ссылку на commit;
+- список изменённых файлов;
+- скриншот;
+- описание принятого решения;
+- описание ошибки;
+- текущую stop-точку;
+- что нужно делать дальше.
+
+## Твоя задача
+
+Сначала восстанови актуальный контекст проекта по документам.
+
+Не отвечай по памяти.
+
+Не делай выводы только из моего сообщения.
+
+Сначала проверь документы проекта в public docs repo, если он доступен.
+
+Если public docs repo недоступен, скажи об этом и попроси меня дать актуальные документы текстом или файлом.
+
+## Что нужно проверить
+
+Проверь:
+
+1. что это за проект;
+2. где хранятся документы;
+3. какой текущий статус проекта;
+4. какой последний записанный этап;
+5. какая текущая stop-точка;
+6. какой следующий шаг записан;
+7. какие документы нужно обновить;
+8. какие факты из текущего сообщения уже записаны;
+9. какие факты ещё не записаны;
+10. нет ли противоречий между документами и текущим отчётом.
+
+## Что нужно записывать
+
+В документы можно записывать только важное:
+
+- принятое решение;
+- завершённый этап;
+- доказанный результат;
+- найденную ошибку;
+- исправленную ошибку;
+- новый запрет или правило;
+- изменившийся порядок работы;
+- новый commit или ссылку на commit;
+- изменённые файлы;
+- результаты проверок;
+- что пока не доказано;
+- новую stop-точку;
+- следующий безопасный шаг.
+
+## Что нельзя записывать
+
+Не записывай в документы:
+
+- пароли;
+- токены;
+- приватные ключи;
+- .env;
+- auth-файлы;
+- API keys;
+- секреты;
+- эмоции из переписки;
+- случайный шум;
+- неподтверждённые мысли;
+- идеи, которые не были приняты как решение.
+
+Если в моём сообщении есть секреты, не повторяй их и скажи, что их нельзя переносить в документы.
+
+## Какой результат я хочу получить
+
+Сначала дай мне короткую сводку:
+
+1. что уже понятно;
+2. что нужно обновить;
+3. какие документы будут затронуты;
+4. что нельзя записывать;
+5. какой безопасный следующий шаг.
+
+Потом подготовь один готовый prompt для Codex на docs-only update.
+
+Codex prompt должен быть самодостаточным.
+
+Codex должен менять только документы проекта.
+
+Codex не должен менять код приложения, backend, frontend, runtime, production, секреты или unrelated files.
+
+Codex должен в конце сделать commit и push, если это разрешено правилами проекта.
+
+## Важное правило
+
+Ты сам решаешь, что нужно записать в документы, а что нельзя.
+
+Я не должен вручную контролировать каждую строку.
+
+Но перед Codex prompt покажи мне, какие именно документы ты предлагаешь обновить и почему.
+
+## Материалы текущего этапа
+
+[ВСТАВЬТЕ СЮДА ОТЧЁТ CODEX, COMMIT, СКРИНШОТ, РЕШЕНИЕ ИЛИ ОПИСАНИЕ ТОГО, ЧТО НУЖНО ЗАФИКСИРОВАТЬ]`
+          }
         },
         {
           label: "Отдельный шаг",
           title: "Почему docs-update — отдельный шаг",
           html: `
             <p>Обновление документов нельзя смешивать с хаотичной правкой всего подряд.</p>
-            <p>Если одновременно менять уроки, дизайн, сервер, документацию и правила, потом невозможно понять, что именно изменилось.</p>
-            <p>Поэтому <strong>docs-update</strong> должен быть отдельным понятным шагом.</p>
+            <p>Если в одном шаге одновременно менять урок, дизайн, сервер, документы и правила, потом сложно понять, что именно изменилось.</p>
+            <p>Поэтому docs-update лучше делать отдельным понятным run.</p>
+            <p>Сначала ChatGPT проверяет отчёт, commit, изменения и текущую stop-точку.</p>
+            <p>Потом ChatGPT готовит точное задание для Codex.</p>
+            <p>Потом Codex обновляет документы.</p>
+            <p>После этого ChatGPT проверяет, что документы действительно обновлены и что в них не попали лишние или опасные данные.</p>
           `
         },
         {
           label: "Новый диалог",
-          title: "Новый диалог",
+          title: "Как начинать новый диалог",
           html: `
             <p>Новый диалог нельзя начинать словами “ты же помнишь”.</p>
-            <p>Правильно начинать с <strong>актуального контекста</strong>:</p>
+            <p>ChatGPT может не видеть прошлый диалог или может потерять часть старого контекста.</p>
+            <p>Правильный способ другой:</p>
             <ul>
-              <li>что за проект;</li>
+              <li>сначала обновить документы проекта;</li>
+              <li>зафиксировать stop-точку;</li>
+              <li>закрыть или удалить старый активный диалог;</li>
+              <li>открыть новый диалог;</li>
+              <li>вставить prompt для нового диалога;</li>
+              <li>дать ChatGPT прочитать актуальные документы;</li>
+              <li>продолжать работу от записанной stop-точки.</li>
+            </ul>
+            <p>За этим тоже следит ChatGPT.</p>
+            <p>Пользователь не должен сам вспоминать весь проект и вручную пересказывать историю.</p>
+            <p>Задача пользователя — дать стартовый prompt и указать, где находятся документы проекта.</p>
+            <p>Задача ChatGPT — прочитать документы, проверить текущий статус и объяснить, на чём остановились.</p>
+          `,
+          promptForm: {
+            id: "lesson-8-new-project-dialogue-prompt",
+            label: "Prompt для нового диалога",
+            description: "Ниже есть prompt для нового диалога. Его можно скопировать или скачать как Markdown-файл.",
+            actionsLabel: "Действия с prompt для нового диалога",
+            filename: "new_project_dialogue_prompt.md",
+            markdown: `# Prompt для нового диалога по проекту
+
+Начни работу по проекту строго по документам проекта.
+
+Ты — ChatGPT, ведущий технический специалист проекта.
+
+Модель в каждом проектном ответе указывай полным названием, если это требуется правилами проекта.
+
+## Данные проекта
+
+Проект: [НАЗВАНИЕ ПРОЕКТА]
+
+Public docs repo: [ССЫЛКА НА ПУБЛИЧНЫЙ РЕПОЗИТОРИЙ ДОКУМЕНТОВ]
+
+Public app repo: [ССЫЛКА НА ПУБЛИЧНЫЙ РЕПОЗИТОРИЙ ПРИЛОЖЕНИЯ, ЕСЛИ ЕСТЬ]
+
+Локальный docs repo для Codex: [ПУТЬ К DOCS REPO НА СЕРВЕРЕ]
+
+Локальный app repo для Codex: [ПУТЬ К APP REPO НА СЕРВЕРЕ, ЕСЛИ ЕСТЬ]
+
+Папка документов проекта: [ПУТЬ К ДОКУМЕНТАМ ВНУТРИ DOCS REPO]
+
+## Главный принцип
+
+Этот prompt не является источником текущего этапа проекта.
+
+Текущий этап нужно определить только по актуальным документам проекта.
+
+Не продолжай по памяти.
+
+Не продолжай по прошлому диалогу.
+
+Не угадывай, где мы остановились.
+
+Сначала прочитай документы проекта.
+
+## Что нужно сделать сначала
+
+Сначала открой и проверь public docs repo, если он доступен.
+
+Найди основные документы проекта.
+
+Обычно это:
+
+- правила работы;
+- техническое задание;
+- roadmap;
+- current status;
+- context;
+- module map;
+- stop-point;
+- список открытых вопросов;
+- документы по source-of-truth и runtime;
+- документы по безопасным границам.
+
+Если в проекте есть index, entrypoint, manifest или список обязательных документов, используй их как главный вход.
+
+Если документы недоступны, отсутствуют или противоречат друг другу, остановись и напиши, чего не хватает.
+
+## Проверка перед выводами
+
+Перед тем как говорить текущий этап, проверь:
+
+1. что документы относятся именно к этому проекту;
+2. что это не документы другого проекта;
+3. какой документ самый свежий;
+4. какие блоки являются историческими;
+5. какие задачи уже завершены;
+6. какая текущая stop-точка;
+7. какой следующий шаг безопасен;
+8. нет ли противоречий между roadmap, current status и context.
+
+## Что нужно дать в первом ответе
+
+Первый содержательный ответ начни с:
+
+DOC_READ_PROOF
+
+Потом дай:
+
+CORPUS_MATCH_CHECK
+
+Потом дай:
+
+CHRONOLOGY_CHECK
+
+После этого дай структурированную сводку:
+
+1. Принятые правила работы
+2. Что это за проект
+3. Какие документы были прочитаны и почему
+4. Что показывает current status
+5. Что показывает context
+6. Что показывает roadmap
+7. Что показывает module map
+8. Что уже доказано
+9. Что пока не доказано
+10. На каком этапе сейчас работа
+11. На чём остановились
+12. Что логично делать дальше
+13. Какие старые этапы больше не являются текущими
+14. Какие документы были прочитаны ChatGPT и почему это не список документов для Codex
+15. Что обязательно брать в следующий диалог
+
+## Важные правила работы
+
+Сначала анализ, потом технический шаг.
+
+Сначала proof, потом fix.
+
+Один run — одна задача.
+
+ChatGPT проектирует, проверяет и объясняет.
+
+Codex выполняет точное задание.
+
+Codex не должен сам выбирать архитектуру, стратегию или следующий этап.
+
+Не трогай production, секреты, auth-файлы, токены, приватные ключи и .env без отдельного явного разрешения.
+
+Если нужно дать Codex prompt, сначала объясни, зачем он нужен, что он делает, что не делает и какие границы безопасности.
+
+Не давай Codex prompt автоматически в первом ответе.
+
+Сначала восстанови текущий контекст и зафиксируй stop-точку.
+
+## Что делать после стартовой сводки
+
+После стартовой сводки остановись и жди, какой следующий run выберет пользователь.
+
+Не начинай fix, design, docs update, deploy или production handoff автоматически.
+`
+          }
+        },
+        {
+          label: "Практика",
+          title: "Обновить документы и начать новый диалог",
+          html: `
+            <p>В этой практике вы закрепляете полный цикл завершения диалога.</p>
+            <p>Что нужно сделать:</p>
+            <ol>
+              <li>Откройте “Prompt для обновления документов”.</li>
+              <li>Скопируйте prompt или скачайте его как .md.</li>
+              <li>Вставьте prompt в ChatGPT.</li>
+              <li>ChatGPT подготовит задание для Codex на обновление документов.</li>
+              <li>Передайте задание Codex.</li>
+              <li>Верните отчёт Codex в ChatGPT.</li>
+              <li>ChatGPT проверит, что документы обновлены правильно.</li>
+              <li>Закройте или удалите текущий активный диалог с ChatGPT.</li>
+              <li>Откройте новый диалог.</li>
+              <li>Откройте “Prompt для нового диалога”.</li>
+              <li>Скопируйте prompt или скачайте его как .md.</li>
+              <li>Вставьте prompt в новый диалог.</li>
+              <li>Проверьте, что ChatGPT начал не по памяти, а с чтения актуальных документов проекта.</li>
+            </ol>
+            <p>Практика завершена, когда новый диалог смог объяснить:</p>
+            <ul>
+              <li>что это за проект;</li>
               <li>где документы;</li>
               <li>что уже сделано;</li>
               <li>что доказано;</li>
-              <li>какая stop-точка;</li>
-              <li>какой следующий шаг.</li>
+              <li>где stop-точка;</li>
+              <li>какой следующий шаг безопасен.</li>
             </ul>
           `
         },
         {
-          label: "Точка остановки",
-          title: "Stop-point",
+          label: "Главный вывод урока",
+          title: "Главное",
           html: `
-            <p><strong>Stop-point</strong> — это точка остановки.</p>
-            <p>Она отвечает на вопрос:</p>
-            <p>“На чём мы остановились и что можно делать дальше?”</p>
-            <p>Без stop-point следующий диалог начинает гадать.</p>
-          `
-        },
-        {
-          label: "Итог",
-          title: "Главный вывод",
-          html: `
-            <p><strong>Документы</strong> обновляют не ради формальности. Они нужны, чтобы <strong>ChatGPT</strong>, <strong>Codex</strong> и пользователь продолжали работу с одного и того же состояния, а не по памяти и догадкам.</p>
+            <p>Документы — это память проекта.</p>
+            <p>ChatGPT следит, что нужно записать в документы, а что записывать нельзя.</p>
+            <p>Пользователь не обязан вручную контролировать каждую строку документации, но может проверить, что именно ChatGPT собирается обновить.</p>
+            <p>Перед новым диалогом документы нужно обновить, а новый диалог нужно начинать с актуального контекста.</p>
+            <p>Так проект продолжается не по памяти и догадкам, а по записанным фактам.</p>
           `
         }
       ],
-      contentHtml: `
-        <p><strong>Документы</strong> — это память проекта.</p>
-        <p>Если важное решение осталось только в чате, оно может потеряться.</p>
-        <p>Если <strong>stop-точка</strong> не записана, следующий диалог начнёт гадать.</p>
-        <p>Когда нужно обновлять документы</p>
-        <p><strong>Документы</strong> нужно обновлять, когда:</p>
-        <ul>
-          <li>принято новое правило;</li>
-          <li>изменился порядок работы;</li>
-          <li>завершён важный этап;</li>
-          <li>исправлена важная ошибка;</li>
-          <li>изменилась структура курса;</li>
-          <li>появилась новая <strong>stop-точка</strong>;</li>
-          <li>изменился <strong>следующий шаг</strong>;</li>
-          <li>пользователь принял важное решение.</li>
-        </ul>
-        <p>Что нужно записывать</p>
-        <p>В <strong>документы</strong> нужно записывать:</p>
-        <ul>
-          <li>что изменилось;</li>
-          <li><strong>что доказано</strong>;</li>
-          <li><strong>что не доказано</strong>;</li>
-          <li>что теперь нельзя делать;</li>
-          <li>где остановились;</li>
-          <li>какой следующий шаг безопасен.</li>
-        </ul>
-        <p>Что не нужно записывать</p>
-        <p>Не нужно записывать:</p>
-        <ul>
-          <li>эмоции из переписки;</li>
-          <li>случайные идеи;</li>
-          <li>временный шум;</li>
-          <li>неутверждённые мысли;</li>
-          <li>секреты;</li>
-          <li>пароли;</li>
-          <li>токены.</li>
-        </ul>
-        <p>Почему <strong>docs-update</strong> — отдельный шаг</p>
-        <p>Обновление документов нельзя смешивать с хаотичной правкой всего подряд.</p>
-        <p>Если одновременно менять уроки, дизайн, сервер, документацию и правила, потом невозможно понять, что именно изменилось.</p>
-        <p>Поэтому <strong>docs-update</strong> должен быть отдельным понятным шагом.</p>
-        <p>Новый диалог</p>
-        <p>Новый диалог нельзя начинать словами “ты же помнишь”.</p>
-        <p>Правильно начинать с <strong>актуального контекста</strong>:</p>
-        <p>Нужен <strong>актуальный контекст</strong>.</p>
-        <ul>
-          <li>что за проект;</li>
-          <li>где документы;</li>
-          <li>что уже сделано;</li>
-          <li>что доказано;</li>
-          <li>какая stop-точка;</li>
-          <li>какой следующий шаг.</li>
-        </ul>
-        <p><strong>Stop-point</strong></p>
-        <p><strong>Stop-point</strong> — это точка остановки.</p>
-        <p>Она отвечает на вопрос:</p>
-        <p>“На чём мы остановились и что можно делать дальше?”</p>
-        <p>Без stop-point следующий диалог начинает гадать.</p>
-        <p>Главный вывод</p>
-        <p><strong>Документы</strong> обновляют не ради формальности. Они нужны, чтобы <strong>ChatGPT</strong>, <strong>Codex</strong> и пользователь продолжали работу с одного и того же состояния, а не по памяти и догадкам.</p>
-      `,
       quizzes: [
         {
-          prompt: "Когда нужно обновлять документы?",
+          prompt: "Что такое документы проекта в этом уроке?",
           options: [
-            "После каждой эмоции в чате",
-            "После принятого важного решения или завершённого этапа",
-            "Только в самом конце проекта"
+            "Память проекта, где сохраняют важные решения и состояние работы",
+            "Случайные заметки из переписки",
+            "Только список паролей и токенов"
           ],
-          answerIndex: 1,
+          answerIndex: 0,
           explanation:
-            "Документы обновляют после важных решений, завершённых этапов и появления новой stop-точки."
+            "Документы хранят важное: решения, статус, правила, stop-точку и следующий шаг."
+        },
+        {
+          prompt: "Кто проверяет, что нужно записать в документы, а что нет?",
+          options: [
+            "Пользователь вручную решает каждый пункт",
+            "Codex без ChatGPT",
+            "ChatGPT сам проверяет, что нужно записать и что не нужно переносить"
+          ],
+          answerIndex: 2,
+          explanation:
+            "В этом процессе ChatGPT сам решает, что записывать в документы, а что не стоит переносить."
         },
         {
           prompt: "Что нельзя записывать в документы?",
           options: [
-            "Пароли, токены и случайный шум",
-            "Принятое правило",
+            "Пароли, токены, приватные ключи и случайный шум",
+            "Доказанные факты",
             "Stop-point"
           ],
           answerIndex: 0,
           explanation:
-            "Секреты, пароли, токены и случайный шум нельзя переносить в документы."
+            "Секреты, шум, эмоции и неподтверждённые мысли в документы не переносят."
         },
         {
-          prompt: "Зачем нужен stop-point?",
+          prompt: "Почему обновление документов лучше делать отдельным шагом?",
           options: [
-            "Чтобы заменить roadmap",
-            "Чтобы скрыть ошибки",
-            "Чтобы следующий диалог начинался с точного состояния"
-          ],
-          answerIndex: 2,
-          explanation:
-            "Stop-point позволяет продолжить работу с точного места, а не по памяти."
-        },
-        {
-          prompt: "Почему нельзя продолжать проект только по памяти?",
-          options: [
-            "Потому что Git перестанет работать",
-            "Потому что можно потерять решения и повторить ошибки",
-            "Потому что Codex сам всё помнит"
+            "Чтобы смешать все задачи в один run",
+            "Чтобы потом было легко понять, что именно изменилось и где остановились",
+            "Чтобы не проверять результат"
           ],
           answerIndex: 1,
           explanation:
-            "В длинном проекте память ненадёжна, поэтому важное нужно фиксировать."
+            "Отдельный шаг помогает не смешивать разные изменения и проще проверять результат."
+        },
+        {
+          prompt: "С чего должен начинаться новый диалог?",
+          options: [
+            "С памяти о прошлом диалоге без проверки",
+            "С вопроса о секретах и токенах",
+            "С чтения актуальных документов проекта и текущей stop-точки"
+          ],
+          answerIndex: 2,
+          explanation:
+            "Новый диалог должен стартовать с документов, а не с фразы “ты же помнишь”."
         }
       ],
       resultTitle: "Главный вывод урока",
-      resultText: "Документы сохраняют решения, доказательства и stop-точку. Новый диалог должен начинаться с актуального контекста, а не с догадок.",
+      resultText: "Документы сохраняют решения, правила, проверки и stop-point. ChatGPT сам следит, что нужно записать, а новый диалог начинается с актуального контекста, а не по памяти.",
       nextStepTitle: "Следующий урок",
       nextStepText: "В следующем уроке соберём главные ошибки и правила безопасной работы.",
       nextStepButtonLabel: "Перейти к уроку 9",
@@ -3091,7 +3378,7 @@ function renderLessonBlocks(section) {
   }
 
   return blocks
-    .map((block) => {
+    .map((block, index) => {
       const label = block.label ? `<span class="block-label">${escapeHTML(block.label)}</span>` : "";
       const title = block.title ? `<h4>${escapeHTML(block.title)}</h4>` : "";
       let body = "";
@@ -3108,9 +3395,22 @@ function renderLessonBlocks(section) {
         body = `${paragraphs}${items}`;
       }
 
-      const starterPrompt = block.includeStarterPromptForm && section.starterPromptPlacement === "block"
-        ? renderStarterPromptForm(section)
-        : "";
+      const promptForms = [];
+      if (block.includeStarterPromptForm && section.starterPromptPlacement === "block") {
+        promptForms.push(section);
+      }
+      if (block.promptForm) {
+        promptForms.push({
+          id: block.promptForm.id || `${section.id}-${index}-starter-prompt`,
+          label: block.promptForm.label,
+          description: block.promptForm.description,
+          actionsLabel: block.promptForm.actionsLabel,
+          filename: block.promptForm.filename,
+          markdown: block.promptForm.markdown
+        });
+      }
+
+      const starterPrompt = promptForms.map((promptForm) => renderStarterPromptForm(promptForm)).join("");
 
       return `
         <section class="callout lesson-content-block">
@@ -3280,27 +3580,54 @@ function renderOutcome(section) {
   `;
 }
 
-function renderStarterPromptForm(section) {
-  if (!section || !section.starterPromptMarkdown) {
+function normalizeStarterPromptData(promptSource) {
+  if (!promptSource) {
+    return null;
+  }
+
+  if (promptSource.starterPromptMarkdown) {
+    return {
+      id: promptSource.id,
+      label: promptSource.starterPromptLabel || "Prompt",
+      description:
+        promptSource.starterPromptDescription || "Ниже есть prompt. Его можно скопировать или скачать как Markdown-файл.",
+      actionsLabel: promptSource.starterPromptActionsLabel || "Действия с prompt",
+      filename: promptSource.starterPromptFilename || "start_project_documentation_prompt.md",
+      markdown: promptSource.starterPromptMarkdown
+    };
+  }
+
+  if (promptSource.markdown) {
+    return {
+      id: promptSource.id,
+      label: promptSource.label || "Prompt",
+      description: promptSource.description || "Ниже есть prompt. Его можно скопировать или скачать как Markdown-файл.",
+      actionsLabel: promptSource.actionsLabel || "Действия с prompt",
+      filename: promptSource.filename || "start_project_documentation_prompt.md",
+      markdown: promptSource.markdown
+    };
+  }
+
+  return null;
+}
+
+function renderStarterPromptForm(promptSource) {
+  const prompt = normalizeStarterPromptData(promptSource);
+  if (!prompt) {
     return "";
   }
 
-  const textareaId = `${section.id}-starter-prompt`;
-  const filename = section.starterPromptFilename || "start_project_documentation_prompt.md";
-  const promptLabel = section.starterPromptLabel || "Prompt";
-  const promptDescription =
-    section.starterPromptDescription || "Ниже есть prompt. Его можно скопировать или скачать как Markdown-файл.";
-  const promptActionsLabel = section.starterPromptActionsLabel || "Действия с prompt";
-  const isOpen = Boolean(state.openStarterPromptIds?.has(section.id));
+  const textareaId = `${prompt.id}-starter-prompt`;
+  const isOpen = Boolean(state.openStarterPromptIds?.has(prompt.id));
 
   return `
-    <section class="callout" data-starter-prompt-panel="${section.id}" id="${section.id}-starter-prompt">
-      <span class="block-label">${escapeHTML(promptLabel)}</span>
-      <p>${escapeHTML(promptDescription)}</p>
-      <div class="starter-prompt-actions" role="group" aria-label="${escapeHTML(promptActionsLabel)}">
-        <button class="primary-button starter-prompt-button" type="button" data-starter-prompt-toggle="${section.id}">${isOpen ? "Скрыть prompt" : "Смотреть prompt"}</button>
-        <button class="primary-button starter-prompt-button" type="button" data-starter-prompt-copy="${section.id}">Скопировать prompt</button>
-        <button class="primary-button starter-prompt-button" type="button" data-starter-prompt-download="${section.id}" data-starter-prompt-filename="${escapeHTML(filename)}">Скачать .md</button>
+    <section class="callout" data-starter-prompt-panel="${prompt.id}" id="${prompt.id}-starter-prompt">
+      <span class="block-label">${escapeHTML(prompt.label)}</span>
+      <p>${escapeHTML(prompt.description)}</p>
+      <div class="starter-prompt-actions" role="group" aria-label="${escapeHTML(prompt.actionsLabel)}">
+        <button class="primary-button starter-prompt-button" type="button" data-starter-prompt-toggle="${prompt.id}">${isOpen ? "Скрыть prompt" : "Смотреть prompt"}</button>
+        <button class="primary-button starter-prompt-button" type="button" data-starter-prompt-copy="${prompt.id}">Скопировать prompt</button>
+        <button class="primary-button starter-prompt-button" type="button" data-starter-prompt-download="${prompt.id}" data-starter-prompt-filename="${escapeHTML(prompt.filename)}">Скачать .md</button>
       </div>
       <textarea
         id="${textareaId}"
@@ -3309,13 +3636,15 @@ function renderStarterPromptForm(section) {
         rows="28"
         ${isOpen ? "" : "hidden"}
         style="width: 100%; min-height: 420px; resize: vertical; overflow: auto; font: inherit; line-height: 1.5; margin-top: 12px;"
-      >${escapeHTML(section.starterPromptMarkdown)}</textarea>
+      >${escapeHTML(prompt.markdown)}</textarea>
     </section>
   `;
 }
 
-function getStarterPromptSection(sectionId) {
-  return courseData.sections.find((section) => section.id === sectionId) || null;
+function getStarterPromptMarkdown(promptId) {
+  const panel = document.querySelector(`[data-starter-prompt-panel="${promptId}"]`);
+  const textarea = panel?.querySelector(`textarea[id="${promptId}-starter-prompt"]`);
+  return textarea?.value || "";
 }
 
 function copyTextToClipboard(text) {
@@ -3528,22 +3857,23 @@ document.addEventListener("click", (event) => {
 
   const starterPromptCopyButton = event.target.closest("[data-starter-prompt-copy]");
   if (starterPromptCopyButton) {
-    const section = getStarterPromptSection(starterPromptCopyButton.dataset.starterPromptCopy);
-    if (section?.starterPromptMarkdown) {
-      copyTextToClipboard(section.starterPromptMarkdown);
+    const promptId = starterPromptCopyButton.dataset.starterPromptCopy;
+    const promptMarkdown = getStarterPromptMarkdown(promptId);
+    if (promptMarkdown) {
+      copyTextToClipboard(promptMarkdown);
     }
     return;
   }
 
   const starterPromptDownloadButton = event.target.closest("[data-starter-prompt-download]");
   if (starterPromptDownloadButton) {
-    const section = getStarterPromptSection(starterPromptDownloadButton.dataset.starterPromptDownload);
-    if (section?.starterPromptMarkdown) {
+    const promptId = starterPromptDownloadButton.dataset.starterPromptDownload;
+    const promptMarkdown = getStarterPromptMarkdown(promptId);
+    if (promptMarkdown) {
       const filename =
         starterPromptDownloadButton.dataset.starterPromptFilename ||
-        section.starterPromptFilename ||
         "start_project_documentation_prompt.md";
-      downloadMarkdown(filename, section.starterPromptMarkdown);
+      downloadMarkdown(filename, promptMarkdown);
     }
     return;
   }

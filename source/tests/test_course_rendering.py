@@ -331,7 +331,9 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "В следующем уроке разберём процесс работы: какие бывают run’ы Codex, зачем нужна пошаговость и как удерживать важные инструкции в контексте ChatGPT." in lesson6_section
     assert "Перейти к уроку 7" in lesson6_section
     lesson8_start = script_response.text.index('id: "lesson-8"')
+    lesson9_start = script_response.text.index('id: "lesson-9"')
     lesson7_section = script_response.text[lesson7_start:lesson8_start]
+    lesson8_section = script_response.text[lesson8_start:lesson9_start]
     lesson4_agents_index = lesson4_section.index('label: "AGENTS.md"')
     lesson4_skills_index = lesson4_section.index('label: "Skills"')
     lesson4_errors_index = lesson4_section.index('label: "Частые ошибки"')
@@ -352,6 +354,34 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Какую модель выбирать для Codex" in script_response.text
     assert "Частые ошибки и правила безопасной работы" in script_response.text
     assert "Обновление документации и новый диалог" in script_response.text
+    assert "Проект может идти много дней или недель." in lesson8_section
+    assert "Документы проекта — это память проекта." in lesson8_section
+    assert "ChatGPT сам проверяет" in lesson8_section
+    assert "Пользователю не нужно вручную контролировать" in lesson8_section
+    assert "Prompt для обновления документов" in lesson8_section
+    assert "Prompt для нового диалога" in lesson8_section
+    assert 'project_docs_update_prompt.md' in lesson8_section
+    assert 'new_project_dialogue_prompt.md' in lesson8_section
+    assert lesson8_section.count("promptForm: {") == 2
+    assert 'title: "Что нужно записывать"' not in lesson8_section
+    assert 'title: "Что не нужно записывать"' not in lesson8_section
+    assert "Что ChatGPT проверяет перед обновлением документов" in lesson8_section
+    assert "Как начинать новый диалог" in lesson8_section
+    assert "Обновить документы и начать новый диалог" in lesson8_section
+    assert "Главное" in lesson8_section
+    for forbidden in [
+        "OpenScript",
+        "AI Starter Community",
+        "openscript.ru",
+        "MaksimUnimax",
+        "Agent Lab",
+        "APM",
+        "Kilo",
+        "/opt/ai-starter-community",
+        "/opt/openscript-site-docs",
+        "design/product-story-03",
+    ]:
+        assert forbidden not in lesson8_section
     assert "Зарегистрировать аккаунт GitHub" in script_response.text
     assert "Что нельзя делать" not in lesson3_section
     assert "Вступление" in script_response.text
