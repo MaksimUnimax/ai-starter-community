@@ -811,20 +811,27 @@ const courseData = {
       label: "Определение",
       title: "Что такое Codex",
       html: `
-        <p><strong>Codex</strong> — это технический ИИ-исполнитель для работы с кодом и файлами проекта.</p>
-        <p>Проще говоря, Codex — это инструмент, который работает в проекте и может:</p>
+        <p><strong>Codex</strong> — это <strong>Codex CLI</strong>.</p>
+        <p><strong>CLI</strong> читается как “си-эл-ай”.</p>
+        <p><strong>CLI</strong> — это способ работать с программой через командную строку. На Windows это обычно <strong>PowerShell</strong>, на macOS — <strong>Terminal</strong>.</p>
+        <p>Проще говоря, вы не нажимаете кнопки в обычном окне программы, а пишете команду в терминале. Например, команда <strong>codex</strong> запускает Codex.</p>
+        <p><strong>Codex CLI</strong> — это инструмент OpenAI для работы с кодом и файлами проекта.</p>
+        <p>Он открывается в терминале и может работать в выбранной папке проекта.</p>
+        <p><strong>Codex</strong> может:</p>
         <ul>
           <li>читать файлы проекта;</li>
           <li>менять код;</li>
           <li>менять тексты в нужных файлах;</li>
           <li>запускать проверки;</li>
           <li>смотреть ошибки;</li>
-          <li>делать commit;</li>
+          <li>выполнять команды;</li>
           <li>готовить отчёт о выполненной работе.</li>
         </ul>
-        <p>Codex не является руководителем проекта.</p>
-        <p>Он не должен сам выбирать стратегию, менять план курса, придумывать архитектуру или решать, какой этап делать дальше.</p>
-        <p>В нашей системе это делает ChatGPT.</p>
+        <p><strong>Важно:</strong> Codex не является руководителем проекта.</p>
+        <p>Codex не должен сам выбирать стратегию, менять план курса, придумывать архитектуру или решать, какой этап делать дальше.</p>
+        <p>В нашей системе это делает <strong>ChatGPT</strong>.</p>
+        <p><strong>ChatGPT</strong> понимает цель, читает правила, проверяет документацию, следит за run’ами и пишет точное задание.</p>
+        <p><strong>Codex CLI</strong> выполняет это задание в проекте и возвращает отчёт.</p>
       `
     },
     {
@@ -2275,7 +2282,7 @@ ChatGPT вставляет тексты документов в prompt для Co
             <p><strong>Что нужно сделать:</strong></p>
 
             <ol>
-              <li>Откройте готовый prompt ниже.</li>
+              <li>Откройте блок “Prompt для создания расширения” ниже.</li>
               <li>Скопируйте prompt кнопкой “Скопировать prompt” или скачайте его кнопкой “Скачать .md”.</li>
               <li>Откройте новый чат с <strong>ChatGPT</strong>.</li>
               <li>Вставьте prompt в <strong>ChatGPT</strong>.</li>
@@ -2296,13 +2303,10 @@ ChatGPT вставляет тексты документов в prompt для Co
             <p><strong>Ошибка 2:</strong> давать <strong>Codex</strong> сразу много задач.</p>
             <p>Правильно: чаще всего один run решает одну задачу, чтобы сохранить контроль.</p>
 
-            <p><strong>Ошибка 3:</strong> писать код в design run.</p>
-            <p>Правильно: в <strong>design run</strong> код не пишется, только описывается план решения.</p>
-
-            <p><strong>Ошибка 4:</strong> чинить проблему без proof run.</p>
+            <p><strong>Ошибка 3:</strong> чинить проблему без proof run.</p>
             <p>Правильно: сначала доказать факты, потом исправлять.</p>
 
-            <p><strong>Ошибка 5:</strong> хранить секреты в prefix-расширении.</p>
+            <p><strong>Ошибка 4:</strong> хранить секреты в prefix-расширении.</p>
             <p>Правильно: prefix может содержать правила и напоминания, но не пароли, токены или ключи.</p>
           `
         },
@@ -2322,8 +2326,11 @@ ChatGPT вставляет тексты документов в prompt для Co
           `
         }
       ],
+      starterPromptLabel: "Prompt для создания расширения",
+      starterPromptDescription: "Ниже есть prompt для практики. Его можно скопировать или скачать как Markdown-файл.",
+      starterPromptActionsLabel: "Действия с prompt для практики",
       starterPromptFilename: "prefix_extension_for_chatgpt_prompt.md",
-      starterPromptMarkdown: `# Prompt для создания prefix-расширения для ChatGPT
+      starterPromptMarkdown: `# Prompt для создания расширения
 
 Ты — ChatGPT, ведущий технический специалист.
 
@@ -3271,13 +3278,17 @@ function renderStarterPromptForm(section) {
 
   const textareaId = `${section.id}-starter-prompt`;
   const filename = section.starterPromptFilename || "start_project_documentation_prompt.md";
+  const promptLabel = section.starterPromptLabel || "Пример стартового prompt’а";
+  const promptDescription =
+    section.starterPromptDescription || "Ниже есть готовый prompt для начала проекта. Его можно скопировать или скачать как Markdown-файл.";
+  const promptActionsLabel = section.starterPromptActionsLabel || "Действия со стартовым prompt";
   const isOpen = Boolean(state.openStarterPromptIds?.has(section.id));
 
   return `
     <section class="callout" data-starter-prompt-panel="${section.id}" id="${section.id}-starter-prompt">
-      <span class="block-label">Пример стартового prompt’а</span>
-      <p>Ниже есть готовый prompt для начала проекта. Его можно скопировать или скачать как Markdown-файл.</p>
-      <div class="starter-prompt-actions" role="group" aria-label="Действия со стартовым prompt">
+      <span class="block-label">${escapeHTML(promptLabel)}</span>
+      <p>${escapeHTML(promptDescription)}</p>
+      <div class="starter-prompt-actions" role="group" aria-label="${escapeHTML(promptActionsLabel)}">
         <button class="primary-button starter-prompt-button" type="button" data-starter-prompt-toggle="${section.id}">${isOpen ? "Скрыть prompt" : "Смотреть prompt"}</button>
         <button class="primary-button starter-prompt-button" type="button" data-starter-prompt-copy="${section.id}">Скопировать prompt</button>
         <button class="primary-button starter-prompt-button" type="button" data-starter-prompt-download="${section.id}" data-starter-prompt-filename="${escapeHTML(filename)}">Скачать .md</button>

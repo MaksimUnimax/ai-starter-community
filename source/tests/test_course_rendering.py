@@ -318,6 +318,13 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     lesson4_skills_index = lesson4_section.index('label: "Skills"')
     lesson4_errors_index = lesson4_section.index('label: "Частые ошибки"')
     assert lesson4_agents_index < lesson4_skills_index < lesson4_errors_index
+    assert "<strong>Codex</strong> — это <strong>Codex CLI</strong>." in script_response.text
+    assert "<strong>CLI</strong> читается как “си-эл-ай”." in script_response.text
+    assert "<strong>CLI</strong> — это способ работать с программой через командную строку. На Windows это обычно <strong>PowerShell</strong>, на macOS — <strong>Terminal</strong>." in script_response.text
+    assert "команда <strong>codex</strong> запускает Codex." in script_response.text
+    assert "Он открывается в терминале и может работать в выбранной папке проекта." in script_response.text
+    assert "<strong>ChatGPT</strong> понимает цель, читает правила, проверяет документацию, следит за run’ами и пишет точное задание." in script_response.text
+    assert "<strong>Codex CLI</strong> выполняет это задание в проекте и возвращает отчёт." in script_response.text
     assert "Какую модель выбирать для Codex" in script_response.text
     assert "Частые ошибки и правила безопасной работы" in script_response.text
     assert "Обновление документации и новый диалог" in script_response.text
@@ -371,10 +378,17 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Developer mode" in lesson7_section
     assert "Load unpacked" in lesson7_section
     assert "Я не программист" in lesson7_section
+    assert "Prompt для создания расширения" in lesson7_section
+    assert "starterPromptLabel: \"Prompt для создания расширения\"" in lesson7_section
+    assert "starterPromptDescription: \"Ниже есть prompt для практики. Его можно скопировать или скачать как Markdown-файл.\"" in lesson7_section
+    assert "starterPromptActionsLabel: \"Действия с prompt для практики\"" in lesson7_section
     assert "starterPromptFilename: \"prefix_extension_for_chatgpt_prompt.md\"" in lesson7_section
-    assert "starterPromptMarkdown: `# Prompt для создания prefix-расширения для ChatGPT" in lesson7_section
-    assert "Откройте готовый prompt ниже." in lesson7_section
+    assert "starterPromptMarkdown: `# Prompt для создания расширения" in lesson7_section
+    assert "Откройте блок “Prompt для создания расширения” ниже." in lesson7_section
     assert "Скопируйте prompt кнопкой “Скопировать prompt” или скачайте его кнопкой “Скачать .md”." in lesson7_section
+    assert "Ошибка 3: писать код в design run." not in lesson7_section
+    assert "Правильно: в <strong>design run</strong> код не пишется, только описывается план решения." not in lesson7_section
+    assert "стартовый prompt" not in lesson7_section
     assert "<pre><code>" not in lesson7_section
     assert "Что такое run в этом курсе?" in lesson7_section
     assert "Что такое design run?" in lesson7_section
