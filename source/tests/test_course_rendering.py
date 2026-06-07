@@ -376,6 +376,18 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "markdown: `# Prompt для обновления документов проекта" in lesson8_section
     assert "markdown: `# Prompt для нового диалога по проекту" in lesson8_section
     assert lesson8_section.count("promptForm: {") == 2
+    assert "Что я передам ниже" not in lesson8_section
+    assert "Ниже я передам" not in lesson8_section
+    assert "Материалы текущего этапа" not in lesson8_section
+    assert "ВСТАВЬТЕ СЮДА ОТЧЁТ" not in lesson8_section
+    assert "СКРИНШОТ, РЕШЕНИЕ ИЛИ ОПИСАНИЕ" not in lesson8_section
+    assert "Этот prompt — универсальный шаблон" in lesson8_section
+    assert "создай для меня новый проектный prompt для обновления документов" in lesson8_section
+    assert "создай для меня новый prompt для нового диалога" in lesson8_section
+    assert "Сохраните этот новый prompt в prefix-расширение" in lesson8_section
+    assert "используйте его, а не универсальный шаблон из урока" in lesson8_section
+    assert "Проверь текущий диалог, если он доступен." in lesson8_section
+    assert "Проверь документы проекта в public docs repo, если он доступен." in lesson8_section
     assert 'title: "Что нужно записывать"' not in lesson8_section
     assert 'title: "Что не нужно записывать"' not in lesson8_section
     assert "Что ChatGPT проверяет перед обновлением документов" in lesson8_section
