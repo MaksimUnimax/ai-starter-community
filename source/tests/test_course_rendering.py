@@ -200,6 +200,8 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "hero-bg-desktop" in page_response.text
     assert "hero-bg-mobile" in page_response.text
     assert "На главную" in page_response.text
+    assert "Структура курса" in page_response.text
+    assert "Структура урока" not in page_response.text
     assert "Тестовая версия курса" not in page_response.text
     assert "тестовая версия урока" not in page_response.text
     assert "Курс показывает, как вести проектную работу с ИИ без ручного написания кода: от простой идеи до проверенного результата." in page_response.text
