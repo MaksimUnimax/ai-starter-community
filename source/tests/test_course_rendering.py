@@ -353,12 +353,13 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "В proof run код не пишется." in lesson7_section
     assert "<strong>Codex</strong> стремится решить задачу с меньшими ресурсами" in lesson7_section
     assert "контекстное окно" in lesson7_section
-    assert "Prefix-расширение" in lesson7_section
-    assert "Project Prefixer" in lesson7_section
-    assert "https://github.com/MaksimUnimax/openscript-agent-lab-student-kit" in lesson7_section
-    assert "Практика завершена, когда" in lesson7_section
-    assert "расширение установлено в браузер" in lesson7_section
-    assert "тестовое сообщение в <strong>ChatGPT</strong> отправилось с prefix перед текстом" in lesson7_section
+    assert '<strong>Prefix-расширение</strong> — это программа-расширение для Chrome или Edge.' in lesson7_section
+    assert 'Вы заранее сохраняете в расширении важный текст. Потом, когда пишете сообщение в <strong>ChatGPT</strong>, вы выбираете нужный <strong>prefix</strong> мышкой и нажимаете отправить.' in lesson7_section
+    assert '<strong>Prefix</strong> помогает напомнить <strong>ChatGPT</strong> об этом правиле без ручного написания большого текста.' in lesson7_section
+    assert "ручного копирования" not in lesson7_section
+    assert "Project Prefixer" not in lesson7_section
+    assert "https://github.com/MaksimUnimax/openscript-agent-lab-student-kit" not in lesson7_section
+    assert "Отправьте тестовое сообщение в <strong>ChatGPT</strong> и убедитесь, что prefix добавился перед текстом." in lesson7_section
     assert "manifest.json" in lesson7_section
     assert "content.js" in lesson7_section
     assert "popup.html" in lesson7_section
@@ -370,6 +371,11 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Developer mode" in lesson7_section
     assert "Load unpacked" in lesson7_section
     assert "Я не программист" in lesson7_section
+    assert "starterPromptFilename: \"prefix_extension_for_chatgpt_prompt.md\"" in lesson7_section
+    assert "starterPromptMarkdown: `# Prompt для создания prefix-расширения для ChatGPT" in lesson7_section
+    assert "Откройте готовый prompt ниже." in lesson7_section
+    assert "Скопируйте prompt кнопкой “Скопировать prompt” или скачайте его кнопкой “Скачать .md”." in lesson7_section
+    assert "<pre><code>" not in lesson7_section
     assert "Что такое run в этом курсе?" in lesson7_section
     assert "Что такое design run?" in lesson7_section
     assert "Что такое fix run?" in lesson7_section
