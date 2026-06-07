@@ -282,7 +282,7 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert 'review: "lesson-9"' in script_response.text
     assert 'navTitle: "Урок 9 — Советы и правила безопасной работы"' in script_response.text
     assert 'navTitle: "Финал курса"' in script_response.text
-    assert 'title: "Поздравляем, вы завершили вводный курс"' in script_response.text
+    assert 'title: "Поздравляем, вы завершили курс"' in script_response.text
     assert "Документы проекта: техническое задание (ТЗ), roadmap, правила и контекст" in script_response.text
     assert "Старт проекта: сначала документация, потом разработка" in script_response.text
     assert "ChatGPT выступает как ведущий специалист" in script_response.text
@@ -370,10 +370,15 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Не используйте <strong>Instant</strong> для серьёзной проектной работы." in lesson9_section
     assert "nextStepTargetId: \"lesson-10\"" in lesson9_section
     assert "Завершить курс" in lesson9_section
-    assert "Поздравляем, вы завершили вводный курс" in lesson10_section
-    assert "создавать программы" in lesson10_section
+    assert "Поздравляем, вы завершили курс" in lesson10_section
+    assert "вводный курс" not in lesson10_section
+    assert "Вы прошли курс по работе с ChatGPT и Codex." in lesson10_section
     assert "без знания языков программирования" in lesson10_section
-    assert "ChatGPT и Codex выбраны для старта" in lesson10_section
+    assert "без понимания того, как устроена разработка изнутри" in lesson10_section
+    assert "Разработка — это не только написание кода." in lesson10_section
+    assert "<strong>ChatGPT</strong> выступает как программист, архитектор, аналитик, технический руководитель, редактор документации и проверяющий." in lesson10_section
+    assert "<strong>ChatGPT</strong> и <strong>Codex</strong> выбраны для старта" in lesson10_section
+    assert "цена / качество" in lesson10_section
     assert "Anthropic/Claude" in lesson10_section
     assert "Qwen" in lesson10_section
     assert "Kimi" in lesson10_section
@@ -383,6 +388,12 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Курс останется доступным" in lesson10_section
     assert "Курс будет время от времени обновляться" in lesson10_section
     assert "Это не юридическая консультация." in lesson10_section
+    assert "ChatGPT и OpenAI не запрещены в России" in lesson10_section
+    assert "использование VPN именно для доступа к ChatGPT" in lesson10_section
+    assert "не является обходом запрета" in lesson10_section
+    assert "выступает как программист, архитектор, аналитик" in lesson10_section
+    assert "Вы не становитесь профессиональным разработчиком за один курс" not in lesson10_section
+    assert "пока не знаете" not in lesson10_section
     assert "Проект может идти много дней или недель." in lesson8_section
     assert "<strong>Документы проекта</strong> — это память проекта." in lesson8_section
     assert "<strong>Техническое задание</strong>" in lesson8_section
