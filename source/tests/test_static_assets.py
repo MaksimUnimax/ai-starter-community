@@ -13,6 +13,7 @@ def test_favicon_svg_is_served_and_matches_constraints(client):
     assert "<svg" in svg_text
     assert '<rect x="500" y="500" width="23000" height="23000" rx="4200" ry="4200" fill="#FEF8EC"/>' in svg_text
     assert svg_text.count("<rect") == 1
+    assert 'transform="translate(12000 12000) scale(0.85) translate(-12000 -12000)"' in svg_text
     assert "clipPath" not in svg_text
     assert "<image" not in svg_text
     assert "<text" not in svg_text
