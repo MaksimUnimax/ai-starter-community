@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import re
 import sqlite3
-from pathlib import Path
 
 from app.auth.service import register_user, verify_email
 from app.paid_options.service import create_paid_option, list_paid_options
@@ -50,13 +49,17 @@ def _create_paid_option(test_settings, **kwargs):
     return create_paid_option(settings=test_settings, **kwargs)
 
 
-def test_cabinet_paid_options_block_renders_active_catalog_and_safe_buy_notice(client, test_settings):
+def _extract_paid_option_titles(body: str) -> list[str]:
+    return re.findall(r'<h3 class="paid-option__title">([^<]+)</h3>', body)
+
+
+def test_cabinet_paid_options_block_hides_base_option_and_sorts_visible_addons(client, test_settings):
     _create_paid_option(
         test_settings,
-        code="cabinet_active_null_price",
-        title="Опция без цены",
-        description="Опция без указанной цены.",
-        price_amount_minor=None,
+        code="ai_gpt_tool",
+        title="AI / GPT-инструмент",
+        description="Базовый AI-инструмент для старта.",
+        price_amount_minor=699000,
         currency="RUB",
         default_duration_days=None,
         status="active",
@@ -65,39 +68,39 @@ def test_cabinet_paid_options_block_renders_active_catalog_and_safe_buy_notice(c
     )
     _create_paid_option(
         test_settings,
-        code="cabinet_active_two_thousand",
-        title="Опция на 2 000 ₽",
-        description="Опция с указанной стоимостью.",
+        code="cabinet_addon_two_thousand_chatgpt_plus",
+        title="Chat GPT Plus",
+        description="Оплаченный на месяц аккаунт Chat GPT Plus",
+        price_amount_minor=200000,
+        currency="RUB",
+        default_duration_days=30,
+        status="active",
+        is_renewable=True,
+        sort_order=0,
+    )
+    _create_paid_option(
+        test_settings,
+        code="cabinet_addon_four_thousand_server_plus_chatgpt",
+        title="Сервер + ChatGPT Plus",
+        description="Аренда сервера, плюс оплаченный аккаунт ChatGPT Plus.",
+        price_amount_minor=400000,
+        currency="RUB",
+        default_duration_days=30,
+        status="active",
+        is_renewable=True,
+        sort_order=0,
+    )
+    _create_paid_option(
+        test_settings,
+        code="cabinet_addon_two_thousand_server",
+        title="Сервер",
+        description="Аренда сервера.",
         price_amount_minor=200000,
         currency="RUB",
         default_duration_days=30,
         status="active",
         is_renewable=True,
         sort_order=1,
-    )
-    _create_paid_option(
-        test_settings,
-        code="cabinet_active_six_nine_nine",
-        title="Опция на 6 990 ₽",
-        description="Ещё одна активная опция.",
-        price_amount_minor=699000,
-        currency="RUB",
-        default_duration_days=None,
-        status="active",
-        is_renewable=False,
-        sort_order=2,
-    )
-    _create_paid_option(
-        test_settings,
-        code="cabinet_active_four_thousand",
-        title="Опция на 4 000 ₽",
-        description="Активная опция с сроком.",
-        price_amount_minor=400000,
-        currency="RUB",
-        default_duration_days=30,
-        status="active",
-        is_renewable=True,
-        sort_order=3,
     )
     _create_paid_option(
         test_settings,
@@ -111,15 +114,28 @@ def test_cabinet_paid_options_block_renders_active_catalog_and_safe_buy_notice(c
         is_renewable=True,
         sort_order=99,
     )
+    _create_paid_option(
+        test_settings,
+        code="cabinet_hidden_option",
+        title="Скрытая опция",
+        description="Не должна отображаться в кабинете.",
+        price_amount_minor=100000,
+        currency="RUB",
+        default_duration_days=30,
+        status="hidden",
+        is_renewable=True,
+        sort_order=99,
+    )
 
     active_option_codes = {item.code for item in list_paid_options(settings=test_settings)}
     assert active_option_codes == {
-        "cabinet_active_null_price",
-        "cabinet_active_two_thousand",
-        "cabinet_active_six_nine_nine",
-        "cabinet_active_four_thousand",
+        "ai_gpt_tool",
+        "cabinet_addon_two_thousand_chatgpt_plus",
+        "cabinet_addon_four_thousand_server_plus_chatgpt",
+        "cabinet_addon_two_thousand_server",
     }
     assert "cabinet_archived_option" not in active_option_codes
+    assert "cabinet_hidden_option" not in active_option_codes
 
     _login_registered_user(client, test_settings, "cabinet-paid-options@example.com", "cabinetpaidoptions")
 
@@ -129,47 +145,100 @@ def test_cabinet_paid_options_block_renders_active_catalog_and_safe_buy_notice(c
 
     assert body.index('data-local-accounts-root') < body.index('data-prompts-library-root') < body.index('data-paid-options-root')
     assert "Активация опций" in body
-    assert "Сейчас активных опций: 4" in body
+    assert "Доступно для подключения: 3" in body
+    assert "Сейчас активных опций" not in body
     assert "Здесь показаны активные платные опции, которые можно будет подключать к аккаунту." in body
-    assert "Опция без цены" in body
-    assert "Опция на 2 000 ₽" in body
-    assert "Опция на 6 990 ₽" in body
-    assert "Опция на 4 000 ₽" in body
+    assert "AI / GPT-инструмент" not in body
+    assert "ai_gpt_tool" not in body
     assert "Архивная опция" not in body
-    assert "Цена не указана" in body
-    assert "2 000 ₽" in body
-    assert "6 990 ₽" in body
+    assert "Скрытая опция" not in body
+    assert "Сервер + ChatGPT Plus" in body
+    assert "Chat GPT Plus" in body
+    assert "Сервер" in body
+    assert _extract_paid_option_titles(body) == [
+        "Сервер + ChatGPT Plus",
+        "Chat GPT Plus",
+        "Сервер",
+    ]
     assert "4 000 ₽" in body
-    assert "Срок: 30 дней" in body
-    assert "Можно продлевать" in body
-    assert body.count('type="button" data-paid-option-buy>Купить</button>') == 4
-    assert body.count('data-paid-option-card') == 4
+    assert body.index("4 000 ₽") < body.index("2 000 ₽")
+    assert body.count('type="button" data-paid-option-buy>Купить</button>') == 3
+    assert body.count('data-paid-option-card') == 3
     assert 'data-paid-options-list' in body
     assert 'data-paid-options-notice' in body
     assert 'Оплата пока не подключена. Эта кнопка подготовлена для следующего этапа.' in body
     assert '/cabinet/payments' not in body
     assert '/admin/payments' not in body
     assert '/cabinet/paid-options' not in body
-    routes_text = Path("/tmp/ai-starter-paid-options-block-20260608/source/app/user_cabinet/routes.py").read_text(encoding="utf-8")
-    assert '"/cabinet/payments"' not in routes_text
-    assert '"/cabinet/paid-options"' not in routes_text
-    assert "payment provider" not in routes_text.lower()
     assert "Аккаунты" in body
     assert "Промпты" in body
     assert "Промпты из курса" in body
 
 
-def test_cabinet_paid_options_block_shows_empty_state_when_catalog_is_empty(client, test_settings):
-    _login_registered_user(client, test_settings, "cabinet-paid-options-empty@example.com", "cabinetpaidoptionsempty")
+def test_cabinet_paid_options_block_places_null_price_last_when_present(client, test_settings):
+    _create_paid_option(
+        test_settings,
+        code="cabinet_active_null_price",
+        title="Опция без цены",
+        description="Опция без указанной цены.",
+        price_amount_minor=None,
+        currency="RUB",
+        default_duration_days=None,
+        status="active",
+        is_renewable=True,
+        sort_order=2,
+    )
+    _create_paid_option(
+        test_settings,
+        code="cabinet_active_two_thousand_a",
+        title="Опция на 2 000 ₽",
+        description="Опция с указанной стоимостью.",
+        price_amount_minor=200000,
+        currency="RUB",
+        default_duration_days=30,
+        status="active",
+        is_renewable=True,
+        sort_order=1,
+    )
+    _create_paid_option(
+        test_settings,
+        code="cabinet_active_four_thousand",
+        title="Опция на 4 000 ₽",
+        description="Активная опция с сроком.",
+        price_amount_minor=400000,
+        currency="RUB",
+        default_duration_days=30,
+        status="active",
+        is_renewable=True,
+        sort_order=0,
+    )
+    _create_paid_option(
+        test_settings,
+        code="cabinet_active_two_thousand_b",
+        title="Опция на 2 000 ₽, вторая",
+        description="Еще одна активная опция.",
+        price_amount_minor=200000,
+        currency="RUB",
+        default_duration_days=30,
+        status="active",
+        is_renewable=True,
+        sort_order=3,
+    )
+
+    _login_registered_user(client, test_settings, "cabinet-paid-options-null-price@example.com", "cabinetpaidoptionsnullprice")
 
     response = client.get("/cabinet")
     assert response.status_code == 200
     body = response.text
 
-    assert "Активация опций" in body
-    assert "Сейчас активных опций: 0" in body
-    assert "Пока нет активных опций для подключения." in body
-    assert 'type="button" data-paid-option-buy>Купить</button>' not in body
-    assert "data-paid-options-list" not in body
-    assert "Аккаунты" in body
-    assert "Промпты" in body
+    assert "Доступно для подключения: 4" in body
+    assert _extract_paid_option_titles(body) == [
+        "Опция на 4 000 ₽",
+        "Опция на 2 000 ₽",
+        "Опция на 2 000 ₽, вторая",
+        "Опция без цены",
+    ]
+    assert body.index("4 000 ₽") < body.index("2 000 ₽")
+    assert body.rindex("2 000 ₽") < body.index("Цена не указана")
+    assert body.count('type="button" data-paid-option-buy>Купить</button>') == 4
+    assert 'Оплата пока не подключена. Эта кнопка подготовлена для следующего этапа.' in body

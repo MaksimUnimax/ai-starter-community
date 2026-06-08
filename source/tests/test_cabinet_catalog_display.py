@@ -94,7 +94,8 @@ def test_cabinet_displays_course_shell_without_tariffs_or_payment_noise(client, 
     assert cabinet_response.text.index('data-paid-options-root') > cabinet_response.text.index('data-prompts-library-root')
     assert "Активация опций" in cabinet_response.text
     assert "Пока нет активных опций для подключения." in cabinet_response.text
-    assert "Сейчас активных опций: 0" in cabinet_response.text
+    assert "Доступно для подключения:" not in cabinet_response.text
+    assert "Сейчас активных опций:" not in cabinet_response.text
     assert "Купить" not in cabinet_response.text
     assert "Доступные тарифы" not in cabinet_response.text
     assert "Что дальше" not in cabinet_response.text

@@ -166,7 +166,9 @@
       <div class="stack paid-options-intro">
         <h2 class="section-title">Активация опций</h2>
         <p class="form-help">Здесь показаны активные платные опции, которые можно будет подключать к аккаунту.</p>
-        <p class="paid-options-count">Сейчас активных опций: {{ active_paid_options_count }}</p>
+        {% if active_paid_options_count %}
+          <p class="paid-options-count">Доступно для подключения: {{ active_paid_options_count }}</p>
+        {% endif %}
       </div>
     </div>
 

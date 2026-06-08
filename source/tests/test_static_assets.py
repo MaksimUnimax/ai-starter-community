@@ -86,9 +86,13 @@ def test_stylesheet_is_served(client):
     assert ".paid-options-count {" in response.text
     assert ".paid-options-grid {" in response.text
     assert ".paid-option-card {" in response.text
+    assert "height: 100%;" in response.text
     assert ".paid-option__headline {" in response.text
+    assert ".paid-option__intro {" in response.text
+    assert ".paid-option__meta {" in response.text
     assert ".paid-option__buy {" in response.text
     assert ".paid-options-notice {" in response.text
+    assert "margin-top: auto;" in response.text
 
 
 def test_cabinet_local_accounts_script_is_served(client):

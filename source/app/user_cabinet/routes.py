@@ -33,6 +33,7 @@ LEARNING_COURSE_URL = "/materials/drafts/dair-smoke-20260529/"
 LEARNING_PROJECT_DOWNLOAD_URL = "/cabinet/learning/project-file"
 LEARNING_PROJECT_FILE_NAME = "02_СТАРТ_ПРОЕКТА_GIT_ДОКУМЕНТАЦИЯ_СТРУКТУРА.md"
 LEARNING_PROJECT_FILE_PATH = Path(__file__).resolve().parent / "private_files" / LEARNING_PROJECT_FILE_NAME
+BASE_CABINET_PAID_OPTION_CODE = "ai_gpt_tool"
 
 
 def _format_price(amount_minor: int | None, currency: str | None) -> str:
@@ -50,23 +51,38 @@ def _format_price(amount_minor: int | None, currency: str | None) -> str:
     return f"{amount_text} {currency_suffix}"
 
 
+def _cabinet_paid_option_sort_key(option):
+    amount_minor = option.price_amount_minor
+    return (
+        amount_minor is None,
+        -(amount_minor or 0),
+        int(option.sort_order),
+        option.title.casefold(),
+        int(option.id),
+    )
+
+
 def _active_paid_options_for_cabinet(settings):
-    options = []
-    for option in list_paid_options(settings=settings):
-        options.append(
-            {
-                "id": option.id,
-                "code": option.code,
-                "title": option.title,
-                "description": option.description,
-                "formatted_price": _format_price(option.price_amount_minor, option.currency),
-                "currency": option.currency,
-                "default_duration_days": option.default_duration_days,
-                "is_renewable": option.is_renewable,
-                "status": option.status,
-            }
-        )
-    return options
+    options = [
+        option
+        for option in list_paid_options(settings=settings)
+        if option.code != BASE_CABINET_PAID_OPTION_CODE
+    ]
+    options.sort(key=_cabinet_paid_option_sort_key)
+    return [
+        {
+            "id": option.id,
+            "code": option.code,
+            "title": option.title,
+            "description": option.description,
+            "formatted_price": _format_price(option.price_amount_minor, option.currency),
+            "currency": option.currency,
+            "default_duration_days": option.default_duration_days,
+            "is_renewable": option.is_renewable,
+            "status": option.status,
+        }
+        for option in options
+    ]
 
 
 def _template(request: Request, template_name: str, **context) -> HTMLResponse:
