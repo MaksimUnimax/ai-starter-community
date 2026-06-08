@@ -71,6 +71,10 @@ def test_cabinet_prompt_library_renders_course_prompts_and_custom_prompt_templat
     assert "Сбросить к версии курса" in cabinet_response.text
     assert "Удалить" in cabinet_response.text
     assert "data-prompts-custom-template" in cabinet_response.text
+    assert 'class="prompt-card prompt-card--custom prompt-card--collapsed"' in cabinet_response.text
+    assert 'data-prompt-custom data-prompt-expanded="false"' in cabinet_response.text
+    assert 'aria-controls="prompt-body-custom"' in cabinet_response.text
+    assert "Файл: custom-prompt.md" in cabinet_response.text
     assert "openscript:cabinet:prompts-library:v1" in client.get("/static/cabinet-prompts-library.js").text
     assert cabinet_response.text.count('aria-expanded="false"') >= 4
     assert cabinet_response.text.count("data-prompt-body") >= 5

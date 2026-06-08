@@ -112,6 +112,8 @@ def test_cabinet_prompts_library_script_is_served(client):
     assert "data-prompt-body" in response.text
     assert "prompt-card--collapsed" in response.text
     assert "prompt-card--expanded" in response.text
+    assert "isExpanded: false" in response.text
+    assert "prompt.isExpanded = true;" in response.text
     assert "data-prompts-custom-template" in response.text
     assert 'querySelector("[data-prompt-custom]")' in response.text
     assert "prompt-card--editing" in response.text
