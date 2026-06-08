@@ -8,7 +8,7 @@ from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
 from fastapi import APIRouter, HTTPException, Request
-from fastapi.responses import HTMLResponse, PlainTextResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, PlainTextResponse, RedirectResponse, Response
 from fastapi.templating import Jinja2Templates
 
 from app.auth.service import (
@@ -22,6 +22,7 @@ from app.auth.service import (
     list_users_for_admin,
     update_user_role,
 )
+from app.admin.course_export import build_course_export
 from app.core.config import get_settings
 from app.paid_options.schemas import PaidOptionCreateInput, PaidOptionUpdateInput
 from app.paid_options.service import (
@@ -712,6 +713,20 @@ def admin_dashboard(request: Request):
         admin_email=user.email,
         admin_login=user.login,
     )
+
+
+@router.get("/admin/course-export")
+def admin_course_export(request: Request):
+    settings = get_settings()
+    _, response = _admin_user_or_redirect(request, settings=settings)
+    if response is not None:
+        return response
+
+    export = build_course_export()
+    headers = {
+        "Content-Disposition": f'attachment; filename="{export.filename}"',
+    }
+    return Response(content=export.content, media_type="application/zip", headers=headers)
 
 
 @router.api_route("/admin/users", methods=["GET", "HEAD"], response_class=HTMLResponse)
