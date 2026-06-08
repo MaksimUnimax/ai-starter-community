@@ -217,6 +217,14 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Codex, AGENTS.md, Skills, токены и роль модели" in page_response.text
     assert "PowerShell, Terminal и подключение к серверу" in page_response.text
     assert "Процесс работы" in page_response.text
+    lesson1_section = _lesson_section(script_response.text, "lesson-1", "lesson-2")
+    assert "Общая схема" in lesson1_section
+    assert "ChatGPT переводит задачу пользователя на технический язык для Codex" in lesson1_section
+    assert "ChatGPT разбирает задачу, создаёт документацию и проектирует работу" not in lesson1_section
+    assert "Почему результат работы нужно проверять по фактам?" not in lesson1_section
+    assert "Что такое ChatGPT в нашем курсе?" in lesson1_section
+    assert "Что такое Codex в нашем курсе?" in lesson1_section
+    assert "Как правильно разделять ChatGPT и Codex?" in lesson1_section
     assert "Сервер, Codex, AGENTS.md и Skills" not in page_response.text
     assert page_response.text.count("Вернуться в личный кабинет") == 2
     assert page_response.text.count('href="/cabinet"') == 2
