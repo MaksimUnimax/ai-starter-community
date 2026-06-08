@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none" aria-hidden="true">
+  <rect x="24" y="24" width="464" height="464" rx="112" fill="#FBF5EC"/>
+  <path id="favicon-head-profile" d="M188 130C166 143 151 165 147 189C144 209 149 228 160 242C167 250 170 260 168 270C166 284 158 295 146 304C132 315 124 331 124 348C124 371 143 390 166 390H209C217 390 222 384 222 377V360C222 347 228 335 238 326C251 315 263 304 271 291C279 278 283 263 280 249C277 236 270 224 258 215C247 206 241 194 241 181C241 163 249 148 263 137C247 127 228 122 208 122C201 122 195 124 188 130Z" fill="#F3E6D7" stroke="#2A2118" stroke-width="16" stroke-linejoin="round"/>
+  <path id="favicon-network-branch" d="M252 214H308C320 214 330 224 330 236V283" stroke="#2A2118" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M308 214L344 180" stroke="#2A2118" stroke-width="16" stroke-linecap="round"/>
+  <path d="M308 236H356" stroke="#C45C26" stroke-width="16" stroke-linecap="round"/>
+  <path d="M308 283L340 315" stroke="#2A2118" stroke-width="16" stroke-linecap="round"/>
+  <circle cx="344" cy="180" r="12" fill="#2A2118"/>
+  <circle cx="356" cy="236" r="12" fill="#C45C26"/>
+  <circle cx="340" cy="315" r="12" fill="#2A2118"/>
+</svg>
