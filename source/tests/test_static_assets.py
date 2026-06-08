@@ -22,6 +22,15 @@ def test_stylesheet_is_served(client):
     assert ".accounts-grid" in response.text
     assert ".account-card" in response.text
     assert ".account-password-row" in response.text
+    assert "display: flex;" in response.text
+    assert "width: min(100%, 320px);" in response.text
+    assert "max-width: 340px;" in response.text
+    assert ".accounts-builder .select {" in response.text
+    assert "min-height: 38px;" in response.text
+    assert ".accounts-builder .button {" in response.text
+    assert ".account-card__delete {" in response.text
+    assert ".account-actions .button {" in response.text
+    assert ".account-password-toggle {" in response.text
 
 
 def test_cabinet_local_accounts_script_is_served(client):
