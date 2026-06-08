@@ -159,8 +159,8 @@ def test_cabinet_contains_materials_link_and_locked_hint(client, test_settings):
     assert response.text.count('class="button button-primary learning-button"') == 2
     assert 'href="/materials/drafts/dair-smoke-20260529/"' not in response.text
     assert 'href="/cabinet/learning/project-file"' not in response.text
-    assert "Логин: <strong>materialscabinet</strong>" in response.text
-    assert "Email: materials-cabinet@example.com" in response.text
+    assert "Аккаунты" in response.text
+    assert "/static/cabinet-local-accounts.js" in response.text
     assert "Пройдите обучение, затем скачайте файл, вставьте в чат ChatGPT и следуйте его инструкциям." in response.text
     assert "Раздел «Работа с ИИ» будет доступен после оплаты." not in response.text
 
@@ -185,8 +185,8 @@ def test_cabinet_access_labels_for_staff_and_paid_user(client, test_settings):
     _prepare_and_login_verified_user(client, test_settings, "cabinet-paid@example.com", "cabinetpaid", grant_access=True)
     paid_response = client.get("/cabinet")
     assert paid_response.status_code == 200
-    assert "Логин: <strong>cabinetpaid</strong>" in paid_response.text
-    assert "Email: cabinet-paid@example.com" in paid_response.text
+    assert "Аккаунты" in paid_response.text
+    assert "/static/cabinet-local-accounts.js" in paid_response.text
     assert "Перейти к обучению" in paid_response.text
     assert "Скачать файл" in paid_response.text
     assert 'href="/materials/drafts/dair-smoke-20260529/"' in paid_response.text
@@ -196,8 +196,7 @@ def test_cabinet_access_labels_for_staff_and_paid_user(client, test_settings):
     _prepare_and_login_verified_user(client, test_settings, "cabinet-moderator@example.com", "cabinetmod", role="moderator")
     moderator_response = client.get("/cabinet")
     assert moderator_response.status_code == 200
-    assert "Логин: <strong>cabinetmod</strong>" in moderator_response.text
-    assert "Email: cabinet-moderator@example.com" in moderator_response.text
+    assert "Аккаунты" in moderator_response.text
     assert "Перейти к обучению" in moderator_response.text
     assert "Скачать файл" in moderator_response.text
     assert 'href="/materials/drafts/dair-smoke-20260529/"' in moderator_response.text
@@ -207,8 +206,7 @@ def test_cabinet_access_labels_for_staff_and_paid_user(client, test_settings):
     _prepare_and_login_verified_user(client, test_settings, "cabinet-admin@example.com", "cabinetadm", role="admin")
     admin_response = client.get("/cabinet")
     assert admin_response.status_code == 200
-    assert "Логин: <strong>cabinetadm</strong>" in admin_response.text
-    assert "Email: cabinet-admin@example.com" in admin_response.text
+    assert "Аккаунты" in admin_response.text
     assert "Перейти к обучению" in admin_response.text
     assert "Скачать файл" in admin_response.text
     assert 'href="/materials/drafts/dair-smoke-20260529/"' in admin_response.text

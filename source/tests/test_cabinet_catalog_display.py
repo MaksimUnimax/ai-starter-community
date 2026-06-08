@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import sqlite3
 
 from app.auth.service import register_user, verify_email
@@ -34,6 +35,16 @@ def _extract_token_from_db(test_settings, email: str):
     return match.group(1)
 
 
+def _extract_accounts_section(body_text: str) -> str:
+    match = re.search(
+        r'<section class="card stack accounts-card" data-local-accounts-root>(.*?)</section>',
+        body_text,
+        re.S,
+    )
+    assert match is not None
+    return match.group(1)
+
+
 def test_cabinet_displays_course_shell_without_tariffs_or_payment_noise(client, test_settings):
     _verify_registered_user(client, test_settings, "cabinet-catalog@example.com", "cabinetcatalog")
     token = _extract_token_from_db(test_settings, "cabinet-catalog@example.com")
@@ -49,13 +60,10 @@ def test_cabinet_displays_course_shell_without_tariffs_or_payment_noise(client, 
     cabinet_response = client.get("/cabinet")
     assert cabinet_response.status_code == 200
     assert "/static/styles.css" in cabinet_response.text
-    assert "Личный кабинет" in cabinet_response.text
     assert "Настройки" in cabinet_response.text
     assert "⚙" not in cabinet_response.text
     assert 'href="/cabinet/settings"' in cabinet_response.text
-    assert "Аккаунт" in cabinet_response.text
-    assert "Логин: <strong>cabinetcatalog</strong>" in cabinet_response.text
-    assert "Email: cabinet-catalog@example.com" in cabinet_response.text
+    assert "/static/cabinet-local-accounts.js" in cabinet_response.text
     assert "Главная" in cabinet_response.text
     assert "Обучающий блок" in cabinet_response.text
     assert "Обучение" in cabinet_response.text
@@ -69,7 +77,18 @@ def test_cabinet_displays_course_shell_without_tariffs_or_payment_noise(client, 
     assert 'href="/materials/drafts/dair-smoke-20260529/"' not in cabinet_response.text
     assert 'href="/cabinet/learning/project-file"' not in cabinet_response.text
     assert "raw.githubusercontent.com" not in cabinet_response.text
-    assert cabinet_response.text.index("Обучающий блок") < cabinet_response.text.index("Аккаунт")
+    accounts_section = _extract_accounts_section(cabinet_response.text)
+    assert cabinet_response.text.index("Обучающий блок") < cabinet_response.text.index("Аккаунты")
+    assert "Аккаунты" in accounts_section
+    assert "Храните здесь часто используемые логины и пароли. Данные сохраняются только в этом браузере." in accounts_section
+    assert "Добавить блок" in accounts_section
+    assert "ChatGPT" in accounts_section
+    assert "Сервер" in accounts_section
+    assert "Тип нового блока" in accounts_section
+    assert "Личный кабинет" not in accounts_section
+    assert '<h2 class="section-title">Аккаунт</h2>' not in accounts_section
+    assert "Логин:" not in accounts_section
+    assert "Email:" not in accounts_section
     assert "Доступные тарифы" not in cabinet_response.text
     assert "Оплата" not in cabinet_response.text
     assert "Что дальше" not in cabinet_response.text

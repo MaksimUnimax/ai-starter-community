@@ -593,6 +593,115 @@ button:hover {
   pointer-events: none;
 }
 
+.accounts-card {
+  gap: 20px;
+}
+
+.accounts-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.accounts-intro {
+  flex: 1 1 320px;
+  max-width: 62ch;
+}
+
+.accounts-builder {
+  flex: 0 1 360px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.accounts-type-field {
+  flex: 1 1 220px;
+  min-width: 220px;
+}
+
+.accounts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.account-card {
+  display: grid;
+  gap: 14px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--surface-alt);
+  box-shadow: none;
+}
+
+.account-card__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.account-card__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.22rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.account-card__delete {
+  flex: 0 0 auto;
+}
+
+.account-field {
+  display: grid;
+  gap: 6px;
+}
+
+.account-field > span {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.account-password-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.account-password-row .input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.account-password-toggle {
+  flex: 0 0 auto;
+  min-width: 44px;
+  padding-inline: 14px;
+}
+
+.account-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.accounts-empty,
+.accounts-notice {
+  margin: 0;
+}
+
+.accounts-notice {
+  min-height: 1.5em;
+  color: var(--muted);
+}
+
 h1,
 h2,
 h3 {
@@ -1597,6 +1706,33 @@ html { scroll-behavior: smooth; }
   .learning-button {
     width: 100%;
     align-self: stretch;
+  }
+
+  .accounts-header {
+    flex-direction: column;
+  }
+
+  .accounts-builder {
+    width: 100%;
+    flex: 1 1 auto;
+    align-items: stretch;
+  }
+
+  .accounts-type-field {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .accounts-builder .button {
+    width: 100%;
+  }
+
+  .account-password-row {
+    flex-direction: column;
+  }
+
+  .account-password-toggle {
+    width: 100%;
   }
 
   .public-landing-page .hero-title {

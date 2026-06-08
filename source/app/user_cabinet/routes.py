@@ -78,8 +78,6 @@ def cabinet_page(request: Request):
         request,
         "cabinet.html",
         title="Личный кабинет",
-        user_email=user.email,
-        user_login=user.login,
         learning_access=learning_access,
         learning_course_url=LEARNING_COURSE_URL if learning_access else None,
         learning_download_url=LEARNING_PROJECT_DOWNLOAD_URL if learning_access else None,

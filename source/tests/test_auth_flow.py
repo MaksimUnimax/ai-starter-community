@@ -346,8 +346,8 @@ def test_route_flow_login_cabinet_logout_still_works(client, test_settings):
     assert cabinet_response.status_code == 200
     assert "route@example.com" in cabinet_response.text
     assert "routeuser" in cabinet_response.text
-    assert "Логин: <strong>routeuser</strong>" in cabinet_response.text
-    assert "Email: route@example.com" in cabinet_response.text
+    assert "Аккаунты" in cabinet_response.text
+    assert "/static/cabinet-local-accounts.js" in cabinet_response.text
     assert "Главная" in cabinet_response.text
     assert "Обучающий блок" in cabinet_response.text
     assert "Обучение" in cabinet_response.text
@@ -617,8 +617,8 @@ def test_cabinet_shows_logout_button_and_access_text(client, test_settings):
     assert cabinet_response.status_code == 200
     assert "cabinetux@example.com" in cabinet_response.text
     assert "cabinetux" in cabinet_response.text
-    assert "Логин: <strong>cabinetux</strong>" in cabinet_response.text
-    assert "Email: cabinetux@example.com" in cabinet_response.text
+    assert "Аккаунты" in cabinet_response.text
+    assert "Добавить блок" in cabinet_response.text
     assert "Главная" in cabinet_response.text
     assert "Обучающий блок" in cabinet_response.text
     assert "Обучение" in cabinet_response.text

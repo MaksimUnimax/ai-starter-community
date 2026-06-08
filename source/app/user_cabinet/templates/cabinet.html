@@ -28,13 +28,26 @@
     {% endif %}
   </section>
 
-  <section class="card stack">
-    <div class="stack">
-      <p class="muted">Личный кабинет</p>
-      <h1 class="section-title">Личный кабинет</h1>
-      <h2 class="section-title">Аккаунт</h2>
-      <p>Логин: <strong>{{ user_login }}</strong></p>
-      <p>Email: {{ user_email }}</p>
+  <section class="card stack accounts-card" data-local-accounts-root>
+    <div class="accounts-header">
+      <div class="stack accounts-intro">
+        <h1 class="section-title">Аккаунты</h1>
+        <p class="form-help">Храните здесь часто используемые логины и пароли. Данные сохраняются только в этом браузере.</p>
+      </div>
+      <div class="accounts-builder">
+        <label class="form-row accounts-type-field">
+          <span>Тип нового блока</span>
+          <select class="select" data-local-accounts-type>
+            <option value="chatgpt">ChatGPT</option>
+            <option value="server">Сервер</option>
+          </select>
+        </label>
+        <button class="button button-primary" type="button" data-local-accounts-add>Добавить блок</button>
+      </div>
     </div>
+    <div class="accounts-grid" data-local-accounts-list></div>
+    <p class="form-help accounts-empty" data-local-accounts-empty>Пока нет ни одного блока. Добавьте первый выше.</p>
+    <p class="accounts-notice" data-local-accounts-notice aria-live="polite" role="status"></p>
   </section>
+  <script src="/static/cabinet-local-accounts.js"></script>
 {% endblock %}
