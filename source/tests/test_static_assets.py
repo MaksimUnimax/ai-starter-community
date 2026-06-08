@@ -11,6 +11,7 @@ def test_favicon_svg_is_served_and_matches_constraints(client):
     assert response.headers["content-type"].startswith("image/svg+xml")
     assert favicon_path.exists()
     assert "<svg" in svg_text
+    assert 'transform="translate(12000 12000) scale(1.25) translate(-12000 -12000)"' in svg_text
     assert "<text" not in svg_text
     assert "OS" not in svg_text
     assert "base64" not in svg_text.lower()
