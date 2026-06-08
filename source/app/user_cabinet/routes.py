@@ -17,6 +17,7 @@ from app.auth.service import (
 )
 from app.core.config import get_settings
 from app.materials.service import user_has_materials_access
+from app.user_cabinet.prompts_library import load_cabinet_prompts
 
 router = APIRouter()
 templates = Jinja2Templates(directory=str(Path(__file__).resolve().parent / "templates"))
@@ -81,6 +82,7 @@ def cabinet_page(request: Request):
         learning_access=learning_access,
         learning_course_url=LEARNING_COURSE_URL if learning_access else None,
         learning_download_url=LEARNING_PROJECT_DOWNLOAD_URL if learning_access else None,
+        cabinet_prompts=load_cabinet_prompts(),
     )
 
 

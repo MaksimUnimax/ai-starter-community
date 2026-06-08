@@ -1,5 +1,24 @@
 from __future__ import annotations
 
+from pathlib import Path
+
+
+ROOT = Path("/opt/ai-starter-community/source/app")
+
+
+def test_favicon_svg_is_served_and_matches_constraints(client):
+    response = client.get("/static/favicon.svg")
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("image/svg+xml")
+    assert "<svg" in response.text
+    assert "<text" not in response.text
+    assert "OS" not in response.text
+    assert "base64" not in response.text.lower()
+    assert "data:image" not in response.text.lower()
+    assert "blue" not in response.text.lower()
+    assert "#0000ff" not in response.text.lower()
+    assert "#00f" not in response.text.lower()
+
 
 def test_stylesheet_is_served(client):
     response = client.get("/static/styles.css")
@@ -34,6 +53,14 @@ def test_stylesheet_is_served(client):
     assert ".account-actions .button {" in response.text
     assert ".account-actions .button:disabled {" in response.text
     assert ".account-password-toggle {" in response.text
+    assert ".prompts-library-card {" in response.text
+    assert ".prompts-library-header {" in response.text
+    assert ".prompts-grid {" in response.text
+    assert ".prompt-card {" in response.text
+    assert ".prompt-textarea {" in response.text
+    assert ".prompt-actions {" in response.text
+    assert ".prompt-card--custom," in response.text
+    assert ".prompt-card--editing" in response.text
 
 
 def test_cabinet_local_accounts_script_is_served(client):
@@ -56,3 +83,31 @@ def test_cabinet_local_accounts_script_is_served(client):
     assert "Удалить" in response.text
     assert "account-edit-row" not in response.text
     assert "account-save-row" not in response.text
+
+
+def test_cabinet_prompts_library_script_is_served(client):
+    response = client.get("/static/cabinet-prompts-library.js")
+    assert response.status_code == 200
+    assert "openscript:cabinet:prompts-library:v1" in response.text
+    assert "Промпт скопирован" in response.text
+    assert "Промпт сохранён" in response.text
+    assert "Версия курса восстановлена" in response.text
+    assert "Промпт скачан" in response.text
+    assert "data-prompt-edit" in response.text
+    assert "data-prompt-save" in response.text
+    assert "data-prompt-copy" in response.text
+    assert "data-prompt-download" in response.text
+    assert "data-prompt-reset" in response.text
+    assert "data-prompt-delete" in response.text
+    assert "data-prompts-custom-template" in response.text
+    assert 'querySelector("[data-prompt-custom]")' in response.text
+    assert "prompt-card--editing" in response.text
+
+
+def test_global_templates_link_to_favicon():
+    shared_base = (ROOT / "shared/templates/base.html").read_text(encoding="utf-8")
+    admin_base = (ROOT / "admin/templates/base.html").read_text(encoding="utf-8")
+
+    for template in (shared_base, admin_base):
+        assert 'rel="icon" href="/static/favicon.svg" type="image/svg+xml"' in template
+        assert 'rel="shortcut icon" href="/static/favicon.svg" type="image/svg+xml"' in template

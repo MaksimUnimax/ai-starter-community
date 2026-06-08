@@ -49,5 +49,86 @@
     <p class="form-help accounts-empty" data-local-accounts-empty>Пока нет ни одного блока. Добавьте первый выше.</p>
     <p class="accounts-notice" data-local-accounts-notice aria-live="polite" role="status"></p>
   </section>
+  <section class="card stack prompts-library-card" data-prompts-library-root>
+    <div class="prompts-library-header">
+      <div class="stack prompts-library-intro">
+        <h2 class="section-title">Промпты</h2>
+        <p class="form-help">Здесь собраны промпты из курса и ваши личные промпты. Их можно редактировать, копировать и скачивать как Markdown.</p>
+      </div>
+      <button class="button button-primary prompts-add-button" type="button" data-prompts-add>Добавить промпт</button>
+    </div>
+
+    <section class="prompts-section">
+      <div class="prompts-section__header">
+        <h3 class="section-title prompts-section__title">Промпты из курса</h3>
+      </div>
+      <div class="prompts-grid prompts-grid--built-in" data-prompts-built-in-list>
+        {% for prompt in cabinet_prompts %}
+          <article
+            class="prompt-card prompt-card--built-in"
+            data-prompt-id="{{ prompt.id|e }}"
+            data-prompt-filename="{{ prompt.filename|e }}"
+            data-prompt-owner="{{ prompt.owner_label|e }}"
+            data-prompt-source-label="{{ (prompt.source_label or '')|e }}"
+            data-prompt-title="{{ prompt.title|e }}"
+          >
+            <div class="prompt-card__header">
+              <div class="stack prompt-card__intro">
+                <h4 class="prompt-card__title">{{ prompt.title }}</h4>
+                <p class="prompt-card__meta">{{ prompt.owner_label }}{% if prompt.source_label %} · {{ prompt.source_label }}{% endif %}</p>
+              </div>
+              <span class="prompt-card__badge">Курс</span>
+            </div>
+            <label class="prompt-field">
+              <span>Промпт</span>
+              <textarea class="textarea prompt-textarea" data-prompt-textarea readonly rows="12">{{ prompt.markdown }}</textarea>
+            </label>
+            <div class="prompt-actions prompt-actions--built-in">
+              <button class="button button-secondary" type="button" data-prompt-edit>Редактировать</button>
+              <button class="button button-primary" type="button" data-prompt-save hidden>Сохранить</button>
+              <button class="button button-secondary" type="button" data-prompt-copy>Скопировать</button>
+              <button class="button button-secondary" type="button" data-prompt-download>Скачать .md</button>
+              <button class="button button-secondary" type="button" data-prompt-reset>Сбросить к версии курса</button>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="prompts-section">
+      <div class="prompts-section__header">
+        <h3 class="section-title prompts-section__title">Мои промпты</h3>
+      </div>
+      <p class="form-help prompts-empty" data-prompts-empty>Пока нет ни одного личного промпта. Добавьте первый выше.</p>
+      <div class="prompts-grid prompts-grid--custom" data-prompts-custom-list></div>
+      <template data-prompts-custom-template>
+        <article class="prompt-card prompt-card--custom prompt-card--editing" data-prompt-custom>
+          <div class="prompt-card__header">
+            <div class="stack prompt-card__intro">
+              <label class="prompt-title-field">
+                <span>Название</span>
+                <input class="input prompt-title-input" type="text" data-prompt-title placeholder="Название промпта" autocomplete="off">
+              </label>
+            </div>
+            <span class="prompt-card__badge">Личный</span>
+          </div>
+          <label class="prompt-field">
+            <span>Промпт</span>
+            <textarea class="textarea prompt-textarea" data-prompt-textarea rows="12" placeholder="Введите текст промпта"></textarea>
+          </label>
+          <div class="prompt-actions prompt-actions--custom">
+            <button class="button button-secondary" type="button" data-prompt-edit>Редактировать</button>
+            <button class="button button-primary" type="button" data-prompt-save>Сохранить</button>
+            <button class="button button-secondary" type="button" data-prompt-copy>Скопировать</button>
+            <button class="button button-secondary" type="button" data-prompt-download>Скачать .md</button>
+            <button class="button button-secondary" type="button" data-prompt-delete>Удалить</button>
+          </div>
+        </article>
+      </template>
+    </section>
+
+    <p class="prompts-notice" data-prompts-notice aria-live="polite" role="status"></p>
+  </section>
   <script src="/static/cabinet-local-accounts.js"></script>
+  <script src="/static/cabinet-prompts-library.js"></script>
 {% endblock %}

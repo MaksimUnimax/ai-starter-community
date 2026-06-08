@@ -79,6 +79,7 @@ def test_cabinet_displays_course_shell_without_tariffs_or_payment_noise(client, 
     assert "raw.githubusercontent.com" not in cabinet_response.text
     accounts_section = _extract_accounts_section(cabinet_response.text)
     assert cabinet_response.text.index("Обучающий блок") < cabinet_response.text.index("Аккаунты")
+    assert cabinet_response.text.index('data-local-accounts-root') < cabinet_response.text.index('data-prompts-library-root')
     assert "Аккаунты" in accounts_section
     assert "Храните здесь часто используемые логины и пароли. Данные сохраняются только в этом браузере." in accounts_section
     assert "Добавить блок" in accounts_section
