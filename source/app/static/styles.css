@@ -872,6 +872,19 @@ button:hover {
   font-size: 0.84rem;
 }
 
+.prompt-card__filename {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.prompt-card__header-actions {
+  display: grid;
+  gap: 6px;
+  justify-items: end;
+  align-items: start;
+}
+
 .prompt-card__badge {
   flex: 0 0 auto;
   padding: 4px 10px;
@@ -883,6 +896,23 @@ button:hover {
   letter-spacing: 0.04em;
   text-transform: uppercase;
   white-space: nowrap;
+}
+
+.prompt-card__toggle {
+  min-height: 32px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  line-height: 1.1;
+}
+
+.prompt-card__body {
+  display: grid;
+  gap: 12px;
+}
+
+.prompt-card--collapsed {
+  gap: 10px;
 }
 
 .prompt-field {
@@ -934,6 +964,10 @@ button:hover {
   font-family: var(--font-mono);
   font-size: 0.92rem;
   line-height: 1.6;
+}
+
+.prompt-card--collapsed .prompt-card__body[hidden] {
+  display: none;
 }
 
 .prompt-actions {

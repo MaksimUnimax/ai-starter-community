@@ -59,6 +59,11 @@ def test_stylesheet_is_served(client):
     assert ".prompts-library-header {" in response.text
     assert ".prompts-grid {" in response.text
     assert ".prompt-card {" in response.text
+    assert ".prompt-card__filename" in response.text
+    assert ".prompt-card__header-actions" in response.text
+    assert ".prompt-card__toggle" in response.text
+    assert ".prompt-card__body" in response.text
+    assert ".prompt-card--collapsed" in response.text
     assert ".prompt-textarea {" in response.text
     assert ".prompt-actions {" in response.text
     assert ".prompt-card--custom," in response.text
@@ -95,15 +100,23 @@ def test_cabinet_prompts_library_script_is_served(client):
     assert "Промпт сохранён" in response.text
     assert "Версия курса восстановлена" in response.text
     assert "Промпт скачан" in response.text
+    assert "Развернуть" in response.text
+    assert "Свернуть" in response.text
     assert "data-prompt-edit" in response.text
     assert "data-prompt-save" in response.text
     assert "data-prompt-copy" in response.text
     assert "data-prompt-download" in response.text
     assert "data-prompt-reset" in response.text
     assert "data-prompt-delete" in response.text
+    assert "data-prompt-toggle" in response.text
+    assert "data-prompt-body" in response.text
+    assert "prompt-card--collapsed" in response.text
+    assert "prompt-card--expanded" in response.text
     assert "data-prompts-custom-template" in response.text
     assert 'querySelector("[data-prompt-custom]")' in response.text
     assert "prompt-card--editing" in response.text
+    assert "setPromptCardExpanded" in response.text
+    assert 'toggleButton.addEventListener("click"' in response.text
 
 
 def test_global_templates_link_to_favicon():

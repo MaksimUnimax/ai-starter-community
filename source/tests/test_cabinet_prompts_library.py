@@ -36,7 +36,8 @@ def _extract_token_from_db(test_settings, email: str):
 
 def _extract_built_in_prompt_markdowns(body_text: str) -> dict[str, str]:
     pattern = re.compile(
-        r'<article\s+class="prompt-card prompt-card--built-in"\s+data-prompt-id="(?P<id>[^"]+)".*?'
+        r'<article\s+class="prompt-card prompt-card--built-in prompt-card--collapsed"[^>]*data-prompt-id="(?P<id>[^"]+)".*?'
+        r'<div class="prompt-card__body"[^>]*hidden[^>]*>.*?'
         r'<textarea class="textarea prompt-textarea" data-prompt-textarea readonly rows="12">(?P<markdown>.*?)</textarea>',
         re.S,
     )
@@ -60,7 +61,7 @@ def test_cabinet_prompt_library_renders_course_prompts_and_custom_prompt_templat
     assert cabinet_response.text.index('data-local-accounts-root') < cabinet_response.text.index('data-prompts-library-root')
     assert "Промпты" in cabinet_response.text
     assert "Промпты из курса" in cabinet_response.text
-    assert cabinet_response.text.count('class="prompt-card prompt-card--built-in"') == 4
+    assert cabinet_response.text.count('class="prompt-card prompt-card--built-in prompt-card--collapsed"') == 4
     assert "Мои промпты" in cabinet_response.text
     assert "Добавить промпт" in cabinet_response.text
     assert "Редактировать" in cabinet_response.text
@@ -71,6 +72,24 @@ def test_cabinet_prompt_library_renders_course_prompts_and_custom_prompt_templat
     assert "Удалить" in cabinet_response.text
     assert "data-prompts-custom-template" in cabinet_response.text
     assert "openscript:cabinet:prompts-library:v1" in client.get("/static/cabinet-prompts-library.js").text
+    assert cabinet_response.text.count('aria-expanded="false"') >= 4
+    assert cabinet_response.text.count("data-prompt-body") >= 5
+    assert cabinet_response.text.count("Развернуть") >= 5
+
+    collapsed_cards = re.findall(
+        r'<article\s+class="prompt-card prompt-card--built-in prompt-card--collapsed"[^>]*>.*?</article>',
+        cabinet_response.text,
+        re.S,
+    )
+    assert len(collapsed_cards) == 4
+    for card_html in collapsed_cards:
+        assert 'data-prompt-expanded="false"' in card_html
+        assert "prompt-card__filename" in card_html
+        assert "data-prompt-body" in card_html
+        assert "hidden" in card_html
+        assert 'data-prompt-toggle' in card_html
+        assert 'aria-expanded="false"' in card_html
+        assert "Развернуть" in card_html
 
     prompts = load_cabinet_prompts()
     assert len(prompts) == 4

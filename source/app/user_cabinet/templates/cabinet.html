@@ -65,30 +65,45 @@
       <div class="prompts-grid prompts-grid--built-in" data-prompts-built-in-list>
         {% for prompt in cabinet_prompts %}
           <article
-            class="prompt-card prompt-card--built-in"
+            class="prompt-card prompt-card--built-in prompt-card--collapsed"
             data-prompt-id="{{ prompt.id|e }}"
             data-prompt-filename="{{ prompt.filename|e }}"
             data-prompt-owner="{{ prompt.owner_label|e }}"
             data-prompt-source-label="{{ (prompt.source_label or '')|e }}"
             data-prompt-title="{{ prompt.title|e }}"
+            data-prompt-expanded="false"
           >
             <div class="prompt-card__header">
               <div class="stack prompt-card__intro">
                 <h4 class="prompt-card__title">{{ prompt.title }}</h4>
                 <p class="prompt-card__meta">{{ prompt.owner_label }}{% if prompt.source_label %} · {{ prompt.source_label }}{% endif %}</p>
+                <p class="prompt-card__filename">Файл: {{ prompt.filename }}</p>
               </div>
-              <span class="prompt-card__badge">Курс</span>
+              <div class="prompt-card__header-actions">
+                <span class="prompt-card__badge">Курс</span>
+                <button
+                  class="button button-secondary prompt-card__toggle"
+                  type="button"
+                  data-prompt-toggle
+                  aria-controls="prompt-body-{{ prompt.id|e }}"
+                  aria-expanded="false"
+                >
+                  Развернуть
+                </button>
+              </div>
             </div>
-            <label class="prompt-field">
-              <span>Промпт</span>
-              <textarea class="textarea prompt-textarea" data-prompt-textarea readonly rows="12">{{ prompt.markdown }}</textarea>
-            </label>
-            <div class="prompt-actions prompt-actions--built-in">
-              <button class="button button-secondary" type="button" data-prompt-edit>Редактировать</button>
-              <button class="button button-primary" type="button" data-prompt-save hidden>Сохранить</button>
-              <button class="button button-secondary" type="button" data-prompt-copy>Скопировать</button>
-              <button class="button button-secondary" type="button" data-prompt-download>Скачать .md</button>
-              <button class="button button-secondary" type="button" data-prompt-reset>Сбросить к версии курса</button>
+            <div class="prompt-card__body" id="prompt-body-{{ prompt.id|e }}" data-prompt-body hidden>
+              <label class="prompt-field">
+                <span>Промпт</span>
+                <textarea class="textarea prompt-textarea" data-prompt-textarea readonly rows="12">{{ prompt.markdown }}</textarea>
+              </label>
+              <div class="prompt-actions prompt-actions--built-in">
+                <button class="button button-secondary" type="button" data-prompt-edit>Редактировать</button>
+                <button class="button button-primary" type="button" data-prompt-save hidden>Сохранить</button>
+                <button class="button button-secondary" type="button" data-prompt-copy>Скопировать</button>
+                <button class="button button-secondary" type="button" data-prompt-download>Скачать .md</button>
+                <button class="button button-secondary" type="button" data-prompt-reset>Сбросить к версии курса</button>
+              </div>
             </div>
           </article>
         {% endfor %}
@@ -102,26 +117,42 @@
       <p class="form-help prompts-empty" data-prompts-empty>Пока нет ни одного личного промпта. Добавьте первый выше.</p>
       <div class="prompts-grid prompts-grid--custom" data-prompts-custom-list></div>
       <template data-prompts-custom-template>
-        <article class="prompt-card prompt-card--custom prompt-card--editing" data-prompt-custom>
+        <article class="prompt-card prompt-card--custom prompt-card--collapsed" data-prompt-custom data-prompt-expanded="false">
           <div class="prompt-card__header">
             <div class="stack prompt-card__intro">
-              <label class="prompt-title-field">
-                <span>Название</span>
-                <input class="input prompt-title-input" type="text" data-prompt-title placeholder="Название промпта" autocomplete="off">
-              </label>
+              <h4 class="prompt-card__title" data-prompt-summary-title>Новый промпт</h4>
+              <p class="prompt-card__meta">Личный промпт</p>
+              <p class="prompt-card__filename">Файл: custom-prompt.md</p>
             </div>
-            <span class="prompt-card__badge">Личный</span>
+            <div class="prompt-card__header-actions">
+              <span class="prompt-card__badge">Личный</span>
+              <button
+                class="button button-secondary prompt-card__toggle"
+                type="button"
+                data-prompt-toggle
+                aria-controls="prompt-body-custom"
+                aria-expanded="false"
+              >
+                Развернуть
+              </button>
+            </div>
           </div>
-          <label class="prompt-field">
-            <span>Промпт</span>
-            <textarea class="textarea prompt-textarea" data-prompt-textarea rows="12" placeholder="Введите текст промпта"></textarea>
-          </label>
-          <div class="prompt-actions prompt-actions--custom">
-            <button class="button button-secondary" type="button" data-prompt-edit>Редактировать</button>
-            <button class="button button-primary" type="button" data-prompt-save>Сохранить</button>
-            <button class="button button-secondary" type="button" data-prompt-copy>Скопировать</button>
-            <button class="button button-secondary" type="button" data-prompt-download>Скачать .md</button>
-            <button class="button button-secondary" type="button" data-prompt-delete>Удалить</button>
+          <div class="prompt-card__body" id="prompt-body-custom" data-prompt-body hidden>
+            <label class="prompt-title-field">
+              <span>Название</span>
+              <input class="input prompt-title-input" type="text" data-prompt-title placeholder="Название промпта" autocomplete="off">
+            </label>
+            <label class="prompt-field">
+              <span>Промпт</span>
+              <textarea class="textarea prompt-textarea" data-prompt-textarea rows="12" placeholder="Введите текст промпта"></textarea>
+            </label>
+            <div class="prompt-actions prompt-actions--custom">
+              <button class="button button-secondary" type="button" data-prompt-edit>Редактировать</button>
+              <button class="button button-primary" type="button" data-prompt-save>Сохранить</button>
+              <button class="button button-secondary" type="button" data-prompt-copy>Скопировать</button>
+              <button class="button button-secondary" type="button" data-prompt-download>Скачать .md</button>
+              <button class="button button-secondary" type="button" data-prompt-delete>Удалить</button>
+            </div>
           </div>
         </article>
       </template>

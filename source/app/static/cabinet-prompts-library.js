@@ -58,6 +58,7 @@
       markdown: typeof rawPrompt?.markdown === "string" ? rawPrompt.markdown : "",
       updatedAt: typeof rawPrompt?.updatedAt === "string" ? rawPrompt.updatedAt : "",
       isEditing: false,
+      isExpanded: false,
     }));
 
     return { overrides, custom };
@@ -165,6 +166,24 @@
     }, 0);
   }
 
+  function setPromptCardExpanded(card, expanded) {
+    const body = card.querySelector("[data-prompt-body]");
+    const toggleButton = card.querySelector("[data-prompt-toggle]");
+
+    card.dataset.promptExpanded = String(expanded);
+    card.classList.toggle("prompt-card--collapsed", !expanded);
+    card.classList.toggle("prompt-card--expanded", expanded);
+
+    if (body) {
+      body.hidden = !expanded;
+    }
+
+    if (toggleButton) {
+      toggleButton.setAttribute("aria-expanded", String(expanded));
+      toggleButton.textContent = expanded ? "Свернуть" : "Развернуть";
+    }
+  }
+
   function collectBuiltInPrompts() {
     if (!builtInList) {
       return [];
@@ -185,8 +204,11 @@
         copyButton: card.querySelector("[data-prompt-copy]"),
         downloadButton: card.querySelector("[data-prompt-download]"),
         resetButton: card.querySelector("[data-prompt-reset]"),
+        toggleButton: card.querySelector("[data-prompt-toggle]"),
+        body: card.querySelector("[data-prompt-body]"),
         originalMarkdown: textarea?.defaultValue || textarea?.value || "",
         isEditing: false,
+        isExpanded: false,
       };
     });
   }
@@ -202,6 +224,10 @@
     prompt.textarea.readOnly = !prompt.isEditing;
     prompt.textarea.setAttribute("aria-readonly", String(!prompt.isEditing));
     prompt.card.classList.toggle("prompt-card--editing", prompt.isEditing);
+    setPromptCardExpanded(prompt.card, prompt.isEditing || prompt.isExpanded);
+    if (prompt.toggleButton) {
+      prompt.toggleButton.disabled = prompt.isEditing;
+    }
     if (prompt.saveButton) {
       prompt.saveButton.hidden = !prompt.isEditing;
       prompt.saveButton.disabled = !prompt.isEditing;
@@ -230,9 +256,20 @@
     builtInPrompts.forEach((prompt) => {
       applyBuiltInPrompt(prompt);
 
+      if (prompt.toggleButton) {
+        prompt.toggleButton.addEventListener("click", () => {
+          if (prompt.isEditing) {
+            return;
+          }
+          prompt.isExpanded = !prompt.isExpanded;
+          applyBuiltInPrompt(prompt);
+        });
+      }
+
       if (prompt.editButton) {
         prompt.editButton.addEventListener("click", () => {
           prompt.isEditing = true;
+          prompt.isExpanded = true;
           applyBuiltInPrompt(prompt);
           prompt.textarea.focus();
           prompt.textarea.select();
@@ -243,6 +280,7 @@
         prompt.saveButton.addEventListener("click", () => {
           persistBuiltInOverride(prompt);
           prompt.isEditing = false;
+          prompt.isExpanded = true;
           applyBuiltInPrompt(prompt);
           setNotice("Промпт сохранён");
         });
@@ -265,6 +303,7 @@
       if (prompt.resetButton) {
         prompt.resetButton.addEventListener("click", () => {
           prompt.isEditing = false;
+          prompt.isExpanded = true;
           resetBuiltInOverride(prompt);
           applyBuiltInPrompt(prompt);
           setNotice("Версия курса восстановлена");
@@ -287,6 +326,9 @@
     const copyButton = card.querySelector("[data-prompt-copy]");
     const downloadButton = card.querySelector("[data-prompt-download]");
     const deleteButton = card.querySelector("[data-prompt-delete]");
+    const toggleButton = card.querySelector("[data-prompt-toggle]");
+    const body = card.querySelector("[data-prompt-body]");
+    const summaryTitle = card.querySelector("[data-prompt-summary-title]");
 
     card.dataset.promptId = prompt.id;
     titleInput.value = prompt.title;
@@ -294,6 +336,9 @@
     card.classList.toggle("prompt-card--editing", prompt.isEditing);
     titleInput.readOnly = !prompt.isEditing;
     textarea.readOnly = !prompt.isEditing;
+    if (summaryTitle) {
+      summaryTitle.textContent = prompt.title;
+    }
     if (editButton) {
       editButton.hidden = prompt.isEditing;
       editButton.disabled = prompt.isEditing;
@@ -302,10 +347,15 @@
       saveButton.hidden = !prompt.isEditing;
       saveButton.disabled = !prompt.isEditing;
     }
+    if (toggleButton) {
+      toggleButton.disabled = prompt.isEditing;
+    }
+    setPromptCardExpanded(card, prompt.isEditing || prompt.isExpanded);
 
     if (editButton) {
       editButton.addEventListener("click", () => {
         prompt.isEditing = true;
+        prompt.isExpanded = true;
         renderCustomPrompts();
       });
     }
@@ -316,6 +366,7 @@
         prompt.markdown = textarea.value;
         prompt.updatedAt = new Date().toISOString();
         prompt.isEditing = false;
+        prompt.isExpanded = true;
         persistState();
         renderCustomPrompts();
         setNotice("Промпт сохранён");
@@ -345,9 +396,22 @@
       });
     }
 
+    if (toggleButton) {
+      toggleButton.addEventListener("click", () => {
+        if (prompt.isEditing) {
+          return;
+        }
+        prompt.isExpanded = !prompt.isExpanded;
+        renderCustomPrompts();
+      });
+    }
+
     titleInput.addEventListener("input", () => {
       if (prompt.isEditing) {
         prompt.title = normalizeCustomTitle(titleInput.value);
+        if (summaryTitle) {
+          summaryTitle.textContent = prompt.title;
+        }
       }
     });
 
