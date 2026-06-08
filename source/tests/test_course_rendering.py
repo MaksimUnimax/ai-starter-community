@@ -403,6 +403,36 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Советы и правила безопасной работы" in script_response.text
     assert "Обновление документации и новый диалог" in script_response.text
     assert "Совет 1" in lesson9_section
+    assert "Совет 2" in lesson9_section
+    assert "Совет 3" in lesson9_section
+    assert "Совет 4" in lesson9_section
+    assert "Совет 5" in lesson9_section
+    assert "Совет 6" in lesson9_section
+    assert "Совет 7" in lesson9_section
+    assert "Совет 8" in lesson9_section
+    lesson9_labels = [
+        'label: "Совет 1"',
+        'label: "Совет 2"',
+        'label: "Совет 3"',
+        'label: "Совет 4"',
+        'label: "Совет 5"',
+        'label: "Совет 6"',
+        'label: "Совет 7"',
+        'label: "Совет 8"',
+    ]
+    lesson9_label_positions = [lesson9_section.index(label) for label in lesson9_labels]
+    assert lesson9_label_positions == sorted(lesson9_label_positions)
+    assert "Используйте скриншоты и видеозаписи" in lesson9_section
+    assert "Ножницы" in lesson9_section
+    assert "Snipping Tool" in lesson9_section
+    assert "Windows + Shift + S" in lesson9_section
+    assert "Windows + Shift + R" in lesson9_section
+    assert "Shift + Command + 5" in lesson9_section
+    assert "Command + Space" in lesson9_section
+    assert "Screenshot" in lesson9_section
+    assert "Снимок экрана" in lesson9_section
+    assert "ChatGPT получает больше контекста" in lesson9_section
+    assert "Главное правило: если словами объяснить сложно, сделайте скриншот, нарисуйте стрелку и отправьте его в ChatGPT." in lesson9_section
     assert "Ошибка 1" not in lesson9_section
     assert "Финальное правило" not in lesson9_section
     assert "Проверяйте версию ChatGPT" in lesson9_section
