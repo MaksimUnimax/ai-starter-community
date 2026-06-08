@@ -57,6 +57,31 @@ CREATE TABLE IF NOT EXISTS email_outbox (
     error TEXT NULL
 );
 
+CREATE TABLE IF NOT EXISTS account_blocks (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    owner_user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    type TEXT NOT NULL,
+    title TEXT NOT NULL,
+    login TEXT NOT NULL DEFAULT '',
+    password_secret TEXT NOT NULL DEFAULT '',
+    email TEXT NULL,
+    status TEXT NOT NULL DEFAULT 'inactive',
+    duration_days INTEGER NOT NULL DEFAULT 60,
+    activated_at TEXT NULL,
+    expires_at TEXT NULL,
+    created_by_user_id INTEGER NULL REFERENCES users(id) ON DELETE SET NULL,
+    updated_by_user_id INTEGER NULL REFERENCES users(id) ON DELETE SET NULL,
+    activated_by_user_id INTEGER NULL REFERENCES users(id) ON DELETE SET NULL,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    CHECK (type IN ('chatgpt', 'server', 'mail')),
+    CHECK (status IN ('inactive', 'active', 'expired'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_account_blocks_owner_user_id ON account_blocks(owner_user_id);
+CREATE INDEX IF NOT EXISTS idx_account_blocks_owner_user_type ON account_blocks(owner_user_id, type);
+CREATE INDEX IF NOT EXISTS idx_account_blocks_status ON account_blocks(status);
+
 CREATE TABLE IF NOT EXISTS tariffs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     code TEXT UNIQUE NOT NULL,

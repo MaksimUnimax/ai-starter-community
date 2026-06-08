@@ -35,6 +35,7 @@ ROLE_USER = "user"
 ROLE_MODERATOR = "moderator"
 ROLE_ADMIN = "admin"
 ALLOWED_ROLES = (ROLE_USER, ROLE_MODERATOR, ROLE_ADMIN)
+ACCOUNT_BLOCK_MANAGEMENT_ROLES = {ROLE_ADMIN, ROLE_MODERATOR}
 ALLOWED_ADMIN_USER_ACCESS_STATUSES = ("not_activated", "activated")
 ALLOWED_ADMIN_USER_SORT_ORDERS = ("desc", "asc")
 ADMIN_USER_DEFAULT_SORT = "desc"
@@ -161,6 +162,16 @@ def is_admin_role(role: str) -> bool:
 
 def has_staff_materials_access(role: str) -> bool:
     return role in {ROLE_ADMIN, ROLE_MODERATOR}
+
+
+def can_manage_account_blocks(subject: UserPublic | str | None) -> bool:
+    if isinstance(subject, UserPublic):
+        role = subject.role
+    elif subject is None:
+        role = ""
+    else:
+        role = str(subject)
+    return role.strip().lower() in ACCOUNT_BLOCK_MANAGEMENT_ROLES
 
 
 def user_can_access_materials(user: UserPublic | None) -> bool:
