@@ -221,6 +221,11 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Общая схема" in lesson1_section
     assert "ChatGPT переводит задачу пользователя на технический язык для Codex" in lesson1_section
     assert "ChatGPT разбирает задачу, создаёт документацию и проектирует работу" not in lesson1_section
+    assert "документы фиксируют план" not in lesson1_section
+    lesson1_difference_block = lesson1_section[
+        lesson1_section.index('label: "Разница"'):lesson1_section.index('label: "Роль пользователя"')
+    ]
+    assert "переводит задачу пользователя на технический язык для Codex" in lesson1_difference_block
     assert "Почему результат работы нужно проверять по фактам?" not in lesson1_section
     assert "Что такое ChatGPT в нашем курсе?" in lesson1_section
     assert "Что такое Codex в нашем курсе?" in lesson1_section
