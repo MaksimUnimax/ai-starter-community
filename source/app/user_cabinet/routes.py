@@ -1,5 +1,6 @@
 """User cabinet routes guarded by the session cookie."""
 
+from decimal import Decimal
 from pathlib import Path
 
 from fastapi import APIRouter, Form, HTTPException, Request
@@ -16,6 +17,7 @@ from app.auth.service import (
     get_current_user_from_cookies,
 )
 from app.core.config import get_settings
+from app.paid_options.service import list_paid_options
 from app.materials.service import user_has_materials_access
 from app.user_cabinet.prompts_library import load_cabinet_prompts
 
@@ -31,6 +33,40 @@ LEARNING_COURSE_URL = "/materials/drafts/dair-smoke-20260529/"
 LEARNING_PROJECT_DOWNLOAD_URL = "/cabinet/learning/project-file"
 LEARNING_PROJECT_FILE_NAME = "02_СТАРТ_ПРОЕКТА_GIT_ДОКУМЕНТАЦИЯ_СТРУКТУРА.md"
 LEARNING_PROJECT_FILE_PATH = Path(__file__).resolve().parent / "private_files" / LEARNING_PROJECT_FILE_NAME
+
+
+def _format_price(amount_minor: int | None, currency: str | None) -> str:
+    if amount_minor is None:
+        return "Цена не указана"
+
+    amount = Decimal(int(amount_minor)) / Decimal(100)
+    if amount == amount.to_integral():
+        amount_text = f"{int(amount):,}".replace(",", " ")
+    else:
+        amount_text = f"{amount:,.2f}".replace(",", " ").replace(".", ",")
+
+    currency_code = (currency or "RUB").upper()
+    currency_suffix = "₽" if currency_code == "RUB" else currency_code
+    return f"{amount_text} {currency_suffix}"
+
+
+def _active_paid_options_for_cabinet(settings):
+    options = []
+    for option in list_paid_options(settings=settings):
+        options.append(
+            {
+                "id": option.id,
+                "code": option.code,
+                "title": option.title,
+                "description": option.description,
+                "formatted_price": _format_price(option.price_amount_minor, option.currency),
+                "currency": option.currency,
+                "default_duration_days": option.default_duration_days,
+                "is_renewable": option.is_renewable,
+                "status": option.status,
+            }
+        )
+    return options
 
 
 def _template(request: Request, template_name: str, **context) -> HTMLResponse:
@@ -74,6 +110,7 @@ def cabinet_page(request: Request):
     if redirect_response is not None:
         return redirect_response
     learning_access = user_has_materials_access(user)
+    active_paid_options = _active_paid_options_for_cabinet(settings)
 
     return _template(
         request,
@@ -83,6 +120,8 @@ def cabinet_page(request: Request):
         learning_course_url=LEARNING_COURSE_URL if learning_access else None,
         learning_download_url=LEARNING_PROJECT_DOWNLOAD_URL if learning_access else None,
         cabinet_prompts=load_cabinet_prompts(),
+        active_paid_options=active_paid_options,
+        active_paid_options_count=len(active_paid_options),
     )
 
 

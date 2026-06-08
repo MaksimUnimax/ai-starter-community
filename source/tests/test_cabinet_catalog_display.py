@@ -90,15 +90,21 @@ def test_cabinet_displays_course_shell_without_tariffs_or_payment_noise(client, 
     assert '<h2 class="section-title">Аккаунт</h2>' not in accounts_section
     assert "Логин:" not in accounts_section
     assert "Email:" not in accounts_section
+    assert cabinet_response.text.index('data-prompts-library-root') < cabinet_response.text.index('data-paid-options-root')
+    assert cabinet_response.text.index('data-paid-options-root') > cabinet_response.text.index('data-prompts-library-root')
+    assert "Активация опций" in cabinet_response.text
+    assert "Пока нет активных опций для подключения." in cabinet_response.text
+    assert "Сейчас активных опций: 0" in cabinet_response.text
+    assert "Купить" not in cabinet_response.text
     assert "Доступные тарифы" not in cabinet_response.text
-    assert "Оплата" not in cabinet_response.text
     assert "Что дальше" not in cabinet_response.text
     assert "Раздел «Работа с ИИ» будет доступен после оплаты." not in cabinet_response.text
     assert "активирован" not in cabinet_response.text
     assert "доступен по роли" not in cabinet_response.text
     assert "Стартовый доступ" not in cabinet_response.text
-    assert "Оплата будет подключена позже." not in cabinet_response.text
     assert "Последний платёж" not in cabinet_response.text
+    assert '/admin/payments' not in cabinet_response.text
+    assert '/cabinet/payments' not in cabinet_response.text
 
 
 def test_cabinet_shows_active_learning_links_when_access_granted(client, test_settings):

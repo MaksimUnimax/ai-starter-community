@@ -160,6 +160,72 @@
 
     <p class="prompts-notice" data-prompts-notice aria-live="polite" role="status"></p>
   </section>
+
+  <section class="card stack paid-options-card" data-paid-options-root>
+    <div class="paid-options-header">
+      <div class="stack paid-options-intro">
+        <h2 class="section-title">Активация опций</h2>
+        <p class="form-help">Здесь показаны активные платные опции, которые можно будет подключать к аккаунту.</p>
+        <p class="paid-options-count">Сейчас активных опций: {{ active_paid_options_count }}</p>
+      </div>
+    </div>
+
+    {% if active_paid_options %}
+      <div class="paid-options-grid" data-paid-options-list>
+        {% for option in active_paid_options %}
+          <article class="paid-option-card" data-paid-option-card data-paid-option-id="{{ option.id|e }}">
+            <div class="stack paid-option__intro">
+              <div class="paid-option__headline">
+                <h3 class="paid-option__title">{{ option.title }}</h3>
+                <span class="paid-option__badge">Активно</span>
+              </div>
+              {% if option.description %}
+                <p class="paid-option__description">{{ option.description }}</p>
+              {% endif %}
+            </div>
+
+            <div class="stack paid-option__meta">
+              <p class="paid-option__price">{{ option.formatted_price }}</p>
+              {% if option.default_duration_days %}
+                <p class="paid-option__duration">Срок: {{ option.default_duration_days }} дней</p>
+              {% endif %}
+              {% if option.is_renewable %}
+                <p class="paid-option__renewable">Можно продлевать</p>
+              {% endif %}
+            </div>
+
+            <div class="paid-option__actions">
+              <button class="button button-primary paid-option__buy" type="button" data-paid-option-buy>Купить</button>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="form-help paid-options-empty">Пока нет активных опций для подключения.</p>
+    {% endif %}
+
+    <p class="paid-options-notice" data-paid-options-notice aria-live="polite" role="status"></p>
+  </section>
   <script src="/static/cabinet-local-accounts.js"></script>
   <script src="/static/cabinet-prompts-library.js"></script>
+  <script>
+    (() => {
+      const root = document.querySelector("[data-paid-options-root]");
+      if (!root) {
+        return;
+      }
+
+      const notice = root.querySelector("[data-paid-options-notice]");
+      root.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-paid-option-buy]");
+        if (!button) {
+          return;
+        }
+
+        if (notice) {
+          notice.textContent = "Оплата пока не подключена. Эта кнопка подготовлена для следующего этапа.";
+        }
+      });
+    })();
+  </script>
 {% endblock %}

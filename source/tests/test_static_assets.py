@@ -81,6 +81,14 @@ def test_stylesheet_is_served(client):
     assert ".prompt-card--editing" in response.text
     assert "@media (max-width: 640px)" in response.text
     assert "--prompt-card-collapsed-height: 176px;" in response.text
+    assert ".paid-options-card {" in response.text
+    assert ".paid-options-header {" in response.text
+    assert ".paid-options-count {" in response.text
+    assert ".paid-options-grid {" in response.text
+    assert ".paid-option-card {" in response.text
+    assert ".paid-option__headline {" in response.text
+    assert ".paid-option__buy {" in response.text
+    assert ".paid-options-notice {" in response.text
 
 
 def test_cabinet_local_accounts_script_is_served(client):
