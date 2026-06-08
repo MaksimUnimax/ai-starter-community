@@ -60,6 +60,7 @@ def test_cabinet_prompt_library_renders_course_prompts_and_custom_prompt_templat
     assert cabinet_response.text.index('data-local-accounts-root') < cabinet_response.text.index('data-prompts-library-root')
     assert "Промпты" in cabinet_response.text
     assert "Промпты из курса" in cabinet_response.text
+    assert cabinet_response.text.count('class="prompt-card prompt-card--built-in"') == 4
     assert "Мои промпты" in cabinet_response.text
     assert "Добавить промпт" in cabinet_response.text
     assert "Редактировать" in cabinet_response.text
@@ -94,6 +95,14 @@ def test_cabinet_prompt_library_renders_course_prompts_and_custom_prompt_templat
     }
     rendered_markdowns = _extract_built_in_prompt_markdowns(cabinet_response.text)
     assert set(rendered_markdowns) == set(expected_source)
+    assert "Старт проекта с разработки документации" in cabinet_response.text
+    assert "Prompt для создания расширения" in cabinet_response.text
+    assert "Prompt для обновления документов проекта" in cabinet_response.text
+    assert "Prompt для нового диалога по проекту" in cabinet_response.text
+    assert "start_project_documentation_prompt.md" in cabinet_response.text
+    assert "prefix_extension_for_chatgpt_prompt.md" in cabinet_response.text
+    assert "project_docs_update_prompt.md" in cabinet_response.text
+    assert "new_project_dialogue_prompt.md" in cabinet_response.text
 
     for prompt in prompts:
         rendered = rendered_markdowns[prompt["id"]]
@@ -101,6 +110,19 @@ def test_cabinet_prompt_library_renders_course_prompts_and_custom_prompt_templat
         assert prompt["title"] in cabinet_response.text
         assert prompt["owner_label"] in cabinet_response.text
         assert prompt["filename"] in cabinet_response.text
+
+    assert "Ты — ChatGPT, ведущий технический специалист проекта." in cabinet_response.text
+    assert "Сначала ответь только одной фразой:" in cabinet_response.text
+    assert "Опишите свою идею проекта простыми словами" in cabinet_response.text
+    assert "Мне нужно сделать простое browser-расширение для ChatGPT." in cabinet_response.text
+    assert "Сделай расширение для Chrome и Edge." in cabinet_response.text
+    assert "https://chatgpt.com/*" in cabinet_response.text
+    assert "Мне нужно обновить документы проекта после текущего этапа работы." in cabinet_response.text
+    assert "Public docs repo: [ССЫЛКА НА ПУБЛИЧНЫЙ РЕПОЗИТОРИЙ ДОКУМЕНТОВ]" in cabinet_response.text
+    assert "Prompt для обновления документов проекта" in cabinet_response.text
+    assert "Начни работу по проекту строго по документам проекта." in cabinet_response.text
+    assert "Не продолжай по памяти." in cabinet_response.text
+    assert "Prompt для нового диалога по проекту" in cabinet_response.text
 
     course_script = Path(
         "/opt/ai-starter-community/source/app/materials/course_content/drafts/dair_smoke_20260529/script.js"
