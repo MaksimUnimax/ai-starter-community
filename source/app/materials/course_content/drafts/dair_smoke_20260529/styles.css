@@ -668,6 +668,13 @@ button:hover,
   gap: 18px;
 }
 
+.lesson-shell .section-body > .callout:not([data-starter-prompt-panel]) p,
+.lesson-shell .section-body > .callout:not([data-starter-prompt-panel]) li,
+.lesson-shell .section-body > .next-step-card p {
+  font-size: 18px;
+  line-height: 1.65;
+}
+
 .lesson-one .section-body {
   gap: 20px;
 }
@@ -1018,6 +1025,12 @@ button:hover,
   .lesson-progress,
   .lesson-shell {
     padding: 16px;
+  }
+
+  .lesson-shell .section-body > .callout:not([data-starter-prompt-panel]) p,
+  .lesson-shell .section-body > .callout:not([data-starter-prompt-panel]) li,
+  .lesson-shell .section-body > .next-step-card p {
+    font-size: 16px;
   }
 
   .hero-actions {

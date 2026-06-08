@@ -234,14 +234,25 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert ".course-intro .section-heading" in styles_response.text
     assert "text-align: center;" in styles_response.text
     assert "line-height: 1.45;" in styles_response.text
+    assert "font-size:" not in styles_response.text.split("body {", 1)[1].split("button,\na {", 1)[0]
+    assert ".lesson-shell .section-body > .callout:not([data-starter-prompt-panel]) p" in styles_response.text
+    assert ".lesson-shell .section-body > .callout:not([data-starter-prompt-panel]) li" in styles_response.text
+    assert ".lesson-shell .section-body > .next-step-card p" in styles_response.text
+    assert "font-size: 18px;" in styles_response.text
+    assert "line-height: 1.65;" in styles_response.text
     assert ".course-note {" in styles_response.text
     assert "color: var(--accent-strong);" in styles_response.text
     assert "@media (max-width: 680px)" in styles_response.text
+    assert "font-size: 16px;" in styles_response.text
     assert ".hero-bg-mobile {\n    display: none;" in styles_response.text
     assert ".hero-bg-desktop {\n    display: none;" in styles_response.text
     assert ".definition-stack" in styles_response.text
     assert ".definition-card" in styles_response.text
     assert ".process-flow" in styles_response.text
+    assert ".block-label {\n  display: block;" in styles_response.text
+    assert "font-size: 0.82rem;" in styles_response.text
+    assert ".nav-button .nav-title {\n  display: block;" in styles_response.text
+    assert ".starter-prompt-button {\n  width: auto;" in styles_response.text
     assert "linear-gradient(180deg, #fff 0%, #fff6ec 100%)" not in styles_response.text
     assert ".flashcard.is-revealed" in styles_response.text
     assert ".flashcard-title" in styles_response.text
