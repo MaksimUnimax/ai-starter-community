@@ -283,8 +283,8 @@
       passwordInput.readOnly = !editing;
       loginField.input.setAttribute("aria-readonly", String(!editing));
       passwordInput.setAttribute("aria-readonly", String(!editing));
-      editButton.hidden = editing;
-      saveButton.hidden = !editing;
+      editButton.disabled = editing;
+      saveButton.disabled = !editing;
     }
 
     editButton.addEventListener("click", () => {
@@ -320,7 +320,7 @@
       void copyValue(passwordInput.value, "Пароль скопирован");
     });
 
-    actions.append(editButton, saveButton, copyLoginButton, copyPasswordButton);
+    actions.append(copyLoginButton, editButton, copyPasswordButton, saveButton);
 
     article.append(loginField.field, passwordField, actions);
     syncMode();

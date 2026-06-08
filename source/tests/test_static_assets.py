@@ -22,14 +22,17 @@ def test_stylesheet_is_served(client):
     assert ".accounts-grid" in response.text
     assert ".account-card" in response.text
     assert ".account-password-row" in response.text
-    assert "display: flex;" in response.text
     assert "width: min(100%, 320px);" in response.text
     assert "max-width: 340px;" in response.text
     assert ".accounts-builder .select {" in response.text
     assert "min-height: 38px;" in response.text
     assert ".accounts-builder .button {" in response.text
     assert ".account-card__delete {" in response.text
+    assert ".account-actions {" in response.text
+    assert "display: grid;" in response.text
+    assert "grid-template-columns: repeat(2, minmax(0, 1fr));" in response.text
     assert ".account-actions .button {" in response.text
+    assert ".account-actions .button:disabled {" in response.text
     assert ".account-password-toggle {" in response.text
 
 
@@ -43,8 +46,13 @@ def test_cabinet_local_accounts_script_is_served(client):
     assert "readOnly = !account.isEditing" in response.text
     assert "persisted: false" in response.text
     assert "isEditing: true" in response.text
+    assert "editButton.disabled = editing;" in response.text
+    assert "saveButton.disabled = !editing;" in response.text
+    assert "actions.append(copyLoginButton, editButton, copyPasswordButton, saveButton);" in response.text
     assert "Скопировать логин" in response.text
     assert "Скопировать пароль" in response.text
     assert "Показать пароль" in response.text
     assert "Скрыть пароль" in response.text
     assert "Удалить" in response.text
+    assert "account-edit-row" not in response.text
+    assert "account-save-row" not in response.text
