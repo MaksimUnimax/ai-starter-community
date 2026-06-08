@@ -2,11 +2,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
-
-ROOT = Path("/opt/ai-starter-community/source/app")
-
-
 def test_favicon_svg_is_served_and_matches_constraints(client):
+    favicon_path = Path(__file__).resolve().parents[1] / "app" / "static" / "favicon.svg"
+    svg_text = favicon_path.read_text(encoding="utf-8")
+
     response = client.get("/static/favicon.svg")
     assert response.status_code == 200
     assert response.headers["content-type"].startswith("image/svg+xml")
@@ -18,6 +17,10 @@ def test_favicon_svg_is_served_and_matches_constraints(client):
     assert "blue" not in response.text.lower()
     assert "#0000ff" not in response.text.lower()
     assert "#00f" not in response.text.lower()
+    assert 'id="favicon-head-profile"' in svg_text
+    assert 'id="favicon-network-branch"' in svg_text
+    assert "cloud" not in response.text.lower()
+    assert "speech" not in response.text.lower()
 
 
 def test_stylesheet_is_served(client):
@@ -105,8 +108,8 @@ def test_cabinet_prompts_library_script_is_served(client):
 
 
 def test_global_templates_link_to_favicon():
-    shared_base = (ROOT / "shared/templates/base.html").read_text(encoding="utf-8")
-    admin_base = (ROOT / "admin/templates/base.html").read_text(encoding="utf-8")
+    shared_base = (Path(__file__).resolve().parents[1] / "app" / "shared/templates/base.html").read_text(encoding="utf-8")
+    admin_base = (Path(__file__).resolve().parents[1] / "app" / "admin/templates/base.html").read_text(encoding="utf-8")
 
     for template in (shared_base, admin_base):
         assert 'rel="icon" href="/static/favicon.svg" type="image/svg+xml"' in template
