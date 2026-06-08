@@ -659,6 +659,19 @@ button:hover {
   box-shadow: none;
 }
 
+.account-card--editing {
+  border-color: rgba(196, 92, 38, 0.36);
+  background: #fffaf4;
+}
+
+.account-card--locked .account-card__edit {
+  display: inline-flex;
+}
+
+.account-card--editing .account-card__save {
+  display: inline-flex;
+}
+
 .account-card__header {
   display: flex;
   justify-content: space-between;
@@ -717,6 +730,12 @@ button:hover {
   padding: 8px 10px;
   border-radius: 10px;
   font-size: 0.95rem;
+}
+
+.account-card .input[readonly] {
+  background: var(--surface);
+  color: var(--text);
+  cursor: default;
 }
 
 .account-password-toggle {

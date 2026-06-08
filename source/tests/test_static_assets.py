@@ -37,6 +37,12 @@ def test_cabinet_local_accounts_script_is_served(client):
     response = client.get("/static/cabinet-local-accounts.js")
     assert response.status_code == 200
     assert "openscript:cabinet:local-accounts:v1" in response.text
+    assert "Редактировать" in response.text
+    assert "Сохранить" in response.text
+    assert "account-card--editing" in response.text
+    assert "readOnly = !account.isEditing" in response.text
+    assert "persisted: false" in response.text
+    assert "isEditing: true" in response.text
     assert "Скопировать логин" in response.text
     assert "Скопировать пароль" in response.text
     assert "Показать пароль" in response.text

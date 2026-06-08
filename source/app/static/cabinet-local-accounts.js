@@ -36,6 +36,8 @@
       login: typeof raw?.login === "string" ? raw.login : "",
       password: typeof raw?.password === "string" ? raw.password : "",
       passwordVisible: Boolean(raw?.passwordVisible),
+      persisted: true,
+      isEditing: false,
     };
   }
 
@@ -57,7 +59,16 @@
 
   function persistAccounts() {
     try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(accounts));
+      const storedAccounts = accounts
+        .filter((account) => account.persisted)
+        .map(({ id, type, login, password, passwordVisible }) => ({
+          id,
+          type,
+          login,
+          password,
+          passwordVisible,
+        }));
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(storedAccounts));
       return true;
     } catch (_error) {
       return false;
@@ -92,7 +103,9 @@
       return null;
     }
     Object.assign(account, patch);
-    persistAccounts();
+    if (account.persisted) {
+      persistAccounts();
+    }
     return account;
   }
 
@@ -111,8 +124,9 @@
       login: "",
       password: "",
       passwordVisible: false,
+      persisted: false,
+      isEditing: true,
     });
-    persistAccounts();
     renderAccounts();
 
     const lastCard = listElement?.querySelector(".account-card:last-child");
@@ -183,29 +197,10 @@
     article.className = "account-card";
     article.dataset.accountId = account.id;
 
-    const header = document.createElement("div");
-    header.className = "account-card__header";
-
-    const title = document.createElement("h3");
-    title.className = "account-card__title";
-    title.textContent = account.title;
-
-    const deleteButton = document.createElement("button");
-    deleteButton.className = "button button-danger account-card__delete";
-    deleteButton.type = "button";
-    deleteButton.textContent = "Удалить";
-    deleteButton.addEventListener("click", () => {
-      removeAccount(account.id);
-    });
-
-    header.append(title, deleteButton);
-    article.append(header);
-
     const loginField = createField("Логин", "text", account.login, "login");
     loginField.input.placeholder = "Введите логин";
-    loginField.input.addEventListener("input", () => {
-      updateAccount(account.id, { login: loginField.input.value });
-    });
+    loginField.input.readOnly = !account.isEditing;
+    loginField.input.setAttribute("aria-readonly", String(!account.isEditing));
 
     const passwordField = document.createElement("label");
     passwordField.className = "account-field";
@@ -224,9 +219,8 @@
     passwordInput.autocomplete = "off";
     passwordInput.spellcheck = false;
     passwordInput.dataset.accountField = "password";
-    passwordInput.addEventListener("input", () => {
-      updateAccount(account.id, { password: passwordInput.value });
-    });
+    passwordInput.readOnly = !account.isEditing;
+    passwordInput.setAttribute("aria-readonly", String(!account.isEditing));
 
     const toggleButton = document.createElement("button");
     toggleButton.className = "button button-secondary account-password-toggle";
@@ -234,6 +228,24 @@
     toggleButton.textContent = account.passwordVisible ? "Скрыть пароль" : "Показать пароль";
     toggleButton.setAttribute("aria-label", account.passwordVisible ? "Скрыть пароль" : "Показать пароль");
     toggleButton.setAttribute("aria-pressed", String(account.passwordVisible));
+
+    const header = document.createElement("div");
+    header.className = "account-card__header";
+
+    const title = document.createElement("h3");
+    title.className = "account-card__title";
+    title.textContent = account.title;
+
+    const deleteButton = document.createElement("button");
+    deleteButton.className = "button button-danger account-card__delete";
+    deleteButton.type = "button";
+    deleteButton.textContent = "Удалить";
+    deleteButton.addEventListener("click", () => {
+      removeAccount(account.id);
+    });
+
+    header.append(title, deleteButton);
+    article.append(header);
     toggleButton.addEventListener("click", () => {
       const updated = updateAccount(account.id, {
         passwordVisible: !account.passwordVisible,
@@ -253,6 +265,45 @@
     const actions = document.createElement("div");
     actions.className = "account-actions";
 
+    const editButton = document.createElement("button");
+    editButton.className = "button button-secondary account-card__edit";
+    editButton.type = "button";
+    editButton.textContent = "Редактировать";
+
+    const saveButton = document.createElement("button");
+    saveButton.className = "button button-primary account-card__save";
+    saveButton.type = "button";
+    saveButton.textContent = "Сохранить";
+
+    function syncMode() {
+      const editing = Boolean(account.isEditing);
+      article.classList.toggle("account-card--editing", editing);
+      article.classList.toggle("account-card--locked", !editing);
+      loginField.input.readOnly = !editing;
+      passwordInput.readOnly = !editing;
+      loginField.input.setAttribute("aria-readonly", String(!editing));
+      passwordInput.setAttribute("aria-readonly", String(!editing));
+      editButton.hidden = editing;
+      saveButton.hidden = !editing;
+    }
+
+    editButton.addEventListener("click", () => {
+      account.isEditing = true;
+      syncMode();
+      loginField.input.focus();
+      loginField.input.select();
+    });
+
+    saveButton.addEventListener("click", () => {
+      account.login = loginField.input.value;
+      account.password = passwordInput.value;
+      account.persisted = true;
+      account.isEditing = false;
+      persistAccounts();
+      setNotice("Сохранено");
+      syncMode();
+    });
+
     const copyLoginButton = document.createElement("button");
     copyLoginButton.className = "button button-secondary";
     copyLoginButton.type = "button";
@@ -269,9 +320,10 @@
       void copyValue(passwordInput.value, "Пароль скопирован");
     });
 
-    actions.append(copyLoginButton, copyPasswordButton);
+    actions.append(editButton, saveButton, copyLoginButton, copyPasswordButton);
 
     article.append(loginField.field, passwordField, actions);
+    syncMode();
     return article;
   }
 
