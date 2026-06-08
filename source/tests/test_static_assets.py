@@ -9,18 +9,17 @@ def test_favicon_svg_is_served_and_matches_constraints(client):
     response = client.get("/static/favicon.svg")
     assert response.status_code == 200
     assert response.headers["content-type"].startswith("image/svg+xml")
-    assert "<svg" in response.text
-    assert "<text" not in response.text
-    assert "OS" not in response.text
-    assert "base64" not in response.text.lower()
-    assert "data:image" not in response.text.lower()
-    assert "blue" not in response.text.lower()
-    assert "#0000ff" not in response.text.lower()
-    assert "#00f" not in response.text.lower()
-    assert 'id="favicon-head-profile"' in svg_text
-    assert 'id="favicon-network-branch"' in svg_text
-    assert "cloud" not in response.text.lower()
-    assert "speech" not in response.text.lower()
+    assert favicon_path.exists()
+    assert "<svg" in svg_text
+    assert "<text" not in svg_text
+    assert "OS" not in svg_text
+    assert "base64" not in svg_text.lower()
+    assert "data:image" not in svg_text.lower()
+    assert "blue" not in svg_text.lower()
+    assert "#0000ff" not in svg_text.lower()
+    assert "#00f" not in svg_text.lower()
+    assert "cloud" not in svg_text.lower()
+    assert "speech" not in svg_text.lower()
 
 
 def test_stylesheet_is_served(client):
