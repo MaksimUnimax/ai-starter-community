@@ -56,6 +56,7 @@ def test_stylesheet_is_served(client):
     assert ".account-actions .button:disabled {" in response.text
     assert ".account-password-toggle {" in response.text
     assert ".prompts-library-card {" in response.text
+    assert "--prompt-card-collapsed-height: 192px;" in response.text
     assert ".prompts-library-header {" in response.text
     assert ".prompts-grid {" in response.text
     assert ".prompt-card {" in response.text
@@ -64,10 +65,16 @@ def test_stylesheet_is_served(client):
     assert ".prompt-card__toggle" in response.text
     assert ".prompt-card__body" in response.text
     assert ".prompt-card--collapsed" in response.text
+    assert "height: var(--prompt-card-collapsed-height);" in response.text
+    assert "display: -webkit-box;" in response.text
+    assert "-webkit-line-clamp: 2;" in response.text
+    assert "text-overflow: ellipsis;" in response.text
     assert ".prompt-textarea {" in response.text
     assert ".prompt-actions {" in response.text
     assert ".prompt-card--custom," in response.text
     assert ".prompt-card--editing" in response.text
+    assert "@media (max-width: 640px)" in response.text
+    assert "--prompt-card-collapsed-height: 176px;" in response.text
 
 
 def test_cabinet_local_accounts_script_is_served(client):
