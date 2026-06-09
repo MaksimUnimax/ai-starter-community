@@ -24,6 +24,7 @@ from app.auth.service import (
     get_user_by_session_token,
     list_users_for_admin,
     role_label_ru,
+    set_user_materials_access,
     update_user_role,
 )
 from app.admin.course_export import build_course_export
@@ -391,6 +392,13 @@ def _role_error_response(message: str) -> PlainTextResponse:
     else:
         text = "Не удалось изменить роль пользователя."
     return PlainTextResponse(text, status_code=400)
+
+
+def _admin_users_redirect(request: Request) -> RedirectResponse:
+    redirect_url = "/admin/users"
+    if request.url.query:
+        redirect_url = f"{redirect_url}?{request.url.query}"
+    return RedirectResponse(url=redirect_url, status_code=303)
 
 
 def _template(request: Request, template_name: str, **context) -> HTMLResponse:
@@ -1203,10 +1211,33 @@ async def admin_user_role_update(request: Request, user_id: int):
         raise HTTPException(status_code=404, detail="user not found")
     except RoleError as exc:
         return _role_error_response(str(exc))
-    redirect_url = "/admin/users"
-    if request.url.query:
-        redirect_url = f"{redirect_url}?{request.url.query}"
-    return RedirectResponse(url=redirect_url, status_code=303)
+    return _admin_users_redirect(request)
+
+
+@router.post("/admin/users/{user_id}/materials-access/grant")
+def admin_user_materials_access_grant(request: Request, user_id: int):
+    settings = get_settings()
+    _, response = _admin_user_or_redirect(request, settings=settings)
+    if response is not None:
+        return response
+    try:
+        set_user_materials_access(user_id=user_id, granted=True, settings=settings)
+    except AuthNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="user not found") from exc
+    return _admin_users_redirect(request)
+
+
+@router.post("/admin/users/{user_id}/materials-access/revoke")
+def admin_user_materials_access_revoke(request: Request, user_id: int):
+    settings = get_settings()
+    _, response = _admin_user_or_redirect(request, settings=settings)
+    if response is not None:
+        return response
+    try:
+        set_user_materials_access(user_id=user_id, granted=False, settings=settings)
+    except AuthNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="user not found") from exc
+    return _admin_users_redirect(request)
 
 
 @router.api_route("/admin/tariffs", methods=["GET", "HEAD"], response_class=HTMLResponse)

@@ -5,7 +5,7 @@
     <div class="stack">
       <p class="muted">Просмотр безопасных данных</p>
       <h1 class="section-title">Пользователи</h1>
-      <p class="form-help">Показаны только безопасные поля учётных записей. Через эту страницу можно только назначать и убирать модераторов.</p>
+      <p class="form-help">Показаны только безопасные поля учётных записей. Через эту страницу можно назначать и убирать модераторов, а также выдавать и отзывать платный доступ.</p>
     </div>
 
     <form class="stack" method="get" action="/admin/users">
@@ -103,7 +103,22 @@
                 {{ user.access_status }}
               {% endif %}
             </td>
-            <td>{{ "да" if user.materials_access_granted else "нет" }}</td>
+            <td>
+              <div class="stack">
+                <span class="badge {% if user.materials_access_granted %}badge-success{% else %}badge-muted{% endif %}">
+                  {% if user.materials_access_granted %}Доступ выдан{% else %}Доступ не выдан{% endif %}
+                </span>
+                {% if user.materials_access_granted %}
+                  <form class="compact-form" method="post" action="/admin/users/{{ user.id }}/materials-access/revoke{% if query_string %}?{{ query_string }}{% endif %}">
+                    <button class="button button-secondary" type="submit">Отозвать доступ</button>
+                  </form>
+                {% else %}
+                  <form class="compact-form" method="post" action="/admin/users/{{ user.id }}/materials-access/grant{% if query_string %}?{{ query_string }}{% endif %}">
+                    <button class="button button-primary" type="submit">Выдать доступ</button>
+                  </form>
+                {% endif %}
+              </div>
+            </td>
             <td>{{ user.created_at }}</td>
             <td>{{ user.updated_at }}</td>
           </tr>
