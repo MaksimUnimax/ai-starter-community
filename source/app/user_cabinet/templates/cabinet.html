@@ -82,28 +82,6 @@
       <div class="accounts-owner-groups">
         {% for group in account_block_groups %}
           <section class="account-owner-group">
-            <header class="account-owner-group__header">
-              <div class="stack account-owner-group__intro">
-                <h2 class="account-owner-group__title">
-                  {% if account_blocks_manage_mode %}
-                    {{ group.owner.display_label }}
-                  {% else %}
-                    Ваши аккаунты
-                  {% endif %}
-                </h2>
-                <p class="account-owner-group__meta">
-                  {% if account_blocks_manage_mode %}
-                    {{ group.owner.login }} · {{ group.owner.email }} · {{ group.owner.role_label }}
-                  {% else %}
-                    Данные доступны только вам.
-                  {% endif %}
-                </p>
-              </div>
-              {% if account_blocks_manage_mode %}
-                <span class="account-owner-group__badge">{{ group.blocks|length }} шт.</span>
-              {% endif %}
-            </header>
-
             {% if group.blocks %}
               <div class="accounts-grid">
                 {% for block in group.blocks %}
@@ -123,9 +101,6 @@
                             {% endif %}
                           </div>
                         </div>
-                        {% if account_blocks_manage_mode %}
-                          <p class="account-card__owner-line">Владелец: {{ group.owner.display_label }}</p>
-                        {% endif %}
                       </div>
                     </header>
 
@@ -147,7 +122,6 @@
                         </label>
                         <div class="account-card__details">
                           <p class="account-card__detail">{{ block.activation_summary }}</p>
-                          <p class="account-card__detail">Срок действия: {{ block.duration_days }} дней</p>
                         </div>
                         {% if account_blocks_manage_mode %}
                           <div class="account-actions account-actions--view">

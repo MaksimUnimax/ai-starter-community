@@ -112,6 +112,10 @@ def test_stylesheet_is_served(client):
     assert 'name="email"' not in template_text
     assert "Осталось после активации" not in template_text
     assert "data-account-card-edit-form" in template_text
+    assert "account-owner-group__title" not in template_text
+    assert "account-owner-group__meta" not in template_text
+    assert "account-card__owner-line" not in template_text
+    assert "Срок действия" not in template_text
 
 
 def test_cabinet_local_accounts_script_is_served(client):

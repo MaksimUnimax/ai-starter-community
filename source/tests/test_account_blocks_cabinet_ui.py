@@ -134,6 +134,10 @@ def test_user_sees_compact_server_backed_account_blocks_and_copy_only_controls(c
     assert "Срок завершён: 60 из 60 дней" not in accounts_section
     assert "Осталось после активации" not in accounts_section
     assert "Владелец:" not in accounts_section
+    assert "account-owner-group__title" not in accounts_section
+    assert "account-owner-group__meta" not in accounts_section
+    assert "account-card__owner-line" not in accounts_section
+    assert "Срок действия" not in accounts_section
 
 
 def test_admin_can_create_edit_activate_and_delete_account_blocks(client, test_settings):
@@ -221,6 +225,11 @@ def test_admin_can_create_edit_activate_and_delete_account_blocks(client, test_s
     assert "Удалить" in accounts_section
     assert "Активировать" in accounts_section
     assert "Сервер" in accounts_section
+    assert "account-owner-group__title" not in accounts_section
+    assert "account-owner-group__meta" not in accounts_section
+    assert "account-card__owner-line" not in accounts_section
+    assert "Владелец:" not in accounts_section
+    assert "Срок действия" not in accounts_section
     edit_form = _extract_first_edit_form(accounts_section)
     assert 'name="login"' in edit_form
     assert 'name="password_secret"' in edit_form
@@ -365,3 +374,4 @@ def test_expired_account_block_shows_finished_day_counter_without_active_label(c
     assert "Активно" not in accounts_section
     assert "Активен: день" not in accounts_section
     assert "Осталось после активации" not in accounts_section
+    assert "Срок действия" not in accounts_section
