@@ -28,7 +28,7 @@
     {% endif %}
   </section>
 
-  <section class="card stack accounts-card" data-local-accounts-root data-account-blocks-source="server">
+  <section id="accounts" class="card stack accounts-card" data-local-accounts-root data-account-blocks-source="server">
     <div class="accounts-header">
       <div class="stack accounts-intro">
         <h2 class="section-title accounts-title">Аккаунты</h2>
@@ -59,7 +59,6 @@
               <span>Пароль</span>
               <input class="input" name="password_secret" type="text" placeholder="Пароль" autocomplete="off">
             </label>
-            <p class="form-help accounts-duration-note">После активации блок работает {{ account_block_duration_days }} дней.</p>
             <button class="button button-primary" type="submit">Добавить блок</button>
           </form>
         </div>

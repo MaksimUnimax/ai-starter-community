@@ -74,14 +74,18 @@ def test_activation_sets_elapsed_day_counter_and_prepares_notification_without_s
     assert result.block.is_active is True
     assert result.block.is_expired is False
     assert result.block.activation_day == 1
-    assert result.block.activation_summary == "Активен: день 1 из 60"
+    assert result.block.activation_summary == "Активен: день 1"
     assert result.block.activated_at == fixed_now.isoformat()
     assert result.block.expires_at == (fixed_now + timedelta(days=60)).isoformat()
     assert result.block.activated_by_user_id == admin.id
     assert result.notification is not None
     assert result.notification.recipient_email == owner.email
-    assert result.notification.subject == "Аккаунт в кабинете активирован"
-    assert "Почта" in result.notification.body_text
+    assert result.notification.subject == "Активирована опция OpenScript"
+    assert "У вас активирована опция: Почта." in result.notification.body_text
+    assert "https://openscript.ru/" in result.notification.body_text
+    assert "https://openscript.ru/cabinet" in result.notification.body_text
+    assert "mail-login" not in result.notification.body_text
+    assert "mail-secret" not in result.notification.body_text
     assert result.notification.expires_at == result.block.expires_at
 
     with _connect(test_settings) as conn:
@@ -119,14 +123,14 @@ def test_elapsed_day_counter_reaches_day_17_and_caps_at_day_60(test_settings):
     assert day_17_view.is_active is True
     assert day_17_view.is_expired is False
     assert day_17_view.activation_day == 17
-    assert day_17_view.activation_summary == "Активен: день 17 из 60"
+    assert day_17_view.activation_summary == "Активен: день 17"
 
     with patch("app.account_blocks.service.utc_now", return_value=day_60_now):
         day_60_view = get_account_block_public(actor=owner, block_id=block.id, settings=test_settings)
     assert day_60_view.is_active is True
     assert day_60_view.is_expired is False
     assert day_60_view.activation_day == 60
-    assert day_60_view.activation_summary == "Активен: день 60 из 60"
+    assert day_60_view.activation_summary == "Активен: день 60"
 
     with patch("app.account_blocks.service.utc_now", return_value=expired_now):
         expired_view = get_account_block_public(actor=owner, block_id=block.id, settings=test_settings)
@@ -134,12 +138,12 @@ def test_elapsed_day_counter_reaches_day_17_and_caps_at_day_60(test_settings):
     assert expired_view.is_active is False
     assert expired_view.is_expired is True
     assert expired_view.activation_day == 60
-    assert expired_view.activation_summary == "Срок завершён: 60 из 60 дней"
+    assert expired_view.activation_summary == "Срок завершён"
 
     with patch("app.account_blocks.service.utc_now", return_value=expired_now):
         reactivated = activate_account_block(actor=admin, block_id=block.id, settings=test_settings)
     assert reactivated.block.activation_day == 1
-    assert reactivated.block.activation_summary == "Активен: день 1 из 60"
+    assert reactivated.block.activation_summary == "Активен: день 1"
     assert reactivated.block.expires_at == (expired_now + timedelta(days=60)).isoformat()
 
 

@@ -36,7 +36,7 @@ def _extract_token_from_db(test_settings, email: str):
 
 
 def _extract_accounts_section(body_text: str) -> str:
-    start_marker = '<section class="card stack accounts-card" data-local-accounts-root data-account-blocks-source="server">'
+    start_marker = '<section id="accounts" class="card stack accounts-card" data-local-accounts-root data-account-blocks-source="server">'
     end_marker = '\n  <section class="card stack prompts-library-card" data-prompts-library-root>'
     start = body_text.find(start_marker)
     end = body_text.find(end_marker, start)

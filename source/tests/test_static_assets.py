@@ -116,11 +116,14 @@ def test_stylesheet_is_served(client):
     assert 'name="owner_user_id"' not in template_text
     assert 'Владелец' not in template_text
     assert "Осталось после активации" not in template_text
+    assert "После активации блок работает" not in template_text
+    assert "60 дней" not in template_text
     assert "data-account-card-edit-form" in template_text
     assert "account-owner-group__title" not in template_text
     assert "account-owner-group__meta" not in template_text
     assert "account-card__owner-line" not in template_text
     assert "Срок действия" not in template_text
+    assert 'id="accounts"' in template_text
 
 
 def test_cabinet_local_accounts_script_is_served(client):

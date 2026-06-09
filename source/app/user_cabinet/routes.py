@@ -2,6 +2,7 @@
 
 from collections import defaultdict
 from decimal import Decimal
+import logging
 from pathlib import Path
 
 from fastapi import APIRouter, Form, HTTPException, Request
@@ -34,11 +35,13 @@ from app.account_blocks.service import (
     update_account_block,
 )
 from app.core.config import get_settings
+from app.notifications.email_service import send_account_block_activation_email
 from app.paid_options.service import list_paid_options
 from app.materials.service import user_has_materials_access
 from app.user_cabinet.prompts_library import load_cabinet_prompts
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 templates = Jinja2Templates(directory=str(Path(__file__).resolve().parent / "templates"))
 templates.env.loader = ChoiceLoader(
     [
@@ -66,7 +69,9 @@ ACCOUNT_BLOCK_NOTICE_MESSAGES = {
     "created": "Блок создан.",
     "updated": "Блок сохранён.",
     "deleted": "Блок удалён.",
-    "activated": "Блок активирован на 60 дней.",
+    "activated": "Блок активирован.",
+    "activated_email_sent": "Блок активирован. Уведомление отправлено на почту пользователя.",
+    "activated_email_failed": "Блок активирован, но письмо отправить не удалось.",
 }
 
 
@@ -173,7 +178,7 @@ def _cabinet_account_block_redirect(*, notice_key: str, owner_user_id: int | Non
     query = [f"account_blocks_notice={notice_key}"]
     if owner_user_id is not None:
         query.append(f"owner_id={int(owner_user_id)}")
-    return RedirectResponse(url=f"/cabinet?{'&'.join(query)}", status_code=303)
+    return RedirectResponse(url=f"/cabinet?{'&'.join(query)}#accounts", status_code=303)
 
 
 def _resolve_account_block_owner_id(*, request: Request, actor) -> int:
@@ -312,7 +317,6 @@ def cabinet_page(request: Request):
         cabinet_prompts=load_cabinet_prompts(),
         active_paid_options=active_paid_options,
         active_paid_options_count=len(active_paid_options),
-        account_block_duration_days=ACCOUNT_BLOCK_DURATION_DAYS,
         account_block_type_options=[
             {"value": "chatgpt", "label": "ChatGPT"},
             {"value": "server", "label": "Сервер"},
@@ -486,11 +490,26 @@ def cabinet_activate_account_block(request: Request, block_id: int):
         raise HTTPException(status_code=403, detail="account block management requires moderator or admin access")
     try:
         activation_result = activate_account_block(actor=user, block_id=block_id, settings=settings)
+        notice_key = "activated"
+        if activation_result.notification is not None:
+            try:
+                send_account_block_activation_email(activation_result.notification, settings=settings)
+                notice_key = "activated_email_sent"
+            except Exception as exc:
+                logger.warning(
+                    "Account block activation email failed for block_id=%s owner_user_id=%s: %s",
+                    block_id,
+                    activation_result.block.owner_user_id,
+                    exc,
+                )
+                notice_key = "activated_email_failed"
+        else:
+            notice_key = "activated_email_failed"
     except AccountBlockPermissionError as exc:
         raise HTTPException(status_code=403, detail=str(exc)) from exc
     except AccountBlockNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     return _cabinet_account_block_redirect(
-        notice_key="activated",
+        notice_key=notice_key,
         owner_user_id=activation_result.block.owner_user_id,
     )

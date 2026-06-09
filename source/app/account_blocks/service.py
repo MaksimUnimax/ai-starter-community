@@ -249,11 +249,11 @@ def _activation_progress_for_row(row) -> tuple[int | None, str]:
 
     now = utc_now()
     if expires_at is not None and now >= expires_at:
-        return duration_days, f"Срок завершён: {duration_days} из {duration_days} дней"
+        return duration_days, "Срок завершён"
 
     activation_day = (now.date() - activated_at.date()).days + 1
     activation_day = max(1, min(duration_days, activation_day))
-    return activation_day, f"Активен: день {activation_day} из {duration_days}"
+    return activation_day, f"Активен: день {activation_day}"
 
 
 def _account_block_from_row(row) -> AccountBlockPublic:
@@ -483,15 +483,17 @@ def _activation_notification_for_row(row, *, settings: Settings | None = None) -
     if not recipient_email:
         return None
     title = _account_block_title_for_type(str(row["type"]))
-    type_label = _account_block_type_label(str(row["type"]))
     activated_at = str(row["activated_at"])
     expires_at = str(row["expires_at"])
-    subject = "Аккаунт в кабинете активирован"
+    subject = "Активирована опция OpenScript"
     body_text = (
-        f"Здравствуйте, {str(owner_row['login'])}.\n\n"
-        f"Блок \"{title}\" ({type_label}) активирован.\n"
-        f"Срок действия: до {expires_at}.\n"
-        "Зайдите в личный кабинет, чтобы посмотреть состояние и срок действия блока."
+        "Здравствуйте.\n\n"
+        f"У вас активирована опция: {title}.\n\n"
+        "Опция активирована на сайте OpenScript:\n"
+        "https://openscript.ru/\n\n"
+        "Перейти в личный кабинет:\n"
+        "https://openscript.ru/cabinet\n\n"
+        "Если вы не ожидали это сообщение, просто проигнорируйте его."
     )
     return AccountBlockActivationNotification(
         recipient_email=recipient_email,

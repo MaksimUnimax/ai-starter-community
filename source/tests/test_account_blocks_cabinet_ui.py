@@ -51,7 +51,7 @@ def _login_as(client, test_settings, email: str):
 
 
 def _extract_accounts_section(body_text: str) -> str:
-    start_marker = '<section class="card stack accounts-card" data-local-accounts-root data-account-blocks-source="server">'
+    start_marker = '<section id="accounts" class="card stack accounts-card" data-local-accounts-root data-account-blocks-source="server">'
     end_marker = '\n  <section class="card stack prompts-library-card" data-prompts-library-root>'
     start = body_text.find(start_marker)
     end = body_text.find(end_marker, start)
@@ -115,6 +115,7 @@ def test_user_sees_compact_server_backed_account_blocks_and_copy_only_controls(c
     assert response.status_code == 200
     assert "/static/cabinet-local-accounts.js" in response.text
     assert "data-account-blocks-source=\"server\"" in response.text
+    assert 'id="accounts"' in response.text
 
     accounts_section = _extract_accounts_section(response.text)
     assert "Данные хранятся на сервере и доступны после входа в кабинет с любого устройства." in accounts_section
@@ -129,15 +130,18 @@ def test_user_sees_compact_server_backed_account_blocks_and_copy_only_controls(c
     assert "Скопировать" in accounts_section
     assert "ChatGPT" in accounts_section
     assert "Почта" in accounts_section
-    assert "Активен: день 1 из 60" in accounts_section
+    assert "Активен: день 1" in accounts_section
     assert "Не активирован" in accounts_section
-    assert "Срок завершён: 60 из 60 дней" not in accounts_section
+    assert "Срок завершён" not in accounts_section
     assert "Осталось после активации" not in accounts_section
     assert "Владелец:" not in accounts_section
     assert "account-owner-group__title" not in accounts_section
     assert "account-owner-group__meta" not in accounts_section
     assert "account-card__owner-line" not in accounts_section
     assert "Срок действия" not in accounts_section
+    assert "из 60" not in accounts_section
+    assert "60 дней" not in accounts_section
+    assert "После активации блок работает 60 дней" not in accounts_section
 
 
 def test_admin_can_create_edit_activate_and_delete_account_blocks(client, test_settings):
@@ -163,6 +167,14 @@ def test_admin_can_create_edit_activate_and_delete_account_blocks(client, test_s
     assert "Сохранить" not in builder_shell
     assert "Удалить" not in builder_shell
     assert "Активировать" not in builder_shell
+    with _connect(test_settings) as conn:
+        assert (
+            conn.execute(
+                "SELECT COUNT(*) AS c FROM email_outbox WHERE template_key = ?",
+                ("account_block_activation",),
+            ).fetchone()["c"]
+            == 0
+        )
 
     create_response = client.post(
         f"/cabinet/account-blocks?owner_id={owner_a.id}",
@@ -174,7 +186,7 @@ def test_admin_can_create_edit_activate_and_delete_account_blocks(client, test_s
         follow_redirects=False,
     )
     assert create_response.status_code == 303
-    assert create_response.headers["location"] == f"/cabinet?account_blocks_notice=created&owner_id={owner_a.id}"
+    assert create_response.headers["location"] == f"/cabinet?account_blocks_notice=created&owner_id={owner_a.id}#accounts"
 
     with _connect(test_settings) as conn:
         row = conn.execute("SELECT * FROM account_blocks WHERE login = ?", ("admin-block-login",)).fetchone()
@@ -197,13 +209,21 @@ def test_admin_can_create_edit_activate_and_delete_account_blocks(client, test_s
         follow_redirects=False,
     )
     assert update_response.status_code == 303
-    assert update_response.headers["location"] == f"/cabinet?account_blocks_notice=updated&owner_id={owner_a.id}"
+    assert update_response.headers["location"] == f"/cabinet?account_blocks_notice=updated&owner_id={owner_a.id}#accounts"
+    with _connect(test_settings) as conn:
+        assert (
+            conn.execute(
+                "SELECT COUNT(*) AS c FROM email_outbox WHERE template_key = ?",
+                ("account_block_activation",),
+            ).fetchone()["c"]
+            == 0
+        )
 
     fixed_now = datetime(2026, 6, 8, 12, 0, 0, tzinfo=timezone.utc)
     with patch("app.account_blocks.service.utc_now", return_value=fixed_now):
         activate_response = client.post(f"/cabinet/account-blocks/{block_id}/activate", follow_redirects=False)
     assert activate_response.status_code == 303
-    assert activate_response.headers["location"] == f"/cabinet?account_blocks_notice=activated&owner_id={owner_a.id}"
+    assert activate_response.headers["location"] == f"/cabinet?account_blocks_notice=activated_email_sent&owner_id={owner_a.id}#accounts"
 
     with _connect(test_settings) as conn:
         updated_row = conn.execute("SELECT * FROM account_blocks WHERE id = ?", (block_id,)).fetchone()
@@ -230,7 +250,6 @@ def test_admin_can_create_edit_activate_and_delete_account_blocks(client, test_s
     assert "account-card__owner-line" not in accounts_section
     assert "Владелец:" not in accounts_section
     assert "Срок действия" not in accounts_section
-    assert '<div class="account-actions account-actions--view">' in accounts_section
     assert f'<form class="account-action-form" method="post" action="/cabinet/account-blocks/{block_id}/delete">' in accounts_section
     assert f'<form class="account-action-form" method="post" action="/cabinet/account-blocks/{block_id}/activate">' in accounts_section
     assert "formaction=" not in accounts_section
@@ -243,15 +262,33 @@ def test_admin_can_create_edit_activate_and_delete_account_blocks(client, test_s
     assert 'name="email"' not in edit_form
     assert "data-account-card-edit-form" in edit_form
     assert 'hidden' in edit_form
-    assert "Активен: день 1 из 60" in accounts_section
+    assert "Активен: день 1" in accounts_section
 
     delete_response = client.post(f"/cabinet/account-blocks/{block_id}/delete", follow_redirects=False)
     assert delete_response.status_code == 303
-    assert delete_response.headers["location"] == f"/cabinet?account_blocks_notice=deleted&owner_id={owner_a.id}"
+    assert delete_response.headers["location"] == f"/cabinet?account_blocks_notice=deleted&owner_id={owner_a.id}#accounts"
 
     with _connect(test_settings) as conn:
         deleted_row = conn.execute("SELECT 1 FROM account_blocks WHERE id = ?", (block_id,)).fetchone()
     assert deleted_row is None
+    with _connect(test_settings) as conn:
+        email_row = conn.execute(
+            """
+            SELECT *
+            FROM email_outbox
+            WHERE recipient_email = ? AND template_key = ?
+            ORDER BY id DESC
+            LIMIT 1
+            """,
+            (owner_a.email, "account_block_activation"),
+        ).fetchone()
+    assert email_row is not None
+    assert email_row["subject"] == "Активирована опция OpenScript"
+    assert "У вас активирована опция: Сервер." in email_row["body_text"]
+    assert "https://openscript.ru/" in email_row["body_text"]
+    assert "https://openscript.ru/cabinet" in email_row["body_text"]
+    assert "updated-login" not in email_row["body_text"]
+    assert "updated-password" not in email_row["body_text"]
 
 
 def test_moderator_can_manage_account_blocks_but_cannot_access_admin_dashboard(client, test_settings):
@@ -272,6 +309,7 @@ def test_moderator_can_manage_account_blocks_but_cannot_access_admin_dashboard(c
         follow_redirects=False,
     )
     assert create_response.status_code == 303
+    assert create_response.headers["location"] == f"/cabinet?account_blocks_notice=created&owner_id={owner.id}#accounts"
 
     with _connect(test_settings) as conn:
         row = conn.execute("SELECT * FROM account_blocks WHERE login = ?", ("moderator-login",)).fetchone()
@@ -290,14 +328,17 @@ def test_moderator_can_manage_account_blocks_but_cannot_access_admin_dashboard(c
         follow_redirects=False,
     )
     assert update_response.status_code == 303
+    assert update_response.headers["location"] == f"/cabinet?account_blocks_notice=updated&owner_id={owner.id}#accounts"
 
     fixed_now = datetime(2026, 6, 8, 12, 0, 0, tzinfo=timezone.utc)
     with patch("app.account_blocks.service.utc_now", return_value=fixed_now):
         activate_response = client.post(f"/cabinet/account-blocks/{block_id}/activate", follow_redirects=False)
     assert activate_response.status_code == 303
+    assert activate_response.headers["location"] == f"/cabinet?account_blocks_notice=activated_email_sent&owner_id={owner.id}#accounts"
 
     delete_response = client.post(f"/cabinet/account-blocks/{block_id}/delete", follow_redirects=False)
     assert delete_response.status_code == 303
+    assert delete_response.headers["location"] == f"/cabinet?account_blocks_notice=deleted&owner_id={owner.id}#accounts"
 
 
 def test_regular_user_cannot_post_account_block_management_actions(client, test_settings):
@@ -370,8 +411,10 @@ def test_expired_account_block_shows_finished_day_counter_without_active_label(c
 
     accounts_section = _extract_accounts_section(response.text)
     assert "Почта" in accounts_section
-    assert "Срок завершён: 60 из 60 дней" in accounts_section
+    assert "Срок завершён" in accounts_section
     assert "Активно" not in accounts_section
     assert "Активен: день" not in accounts_section
     assert "Осталось после активации" not in accounts_section
     assert "Срок действия" not in accounts_section
+    assert "из 60" not in accounts_section
+    assert "60 дней" not in accounts_section

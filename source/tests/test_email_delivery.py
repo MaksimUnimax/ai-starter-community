@@ -6,11 +6,13 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from app.account_blocks.schemas import AccountBlockActivationNotification
 from app.auth.service import AuthError, create_password_reset_request, register_user, verify_email
 from app.core.config import Settings
 from app.notifications.email_service import (
     EmailConfigError,
     EmailDeliveryError,
+    send_account_block_activation_email,
     send_email_verification,
     send_password_reset,
 )
@@ -119,6 +121,51 @@ def test_outbox_mode_preserves_current_behavior(test_settings):
     )
     assert row["status"] == "queued"
     assert "/verify-email/" in row["body_text"]
+
+
+def test_account_block_activation_email_is_queued_in_outbox_mode(test_settings):
+    notification = AccountBlockActivationNotification(
+        recipient_email="owner@example.com",
+        subject="Активирована опция OpenScript",
+        body_text=(
+            "Здравствуйте.\n\n"
+            "У вас активирована опция: Сервер.\n\n"
+            "Опция активирована на сайте OpenScript:\n"
+            "https://openscript.ru/\n\n"
+            "Перейти в личный кабинет:\n"
+            "https://openscript.ru/cabinet\n\n"
+            "Если вы не ожидали это сообщение, просто проигнорируйте его."
+        ),
+        template_key="account_block_activation",
+        block_id=42,
+        owner_user_id=7,
+        owner_login="ownerlogin",
+        owner_email="owner@example.com",
+        block_title="Сервер",
+        block_type="server",
+        activated_at="2026-06-08T12:00:00+00:00",
+        expires_at="2026-08-07T12:00:00+00:00",
+    )
+
+    email_id = send_account_block_activation_email(notification, settings=test_settings)
+    assert email_id > 0
+
+    row = _fetch_one(
+        test_settings,
+        """
+        SELECT *
+        FROM email_outbox
+        WHERE recipient_email = ? AND template_key = ?
+        ORDER BY id DESC
+        LIMIT 1
+        """,
+        (notification.recipient_email, notification.template_key),
+    )
+    assert row is not None
+    assert row["subject"] == notification.subject
+    assert row["body_text"] == notification.body_text
+    assert "ownerlogin" not in row["body_text"]
+    assert "owner@example.com" not in row["body_text"]
 
 
 def test_smtp_verification_send_uses_starttls_and_no_login_when_credentials_missing(tmp_path):
