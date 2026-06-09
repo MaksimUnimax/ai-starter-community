@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from app.core.config import Settings, get_settings
-from app.account_blocks.schemas import AccountBlockActivationNotification
 from app.shared.db import get_connection, get_database_path, initialize_database
 from app.shared.utils import utc_now_iso
 from app.notifications.smtp_adapter import (
@@ -28,6 +29,9 @@ class EmailDeliveryError(RuntimeError):
 
 
 SMTP_AUDIT_REDACTED_BODY = "[redacted: sent via smtp]"
+
+if TYPE_CHECKING:
+    from app.account_blocks.schemas import AccountBlockActivationNotification
 
 
 def _resolved_settings(settings: Settings | None = None) -> Settings:
@@ -207,7 +211,7 @@ def send_password_reset(
 
 
 def send_account_block_activation_email(
-    notification: AccountBlockActivationNotification,
+    notification: "AccountBlockActivationNotification",
     settings: Settings | None = None,
 ) -> int:
     return _queue_email(
