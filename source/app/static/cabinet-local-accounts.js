@@ -9,6 +9,9 @@
   if (!root) {
     return;
   }
+  if (root.dataset.accountBlocksSource === "server") {
+    return;
+  }
 
   const listElement = root.querySelector("[data-local-accounts-list]");
   const emptyElement = root.querySelector("[data-local-accounts-empty]");

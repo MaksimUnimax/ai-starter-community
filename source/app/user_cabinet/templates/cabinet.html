@@ -28,26 +28,247 @@
     {% endif %}
   </section>
 
-  <section class="card stack accounts-card" data-local-accounts-root>
+  <section class="card stack accounts-card" data-local-accounts-root data-account-blocks-source="server">
     <div class="accounts-header">
       <div class="stack accounts-intro">
         <h1 class="section-title">Аккаунты</h1>
-        <p class="form-help">Храните здесь часто используемые логины и пароли. Данные сохраняются только в этом браузере.</p>
+        <p class="form-help">Данные хранятся на сервере и доступны после входа в кабинет с любого устройства.</p>
+        {% if account_blocks_manage_mode %}
+          <p class="form-help accounts-role-note">Администратор и модератор могут управлять блоками всех пользователей.</p>
+        {% else %}
+          <p class="form-help accounts-role-note">Вы видите только свои блоки. Редактирование доступно администратору и модератору.</p>
+        {% endif %}
       </div>
-      <div class="accounts-builder">
-        <label class="form-row accounts-type-field">
-          <span>Тип нового блока</span>
-          <select class="select" data-local-accounts-type>
-            <option value="chatgpt">ChatGPT</option>
-            <option value="server">Сервер</option>
-          </select>
-        </label>
-        <button class="button button-primary" type="button" data-local-accounts-add>Добавить блок</button>
-      </div>
+
+      {% if account_blocks_manage_mode %}
+        <form class="accounts-builder accounts-builder--server" method="post" action="/cabinet/account-blocks">
+          <label class="form-row accounts-type-field">
+            <span>Владелец</span>
+            <select class="select" name="owner_user_id" required>
+              {% for owner in account_block_owner_options %}
+                <option value="{{ owner.id }}" {% if owner.id == account_block_selected_owner_id %}selected{% endif %}>
+                  {{ owner.display_label }}{% if owner.role_label %} · {{ owner.role_label }}{% endif %}
+                </option>
+              {% endfor %}
+            </select>
+          </label>
+          <label class="form-row accounts-type-field">
+            <span>Тип нового блока</span>
+            <select class="select" name="type" required>
+              {% for option in account_block_type_options %}
+                <option value="{{ option.value }}" {% if option.value == 'chatgpt' %}selected{% endif %}>{{ option.label }}</option>
+              {% endfor %}
+            </select>
+          </label>
+          <label class="form-row accounts-field accounts-field--wide">
+            <span>Название</span>
+            <input class="input" name="title" type="text" placeholder="Например: Рабочий ChatGPT" required>
+          </label>
+          <label class="form-row accounts-field">
+            <span>Логин</span>
+            <input class="input" name="login" type="text" placeholder="Логин" autocomplete="off">
+          </label>
+          <label class="form-row accounts-field">
+            <span>Пароль</span>
+            <input class="input" name="password_secret" type="text" placeholder="Пароль" autocomplete="off">
+          </label>
+          <label class="form-row accounts-field accounts-field--wide">
+            <span>Почта</span>
+            <input class="input" name="email" type="email" placeholder="mail@example.com" autocomplete="email">
+          </label>
+          <p class="form-help accounts-duration-note">После активации блок работает {{ account_block_duration_days }} дней.</p>
+          <button class="button button-primary" type="submit">Добавить блок</button>
+        </form>
+      {% endif %}
     </div>
-    <div class="accounts-grid" data-local-accounts-list></div>
-    <p class="form-help accounts-empty" data-local-accounts-empty>Пока нет ни одного блока. Добавьте первый выше.</p>
-    <p class="accounts-notice" data-local-accounts-notice aria-live="polite" role="status"></p>
+
+    <p class="accounts-notice" data-account-blocks-notice aria-live="polite" role="status">{{ account_block_notice or "" }}</p>
+
+    {% if account_block_groups %}
+      <div class="accounts-owner-groups">
+        {% for group in account_block_groups %}
+          <section class="account-owner-group">
+            <header class="account-owner-group__header">
+              <div class="stack account-owner-group__intro">
+                <h2 class="account-owner-group__title">
+                  {% if account_blocks_manage_mode %}
+                    {{ group.owner.display_label }}
+                  {% else %}
+                    Ваши аккаунты
+                  {% endif %}
+                </h2>
+                <p class="account-owner-group__meta">
+                  {% if account_blocks_manage_mode %}
+                    {{ group.owner.login }} · {{ group.owner.email }} · {{ group.owner.role_label }}
+                  {% else %}
+                    Данные доступны только вам.
+                  {% endif %}
+                </p>
+              </div>
+              {% if account_blocks_manage_mode %}
+                <span class="account-owner-group__badge">{{ group.blocks|length }} шт.</span>
+              {% endif %}
+            </header>
+
+            {% if group.blocks %}
+              <div class="accounts-grid">
+                {% for block in group.blocks %}
+                  <article class="account-card">
+                    <header class="account-card__header">
+                      <div class="stack account-card__headline">
+                        <div class="account-card__title-row">
+                          <h3 class="account-card__title">{{ block.title }}</h3>
+                          <div class="account-card__badges">
+                            <span class="account-card__type-badge">{{ block.type_label }}</span>
+                            {% if block.is_active %}
+                              <span class="account-card__status-badge account-card__status-badge--active">Активно</span>
+                            {% elif block.is_expired %}
+                              <span class="account-card__status-badge account-card__status-badge--expired">{{ block.status_label }}</span>
+                            {% else %}
+                              <span class="account-card__status-badge account-card__status-badge--inactive">{{ block.status_label }}</span>
+                            {% endif %}
+                          </div>
+                        </div>
+                        {% if account_blocks_manage_mode %}
+                          <p class="account-card__owner-line">Владелец: {{ group.owner.display_label }}</p>
+                        {% endif %}
+                      </div>
+                    </header>
+
+                    {% if account_blocks_manage_mode %}
+                      <form class="account-card__form" method="post" action="/cabinet/account-blocks/{{ block.id }}">
+                        <label class="account-field">
+                          <span>Название</span>
+                          <input class="input" name="title" type="text" value="{{ block.title|e }}" required>
+                        </label>
+                        <label class="account-field">
+                          <span>Владелец</span>
+                          <select class="select" name="owner_user_id" required>
+                            {% for owner in account_block_owner_options %}
+                              <option value="{{ owner.id }}" {% if owner.id == block.owner_user_id %}selected{% endif %}>
+                                {{ owner.display_label }}{% if owner.role_label %} · {{ owner.role_label }}{% endif %}
+                              </option>
+                            {% endfor %}
+                          </select>
+                        </label>
+                        <label class="account-field">
+                          <span>Тип</span>
+                          <select class="select" name="type" required>
+                            {% for option in account_block_type_options %}
+                              <option value="{{ option.value }}" {% if option.value == block.type %}selected{% endif %}>{{ option.label }}</option>
+                            {% endfor %}
+                          </select>
+                        </label>
+                        <label class="account-field">
+                          <span>Логин</span>
+                          <div class="account-field__control">
+                            <input class="input" name="login" type="text" value="{{ block.login|e }}" autocomplete="off">
+                            <button class="button button-secondary account-copy-button" type="button" data-account-copy>Скопировать</button>
+                          </div>
+                        </label>
+                        <label class="account-field">
+                          <span>Пароль</span>
+                          <div class="account-field__control">
+                            <input class="input" name="password_secret" type="text" value="{{ block.password_secret|e }}" autocomplete="off">
+                            <button class="button button-secondary account-copy-button" type="button" data-account-copy>Скопировать</button>
+                          </div>
+                        </label>
+                        <label class="account-field">
+                          <span>Почта</span>
+                          <div class="account-field__control">
+                            <input class="input" name="email" type="email" value="{{ (block.email or '')|e }}" autocomplete="email">
+                            <button class="button button-secondary account-copy-button" type="button" data-account-copy>Скопировать</button>
+                          </div>
+                        </label>
+                        <div class="account-card__details">
+                          <p class="account-card__detail">Срок: {{ block.duration_days }} дней</p>
+                          {% if block.is_active %}
+                            <p class="account-card__detail">Осталось: {{ block.remaining_days }} дн.</p>
+                          {% elif block.is_expired %}
+                            <p class="account-card__detail">Осталось: 0 дн.</p>
+                          {% else %}
+                            <p class="account-card__detail">Осталось после активации: {{ block.duration_days }} дн.</p>
+                          {% endif %}
+                          {% if block.activated_at %}
+                            <p class="account-card__detail">Активирован: {{ block.activated_at }}</p>
+                          {% endif %}
+                          {% if block.expires_at %}
+                            <p class="account-card__detail">Действует до: {{ block.expires_at }}</p>
+                          {% endif %}
+                        </div>
+                        <div class="account-actions">
+                          <button class="button button-primary account-card__save" type="submit">Сохранить</button>
+                          <button class="button button-secondary button-danger account-card__delete" type="submit" formaction="/cabinet/account-blocks/{{ block.id }}/delete" formnovalidate>Удалить</button>
+                          <button class="button button-primary account-card__activate" type="submit" formaction="/cabinet/account-blocks/{{ block.id }}/activate" formnovalidate>Активировать</button>
+                        </div>
+                      </form>
+                    {% else %}
+                      <div class="account-card__readonly">
+                        <label class="account-field">
+                          <span>Логин</span>
+                          <div class="account-field__control">
+                            <input class="input" type="text" value="{{ block.login|e }}" readonly>
+                            <button class="button button-secondary account-copy-button" type="button" data-account-copy>Скопировать</button>
+                          </div>
+                        </label>
+                        <label class="account-field">
+                          <span>Пароль</span>
+                          <div class="account-field__control">
+                            <input class="input" type="password" value="{{ block.password_secret|e }}" readonly>
+                            <button class="button button-secondary account-copy-button" type="button" data-account-copy>Скопировать</button>
+                          </div>
+                        </label>
+                        {% if block.can_copy_email %}
+                          <label class="account-field">
+                            <span>Почта</span>
+                            <div class="account-field__control">
+                              <input class="input" type="email" value="{{ block.email|e }}" readonly>
+                              <button class="button button-secondary account-copy-button" type="button" data-account-copy>Скопировать</button>
+                            </div>
+                          </label>
+                        {% endif %}
+                        <div class="account-card__details">
+                          <p class="account-card__detail">Срок: {{ block.duration_days }} дней</p>
+                          {% if block.is_active %}
+                            <p class="account-card__detail">Осталось: {{ block.remaining_days }} дн.</p>
+                          {% elif block.is_expired %}
+                            <p class="account-card__detail">Осталось: 0 дн.</p>
+                          {% else %}
+                            <p class="account-card__detail">Осталось после активации: {{ block.duration_days }} дн.</p>
+                          {% endif %}
+                          {% if block.activated_at %}
+                            <p class="account-card__detail">Активирован: {{ block.activated_at }}</p>
+                          {% endif %}
+                          {% if block.expires_at %}
+                            <p class="account-card__detail">Действует до: {{ block.expires_at }}</p>
+                          {% endif %}
+                        </div>
+                      </div>
+                    {% endif %}
+                  </article>
+                {% endfor %}
+              </div>
+            {% else %}
+              <p class="form-help accounts-empty">
+                {% if account_blocks_manage_mode %}
+                  У этого пользователя пока нет блоков.
+                {% else %}
+                  Пока нет ни одного блока. Администратор или модератор добавит их позже.
+                {% endif %}
+              </p>
+            {% endif %}
+          </section>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="form-help accounts-empty">
+        {% if account_blocks_manage_mode %}
+          Пока нет ни одного блока. Добавьте первый выше.
+        {% else %}
+          Пока нет ни одного блока. Администратор или модератор добавит их позже.
+        {% endif %}
+      </p>
+    {% endif %}
   </section>
   <section class="card stack prompts-library-card" data-prompts-library-root>
     <div class="prompts-library-header">
@@ -208,6 +429,70 @@
 
     <p class="paid-options-notice" data-paid-options-notice aria-live="polite" role="status"></p>
   </section>
+  <script>
+    (() => {
+      const root = document.querySelector("[data-local-accounts-root][data-account-blocks-source='server']");
+      if (!root) {
+        return;
+      }
+
+      const notice = root.querySelector("[data-account-blocks-notice]");
+      const setNotice = (message) => {
+        if (!notice) {
+          return;
+        }
+        notice.textContent = message;
+      };
+
+      const copyText = async (value) => {
+        if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+          await navigator.clipboard.writeText(value);
+          return true;
+        }
+
+        const textarea = document.createElement("textarea");
+        textarea.value = value;
+        textarea.setAttribute("readonly", "true");
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
+        textarea.style.left = "-9999px";
+        document.body.appendChild(textarea);
+        textarea.select();
+
+        let copied = false;
+        try {
+          copied = document.execCommand("copy");
+        } catch (_error) {
+          copied = false;
+        }
+
+        document.body.removeChild(textarea);
+        return copied;
+      };
+
+      root.addEventListener("click", async (event) => {
+        const button = event.target.closest("[data-account-copy]");
+        if (!button) {
+          return;
+        }
+
+        const field = button.closest(".account-field");
+        const input = field ? field.querySelector("input") : null;
+        const value = input instanceof HTMLInputElement ? input.value : "";
+        if (!value) {
+          setNotice("Нечего копировать.");
+          return;
+        }
+
+        try {
+          const copied = await copyText(value);
+          setNotice(copied ? "Скопировано." : "Не удалось скопировать.");
+        } catch (_error) {
+          setNotice("Не удалось скопировать.");
+        }
+      });
+    })();
+  </script>
   <script src="/static/cabinet-local-accounts.js"></script>
   <script src="/static/cabinet-prompts-library.js"></script>
   <script>

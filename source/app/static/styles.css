@@ -610,6 +610,12 @@ button:hover {
   max-width: 56ch;
 }
 
+.accounts-role-note {
+  margin: 0;
+  color: var(--muted);
+  max-width: 60ch;
+}
+
 .accounts-builder {
   flex: 0 1 300px;
   display: flex;
@@ -619,10 +625,41 @@ button:hover {
   justify-content: flex-end;
 }
 
+.accounts-builder--server {
+  flex: 1 1 100%;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px 10px;
+  align-items: end;
+  justify-content: stretch;
+}
+
 .accounts-type-field {
   flex: 1 1 180px;
   min-width: 180px;
   max-width: 220px;
+}
+
+.accounts-builder--server .accounts-type-field {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  flex: 1 1 auto;
+}
+
+.accounts-field {
+  display: grid;
+  gap: 4px;
+}
+
+.accounts-field > span {
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 0.84rem;
+}
+
+.accounts-field--wide {
+  grid-column: span 2;
 }
 
 .accounts-builder .select {
@@ -632,10 +669,77 @@ button:hover {
   font-size: 0.95rem;
 }
 
+.accounts-builder--server .select,
+.accounts-builder--server .input {
+  width: 100%;
+}
+
 .accounts-builder .button {
   min-height: 38px;
   padding: 8px 12px;
   font-size: 0.92rem;
+  white-space: nowrap;
+}
+
+.accounts-builder--server .button {
+  grid-column: 1 / -1;
+  justify-self: start;
+}
+
+.accounts-duration-note {
+  margin: 0;
+  grid-column: 1 / -1;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.accounts-owner-groups {
+  display: grid;
+  gap: 16px;
+}
+
+.account-owner-group {
+  display: grid;
+  gap: 12px;
+}
+
+.account-owner-group__header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.account-owner-group__intro {
+  flex: 1 1 240px;
+  min-width: 0;
+}
+
+.account-owner-group__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, 2vw, 1.45rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.account-owner-group__meta {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.account-owner-group__badge {
+  flex: 0 0 auto;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   white-space: nowrap;
 }
 
@@ -657,6 +761,19 @@ button:hover {
   border-radius: 18px;
   background: var(--surface-alt);
   box-shadow: none;
+}
+
+.account-card__headline {
+  gap: 6px;
+  min-width: 0;
+}
+
+.account-card__title-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: space-between;
+  align-items: flex-start;
 }
 
 .account-card--editing {
@@ -685,6 +802,74 @@ button:hover {
   font-size: 1.02rem;
   font-weight: 700;
   letter-spacing: -0.02em;
+}
+
+.account-card__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.account-card__type-badge,
+.account-card__status-badge {
+  flex: 0 0 auto;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.account-card__type-badge {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.account-card__status-badge {
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+
+.account-card__status-badge--active {
+  background: rgba(84, 145, 61, 0.14);
+  color: #2f6c2f;
+}
+
+.account-card__status-badge--inactive {
+  background: var(--surface);
+  color: var(--muted);
+}
+
+.account-card__status-badge--expired {
+  background: rgba(159, 43, 43, 0.12);
+  color: var(--danger);
+}
+
+.account-card__owner-line {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+.account-card__form,
+.account-card__readonly {
+  display: grid;
+  gap: 12px;
+}
+
+.account-card__details {
+  display: grid;
+  gap: 4px;
+}
+
+.account-card__detail {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.88rem;
 }
 
 .account-card__delete {
@@ -717,6 +902,12 @@ button:hover {
   font-size: 0.84rem;
 }
 
+.account-field__control {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
 .account-password-row {
   display: flex;
   gap: 6px;
@@ -738,7 +929,24 @@ button:hover {
   cursor: default;
 }
 
+.account-card .select {
+  min-height: 38px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+}
+
 .account-password-toggle {
+  flex: 0 0 auto;
+  min-width: 38px;
+  min-height: 38px;
+  padding: 8px 10px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  line-height: 1.1;
+}
+
+.account-copy-button {
   flex: 0 0 auto;
   min-width: 38px;
   min-height: 38px;
@@ -753,6 +961,11 @@ button:hover {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 6px;
   align-items: stretch;
+}
+
+.account-card__save,
+.account-card__activate {
+  min-width: 0;
 }
 
 .account-actions .button {
@@ -2210,20 +2423,41 @@ html { scroll-behavior: smooth; }
     justify-content: flex-start;
   }
 
+  .accounts-builder--server {
+    grid-template-columns: 1fr;
+  }
+
   .accounts-type-field {
     min-width: 0;
     width: 100%;
     max-width: none;
   }
 
+  .accounts-field--wide {
+    grid-column: auto;
+  }
+
   .accounts-builder .button {
     width: 100%;
+  }
+
+  .accounts-builder--server .button {
+    justify-self: stretch;
   }
 
   .account-card {
     width: 100%;
     max-width: none;
     flex-basis: 100%;
+  }
+
+  .account-card__title-row {
+    flex-direction: column;
+  }
+
+  .account-field__control {
+    flex-direction: column;
+    align-items: stretch;
   }
 
   .account-actions .button {
@@ -2235,6 +2469,10 @@ html { scroll-behavior: smooth; }
   }
 
   .account-password-toggle {
+    width: 100%;
+  }
+
+  .account-copy-button {
     width: 100%;
   }
 

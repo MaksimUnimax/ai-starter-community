@@ -36,13 +36,13 @@ def _extract_token_from_db(test_settings, email: str):
 
 
 def _extract_accounts_section(body_text: str) -> str:
-    match = re.search(
-        r'<section class="card stack accounts-card" data-local-accounts-root>(.*?)</section>',
-        body_text,
-        re.S,
-    )
-    assert match is not None
-    return match.group(1)
+    start_marker = '<section class="card stack accounts-card" data-local-accounts-root data-account-blocks-source="server">'
+    end_marker = '\n  <section class="card stack prompts-library-card" data-prompts-library-root>'
+    start = body_text.find(start_marker)
+    end = body_text.find(end_marker, start)
+    assert start != -1
+    assert end != -1
+    return body_text[start:end]
 
 
 def test_cabinet_displays_course_shell_without_tariffs_or_payment_noise(client, test_settings):
@@ -83,15 +83,18 @@ def test_cabinet_displays_course_shell_without_tariffs_or_payment_noise(client, 
     assert cabinet_response.text.index("Обучающий блок") < cabinet_response.text.index("Аккаунты")
     assert cabinet_response.text.index('data-local-accounts-root') < cabinet_response.text.index('data-prompts-library-root')
     assert "Аккаунты" in accounts_section
-    assert "Храните здесь часто используемые логины и пароли. Данные сохраняются только в этом браузере." in accounts_section
-    assert "Добавить блок" in accounts_section
-    assert "ChatGPT" in accounts_section
-    assert "Сервер" in accounts_section
-    assert "Тип нового блока" in accounts_section
+    assert "Данные хранятся на сервере и доступны после входа в кабинет с любого устройства." in accounts_section
+    assert "Данные сохраняются только в этом браузере." not in accounts_section
+    assert "Добавить блок" not in accounts_section
+    assert "Тип нового блока" not in accounts_section
+    assert "Активировать" not in accounts_section
+    assert "Сохранить" not in accounts_section
+    assert "Удалить" not in accounts_section
+    assert "Скопировать" not in accounts_section
+    assert "Пока нет ни одного блока." in accounts_section
+    assert "Администратор или модератор добавит их позже." in accounts_section
     assert "Личный кабинет" not in accounts_section
     assert '<h2 class="section-title">Аккаунт</h2>' not in accounts_section
-    assert "Логин:" not in accounts_section
-    assert "Email:" not in accounts_section
     assert cabinet_response.text.index('data-prompts-library-root') < cabinet_response.text.index('data-paid-options-root')
     assert cabinet_response.text.index('data-paid-options-root') > cabinet_response.text.index('data-prompts-library-root')
     assert "Активация опций" in cabinet_response.text
