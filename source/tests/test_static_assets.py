@@ -46,14 +46,20 @@ def test_stylesheet_is_served(client):
     assert ".danger-zone" in response.text
     assert ".empty-state" in response.text
     assert ".accounts-card" in response.text
+    assert ".accounts-title" in response.text
+    assert ".accounts-builder-shell" in response.text
     assert ".accounts-grid" in response.text
     assert ".account-card" in response.text
     assert ".account-password-row" in response.text
-    assert "width: min(100%, 320px);" in response.text
-    assert "max-width: 340px;" in response.text
+    assert "width: min(100%, 760px);" in response.text
+    assert "grid-template-columns: repeat(2, minmax(0, 1fr));" in response.text
+    assert "width: min(100%, 300px);" in response.text
+    assert "max-width: 320px;" in response.text
     assert ".accounts-builder .select {" in response.text
     assert "min-height: 38px;" in response.text
     assert ".accounts-builder .button {" in response.text
+    assert "grid-column: auto;" in response.text
+    assert "min-width: 180px;" in response.text
     assert ".account-card__delete {" in response.text
     assert ".account-actions {" in response.text
     assert "display: grid;" in response.text

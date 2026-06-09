@@ -112,6 +112,7 @@ def test_user_sees_server_backed_account_blocks_and_copy_only_controls(client, t
     assert response.status_code == 200
     assert "/static/cabinet-local-accounts.js" in response.text
     assert "data-account-blocks-source=\"server\"" in response.text
+    assert 'class="section-title accounts-title"' in response.text
 
     accounts_section = _extract_accounts_section(response.text)
     assert "Данные хранятся на сервере и доступны после входа в кабинет с любого устройства." in accounts_section
@@ -145,6 +146,7 @@ def test_admin_can_create_edit_activate_and_delete_account_blocks(client, test_s
     assert cabinet_response.status_code == 200
     assert "Администратор и модератор могут управлять блоками всех пользователей." in cabinet_response.text
     assert "Добавить блок" in cabinet_response.text
+    assert "accounts-builder-shell" in cabinet_response.text
     accounts_section = _extract_accounts_section(cabinet_response.text)
     assert "Сохранить" not in accounts_section
     assert "Удалить" not in accounts_section
@@ -276,6 +278,7 @@ def test_moderator_can_manage_account_blocks_but_cannot_access_admin_dashboard(c
     assert cabinet_response.status_code == 200
     assert "Администратор и модератор могут управлять блоками всех пользователей." in cabinet_response.text
     assert "Добавить блок" in cabinet_response.text
+    assert "accounts-builder-shell" in cabinet_response.text
     accounts_section = _extract_accounts_section(cabinet_response.text)
     assert "Активировать" not in accounts_section
 

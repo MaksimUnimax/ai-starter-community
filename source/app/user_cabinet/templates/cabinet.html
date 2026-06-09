@@ -31,7 +31,7 @@
   <section class="card stack accounts-card" data-local-accounts-root data-account-blocks-source="server">
     <div class="accounts-header">
       <div class="stack accounts-intro">
-        <h1 class="section-title">Аккаунты</h1>
+        <h2 class="section-title accounts-title">Аккаунты</h2>
         <p class="form-help">Данные хранятся на сервере и доступны после входа в кабинет с любого устройства.</p>
         {% if account_blocks_manage_mode %}
           <p class="form-help accounts-role-note">Администратор и модератор могут управлять блоками всех пользователей.</p>
@@ -41,44 +41,46 @@
       </div>
 
       {% if account_blocks_manage_mode %}
-        <form class="accounts-builder accounts-builder--server" method="post" action="/cabinet/account-blocks">
-          <label class="form-row accounts-type-field">
-            <span>Владелец</span>
-            <select class="select" name="owner_user_id" required>
-              {% for owner in account_block_owner_options %}
-                <option value="{{ owner.id }}" {% if owner.id == account_block_selected_owner_id %}selected{% endif %}>
-                  {{ owner.display_label }}{% if owner.role_label %} · {{ owner.role_label }}{% endif %}
-                </option>
-              {% endfor %}
-            </select>
-          </label>
-          <label class="form-row accounts-type-field">
-            <span>Тип нового блока</span>
-            <select class="select" name="type" required>
-              {% for option in account_block_type_options %}
-                <option value="{{ option.value }}" {% if option.value == 'chatgpt' %}selected{% endif %}>{{ option.label }}</option>
-              {% endfor %}
-            </select>
-          </label>
-          <label class="form-row accounts-field accounts-field--wide">
-            <span>Название</span>
-            <input class="input" name="title" type="text" placeholder="Например: Рабочий ChatGPT" required>
-          </label>
-          <label class="form-row accounts-field">
-            <span>Логин</span>
-            <input class="input" name="login" type="text" placeholder="Логин" autocomplete="off">
-          </label>
-          <label class="form-row accounts-field">
-            <span>Пароль</span>
-            <input class="input" name="password_secret" type="text" placeholder="Пароль" autocomplete="off">
-          </label>
-          <label class="form-row accounts-field accounts-field--wide">
-            <span>Почта</span>
-            <input class="input" name="email" type="email" placeholder="mail@example.com" autocomplete="email">
-          </label>
-          <p class="form-help accounts-duration-note">После активации блок работает {{ account_block_duration_days }} дней.</p>
-          <button class="button button-primary" type="submit">Добавить блок</button>
-        </form>
+        <div class="accounts-builder-shell">
+          <form class="accounts-builder accounts-builder--server" method="post" action="/cabinet/account-blocks">
+            <label class="form-row accounts-type-field">
+              <span>Владелец</span>
+              <select class="select" name="owner_user_id" required>
+                {% for owner in account_block_owner_options %}
+                  <option value="{{ owner.id }}" {% if owner.id == account_block_selected_owner_id %}selected{% endif %}>
+                    {{ owner.display_label }}{% if owner.role_label %} · {{ owner.role_label }}{% endif %}
+                  </option>
+                {% endfor %}
+              </select>
+            </label>
+            <label class="form-row accounts-type-field">
+              <span>Тип нового блока</span>
+              <select class="select" name="type" required>
+                {% for option in account_block_type_options %}
+                  <option value="{{ option.value }}" {% if option.value == 'chatgpt' %}selected{% endif %}>{{ option.label }}</option>
+                {% endfor %}
+              </select>
+            </label>
+            <label class="form-row accounts-field accounts-field--wide">
+              <span>Название</span>
+              <input class="input" name="title" type="text" placeholder="Например: Рабочий ChatGPT" required>
+            </label>
+            <label class="form-row accounts-field">
+              <span>Логин</span>
+              <input class="input" name="login" type="text" placeholder="Логин" autocomplete="off">
+            </label>
+            <label class="form-row accounts-field">
+              <span>Пароль</span>
+              <input class="input" name="password_secret" type="text" placeholder="Пароль" autocomplete="off">
+            </label>
+            <label class="form-row accounts-field accounts-field--wide">
+              <span>Почта</span>
+              <input class="input" name="email" type="email" placeholder="mail@example.com" autocomplete="email">
+            </label>
+            <p class="form-help accounts-duration-note">После активации блок работает {{ account_block_duration_days }} дней.</p>
+            <button class="button button-primary" type="submit">Добавить блок</button>
+          </form>
+        </div>
       {% endif %}
     </div>
 
