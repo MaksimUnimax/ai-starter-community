@@ -21,6 +21,8 @@ class AccountBlockPublic:
     activated_at: str | None
     expires_at: str | None
     remaining_days: int | None
+    activation_day: int | None
+    activation_summary: str
     is_active: bool
     is_expired: bool
     created_by_user_id: int | None
@@ -38,7 +40,7 @@ class AccountBlockPublic:
 class AccountBlockCreateInput:
     owner_user_id: int
     type: str
-    title: str
+    title: str = ""
     login: str = ""
     password_secret: str = ""
     email: str | None = None

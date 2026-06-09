@@ -93,16 +93,13 @@ def _account_block_card_context(block, copy_data, owner_summary: dict[str, objec
         "title": block.title,
         "login": copy_data.login,
         "password_secret": copy_data.password_secret,
-        "email": copy_data.email,
         "status": block.status,
         "status_label": ACCOUNT_BLOCK_STATUS_LABELS.get(block.status, block.status),
         "duration_days": block.duration_days,
-        "activated_at": block.activated_at,
-        "expires_at": block.expires_at,
-        "remaining_days": block.remaining_days,
+        "activation_day": block.activation_day,
+        "activation_summary": block.activation_summary,
         "is_active": block.is_active,
         "is_expired": block.is_expired,
-        "can_copy_email": bool(block.can_copy_email and copy_data.email),
     }
 
 
@@ -183,38 +180,26 @@ def _parse_account_block_form_fields(
     *,
     owner_user_id: int,
     block_type: str,
-    title: str,
     login: str,
     password_secret: str,
-    email: str | None,
 ) -> AccountBlockCreateInput:
     return AccountBlockCreateInput(
         owner_user_id=owner_user_id,
         type=block_type,
-        title=title,
         login=login,
         password_secret=password_secret,
-        email=email,
         duration_days=ACCOUNT_BLOCK_DURATION_DAYS,
     )
 
 
 def _parse_account_block_update_fields(
     *,
-    owner_user_id: int | None,
-    block_type: str | None,
-    title: str | None,
     login: str | None,
     password_secret: str | None,
-    email: str | None,
 ) -> AccountBlockUpdateInput:
     return AccountBlockUpdateInput(
-        owner_user_id=owner_user_id if owner_user_id is not None else None,
-        type=block_type if block_type is not None else None,
-        title=title if title is not None else None,
         login=login if login is not None else None,
         password_secret=password_secret if password_secret is not None else None,
-        email=email if email is not None else None,
     )
 
 
@@ -413,10 +398,8 @@ def cabinet_create_account_block(
     request: Request,
     owner_user_id: int = Form(default=0),
     block_type: str = Form(alias="type", default=""),
-    title: str = Form(default=""),
     login: str = Form(default=""),
     password_secret: str = Form(default=""),
-    email: str = Form(default=""),
 ):
     settings, user, redirect_response = _require_authenticated_user(request)
     if redirect_response is not None:
@@ -429,10 +412,8 @@ def cabinet_create_account_block(
             data=_parse_account_block_form_fields(
                 owner_user_id=owner_user_id,
                 block_type=block_type,
-                title=title,
                 login=login,
                 password_secret=password_secret,
-                email=email or None,
             ),
             settings=settings,
         )
@@ -447,12 +428,8 @@ def cabinet_create_account_block(
 def cabinet_update_account_block(
     request: Request,
     block_id: int,
-    owner_user_id: int = Form(default=0),
-    block_type: str = Form(alias="type", default=""),
-    title: str = Form(default=""),
     login: str = Form(default=""),
     password_secret: str = Form(default=""),
-    email: str = Form(default=""),
 ):
     settings, user, redirect_response = _require_authenticated_user(request)
     if redirect_response is not None:
@@ -464,12 +441,8 @@ def cabinet_update_account_block(
             actor=user,
             block_id=block_id,
             data=_parse_account_block_update_fields(
-                owner_user_id=owner_user_id,
-                block_type=block_type,
-                title=title,
                 login=login,
                 password_secret=password_secret,
-                email=email or None,
             ),
             settings=settings,
         )

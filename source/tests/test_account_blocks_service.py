@@ -87,7 +87,7 @@ def test_account_blocks_table_and_supported_types_exist(test_settings):
     }.issubset(columns)
 
 
-def test_admin_and_moderator_can_create_update_list_and_delete_blocks(test_settings):
+def test_admin_and_moderator_can_create_update_list_and_delete_blocks_with_derived_titles(test_settings):
     admin = _create_verified_user(test_settings, "ab-admin@example.com", "abadmin", role="admin")
     moderator = _create_verified_user(test_settings, "ab-moderator@example.com", "abmoderator", role="moderator")
     owner = _create_verified_user(test_settings, "ab-owner@example.com", "abowner")
@@ -98,10 +98,10 @@ def test_admin_and_moderator_can_create_update_list_and_delete_blocks(test_setti
         data=AccountBlockCreateInput(
             owner_user_id=owner.id,
             type="chatgpt",
-            title="ChatGPT block",
+            title="Ignored title",
             login="chat-login",
             password_secret="chat-secret",
-            email="owner@example.com",
+            email="ignored@example.com",
         ),
         settings=test_settings,
     )
@@ -109,27 +109,41 @@ def test_admin_and_moderator_can_create_update_list_and_delete_blocks(test_setti
         actor=moderator,
         data=AccountBlockCreateInput(
             owner_user_id=other_owner.id,
-            type="server",
-            title="Server block",
-            login="server-login",
-            password_secret="server-secret",
-            email=None,
+            type="mail",
+            title="Ignored mail title",
+            login="mail-login",
+            password_secret="mail-secret",
+            email="ignored-mail@example.com",
         ),
         settings=test_settings,
     )
 
     assert admin_block.owner_user_id == owner.id
+    assert admin_block.title == "ChatGPT"
+    assert admin_block.email is None
     assert moderator_block.owner_user_id == other_owner.id
+    assert moderator_block.title == "Почта"
+    assert moderator_block.email == other_owner.email
 
     updated_block = update_account_block(
         actor=moderator,
         block_id=admin_block.id,
-        data=AccountBlockUpdateInput(title="Updated title", login="new-login", email="new-owner@example.com"),
+        data=AccountBlockUpdateInput(
+            owner_user_id=other_owner.id,
+            type="mail",
+            title="Should be ignored",
+            login="new-login",
+            password_secret="new-secret",
+            email="new-owner@example.com",
+            duration_days=10,
+        ),
         settings=test_settings,
     )
-    assert updated_block.title == "Updated title"
+    assert updated_block.owner_user_id == owner.id
+    assert updated_block.type == "chatgpt"
+    assert updated_block.title == "ChatGPT"
     assert updated_block.login == "new-login"
-    assert updated_block.email == "new-owner@example.com"
+    assert updated_block.email is None
 
     all_blocks = list_account_blocks_for_viewer(admin, settings=test_settings)
     assert {block.id for block in all_blocks} == {admin_block.id, moderator_block.id}
@@ -137,10 +151,10 @@ def test_admin_and_moderator_can_create_update_list_and_delete_blocks(test_setti
     owner_blocks = list_account_blocks_for_viewer(owner, settings=test_settings)
     assert [block.id for block in owner_blocks] == [admin_block.id]
 
-    copy_data = get_account_block_copy_data(actor=owner, block_id=admin_block.id, settings=test_settings)
-    assert copy_data.login == "new-login"
-    assert copy_data.password_secret == "chat-secret"
-    assert copy_data.email == "new-owner@example.com"
+    copy_data = get_account_block_copy_data(actor=other_owner, block_id=moderator_block.id, settings=test_settings)
+    assert copy_data.login == "mail-login"
+    assert copy_data.password_secret == "mail-secret"
+    assert copy_data.email == other_owner.email
 
     get_account_block_public(actor=admin, block_id=admin_block.id, settings=test_settings)
 
@@ -159,10 +173,10 @@ def test_user_can_only_view_own_blocks_and_cannot_manage(test_settings):
         data=AccountBlockCreateInput(
             owner_user_id=owner.id,
             type="mail",
-            title="Mail block",
+            title="Ignored mail title",
             login="mail-login",
             password_secret="mail-secret",
-            email="mail@example.com",
+            email="ignored@example.com",
         ),
         settings=test_settings,
     )
@@ -171,7 +185,6 @@ def test_user_can_only_view_own_blocks_and_cannot_manage(test_settings):
         data=AccountBlockCreateInput(
             owner_user_id=other_owner.id,
             type="server",
-            title="Other block",
             login="other-login",
             password_secret="other-secret",
         ),
@@ -181,13 +194,13 @@ def test_user_can_only_view_own_blocks_and_cannot_manage(test_settings):
     own_blocks = list_account_blocks_for_viewer(owner, settings=test_settings)
     assert [item.id for item in own_blocks] == [block.id]
     assert own_blocks[0].status == "inactive"
-    assert own_blocks[0].can_copy_email is True
-    assert own_blocks[0].remaining_days is None
+    assert own_blocks[0].title == "Почта"
+    assert own_blocks[0].activation_summary == "Не активирован"
 
     own_copy = get_account_block_copy_data(actor=owner, block_id=block.id, settings=test_settings)
     assert own_copy.login == "mail-login"
     assert own_copy.password_secret == "mail-secret"
-    assert own_copy.email == "mail@example.com"
+    assert own_copy.email == owner.email
 
     with pytest.raises(AccountBlockPermissionError):
         create_account_block(
@@ -195,7 +208,6 @@ def test_user_can_only_view_own_blocks_and_cannot_manage(test_settings):
             data=AccountBlockCreateInput(
                 owner_user_id=owner.id,
                 type="chatgpt",
-                title="Denied",
                 login="x",
                 password_secret="y",
             ),
@@ -205,7 +217,7 @@ def test_user_can_only_view_own_blocks_and_cannot_manage(test_settings):
         update_account_block(
             actor=owner,
             block_id=block.id,
-            data=AccountBlockUpdateInput(title="Denied"),
+            data=AccountBlockUpdateInput(login="Denied"),
             settings=test_settings,
         )
     with pytest.raises(AccountBlockPermissionError):
@@ -224,7 +236,6 @@ def test_invalid_account_block_payloads_are_rejected(test_settings):
             data=AccountBlockCreateInput(
                 owner_user_id=0,
                 type="chatgpt",
-                title="Broken",
                 login="login",
                 password_secret="secret",
             ),
@@ -236,7 +247,6 @@ def test_invalid_account_block_payloads_are_rejected(test_settings):
             data=AccountBlockCreateInput(
                 owner_user_id=admin.id,
                 type="unknown",
-                title="Broken",
                 login="login",
                 password_secret="secret",
             ),
@@ -244,4 +254,3 @@ def test_invalid_account_block_payloads_are_rejected(test_settings):
         )
     with pytest.raises(AccountBlockNotFoundError):
         get_account_block_public(actor=admin, block_id=99999, settings=test_settings)
-

@@ -52,7 +52,7 @@ def _create_verified_user(test_settings, email: str, login: str, role: str = "us
     return authenticate_user(email, "Secret123", settings=test_settings)
 
 
-def test_activation_sets_timer_and_prepares_notification_without_sending_email(test_settings):
+def test_activation_sets_elapsed_day_counter_and_prepares_notification_without_sending_email(test_settings):
     admin = _create_verified_user(test_settings, "act-admin@example.com", "actadmin", role="admin")
     owner = _create_verified_user(test_settings, "act-owner@example.com", "actowner")
     block = create_account_block(
@@ -60,10 +60,8 @@ def test_activation_sets_timer_and_prepares_notification_without_sending_email(t
         data=AccountBlockCreateInput(
             owner_user_id=owner.id,
             type="mail",
-            title="Mail access",
             login="mail-login",
             password_secret="mail-secret",
-            email="mail@example.com",
         ),
         settings=test_settings,
     )
@@ -75,14 +73,14 @@ def test_activation_sets_timer_and_prepares_notification_without_sending_email(t
     assert result.block.status == "active"
     assert result.block.is_active is True
     assert result.block.is_expired is False
-    assert result.block.remaining_days == 60
+    assert result.block.activation_day == 1
+    assert result.block.activation_summary == "Активен: день 1 из 60"
     assert result.block.activated_at == fixed_now.isoformat()
     assert result.block.expires_at == (fixed_now + timedelta(days=60)).isoformat()
     assert result.block.activated_by_user_id == admin.id
     assert result.notification is not None
     assert result.notification.recipient_email == owner.email
     assert result.notification.subject == "Аккаунт в кабинете активирован"
-    assert "Mail access" in result.notification.body_text
     assert "Почта" in result.notification.body_text
     assert result.notification.expires_at == result.block.expires_at
 
@@ -94,7 +92,7 @@ def test_activation_sets_timer_and_prepares_notification_without_sending_email(t
     assert activation_logs == []
 
 
-def test_reactivation_resets_timer_and_expiry_computes_on_read(test_settings):
+def test_elapsed_day_counter_reaches_day_17_and_caps_at_day_60(test_settings):
     admin = _create_verified_user(test_settings, "react-admin@example.com", "reactadmin", role="admin")
     owner = _create_verified_user(test_settings, "react-owner@example.com", "reactowner")
     block = create_account_block(
@@ -102,34 +100,47 @@ def test_reactivation_resets_timer_and_expiry_computes_on_read(test_settings):
         data=AccountBlockCreateInput(
             owner_user_id=owner.id,
             type="server",
-            title="Server access",
             login="server-login",
             password_secret="server-secret",
         ),
         settings=test_settings,
     )
 
-    first_now = datetime(2026, 6, 8, 12, 0, 0, tzinfo=timezone.utc)
-    second_now = datetime(2026, 6, 18, 9, 30, 0, tzinfo=timezone.utc)
-    expired_now = second_now + timedelta(days=61)
+    activation_now = datetime(2026, 6, 1, 9, 0, 0, tzinfo=timezone.utc)
+    day_17_now = activation_now + timedelta(days=16, hours=2)
+    day_60_now = activation_now + timedelta(days=59, hours=6)
+    expired_now = activation_now + timedelta(days=61)
 
-    with patch("app.account_blocks.service.utc_now", return_value=first_now):
-        first_activation = activate_account_block(actor=admin, block_id=block.id, settings=test_settings)
+    with patch("app.account_blocks.service.utc_now", return_value=activation_now):
+        activate_account_block(actor=admin, block_id=block.id, settings=test_settings)
 
-    with patch("app.account_blocks.service.utc_now", return_value=second_now):
-        second_activation = activate_account_block(actor=admin, block_id=block.id, settings=test_settings)
+    with patch("app.account_blocks.service.utc_now", return_value=day_17_now):
+        day_17_view = get_account_block_public(actor=owner, block_id=block.id, settings=test_settings)
+    assert day_17_view.is_active is True
+    assert day_17_view.is_expired is False
+    assert day_17_view.activation_day == 17
+    assert day_17_view.activation_summary == "Активен: день 17 из 60"
 
-    assert second_activation.block.activated_at == second_now.isoformat()
-    assert second_activation.block.expires_at == (second_now + timedelta(days=60)).isoformat()
-    assert second_activation.block.expires_at != first_activation.block.expires_at
+    with patch("app.account_blocks.service.utc_now", return_value=day_60_now):
+        day_60_view = get_account_block_public(actor=owner, block_id=block.id, settings=test_settings)
+    assert day_60_view.is_active is True
+    assert day_60_view.is_expired is False
+    assert day_60_view.activation_day == 60
+    assert day_60_view.activation_summary == "Активен: день 60 из 60"
 
     with patch("app.account_blocks.service.utc_now", return_value=expired_now):
         expired_view = get_account_block_public(actor=owner, block_id=block.id, settings=test_settings)
-
     assert expired_view.status == "expired"
     assert expired_view.is_active is False
     assert expired_view.is_expired is True
-    assert expired_view.remaining_days == 0
+    assert expired_view.activation_day == 60
+    assert expired_view.activation_summary == "Срок завершён: 60 из 60 дней"
+
+    with patch("app.account_blocks.service.utc_now", return_value=expired_now):
+        reactivated = activate_account_block(actor=admin, block_id=block.id, settings=test_settings)
+    assert reactivated.block.activation_day == 1
+    assert reactivated.block.activation_summary == "Активен: день 1 из 60"
+    assert reactivated.block.expires_at == (expired_now + timedelta(days=60)).isoformat()
 
 
 def test_user_cannot_activate_account_blocks(test_settings):
@@ -140,7 +151,6 @@ def test_user_cannot_activate_account_blocks(test_settings):
         data=AccountBlockCreateInput(
             owner_user_id=owner.id,
             type="chatgpt",
-            title="Denied",
             login="deny-login",
             password_secret="deny-secret",
         ),

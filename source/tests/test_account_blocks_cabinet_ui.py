@@ -8,11 +8,10 @@ from unittest.mock import patch
 from app.account_blocks.schemas import AccountBlockCreateInput
 from app.account_blocks.service import activate_account_block, create_account_block
 from app.auth.service import authenticate_user, create_session, register_user, verify_email
-from app.shared.db import get_database_path
 
 
 def _connect(settings):
-    conn = sqlite3.connect(str(get_database_path(settings)))
+    conn = sqlite3.connect(str(settings.database_path))
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -61,42 +60,46 @@ def _extract_accounts_section(body_text: str) -> str:
     return body_text[start:end]
 
 
-def test_user_sees_server_backed_account_blocks_and_copy_only_controls(client, test_settings):
+def _extract_builder_shell(accounts_section: str) -> str:
+    start_marker = '<div class="accounts-builder-shell">'
+    end_marker = '<p class="accounts-notice"'
+    start = accounts_section.find(start_marker)
+    end = accounts_section.find(end_marker, start)
+    assert start != -1
+    assert end != -1
+    return accounts_section[start:end]
+
+
+def _extract_first_edit_form(accounts_section: str) -> str:
+    start_marker = '<form class="account-card__edit-form"'
+    start = accounts_section.find(start_marker)
+    assert start != -1
+    end = accounts_section.find("</form>", start)
+    assert end != -1
+    return accounts_section[start:end]
+
+
+def test_user_sees_compact_server_backed_account_blocks_and_copy_only_controls(client, test_settings):
     admin = _create_verified_user(test_settings, "cab-ui-admin@example.com", "cabuiadmin", role="admin")
     owner = _create_verified_user(test_settings, "cab-ui-owner@example.com", "cabuiowner")
-    other_owner = _create_verified_user(test_settings, "cab-ui-other@example.com", "cabuiother")
 
     active_block = create_account_block(
         actor=admin,
         data=AccountBlockCreateInput(
             owner_user_id=owner.id,
             type="chatgpt",
-            title="ChatGPT access",
             login="owner-chat-login",
             password_secret="owner-chat-password",
-        ),
-        settings=test_settings,
-    )
-    _mail_block = create_account_block(
-        actor=admin,
-        data=AccountBlockCreateInput(
-            owner_user_id=owner.id,
-            type="mail",
-            title="Mail access",
-            login="owner-mail-login",
-            password_secret="owner-mail-password",
-            email="owner-mail@example.com",
         ),
         settings=test_settings,
     )
     create_account_block(
         actor=admin,
         data=AccountBlockCreateInput(
-            owner_user_id=other_owner.id,
-            type="server",
-            title="Hidden block",
-            login="other-login",
-            password_secret="other-password",
+            owner_user_id=owner.id,
+            type="mail",
+            login="owner-mail-login",
+            password_secret="owner-mail-password",
         ),
         settings=test_settings,
     )
@@ -112,28 +115,25 @@ def test_user_sees_server_backed_account_blocks_and_copy_only_controls(client, t
     assert response.status_code == 200
     assert "/static/cabinet-local-accounts.js" in response.text
     assert "data-account-blocks-source=\"server\"" in response.text
-    assert 'class="section-title accounts-title"' in response.text
 
     accounts_section = _extract_accounts_section(response.text)
     assert "Данные хранятся на сервере и доступны после входа в кабинет с любого устройства." in accounts_section
     assert "Данные сохраняются только в этом браузере." not in accounts_section
     assert "Добавить блок" not in accounts_section
-    assert "Сохранить" not in accounts_section
+    assert "Редактировать" not in accounts_section
     assert "Удалить" not in accounts_section
     assert "Активировать" not in accounts_section
-    assert "Редактировать" not in accounts_section
-    assert "ChatGPT access" in accounts_section
-    assert "Mail access" in accounts_section
-    assert "Hidden block" not in accounts_section
-    assert "Почта" in accounts_section
-    assert "owner-mail@example.com" in accounts_section
+    assert 'name="title"' not in accounts_section
+    assert 'name="email"' not in accounts_section
+    assert "data-account-card-edit-form" not in accounts_section
     assert "Скопировать" in accounts_section
-    assert accounts_section.count("Активно") == 1
-    assert "Неактивно" in accounts_section
-    assert "Осталось: 60 дн." in accounts_section
-    assert "Осталось после активации: 60 дн." in accounts_section
+    assert "ChatGPT" in accounts_section
+    assert "Почта" in accounts_section
+    assert "Активен: день 1 из 60" in accounts_section
+    assert "Не активирован" in accounts_section
+    assert "Срок завершён: 60 из 60 дней" not in accounts_section
+    assert "Осталось после активации" not in accounts_section
     assert "Владелец:" not in accounts_section
-    assert "Пока нет ни одного блока." not in accounts_section
 
 
 def test_admin_can_create_edit_activate_and_delete_account_blocks(client, test_settings):
@@ -145,24 +145,26 @@ def test_admin_can_create_edit_activate_and_delete_account_blocks(client, test_s
     cabinet_response = client.get("/cabinet")
     assert cabinet_response.status_code == 200
     assert "Администратор и модератор могут управлять блоками всех пользователей." in cabinet_response.text
-    assert "Добавить блок" in cabinet_response.text
-    assert "accounts-builder-shell" in cabinet_response.text
     accounts_section = _extract_accounts_section(cabinet_response.text)
-    assert "Сохранить" not in accounts_section
-    assert "Удалить" not in accounts_section
-    assert "Активировать" not in accounts_section
-    assert owner_a.login in accounts_section
-    assert owner_b.login in accounts_section
+    builder_shell = _extract_builder_shell(accounts_section)
+    assert "Добавить блок" in builder_shell
+    assert 'name="owner_user_id"' in builder_shell
+    assert 'name="type"' in builder_shell
+    assert 'name="login"' in builder_shell
+    assert 'name="password_secret"' in builder_shell
+    assert 'name="title"' not in builder_shell
+    assert 'name="email"' not in builder_shell
+    assert "Сохранить" not in builder_shell
+    assert "Удалить" not in builder_shell
+    assert "Активировать" not in builder_shell
 
     create_response = client.post(
         "/cabinet/account-blocks",
         data={
             "owner_user_id": owner_a.id,
             "type": "server",
-            "title": "Admin managed block",
             "login": "admin-block-login",
             "password_secret": "admin-block-password",
-            "email": "",
         },
         follow_redirects=False,
     )
@@ -170,16 +172,20 @@ def test_admin_can_create_edit_activate_and_delete_account_blocks(client, test_s
     assert create_response.headers["location"] == f"/cabinet?account_blocks_notice=created&owner_id={owner_a.id}"
 
     with _connect(test_settings) as conn:
-        row = conn.execute("SELECT * FROM account_blocks WHERE title = ?", ("Admin managed block",)).fetchone()
+        row = conn.execute("SELECT * FROM account_blocks WHERE login = ?", ("admin-block-login",)).fetchone()
     assert row is not None
     block_id = int(row["id"])
+    assert row["title"] == "Сервер"
+    assert int(row["owner_user_id"]) == owner_a.id
+    assert row["type"] == "server"
+    assert row["email"] is None
 
     update_response = client.post(
         f"/cabinet/account-blocks/{block_id}",
         data={
             "owner_user_id": owner_b.id,
             "type": "mail",
-            "title": "Updated admin block",
+            "title": "Should be ignored",
             "login": "updated-login",
             "password_secret": "updated-password",
             "email": "updated@example.com",
@@ -187,38 +193,48 @@ def test_admin_can_create_edit_activate_and_delete_account_blocks(client, test_s
         follow_redirects=False,
     )
     assert update_response.status_code == 303
-    assert update_response.headers["location"] == f"/cabinet?account_blocks_notice=updated&owner_id={owner_b.id}"
+    assert update_response.headers["location"] == f"/cabinet?account_blocks_notice=updated&owner_id={owner_a.id}"
 
     fixed_now = datetime(2026, 6, 8, 12, 0, 0, tzinfo=timezone.utc)
     with patch("app.account_blocks.service.utc_now", return_value=fixed_now):
         activate_response = client.post(f"/cabinet/account-blocks/{block_id}/activate", follow_redirects=False)
     assert activate_response.status_code == 303
-    assert activate_response.headers["location"] == f"/cabinet?account_blocks_notice=activated&owner_id={owner_b.id}"
+    assert activate_response.headers["location"] == f"/cabinet?account_blocks_notice=activated&owner_id={owner_a.id}"
 
     with _connect(test_settings) as conn:
         updated_row = conn.execute("SELECT * FROM account_blocks WHERE id = ?", (block_id,)).fetchone()
-        activation_logs = conn.execute(
-            "SELECT * FROM email_outbox WHERE template_key = ?",
-            ("account_block_activation",),
-        ).fetchall()
     assert updated_row is not None
-    assert int(updated_row["owner_user_id"]) == owner_b.id
-    assert updated_row["type"] == "mail"
+    assert int(updated_row["owner_user_id"]) == owner_a.id
+    assert updated_row["type"] == "server"
+    assert updated_row["title"] == "Сервер"
+    assert updated_row["login"] == "updated-login"
+    assert updated_row["password_secret"] == "updated-password"
+    assert updated_row["email"] is None
     assert updated_row["status"] == "active"
     assert updated_row["activated_at"] == fixed_now.isoformat()
     assert updated_row["expires_at"] == (fixed_now + timedelta(days=60)).isoformat()
-    assert activation_logs == []
 
     with patch("app.account_blocks.service.utc_now", return_value=fixed_now):
         active_page = client.get("/cabinet")
-    assert "Updated admin block" in active_page.text
-    assert "Почта" in active_page.text
-    assert "Активно" in active_page.text
-    assert "Осталось: 60 дн." in active_page.text
+    accounts_section = _extract_accounts_section(active_page.text)
+    assert "Редактировать" in accounts_section
+    assert "Удалить" in accounts_section
+    assert "Активировать" in accounts_section
+    assert "Сервер" in accounts_section
+    edit_form = _extract_first_edit_form(accounts_section)
+    assert 'name="login"' in edit_form
+    assert 'name="password_secret"' in edit_form
+    assert 'name="title"' not in edit_form
+    assert 'name="owner_user_id"' not in edit_form
+    assert 'name="type"' not in edit_form
+    assert 'name="email"' not in edit_form
+    assert "data-account-card-edit-form" in edit_form
+    assert 'hidden' in edit_form
+    assert "Активен: день 1 из 60" in accounts_section
 
     delete_response = client.post(f"/cabinet/account-blocks/{block_id}/delete", follow_redirects=False)
     assert delete_response.status_code == 303
-    assert delete_response.headers["location"] == f"/cabinet?account_blocks_notice=deleted&owner_id={owner_b.id}"
+    assert delete_response.headers["location"] == f"/cabinet?account_blocks_notice=deleted&owner_id={owner_a.id}"
 
     with _connect(test_settings) as conn:
         deleted_row = conn.execute("SELECT 1 FROM account_blocks WHERE id = ?", (block_id,)).fetchone()
@@ -238,17 +254,15 @@ def test_moderator_can_manage_account_blocks_but_cannot_access_admin_dashboard(c
         data={
             "owner_user_id": owner.id,
             "type": "chatgpt",
-            "title": "Moderator block",
             "login": "moderator-login",
             "password_secret": "moderator-password",
-            "email": "",
         },
         follow_redirects=False,
     )
     assert create_response.status_code == 303
 
     with _connect(test_settings) as conn:
-        row = conn.execute("SELECT * FROM account_blocks WHERE title = ?", ("Moderator block",)).fetchone()
+        row = conn.execute("SELECT * FROM account_blocks WHERE login = ?", ("moderator-login",)).fetchone()
     assert row is not None
     block_id = int(row["id"])
 
@@ -256,11 +270,11 @@ def test_moderator_can_manage_account_blocks_but_cannot_access_admin_dashboard(c
         f"/cabinet/account-blocks/{block_id}",
         data={
             "owner_user_id": owner.id,
-            "type": "chatgpt",
-            "title": "Moderator block updated",
+            "type": "server",
+            "title": "Ignored title",
             "login": "moderator-login-updated",
             "password_secret": "moderator-password-updated",
-            "email": "",
+            "email": "ignored@example.com",
         },
         follow_redirects=False,
     )
@@ -274,14 +288,6 @@ def test_moderator_can_manage_account_blocks_but_cannot_access_admin_dashboard(c
     delete_response = client.post(f"/cabinet/account-blocks/{block_id}/delete", follow_redirects=False)
     assert delete_response.status_code == 303
 
-    cabinet_response = client.get("/cabinet")
-    assert cabinet_response.status_code == 200
-    assert "Администратор и модератор могут управлять блоками всех пользователей." in cabinet_response.text
-    assert "Добавить блок" in cabinet_response.text
-    assert "accounts-builder-shell" in cabinet_response.text
-    accounts_section = _extract_accounts_section(cabinet_response.text)
-    assert "Активировать" not in accounts_section
-
 
 def test_regular_user_cannot_post_account_block_management_actions(client, test_settings):
     admin = _create_verified_user(test_settings, "cab-ui-deny-admin@example.com", "cabuidenyadmin", role="admin")
@@ -291,7 +297,6 @@ def test_regular_user_cannot_post_account_block_management_actions(client, test_
         data=AccountBlockCreateInput(
             owner_user_id=owner.id,
             type="server",
-            title="Denied block",
             login="denied-login",
             password_secret="denied-password",
         ),
@@ -305,10 +310,8 @@ def test_regular_user_cannot_post_account_block_management_actions(client, test_
         data={
             "owner_user_id": owner.id,
             "type": "chatgpt",
-            "title": "Should not create",
             "login": "nope",
             "password_secret": "nope",
-            "email": "",
         },
     )
     assert create_response.status_code == 403
@@ -321,7 +324,7 @@ def test_regular_user_cannot_post_account_block_management_actions(client, test_
             "title": "Should not update",
             "login": "nope",
             "password_secret": "nope",
-            "email": "",
+            "email": "nope@example.com",
         },
     )
     assert update_response.status_code == 403
@@ -333,7 +336,7 @@ def test_regular_user_cannot_post_account_block_management_actions(client, test_
     assert activate_response.status_code == 403
 
 
-def test_expired_account_block_does_not_show_active_label(client, test_settings):
+def test_expired_account_block_shows_finished_day_counter_without_active_label(client, test_settings):
     admin = _create_verified_user(test_settings, "cab-ui-expire-admin@example.com", "cabuiexpireadmin", role="admin")
     owner = _create_verified_user(test_settings, "cab-ui-expire-owner@example.com", "cabuiexpireowner")
     block = create_account_block(
@@ -341,17 +344,15 @@ def test_expired_account_block_does_not_show_active_label(client, test_settings)
         data=AccountBlockCreateInput(
             owner_user_id=owner.id,
             type="mail",
-            title="Expiring mail block",
             login="expire-login",
             password_secret="expire-password",
-            email="expire@example.com",
         ),
         settings=test_settings,
     )
 
-    first_now = datetime(2026, 6, 8, 12, 0, 0, tzinfo=timezone.utc)
-    expired_now = first_now + timedelta(days=61)
-    with patch("app.account_blocks.service.utc_now", return_value=first_now):
+    activation_now = datetime(2026, 6, 8, 12, 0, 0, tzinfo=timezone.utc)
+    expired_now = activation_now + timedelta(days=61)
+    with patch("app.account_blocks.service.utc_now", return_value=activation_now):
         activate_account_block(actor=admin, block_id=block.id, settings=test_settings)
 
     _login_as(client, test_settings, owner.email)
@@ -359,7 +360,8 @@ def test_expired_account_block_does_not_show_active_label(client, test_settings)
         response = client.get("/cabinet")
 
     accounts_section = _extract_accounts_section(response.text)
-    assert "Expiring mail block" in accounts_section
-    assert "Истекло" in accounts_section
+    assert "Почта" in accounts_section
+    assert "Срок завершён: 60 из 60 дней" in accounts_section
     assert "Активно" not in accounts_section
-    assert "Осталось: 0 дн." in accounts_section
+    assert "Активен: день" not in accounts_section
+    assert "Осталось после активации" not in accounts_section

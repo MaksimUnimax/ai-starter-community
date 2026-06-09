@@ -611,7 +611,7 @@ button:hover {
 }
 
 .accounts-title {
-  font-size: clamp(1.45rem, 2.4vw, 2rem);
+  font-size: clamp(1.2rem, 1.8vw, 1.55rem);
   color: var(--accent-strong);
 }
 
@@ -623,10 +623,10 @@ button:hover {
 
 .accounts-builder-shell {
   flex: 1 1 100%;
-  width: min(100%, 760px);
+  width: min(100%, 680px);
   display: grid;
   gap: 10px;
-  padding: 14px 16px;
+  padding: 12px 14px;
   border: 1px solid var(--border);
   border-radius: 18px;
   background: var(--surface-alt);
@@ -692,9 +692,9 @@ button:hover {
 }
 
 .accounts-builder--server .button {
-  grid-column: auto;
+  grid-column: 1 / -1;
   justify-self: start;
-  min-width: 180px;
+  min-width: 160px;
 }
 
 .accounts-duration-note {
@@ -763,11 +763,11 @@ button:hover {
 
 .account-card {
   display: grid;
-  flex: 0 1 300px;
-  width: min(100%, 300px);
-  max-width: 320px;
-  gap: 12px;
-  padding: 16px;
+  flex: 0 1 280px;
+  width: min(100%, 280px);
+  max-width: 300px;
+  gap: 10px;
+  padding: 14px;
   border: 1px solid var(--border);
   border-radius: 18px;
   background: var(--surface-alt);
@@ -810,7 +810,7 @@ button:hover {
 .account-card__title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: 1.02rem;
+  font-size: 0.98rem;
   font-weight: 700;
   letter-spacing: -0.02em;
 }
@@ -866,21 +866,40 @@ button:hover {
   font-size: 0.84rem;
 }
 
+.account-card__body,
 .account-card__form,
-.account-card__readonly {
+.account-card__readonly,
+.account-card__edit-form {
   display: grid;
   gap: 12px;
 }
 
+.account-card__edit-form[hidden] {
+  display: none;
+}
+
+.account-card__edit-form:not([hidden]) {
+  display: grid;
+}
+
+.account-card--editing .account-card__readonly {
+  display: none;
+}
+
+.account-card--editing .account-card__edit-form {
+  display: grid;
+}
+
 .account-card__details {
   display: grid;
-  gap: 4px;
+  gap: 6px;
 }
 
 .account-card__detail {
   margin: 0;
   color: var(--muted);
   font-size: 0.88rem;
+  line-height: 1.35;
 }
 
 .account-card__delete {
@@ -968,19 +987,13 @@ button:hover {
 }
 
 .account-actions {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 6px;
-  align-items: stretch;
-}
-
-.account-card__save,
-.account-card__activate {
-  min-width: 0;
+  align-items: center;
 }
 
 .account-actions .button {
-  width: 100%;
   min-width: 0;
   min-height: 32px;
   padding: 7px 10px;
@@ -988,6 +1001,18 @@ button:hover {
   font-size: 0.82rem;
   line-height: 1.1;
   white-space: nowrap;
+}
+
+.account-actions--view .button,
+.account-actions--edit .button {
+  flex: 1 1 120px;
+}
+
+.account-card__save,
+.account-card__activate,
+.account-card__edit-toggle,
+.account-card__cancel {
+  min-width: 0;
 }
 
 .account-actions .button:disabled {
@@ -2454,6 +2479,7 @@ html { scroll-behavior: smooth; }
 
   .accounts-builder--server .button {
     justify-self: stretch;
+    width: 100%;
   }
 
   .account-card {
@@ -2485,6 +2511,11 @@ html { scroll-behavior: smooth; }
 
   .account-copy-button {
     width: 100%;
+  }
+
+  .account-actions--view .button,
+  .account-actions--edit .button {
+    flex: 1 1 100%;
   }
 
   .prompts-library-header,

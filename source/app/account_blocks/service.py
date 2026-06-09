@@ -37,6 +37,11 @@ DEFAULT_ACCOUNT_BLOCK_DURATION_DAYS = 60
 TITLE_MAX_LENGTH = 200
 TEXT_MAX_LENGTH = 4000
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+ACCOUNT_BLOCK_TYPE_LABELS = {
+    "chatgpt": "ChatGPT",
+    "server": "Сервер",
+    "mail": "Почта",
+}
 
 
 class AccountBlockError(Exception):
@@ -151,6 +156,14 @@ def _normalize_password_secret(value: str | None) -> str:
     return _normalize_text(value, "password_secret", allow_empty=True)
 
 
+def _account_block_type_label(block_type: str) -> str:
+    return ACCOUNT_BLOCK_TYPE_LABELS.get(block_type, block_type)
+
+
+def _account_block_title_for_type(block_type: str) -> str:
+    return _account_block_type_label(block_type)
+
+
 def _normalize_account_block_input(data: AccountBlockCreateInput | AccountBlockUpdateInput | None = None, *, create: bool) -> dict[str, object]:
     if data is None:
         raise AccountBlockValidationError("data is required")
@@ -158,37 +171,24 @@ def _normalize_account_block_input(data: AccountBlockCreateInput | AccountBlockU
         payload = asdict(data)
         owner_user_id = _normalize_owner_user_id(payload["owner_user_id"])
         block_type = _normalize_block_type(payload["type"])
-        title = _normalize_text(payload["title"], "title", limit=TITLE_MAX_LENGTH)
         login = _normalize_text(payload.get("login"), "login", allow_empty=True)
         password_secret = _normalize_password_secret(payload.get("password_secret"))
-        email = _normalize_email(payload.get("email"))
-        duration_days = _normalize_duration_days(payload.get("duration_days"))
+        _normalize_duration_days(payload.get("duration_days"))
         return {
             "owner_user_id": owner_user_id,
             "type": block_type,
-            "title": title,
+            "title": _account_block_title_for_type(block_type),
             "login": login,
             "password_secret": password_secret,
-            "email": email,
-            "duration_days": duration_days,
+            "duration_days": DEFAULT_ACCOUNT_BLOCK_DURATION_DAYS,
         }
 
     payload = {field.name: getattr(data, field.name) for field in fields(data)}
     cleaned: dict[str, object] = {}
-    if payload.get("owner_user_id") is not _UNSET:
-        cleaned["owner_user_id"] = _normalize_owner_user_id(payload["owner_user_id"])
-    if payload.get("type") is not _UNSET:
-        cleaned["type"] = _normalize_block_type(payload["type"])
-    if payload.get("title") is not _UNSET:
-        cleaned["title"] = _normalize_text(payload["title"], "title", limit=TITLE_MAX_LENGTH)
     if payload.get("login") is not _UNSET:
         cleaned["login"] = _normalize_text(payload["login"], "login", allow_empty=True)
     if payload.get("password_secret") is not _UNSET:
         cleaned["password_secret"] = _normalize_password_secret(payload["password_secret"])
-    if payload.get("email") is not _UNSET:
-        cleaned["email"] = _normalize_email(payload["email"])
-    if payload.get("duration_days") is not _UNSET:
-        cleaned["duration_days"] = _normalize_duration_days(payload["duration_days"])
     if not cleaned:
         raise AccountBlockValidationError("no account block fields provided")
     return cleaned
@@ -240,20 +240,43 @@ def _parse_iso_datetime(value: str | None):
     return datetime.fromisoformat(value)
 
 
+def _activation_progress_for_row(row) -> tuple[int | None, str]:
+    duration_days = int(row["duration_days"] or DEFAULT_ACCOUNT_BLOCK_DURATION_DAYS)
+    activated_at = _parse_iso_datetime(row["activated_at"])
+    expires_at = _parse_iso_datetime(row["expires_at"])
+    if activated_at is None:
+        return None, "Не активирован"
+
+    now = utc_now()
+    if expires_at is not None and now >= expires_at:
+        return duration_days, f"Срок завершён: {duration_days} из {duration_days} дней"
+
+    activation_day = (now.date() - activated_at.date()).days + 1
+    activation_day = max(1, min(duration_days, activation_day))
+    return activation_day, f"Активен: день {activation_day} из {duration_days}"
+
+
 def _account_block_from_row(row) -> AccountBlockPublic:
     status, is_active, is_expired, remaining_days = _effective_status(str(row["status"]), row["expires_at"])
+    activation_day, activation_summary = _activation_progress_for_row(row)
+    title = _account_block_title_for_type(str(row["type"]))
+    owner_row = _fetch_user_row(int(row["owner_user_id"]))
+    owner_email = owner_row["email"] if owner_row is not None else None
+    email = owner_email if str(row["type"]) == "mail" else row["email"]
     return AccountBlockPublic(
         id=int(row["id"]),
         owner_user_id=int(row["owner_user_id"]),
         type=str(row["type"]),
-        title=str(row["title"]),
+        title=title,
         login=str(row["login"]),
-        email=row["email"],
+        email=email,
         status=status,
         duration_days=int(row["duration_days"]),
         activated_at=row["activated_at"],
         expires_at=row["expires_at"],
         remaining_days=remaining_days,
+        activation_day=activation_day,
+        activation_summary=activation_summary,
         is_active=is_active,
         is_expired=is_expired,
         created_by_user_id=row["created_by_user_id"],
@@ -343,10 +366,15 @@ def get_account_block_copy_data(
     if row is None:
         raise AccountBlockNotFoundError("account block not found")
     _assert_viewer_can_access_block(actor, int(row["owner_user_id"]))
+    owner_row = _fetch_user_row(int(row["owner_user_id"]), settings=settings)
+    owner_email = owner_row["email"] if owner_row is not None else None
+    email = row["email"]
+    if row["type"] == "mail":
+        email = owner_email
     return AccountBlockCopyData(
         login=str(row["login"]),
         password_secret=str(row["password_secret"]),
-        email=row["email"],
+        email=email,
     )
 
 
@@ -360,6 +388,9 @@ def create_account_block(
     payload = _normalize_account_block_input(data, create=True)
     owner_user_id = int(payload["owner_user_id"])
     _assert_owner_exists(owner_user_id, settings=settings)
+    owner_row = _fetch_user_row(owner_user_id, settings=settings)
+    owner_email = str(owner_row["email"]) if owner_row is not None else None
+    stored_email = owner_email if str(payload["type"]) == "mail" else None
     now_iso = utc_now_iso()
     with _connection(settings) as connection:
         cursor = connection.execute(
@@ -378,7 +409,7 @@ def create_account_block(
                 str(payload["title"]),
                 str(payload["login"]),
                 str(payload["password_secret"]),
-                payload["email"],
+                stored_email,
                 ACCOUNT_BLOCK_INACTIVE_STATUS,
                 int(payload["duration_days"]),
                 int(actor.id),
@@ -409,29 +440,12 @@ def update_account_block(
             raise AccountBlockNotFoundError("account block not found")
         updates: list[str] = []
         params: list[object] = []
-        if "owner_user_id" in payload:
-            owner_user_id = int(payload["owner_user_id"])
-            _assert_owner_exists(owner_user_id, settings=settings)
-            updates.append("owner_user_id = ?")
-            params.append(owner_user_id)
-        if "type" in payload:
-            updates.append("type = ?")
-            params.append(str(payload["type"]))
-        if "title" in payload:
-            updates.append("title = ?")
-            params.append(str(payload["title"]))
         if "login" in payload:
             updates.append("login = ?")
             params.append(str(payload["login"]))
         if "password_secret" in payload:
             updates.append("password_secret = ?")
             params.append(str(payload["password_secret"]))
-        if "email" in payload:
-            updates.append("email = ?")
-            params.append(payload["email"])
-        if "duration_days" in payload:
-            updates.append("duration_days = ?")
-            params.append(int(payload["duration_days"]))
         updates.append("updated_by_user_id = ?")
         params.append(int(actor.id))
         updates.append("updated_at = ?")
@@ -468,12 +482,8 @@ def _activation_notification_for_row(row, *, settings: Settings | None = None) -
     recipient_email = str(owner_row["email"])
     if not recipient_email:
         return None
-    title = str(row["title"])
-    type_label = {
-        "chatgpt": "ChatGPT",
-        "server": "Сервер",
-        "mail": "Почта",
-    }.get(str(row["type"]), str(row["type"]))
+    title = _account_block_title_for_type(str(row["type"]))
+    type_label = _account_block_type_label(str(row["type"]))
     activated_at = str(row["activated_at"])
     expires_at = str(row["expires_at"])
     subject = "Аккаунт в кабинете активирован"

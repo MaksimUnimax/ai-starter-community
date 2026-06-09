@@ -54,16 +54,12 @@
               </select>
             </label>
             <label class="form-row accounts-type-field">
-              <span>Тип нового блока</span>
+              <span>Тип блока</span>
               <select class="select" name="type" required>
                 {% for option in account_block_type_options %}
                   <option value="{{ option.value }}" {% if option.value == 'chatgpt' %}selected{% endif %}>{{ option.label }}</option>
                 {% endfor %}
               </select>
-            </label>
-            <label class="form-row accounts-field accounts-field--wide">
-              <span>Название</span>
-              <input class="input" name="title" type="text" placeholder="Например: Рабочий ChatGPT" required>
             </label>
             <label class="form-row accounts-field">
               <span>Логин</span>
@@ -72,10 +68,6 @@
             <label class="form-row accounts-field">
               <span>Пароль</span>
               <input class="input" name="password_secret" type="text" placeholder="Пароль" autocomplete="off">
-            </label>
-            <label class="form-row accounts-field accounts-field--wide">
-              <span>Почта</span>
-              <input class="input" name="email" type="email" placeholder="mail@example.com" autocomplete="email">
             </label>
             <p class="form-help accounts-duration-note">После активации блок работает {{ account_block_duration_days }} дней.</p>
             <button class="button button-primary" type="submit">Добавить блок</button>
@@ -137,75 +129,8 @@
                       </div>
                     </header>
 
-                    {% if account_blocks_manage_mode %}
-                      <form class="account-card__form" method="post" action="/cabinet/account-blocks/{{ block.id }}">
-                        <label class="account-field">
-                          <span>Название</span>
-                          <input class="input" name="title" type="text" value="{{ block.title|e }}" required>
-                        </label>
-                        <label class="account-field">
-                          <span>Владелец</span>
-                          <select class="select" name="owner_user_id" required>
-                            {% for owner in account_block_owner_options %}
-                              <option value="{{ owner.id }}" {% if owner.id == block.owner_user_id %}selected{% endif %}>
-                                {{ owner.display_label }}{% if owner.role_label %} · {{ owner.role_label }}{% endif %}
-                              </option>
-                            {% endfor %}
-                          </select>
-                        </label>
-                        <label class="account-field">
-                          <span>Тип</span>
-                          <select class="select" name="type" required>
-                            {% for option in account_block_type_options %}
-                              <option value="{{ option.value }}" {% if option.value == block.type %}selected{% endif %}>{{ option.label }}</option>
-                            {% endfor %}
-                          </select>
-                        </label>
-                        <label class="account-field">
-                          <span>Логин</span>
-                          <div class="account-field__control">
-                            <input class="input" name="login" type="text" value="{{ block.login|e }}" autocomplete="off">
-                            <button class="button button-secondary account-copy-button" type="button" data-account-copy>Скопировать</button>
-                          </div>
-                        </label>
-                        <label class="account-field">
-                          <span>Пароль</span>
-                          <div class="account-field__control">
-                            <input class="input" name="password_secret" type="text" value="{{ block.password_secret|e }}" autocomplete="off">
-                            <button class="button button-secondary account-copy-button" type="button" data-account-copy>Скопировать</button>
-                          </div>
-                        </label>
-                        <label class="account-field">
-                          <span>Почта</span>
-                          <div class="account-field__control">
-                            <input class="input" name="email" type="email" value="{{ (block.email or '')|e }}" autocomplete="email">
-                            <button class="button button-secondary account-copy-button" type="button" data-account-copy>Скопировать</button>
-                          </div>
-                        </label>
-                        <div class="account-card__details">
-                          <p class="account-card__detail">Срок: {{ block.duration_days }} дней</p>
-                          {% if block.is_active %}
-                            <p class="account-card__detail">Осталось: {{ block.remaining_days }} дн.</p>
-                          {% elif block.is_expired %}
-                            <p class="account-card__detail">Осталось: 0 дн.</p>
-                          {% else %}
-                            <p class="account-card__detail">Осталось после активации: {{ block.duration_days }} дн.</p>
-                          {% endif %}
-                          {% if block.activated_at %}
-                            <p class="account-card__detail">Активирован: {{ block.activated_at }}</p>
-                          {% endif %}
-                          {% if block.expires_at %}
-                            <p class="account-card__detail">Действует до: {{ block.expires_at }}</p>
-                          {% endif %}
-                        </div>
-                        <div class="account-actions">
-                          <button class="button button-primary account-card__save" type="submit">Сохранить</button>
-                          <button class="button button-secondary button-danger account-card__delete" type="submit" formaction="/cabinet/account-blocks/{{ block.id }}/delete" formnovalidate>Удалить</button>
-                          <button class="button button-primary account-card__activate" type="submit" formaction="/cabinet/account-blocks/{{ block.id }}/activate" formnovalidate>Активировать</button>
-                        </div>
-                      </form>
-                    {% else %}
-                      <div class="account-card__readonly">
+                    <div class="account-card__body">
+                      <div class="account-card__readonly" data-account-card-view>
                         <label class="account-field">
                           <span>Логин</span>
                           <div class="account-field__control">
@@ -220,33 +145,36 @@
                             <button class="button button-secondary account-copy-button" type="button" data-account-copy>Скопировать</button>
                           </div>
                         </label>
-                        {% if block.can_copy_email %}
-                          <label class="account-field">
-                            <span>Почта</span>
-                            <div class="account-field__control">
-                              <input class="input" type="email" value="{{ block.email|e }}" readonly>
-                              <button class="button button-secondary account-copy-button" type="button" data-account-copy>Скопировать</button>
-                            </div>
-                          </label>
-                        {% endif %}
                         <div class="account-card__details">
-                          <p class="account-card__detail">Срок: {{ block.duration_days }} дней</p>
-                          {% if block.is_active %}
-                            <p class="account-card__detail">Осталось: {{ block.remaining_days }} дн.</p>
-                          {% elif block.is_expired %}
-                            <p class="account-card__detail">Осталось: 0 дн.</p>
-                          {% else %}
-                            <p class="account-card__detail">Осталось после активации: {{ block.duration_days }} дн.</p>
-                          {% endif %}
-                          {% if block.activated_at %}
-                            <p class="account-card__detail">Активирован: {{ block.activated_at }}</p>
-                          {% endif %}
-                          {% if block.expires_at %}
-                            <p class="account-card__detail">Действует до: {{ block.expires_at }}</p>
-                          {% endif %}
+                          <p class="account-card__detail">{{ block.activation_summary }}</p>
+                          <p class="account-card__detail">Срок действия: {{ block.duration_days }} дней</p>
                         </div>
+                        {% if account_blocks_manage_mode %}
+                          <div class="account-actions account-actions--view">
+                            <button class="button button-secondary account-card__edit-toggle" type="button" data-account-card-edit-toggle>Редактировать</button>
+                            <button class="button button-secondary button-danger account-card__delete" type="submit" formaction="/cabinet/account-blocks/{{ block.id }}/delete" formnovalidate>Удалить</button>
+                            <button class="button button-primary account-card__activate" type="submit" formaction="/cabinet/account-blocks/{{ block.id }}/activate" formnovalidate>Активировать</button>
+                          </div>
+                        {% endif %}
                       </div>
-                    {% endif %}
+
+                      {% if account_blocks_manage_mode %}
+                        <form class="account-card__edit-form" method="post" action="/cabinet/account-blocks/{{ block.id }}" hidden data-account-card-edit-form>
+                          <label class="account-field">
+                            <span>Логин</span>
+                            <input class="input" name="login" type="text" value="{{ block.login|e }}" autocomplete="off">
+                          </label>
+                          <label class="account-field">
+                            <span>Пароль</span>
+                            <input class="input" name="password_secret" type="text" value="{{ block.password_secret|e }}" autocomplete="off">
+                          </label>
+                          <div class="account-actions account-actions--edit">
+                            <button class="button button-primary account-card__save" type="submit">Сохранить</button>
+                            <button class="button button-secondary account-card__cancel" type="button" data-account-card-edit-cancel>Отмена</button>
+                          </div>
+                        </form>
+                      {% endif %}
+                    </div>
                   </article>
                 {% endfor %}
               </div>
@@ -473,6 +401,40 @@
       };
 
       root.addEventListener("click", async (event) => {
+        const editToggle = event.target.closest("[data-account-card-edit-toggle]");
+        if (editToggle) {
+          const card = editToggle.closest(".account-card");
+          const view = card ? card.querySelector("[data-account-card-view]") : null;
+          const form = card ? card.querySelector("[data-account-card-edit-form]") : null;
+          if (view instanceof HTMLElement && form instanceof HTMLFormElement) {
+            view.hidden = true;
+            form.hidden = false;
+            card.classList.add("account-card--editing");
+            const firstInput = form.querySelector("input[name='login']");
+            if (firstInput instanceof HTMLInputElement) {
+              firstInput.focus();
+              if (typeof firstInput.select === "function") {
+                firstInput.select();
+              }
+            }
+          }
+          return;
+        }
+
+        const editCancel = event.target.closest("[data-account-card-edit-cancel]");
+        if (editCancel) {
+          const card = editCancel.closest(".account-card");
+          const view = card ? card.querySelector("[data-account-card-view]") : null;
+          const form = card ? card.querySelector("[data-account-card-edit-form]") : null;
+          if (view instanceof HTMLElement && form instanceof HTMLFormElement) {
+            form.reset();
+            form.hidden = true;
+            view.hidden = false;
+            card.classList.remove("account-card--editing");
+          }
+          return;
+        }
+
         const button = event.target.closest("[data-account-copy]");
         if (!button) {
           return;

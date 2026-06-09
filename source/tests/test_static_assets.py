@@ -50,20 +50,21 @@ def test_stylesheet_is_served(client):
     assert ".accounts-builder-shell" in response.text
     assert ".accounts-grid" in response.text
     assert ".account-card" in response.text
-    assert ".account-password-row" in response.text
-    assert "width: min(100%, 760px);" in response.text
+    assert ".account-card__body" in response.text
+    assert ".account-card__edit-form" in response.text
+    assert ".account-actions--view" in response.text
+    assert ".account-actions--edit" in response.text
+    assert "width: min(100%, 680px);" in response.text
     assert "grid-template-columns: repeat(2, minmax(0, 1fr));" in response.text
-    assert "width: min(100%, 300px);" in response.text
-    assert "max-width: 320px;" in response.text
+    assert "width: min(100%, 280px);" in response.text
+    assert "max-width: 300px;" in response.text
     assert ".accounts-builder .select {" in response.text
     assert "min-height: 38px;" in response.text
     assert ".accounts-builder .button {" in response.text
-    assert "grid-column: auto;" in response.text
-    assert "min-width: 180px;" in response.text
+    assert "grid-column: 1 / -1;" in response.text
+    assert "min-width: 160px;" in response.text
     assert ".account-card__delete {" in response.text
     assert ".account-actions {" in response.text
-    assert "display: grid;" in response.text
-    assert "grid-template-columns: repeat(2, minmax(0, 1fr));" in response.text
     assert ".account-actions .button {" in response.text
     assert ".account-actions .button:disabled {" in response.text
     assert ".account-password-toggle {" in response.text
@@ -99,6 +100,18 @@ def test_stylesheet_is_served(client):
     assert ".paid-option__buy {" in response.text
     assert ".paid-options-notice {" in response.text
     assert "margin-top: auto;" in response.text
+
+    assert "font-size: clamp(1.2rem, 1.8vw, 1.55rem);" in response.text
+    assert ".account-card__detail {" in response.text
+    assert "Срок завершён" not in response.text
+    assert "Осталось после активации" not in response.text
+
+    template_path = Path(__file__).resolve().parents[1] / "app" / "user_cabinet" / "templates" / "cabinet.html"
+    template_text = template_path.read_text(encoding="utf-8")
+    assert 'name="title"' not in template_text
+    assert 'name="email"' not in template_text
+    assert "Осталось после активации" not in template_text
+    assert "data-account-card-edit-form" in template_text
 
 
 def test_cabinet_local_accounts_script_is_served(client):
