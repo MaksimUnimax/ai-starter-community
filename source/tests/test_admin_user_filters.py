@@ -109,6 +109,9 @@ def test_admin_users_page_filter_form_and_labels(client, test_settings):
     assert "Сначала старые" in body
     assert "Применить фильтр" in body
     assert "Сбросить" in body
+    assert "Сделать модератором" in body
+    assert "Убрать модератора" in body
+    assert "Администратор" in body
 
 
 def test_admin_users_page_query_param_guard_behavior(client, test_settings):
@@ -283,4 +286,3 @@ def test_list_users_for_admin_supports_filters_and_safe_fields(test_settings):
 
     users_from = list_users_for_admin(settings=test_settings, created_from=datetime(2026, 1, 12, tzinfo=timezone.utc).date())
     assert [user["email"] for user in users_from] == ["admin-new@example.com", "moderator-mid@example.com"]
-

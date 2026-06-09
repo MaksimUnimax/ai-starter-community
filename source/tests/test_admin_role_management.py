@@ -11,9 +11,12 @@ from app.auth.service import (
     RoleError,
     authenticate_user,
     create_session,
+    can_manage_moderators,
     normalize_role,
     register_user,
     role_label_ru,
+    is_admin_role,
+    is_moderator_role,
     update_user_role,
     verify_email,
 )
@@ -76,14 +79,21 @@ def test_role_policy_is_explicit_and_labeled_in_russian():
         "admin": "администратор",
     }
     assert role_label_ru("moderator") == "модератор"
+    assert is_admin_role("admin")
+    assert is_moderator_role("moderator")
+    assert can_manage_moderators("admin")
+    assert not can_manage_moderators("moderator")
+    assert not can_manage_moderators("user")
     with pytest.raises(RoleError):
         normalize_role("owner")
 
 
-def test_update_user_role_rejects_unknown_role(test_settings):
+def test_update_user_role_rejects_unknown_or_admin_role(test_settings):
     user = _create_verified_user(test_settings, "role-invalid@example.com", "roleinvalid")
     with pytest.raises(RoleError):
         update_user_role(user_id=user.id, new_role="owner", settings=test_settings)
+    with pytest.raises(RoleError):
+        update_user_role(user_id=user.id, new_role="admin", settings=test_settings)
 
 
 def test_admin_users_page_shows_role_management_controls(client, test_settings):
@@ -94,8 +104,9 @@ def test_admin_users_page_shows_role_management_controls(client, test_settings):
     response = client.get("/admin/users")
     assert response.status_code == 200
     body = response.text
-    assert "Изменить роль" in body
-    assert "Сохранить роль" in body
+    assert "Модератор" in body
+    assert "Сделать модератором" in body
+    assert "Убрать модератора" not in body
     assert "пользователь" in body
     assert "модератор" in body
     assert "администратор" in body
@@ -108,7 +119,7 @@ def test_admin_users_page_shows_role_management_controls(client, test_settings):
     assert "email_outbox" not in body.lower()
 
 
-def test_admin_can_change_user_roles(client, test_settings):
+def test_admin_can_assign_and_remove_moderator_role(client, test_settings):
     admin = _create_verified_user(test_settings, "role-admin@example.com", "roleadmin", role="admin")
     target = _create_verified_user(test_settings, "role-target@example.com", "roletarget")
     _login_as(client, test_settings, admin.email)
@@ -123,32 +134,38 @@ def test_admin_can_change_user_roles(client, test_settings):
     assert _role_for_email(test_settings, target.email) == "user"
 
     response = client.post(f"/admin/users/{target.id}/role", data={"role": "admin"}, follow_redirects=False)
-    assert response.status_code == 303
-    assert _role_for_email(test_settings, target.email) == "admin"
+    assert response.status_code == 400
+    assert "модератора" in response.text.lower()
+    assert _role_for_email(test_settings, target.email) == "user"
 
 
-def test_admin_role_change_rejects_invalid_role(client, test_settings):
+def test_admin_role_change_rejects_invalid_and_admin_role(client, test_settings):
     admin = _create_verified_user(test_settings, "invalid-admin@example.com", "invalidadmin", role="admin")
     target = _create_verified_user(test_settings, "invalid-target@example.com", "invalidtarget")
     _login_as(client, test_settings, admin.email)
 
     response = client.post(f"/admin/users/{target.id}/role", data={"role": "owner"})
     assert response.status_code == 400
-    assert "Выберите допустимую роль" in response.text
+    assert "модератора" in response.text.lower()
+    assert _role_for_email(test_settings, target.email) == "user"
+
+    response = client.post(f"/admin/users/{target.id}/role", data={"role": "admin"})
+    assert response.status_code == 400
+    assert "модератора" in response.text.lower()
     assert _role_for_email(test_settings, target.email) == "user"
 
 
-def test_last_admin_cannot_be_demoted(client, test_settings):
+def test_admin_cannot_be_demoted_through_moderator_assignment(client, test_settings):
     admin = _create_verified_user(test_settings, "last-admin@example.com", "lastadmin", role="admin")
     _login_as(client, test_settings, admin.email)
 
     response = client.post(f"/admin/users/{admin.id}/role", data={"role": "user"})
     assert response.status_code == 400
-    assert "последнего администратора" in response.text
+    assert "администратора" in response.text.lower()
     assert _role_for_email(test_settings, admin.email) == "admin"
 
 
-def test_non_admin_moderator_and_anonymous_cannot_change_roles(client, test_settings):
+def test_non_admin_moderator_user_and_anonymous_cannot_change_roles(client, test_settings):
     target = _create_verified_user(test_settings, "protected-target@example.com", "protectedtarget")
 
     anonymous_response = client.post(f"/admin/users/{target.id}/role", data={"role": "admin"}, follow_redirects=False)
@@ -157,12 +174,12 @@ def test_non_admin_moderator_and_anonymous_cannot_change_roles(client, test_sett
 
     _create_verified_user(test_settings, "normal-poster@example.com", "normalposter")
     _login_as(client, test_settings, "normal-poster@example.com")
-    user_response = client.post(f"/admin/users/{target.id}/role", data={"role": "admin"})
+    user_response = client.post(f"/admin/users/{target.id}/role", data={"role": "moderator"})
     assert user_response.status_code == 403
 
     client.cookies.clear()
     _create_verified_user(test_settings, "moderator-poster@example.com", "moderatorposter", role="moderator")
     _login_as(client, test_settings, "moderator-poster@example.com")
-    moderator_response = client.post(f"/admin/users/{target.id}/role", data={"role": "admin"})
+    moderator_response = client.post(f"/admin/users/{target.id}/role", data={"role": "moderator"})
     assert moderator_response.status_code == 403
     assert _role_for_email(test_settings, target.email) == "user"

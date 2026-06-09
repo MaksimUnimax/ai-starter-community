@@ -144,7 +144,7 @@ def test_admin_users_shows_safe_fields_and_hides_sensitive_data(client, test_set
     assert "Электронная почта" in body
     assert "Логин" in body
     assert "Роль" in body
-    assert "Изменить роль" in body
+    assert "Модератор" in body
     assert "Активен" in body
     assert "Подтверждён email" in body
     assert "Статус доступа" in body
@@ -152,7 +152,8 @@ def test_admin_users_shows_safe_fields_and_hides_sensitive_data(client, test_set
     assert "администратор" in body
     assert "пользователь" in body
     assert "модератор" in body
-    assert "Сохранить роль" in body
+    assert "Сделать модератором" in body
+    assert "Убрать модератора" not in body
     assert "/admin/users/" in body
     assert "/role" in body
     assert "подтверждён" in body

@@ -139,8 +139,10 @@ def _status_label(value: str) -> str:
 
 def _role_error_response(message: str) -> PlainTextResponse:
     lowered = message.lower()
-    if "last admin" in lowered:
-        text = "Нельзя изменить роль последнего администратора."
+    if "admin role cannot be changed" in lowered:
+        text = "Нельзя изменить роль администратора."
+    elif "unsupported moderator role" in lowered:
+        text = "Можно только назначать или убирать модератора."
     elif "unsupported role" in lowered:
         text = "Выберите допустимую роль."
     else:
@@ -769,6 +771,8 @@ async def admin_user_role_update(request: Request, user_id: int):
         return response
     form = await request.form()
     role = _normalize_text(form.get("role"))
+    if role not in {"user", "moderator"}:
+        return _role_error_response("unsupported moderator role")
     try:
         update_user_role(user_id=user_id, new_role=role, settings=settings)
     except AuthNotFoundError:

@@ -5,7 +5,7 @@
     <div class="stack">
       <p class="muted">Просмотр безопасных данных</p>
       <h1 class="section-title">Пользователи</h1>
-      <p class="form-help">Показаны только безопасные поля учётных записей.</p>
+      <p class="form-help">Показаны только безопасные поля учётных записей. Через эту страницу можно только назначать и убирать модераторов.</p>
     </div>
 
     <form class="stack" method="get" action="/admin/users">
@@ -57,7 +57,7 @@
           <th>Электронная почта</th>
           <th>Логин</th>
           <th>Роль</th>
-          <th>Изменить роль</th>
+          <th>Модератор</th>
           <th>Активен</th>
           <th>Подтверждён email</th>
           <th>Статус доступа</th>
@@ -76,17 +76,19 @@
               {{ user.role_label }}
             </td>
             <td>
-              <form class="compact-form" method="post" action="/admin/users/{{ user.id }}/role{% if query_string %}?{{ query_string }}{% endif %}">
-                <label class="form-row">
-                  <span class="muted">Роль</span>
-                  <select class="select" name="role">
-                    {% for role in allowed_roles %}
-                      <option value="{{ role }}" {% if user.role == role %}selected{% endif %}>{{ role_labels[role] }}</option>
-                    {% endfor %}
-                  </select>
-                </label>
-                <button class="button button-secondary" type="submit">Сохранить роль</button>
-              </form>
+              {% if user.role == "admin" %}
+                <span class="badge badge-muted">Администратор</span>
+              {% elif user.role == "moderator" %}
+                <form class="compact-form" method="post" action="/admin/users/{{ user.id }}/role{% if query_string %}?{{ query_string }}{% endif %}">
+                  <input type="hidden" name="role" value="user">
+                  <button class="button button-secondary" type="submit">Убрать модератора</button>
+                </form>
+              {% else %}
+                <form class="compact-form" method="post" action="/admin/users/{{ user.id }}/role{% if query_string %}?{{ query_string }}{% endif %}">
+                  <input type="hidden" name="role" value="moderator">
+                  <button class="button button-primary" type="submit">Сделать модератором</button>
+                </form>
+              {% endif %}
             </td>
             <td>{{ "да" if user.is_active else "нет" }}</td>
             <td>{{ "подтверждён" if user.email_verified else "не подтверждён" }}</td>

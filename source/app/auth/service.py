@@ -160,6 +160,10 @@ def is_admin_role(role: str) -> bool:
     return role == ROLE_ADMIN
 
 
+def is_moderator_role(role: str) -> bool:
+    return role == ROLE_MODERATOR
+
+
 def has_staff_materials_access(role: str) -> bool:
     return role in {ROLE_ADMIN, ROLE_MODERATOR}
 
@@ -172,6 +176,16 @@ def can_manage_account_blocks(subject: UserPublic | str | None) -> bool:
     else:
         role = str(subject)
     return role.strip().lower() in ACCOUNT_BLOCK_MANAGEMENT_ROLES
+
+
+def can_manage_moderators(subject: UserPublic | str | None) -> bool:
+    if isinstance(subject, UserPublic):
+        role = subject.role
+    elif subject is None:
+        role = ""
+    else:
+        role = str(subject)
+    return is_admin_role(role.strip().lower())
 
 
 def user_can_access_materials(user: UserPublic | None) -> bool:
@@ -362,18 +376,18 @@ def update_user_role(
 ) -> UserPublic:
     resolved = _settings(settings)
     normalized_role = normalize_role(new_role)
+    if normalized_role not in {ROLE_USER, ROLE_MODERATOR}:
+        raise RoleError("unsupported moderator role")
     with _connection(resolved) as connection:
         row = connection.execute("SELECT * FROM users WHERE id = ?", (int(user_id),)).fetchone()
         if row is None:
             raise NotFoundError("user not found")
 
         current_role = str(row["role"])
-        if is_admin_role(current_role) and not is_admin_role(normalized_role):
-            admin_count = int(
-                connection.execute("SELECT COUNT(*) AS count FROM users WHERE role = ?", (ROLE_ADMIN,)).fetchone()["count"]
-            )
-            if admin_count <= 1:
-                raise RoleError("last admin cannot be demoted")
+        if not is_admin_role(current_role) and current_role not in {ROLE_USER, ROLE_MODERATOR}:
+            raise RoleError("unsupported role")
+        if is_admin_role(current_role):
+            raise RoleError("admin role cannot be changed through moderator assignment")
 
         if current_role == normalized_role:
             return _public_user_from_row(row)
