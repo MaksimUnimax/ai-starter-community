@@ -5,6 +5,7 @@ import sqlite3
 
 from app.auth.service import authenticate_user, create_session, register_user, verify_email
 from app.shared.db import get_database_path
+from app.tariffs.service import create_tariff
 
 
 def _connect(settings):
@@ -50,7 +51,8 @@ def test_landing_page(client):
     assert "Начать первый проект" in response.text
     assert "Войти" in response.text
     assert "Вы покупаете не курс, а первый управляемый опыт разработки" in response.text
-    assert "Стартовый месяц OpenScript — 4 990 ₽" in response.text
+    assert "Актуальный тариф на главной выбирается из каталога" in response.text
+    assert "4 990 ₽" not in response.text
     assert "Вопросы перед стартом" in response.text
     assert 'href="#how-it-works"' in response.text
     assert 'href="/login"' in response.text
@@ -60,6 +62,38 @@ def test_landing_page(client):
     assert "ИНН: 741705866660" in response.text
     assert "ОГРНИП: 320745600093211" in response.text
     assert "OpenScripts@yandex.com" in response.text
+
+
+def test_landing_page_uses_homepage_tariff_from_db(client, test_settings):
+    create_tariff(
+        code="landing_homepage_tariff",
+        title="Стартовый месяц OpenScript",
+        description="Это активный тариф для показа на главной.",
+        price_amount_minor=699000,
+        currency="RUB",
+        status="active",
+        show_on_homepage=True,
+        sort_order=1,
+        settings=test_settings,
+    )
+    create_tariff(
+        code="landing_hidden_tariff",
+        title="Скрытый тариф для главной",
+        description="Этот тариф не должен попадать в блок цены.",
+        price_amount_minor=499000,
+        currency="RUB",
+        status="active",
+        show_on_homepage=False,
+        sort_order=0,
+        settings=test_settings,
+    )
+
+    response = client.get("/")
+    assert response.status_code == 200
+    assert "Стартовый месяц OpenScript — 6 990 ₽" in response.text
+    assert "Это активный тариф для показа на главной." in response.text
+    assert "4 990 ₽" not in response.text
+    assert "Скрытый тариф для главной" not in response.text
 
 
 def test_authenticated_landing_page_switches_to_account_and_learning_links(client, test_settings):
