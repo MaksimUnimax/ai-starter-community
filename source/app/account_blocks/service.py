@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 from dataclasses import asdict, fields
 from datetime import timedelta
-from math import floor
+from math import ceil
 
 from app.auth.schemas import UserPublic
 from app.auth.service import can_manage_account_blocks
@@ -122,6 +122,16 @@ def _normalize_duration_days(value: int | str | None, *, default: int = DEFAULT_
     return normalized
 
 
+def _remaining_days_label(remaining_days: int) -> str:
+    if remaining_days == 1:
+        suffix = "день"
+    elif 2 <= remaining_days % 10 <= 4 and not 12 <= remaining_days % 100 <= 14:
+        suffix = "дня"
+    else:
+        suffix = "дней"
+    return f"Осталось {remaining_days} {suffix}"
+
+
 def _normalize_owner_user_id(value: int | str | None, field_name: str = "owner_user_id") -> int:
     if value is None:
         raise AccountBlockValidationError(f"{field_name} is required")
@@ -180,7 +190,7 @@ def _normalize_account_block_input(data: AccountBlockCreateInput | AccountBlockU
             "title": _account_block_title_for_type(block_type),
             "login": login,
             "password_secret": password_secret,
-            "duration_days": DEFAULT_ACCOUNT_BLOCK_DURATION_DAYS,
+            "duration_days": _normalize_duration_days(payload.get("duration_days")),
         }
 
     payload = {field.name: getattr(data, field.name) for field in fields(data)}
@@ -224,8 +234,8 @@ def _effective_status(stored_status: str, expires_at: str | None) -> tuple[str, 
             return ACCOUNT_BLOCK_INACTIVE_STATUS, False, False, None
         if now >= expires_dt:
             return ACCOUNT_BLOCK_EXPIRED_STATUS, False, True, 0
-        remaining_seconds = max(0, int((expires_dt - now).total_seconds()))
-        remaining_days = max(0, floor(remaining_seconds / 86400))
+        remaining_seconds = max(0, (expires_dt - now).total_seconds())
+        remaining_days = max(0, int(ceil(remaining_seconds / 86400)))
         return ACCOUNT_BLOCK_ACTIVE_STATUS, True, False, remaining_days
     if normalized_status == ACCOUNT_BLOCK_EXPIRED_STATUS:
         return ACCOUNT_BLOCK_EXPIRED_STATUS, False, True, 0 if expires_at else None
@@ -241,19 +251,17 @@ def _parse_iso_datetime(value: str | None):
 
 
 def _activation_progress_for_row(row) -> tuple[int | None, str]:
-    duration_days = int(row["duration_days"] or DEFAULT_ACCOUNT_BLOCK_DURATION_DAYS)
     activated_at = _parse_iso_datetime(row["activated_at"])
     expires_at = _parse_iso_datetime(row["expires_at"])
     if activated_at is None:
         return None, "Не активирован"
 
-    now = utc_now()
-    if expires_at is not None and now >= expires_at:
-        return duration_days, "Срок завершён"
-
-    activation_day = (now.date() - activated_at.date()).days + 1
-    activation_day = max(1, min(duration_days, activation_day))
-    return activation_day, f"Активен: день {activation_day}"
+    status, is_active, is_expired, remaining_days = _effective_status(str(row["status"]), row["expires_at"])
+    if is_active and remaining_days is not None:
+        return remaining_days, _remaining_days_label(remaining_days)
+    if is_expired:
+        return 0, "Срок завершён"
+    return None, "Не активирован"
 
 
 def _account_block_from_row(row) -> AccountBlockPublic:
@@ -515,6 +523,7 @@ def activate_account_block(
     *,
     actor: UserPublic,
     block_id: int,
+    duration_days: int | None = None,
     settings: Settings | None = None,
 ) -> AccountBlockActivationResult:
     _assert_actor_can_manage(actor)
@@ -524,12 +533,16 @@ def activate_account_block(
         row = connection.execute("SELECT * FROM account_blocks WHERE id = ?", (int(block_id),)).fetchone()
         if row is None:
             raise AccountBlockNotFoundError("account block not found")
-        duration_days = int(row["duration_days"] or DEFAULT_ACCOUNT_BLOCK_DURATION_DAYS)
-        expires_at = (now + timedelta(days=duration_days)).isoformat()
+        resolved_duration_days = _normalize_duration_days(
+            duration_days,
+            default=int(row["duration_days"] or DEFAULT_ACCOUNT_BLOCK_DURATION_DAYS),
+        )
+        expires_at = (now + timedelta(days=resolved_duration_days)).isoformat()
         connection.execute(
             """
             UPDATE account_blocks
             SET status = ?,
+                duration_days = ?,
                 activated_at = ?,
                 expires_at = ?,
                 activated_by_user_id = ?,
@@ -539,6 +552,7 @@ def activate_account_block(
             """,
             (
                 ACCOUNT_BLOCK_ACTIVE_STATUS,
+                resolved_duration_days,
                 now_iso,
                 expires_at,
                 int(actor.id),
@@ -555,3 +569,50 @@ def activate_account_block(
         block=_public_view_for_block(updated),
         notification=notification,
     )
+
+
+def renew_account_block(
+    *,
+    actor: UserPublic,
+    block_id: int,
+    duration_days: int | None = None,
+    settings: Settings | None = None,
+) -> AccountBlockPublic:
+    _assert_actor_can_manage(actor)
+    now = utc_now()
+    with _connection(settings) as connection:
+        row = connection.execute("SELECT * FROM account_blocks WHERE id = ?", (int(block_id),)).fetchone()
+        if row is None:
+            raise AccountBlockNotFoundError("account block not found")
+        if str(row["status"]) != ACCOUNT_BLOCK_ACTIVE_STATUS:
+            raise AccountBlockValidationError("renewal requires an active account block")
+        expires_at = _parse_iso_datetime(row["expires_at"])
+        if expires_at is None or now >= expires_at:
+            raise AccountBlockValidationError("renewal requires an active account block")
+        resolved_duration_days = _normalize_duration_days(
+            duration_days,
+            default=int(row["duration_days"] or DEFAULT_ACCOUNT_BLOCK_DURATION_DAYS),
+        )
+        new_expires_at = (expires_at + timedelta(days=resolved_duration_days)).isoformat()
+        now_iso = utc_now_iso()
+        connection.execute(
+            """
+            UPDATE account_blocks
+            SET duration_days = ?,
+                expires_at = ?,
+                updated_by_user_id = ?,
+                updated_at = ?
+            WHERE id = ?
+            """,
+            (
+                resolved_duration_days,
+                new_expires_at,
+                int(actor.id),
+                now_iso,
+                int(block_id),
+            ),
+        )
+        updated = connection.execute("SELECT * FROM account_blocks WHERE id = ?", (int(block_id),)).fetchone()
+        if updated is None:
+            raise AccountBlockError("account block renewal failed")
+        return _public_view_for_block(updated)

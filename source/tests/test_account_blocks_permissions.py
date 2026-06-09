@@ -50,3 +50,8 @@ def test_account_block_management_helper_accepts_user_objects():
     assert can_manage_account_blocks(moderator)
     assert not can_manage_account_blocks(user)
 
+
+def test_account_block_management_roles_are_the_only_staff_roles():
+    assert can_manage_account_blocks("ADMIN")
+    assert can_manage_account_blocks(" moderator ")
+    assert not can_manage_account_blocks("guest")

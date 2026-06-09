@@ -10,9 +10,11 @@ import pytest
 from app.account_blocks.schemas import AccountBlockCreateInput
 from app.account_blocks.service import (
     AccountBlockPermissionError,
+    AccountBlockValidationError,
     activate_account_block,
     create_account_block,
     get_account_block_public,
+    renew_account_block,
 )
 from app.auth.service import authenticate_user, register_user, verify_email
 from app.shared.db import get_database_path
@@ -52,7 +54,7 @@ def _create_verified_user(test_settings, email: str, login: str, role: str = "us
     return authenticate_user(email, "Secret123", settings=test_settings)
 
 
-def test_activation_sets_elapsed_day_counter_and_prepares_notification_without_sending_email(test_settings):
+def test_activation_sets_remaining_day_counter_and_prepares_notification_without_sending_email(test_settings):
     admin = _create_verified_user(test_settings, "act-admin@example.com", "actadmin", role="admin")
     owner = _create_verified_user(test_settings, "act-owner@example.com", "actowner")
     block = create_account_block(
@@ -62,6 +64,7 @@ def test_activation_sets_elapsed_day_counter_and_prepares_notification_without_s
             type="mail",
             login="mail-login",
             password_secret="mail-secret",
+            duration_days=30,
         ),
         settings=test_settings,
     )
@@ -73,10 +76,11 @@ def test_activation_sets_elapsed_day_counter_and_prepares_notification_without_s
     assert result.block.status == "active"
     assert result.block.is_active is True
     assert result.block.is_expired is False
-    assert result.block.activation_day == 1
-    assert result.block.activation_summary == "Активен: день 1"
+    assert result.block.remaining_days == 30
+    assert result.block.activation_day == 30
+    assert result.block.activation_summary == "Осталось 30 дней"
     assert result.block.activated_at == fixed_now.isoformat()
-    assert result.block.expires_at == (fixed_now + timedelta(days=60)).isoformat()
+    assert result.block.expires_at == (fixed_now + timedelta(days=30)).isoformat()
     assert result.block.activated_by_user_id == admin.id
     assert result.notification is not None
     assert result.notification.recipient_email == owner.email
@@ -96,7 +100,7 @@ def test_activation_sets_elapsed_day_counter_and_prepares_notification_without_s
     assert activation_logs == []
 
 
-def test_elapsed_day_counter_reaches_day_17_and_caps_at_day_60(test_settings):
+def test_remaining_day_counter_decreases_and_expired_blocks_show_zero(test_settings):
     admin = _create_verified_user(test_settings, "react-admin@example.com", "reactadmin", role="admin")
     owner = _create_verified_user(test_settings, "react-owner@example.com", "reactowner")
     block = create_account_block(
@@ -106,6 +110,7 @@ def test_elapsed_day_counter_reaches_day_17_and_caps_at_day_60(test_settings):
             type="server",
             login="server-login",
             password_secret="server-secret",
+            duration_days=60,
         ),
         settings=test_settings,
     )
@@ -122,28 +127,32 @@ def test_elapsed_day_counter_reaches_day_17_and_caps_at_day_60(test_settings):
         day_17_view = get_account_block_public(actor=owner, block_id=block.id, settings=test_settings)
     assert day_17_view.is_active is True
     assert day_17_view.is_expired is False
-    assert day_17_view.activation_day == 17
-    assert day_17_view.activation_summary == "Активен: день 17"
+    assert day_17_view.remaining_days == 44
+    assert day_17_view.activation_day == 44
+    assert day_17_view.activation_summary == "Осталось 44 дня"
 
     with patch("app.account_blocks.service.utc_now", return_value=day_60_now):
         day_60_view = get_account_block_public(actor=owner, block_id=block.id, settings=test_settings)
     assert day_60_view.is_active is True
     assert day_60_view.is_expired is False
-    assert day_60_view.activation_day == 60
-    assert day_60_view.activation_summary == "Активен: день 60"
+    assert day_60_view.remaining_days == 1
+    assert day_60_view.activation_day == 1
+    assert day_60_view.activation_summary == "Осталось 1 день"
 
     with patch("app.account_blocks.service.utc_now", return_value=expired_now):
         expired_view = get_account_block_public(actor=owner, block_id=block.id, settings=test_settings)
     assert expired_view.status == "expired"
     assert expired_view.is_active is False
     assert expired_view.is_expired is True
-    assert expired_view.activation_day == 60
+    assert expired_view.remaining_days == 0
+    assert expired_view.activation_day == 0
     assert expired_view.activation_summary == "Срок завершён"
 
     with patch("app.account_blocks.service.utc_now", return_value=expired_now):
         reactivated = activate_account_block(actor=admin, block_id=block.id, settings=test_settings)
-    assert reactivated.block.activation_day == 1
-    assert reactivated.block.activation_summary == "Активен: день 1"
+    assert reactivated.block.remaining_days == 60
+    assert reactivated.block.activation_day == 60
+    assert reactivated.block.activation_summary == "Осталось 60 дней"
     assert reactivated.block.expires_at == (expired_now + timedelta(days=60)).isoformat()
 
 
@@ -162,3 +171,48 @@ def test_user_cannot_activate_account_blocks(test_settings):
     )
     with pytest.raises(AccountBlockPermissionError):
         activate_account_block(actor=owner, block_id=block.id, settings=test_settings)
+
+
+def test_renewal_adds_selected_duration_to_remaining_time_and_rejects_inactive_blocks(test_settings):
+    admin = _create_verified_user(test_settings, "renew-admin@example.com", "renewadmin", role="admin")
+    owner = _create_verified_user(test_settings, "renew-owner@example.com", "renewowner")
+    block = create_account_block(
+        actor=admin,
+        data=AccountBlockCreateInput(
+            owner_user_id=owner.id,
+            type="chatgpt",
+            login="renew-login",
+            password_secret="renew-secret",
+            duration_days=30,
+        ),
+        settings=test_settings,
+    )
+
+    activation_now = datetime(2026, 6, 1, 9, 0, 0, tzinfo=timezone.utc)
+    renewal_now = activation_now + timedelta(days=22)
+
+    with patch("app.account_blocks.service.utc_now", return_value=activation_now):
+        activate_account_block(actor=admin, block_id=block.id, settings=test_settings)
+
+    with patch("app.account_blocks.service.utc_now", return_value=renewal_now):
+        renewed = renew_account_block(actor=admin, block_id=block.id, duration_days=30, settings=test_settings)
+
+    assert renewed.remaining_days == 38
+    assert renewed.activation_day == 38
+    assert renewed.activation_summary == "Осталось 38 дней"
+    assert renewed.expires_at == (renewal_now + timedelta(days=38)).isoformat()
+
+    inactive_block = create_account_block(
+        actor=admin,
+        data=AccountBlockCreateInput(
+            owner_user_id=owner.id,
+            type="server",
+            login="inactive-login",
+            password_secret="inactive-secret",
+            duration_days=30,
+        ),
+        settings=test_settings,
+    )
+    with patch("app.account_blocks.service.utc_now", return_value=renewal_now):
+        with pytest.raises(AccountBlockValidationError):
+            renew_account_block(actor=admin, block_id=inactive_block.id, duration_days=30, settings=test_settings)

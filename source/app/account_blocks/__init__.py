@@ -20,6 +20,6 @@ from .service import (
     get_account_block_copy_data,
     get_account_block_public,
     list_account_blocks_for_viewer,
+    renew_account_block,
     update_account_block,
 )
-

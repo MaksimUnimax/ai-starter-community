@@ -243,6 +243,13 @@ def _fetch_user_by_id(user_id: int, settings: Settings | None = None) -> UserPub
         return _public_user_from_row(row) if row else None
 
 
+def get_user_by_email(email: str, settings: Settings | None = None) -> UserPublic | None:
+    normalized_email = _normalize_email(email)
+    with _connection(settings) as connection:
+        row = connection.execute("SELECT * FROM users WHERE email = ?", (normalized_email,)).fetchone()
+        return _public_user_from_row(row) if row else None
+
+
 def get_current_user_from_cookies(
     cookies: Mapping[str, str],
     settings: Settings | None = None,

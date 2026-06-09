@@ -15,6 +15,7 @@ from app.account_blocks.service import (
     get_account_block_copy_data,
     get_account_block_public,
     list_account_blocks_for_viewer,
+    renew_account_block,
     update_account_block,
 )
 from app.auth.service import authenticate_user, create_session, register_user, verify_email
@@ -102,6 +103,7 @@ def test_admin_and_moderator_can_create_update_list_and_delete_blocks_with_deriv
             login="chat-login",
             password_secret="chat-secret",
             email="ignored@example.com",
+            duration_days=45,
         ),
         settings=test_settings,
     )
@@ -121,6 +123,7 @@ def test_admin_and_moderator_can_create_update_list_and_delete_blocks_with_deriv
     assert admin_block.owner_user_id == owner.id
     assert admin_block.title == "ChatGPT"
     assert admin_block.email is None
+    assert admin_block.duration_days == 45
     assert moderator_block.owner_user_id == other_owner.id
     assert moderator_block.title == "Почта"
     assert moderator_block.email == other_owner.email
@@ -222,6 +225,8 @@ def test_user_can_only_view_own_blocks_and_cannot_manage(test_settings):
         )
     with pytest.raises(AccountBlockPermissionError):
         delete_account_block(actor=owner, block_id=block.id, settings=test_settings)
+    with pytest.raises(AccountBlockPermissionError):
+        renew_account_block(actor=owner, block_id=block.id, settings=test_settings)
     with pytest.raises(AccountBlockPermissionError):
         get_account_block_public(actor=other_owner, block_id=block.id, settings=test_settings)
     with pytest.raises(AccountBlockPermissionError):

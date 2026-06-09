@@ -51,6 +51,9 @@ def test_anonymous_admin_redirects_to_login(client):
     head_response = client.head("/admin", follow_redirects=False)
     assert head_response.status_code == 303
     assert head_response.headers["location"] == "/login"
+    response = client.get("/admin/account-blocks", follow_redirects=False)
+    assert response.status_code == 303
+    assert response.headers["location"] == "/login"
 
 
 def test_normal_user_gets_forbidden_on_admin(client, test_settings):
@@ -60,6 +63,8 @@ def test_normal_user_gets_forbidden_on_admin(client, test_settings):
     assert "Доступ запрещён" in response.text
     assert "прав администратора" in response.text
     assert "Forbidden" not in response.text
+    response = client.get("/admin/account-blocks")
+    assert response.status_code == 403
 
 
 def test_moderator_gets_forbidden_on_admin(client, test_settings):
@@ -68,6 +73,8 @@ def test_moderator_gets_forbidden_on_admin(client, test_settings):
     assert response.status_code == 403
     assert "Доступ запрещён" in response.text
     assert "прав администратора" in response.text
+    response = client.get("/admin/account-blocks")
+    assert response.status_code == 403
 
 
 def test_admin_user_can_open_admin_dashboard(client, test_settings):
@@ -80,6 +87,7 @@ def test_admin_user_can_open_admin_dashboard(client, test_settings):
     assert "Электронная почта" in response.text
     assert "Создание, редактирование и архивирование уже доступны в списках тарифов и платных опций." in response.text
     assert "Пользователи" in response.text
+    assert "Блоки аккаунтов" in response.text
     assert "Тарифы" in response.text
     assert "Платные опции" in response.text
     assert "Работа с ИИ" in response.text
@@ -87,6 +95,7 @@ def test_admin_user_can_open_admin_dashboard(client, test_settings):
     assert "Выйти" in response.text
     assert "На главную" in response.text
     assert '/admin/users' in response.text
+    assert '/admin/account-blocks' in response.text
     assert '/admin/tariffs' in response.text
     assert '/admin/paid-options' in response.text
     assert '/materials' in response.text
