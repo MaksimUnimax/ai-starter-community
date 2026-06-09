@@ -410,6 +410,39 @@ def update_user_role(
         return _public_user_from_row(updated)
 
 
+def set_user_materials_access(
+    *,
+    user_id: int,
+    granted: bool,
+    settings: Settings | None = None,
+) -> UserPublic:
+    resolved = _settings(settings)
+    target_access_status = "activated" if granted else "not_activated"
+    target_granted_at = utc_now_iso() if granted else None
+    with _connection(resolved) as connection:
+        row = connection.execute("SELECT * FROM users WHERE id = ?", (int(user_id),)).fetchone()
+        if row is None:
+            raise NotFoundError("user not found")
+        current_granted = row["materials_access_granted_at"] is not None
+        current_access_status = str(row["access_status"])
+        if current_granted == granted and current_access_status == target_access_status:
+            return _public_user_from_row(row)
+
+        now_iso = utc_now_iso()
+        connection.execute(
+            """
+            UPDATE users
+            SET materials_access_granted_at = ?, access_status = ?, updated_at = ?
+            WHERE id = ?
+            """,
+            (target_granted_at, target_access_status, now_iso, int(user_id)),
+        )
+        updated = connection.execute("SELECT * FROM users WHERE id = ?", (int(user_id),)).fetchone()
+        if updated is None:
+            raise AuthError("materials access update failed")
+        return _public_user_from_row(updated)
+
+
 def register_user(
     email: str,
     login: str,

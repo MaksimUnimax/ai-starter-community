@@ -149,13 +149,19 @@ def test_admin_users_shows_safe_fields_and_hides_sensitive_data(client, test_set
     assert "Подтверждён email" in body
     assert "Статус доступа" in body
     assert "Доступ к материалам" in body
+    assert "Доступ выдан" in body
+    assert "Доступ не выдан" in body
     assert "администратор" in body
     assert "пользователь" in body
     assert "модератор" in body
     assert "Сделать модератором" in body
     assert "Убрать модератора" not in body
+    assert "Выдать доступ" in body
+    assert "Отозвать доступ" in body
     assert "/admin/users/" in body
     assert "/role" in body
+    assert "/materials-access/grant" in body
+    assert "/materials-access/revoke" in body
     assert "подтверждён" in body
     assert "не подтверждён" in body
     assert "да" in body
@@ -167,6 +173,7 @@ def test_admin_users_shows_safe_fields_and_hides_sensitive_data(client, test_set
     assert "raw token" not in body.lower()
     assert "cookie" not in body.lower()
     assert "email_outbox" not in body.lower()
+    assert "materials_access_granted_at" not in body.lower()
 
 
 def test_admin_tariffs_shows_starter_tariff_and_admin_controls(client, test_settings):
