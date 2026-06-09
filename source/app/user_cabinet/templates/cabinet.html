@@ -42,7 +42,7 @@
 
       {% if account_blocks_manage_mode %}
         <div class="accounts-builder-shell">
-          <form class="accounts-builder accounts-builder--server" method="post" action="/cabinet/account-blocks{% if account_blocks_manage_mode %}?owner_id={{ account_block_selected_owner_id }}{% endif %}">
+          <form class="accounts-builder accounts-builder--server" method="post" action="/cabinet/account-blocks{% if account_blocks_manage_mode %}?owner_id={{ account_block_selected_owner_id }}{% endif %}" data-account-block-form="create">
             <label class="form-row accounts-type-field">
               <span>Тип блока</span>
               <select class="select" name="type" required>
@@ -115,10 +115,10 @@
                         {% if account_blocks_manage_mode %}
                           <div class="account-actions account-actions--view">
                             <button class="button button-secondary account-card__edit-toggle" type="button" data-account-card-edit-toggle>Редактировать</button>
-                            <form class="account-action-form" method="post" action="/cabinet/account-blocks/{{ block.id }}/delete">
+                            <form class="account-action-form" method="post" action="/cabinet/account-blocks/{{ block.id }}/delete" data-account-block-form="delete">
                               <button class="button button-secondary button-danger account-card__delete" type="submit">Удалить</button>
                             </form>
-                            <form class="account-action-form" method="post" action="/cabinet/account-blocks/{{ block.id }}/activate">
+                            <form class="account-action-form" method="post" action="/cabinet/account-blocks/{{ block.id }}/activate" data-account-block-form="activate">
                               <button class="button button-primary account-card__activate" type="submit">Активировать</button>
                             </form>
                           </div>
@@ -126,7 +126,7 @@
                       </div>
 
                       {% if account_blocks_manage_mode %}
-                        <form class="account-card__edit-form" method="post" action="/cabinet/account-blocks/{{ block.id }}" hidden data-account-card-edit-form>
+                        <form class="account-card__edit-form" method="post" action="/cabinet/account-blocks/{{ block.id }}" hidden data-account-card-edit-form data-account-block-form="update">
                           <label class="account-field">
                             <span>Логин</span>
                             <input class="input" name="login" type="text" value="{{ block.login|e }}" autocomplete="off">
@@ -328,13 +328,14 @@
   </section>
   <script>
     (() => {
-      const root = document.querySelector("[data-local-accounts-root][data-account-blocks-source='server']");
-      if (!root) {
+      const getAccountsRoot = () => document.querySelector("[data-local-accounts-root][data-account-blocks-source='server']");
+      if (!getAccountsRoot()) {
         return;
       }
 
-      const notice = root.querySelector("[data-account-blocks-notice]");
       const setNotice = (message) => {
+        const root = getAccountsRoot();
+        const notice = root ? root.querySelector("[data-account-blocks-notice]") : null;
         if (!notice) {
           return;
         }
@@ -367,13 +368,14 @@
         return copied;
       };
 
-      root.addEventListener("click", async (event) => {
+      document.addEventListener("click", async (event) => {
         const editToggle = event.target.closest("[data-account-card-edit-toggle]");
         if (editToggle) {
+          const root = editToggle.closest("[data-local-accounts-root][data-account-blocks-source='server']");
           const card = editToggle.closest(".account-card");
           const view = card ? card.querySelector("[data-account-card-view]") : null;
           const form = card ? card.querySelector("[data-account-card-edit-form]") : null;
-          if (view instanceof HTMLElement && form instanceof HTMLFormElement) {
+          if (root instanceof HTMLElement && view instanceof HTMLElement && form instanceof HTMLFormElement) {
             view.hidden = true;
             form.hidden = false;
             card.classList.add("account-card--editing");
@@ -390,10 +392,11 @@
 
         const editCancel = event.target.closest("[data-account-card-edit-cancel]");
         if (editCancel) {
+          const root = editCancel.closest("[data-local-accounts-root][data-account-blocks-source='server']");
           const card = editCancel.closest(".account-card");
           const view = card ? card.querySelector("[data-account-card-view]") : null;
           const form = card ? card.querySelector("[data-account-card-edit-form]") : null;
-          if (view instanceof HTMLElement && form instanceof HTMLFormElement) {
+          if (root instanceof HTMLElement && view instanceof HTMLElement && form instanceof HTMLFormElement) {
             form.reset();
             form.hidden = true;
             view.hidden = false;
@@ -404,6 +407,11 @@
 
         const button = event.target.closest("[data-account-copy]");
         if (!button) {
+          return;
+        }
+
+        const root = button.closest("[data-local-accounts-root][data-account-blocks-source='server']");
+        if (!root) {
           return;
         }
 
@@ -422,6 +430,81 @@
           setNotice("Не удалось скопировать.");
         }
       });
+
+      document.addEventListener(
+        "submit",
+        async (event) => {
+          const form = event.target;
+          if (!(form instanceof HTMLFormElement)) {
+            return;
+          }
+          if (!form.matches("[data-account-block-form]")) {
+            return;
+          }
+
+          const root = form.closest("[data-local-accounts-root][data-account-blocks-source='server']");
+          if (!root) {
+            return;
+          }
+
+          event.preventDefault();
+
+          if (form.dataset.accountBlockSubmitting === "true") {
+            return;
+          }
+
+          const submitButton = form.querySelector('button[type="submit"]');
+          const scrollX = window.scrollX;
+          const scrollY = window.scrollY;
+          form.dataset.accountBlockSubmitting = "true";
+          if (submitButton instanceof HTMLButtonElement) {
+            submitButton.disabled = true;
+          }
+
+          try {
+            const response = await fetch(form.action, {
+              method: form.method || "POST",
+              body: new FormData(form),
+              credentials: "same-origin",
+              headers: {
+                "X-Requested-With": "XMLHttpRequest",
+              },
+            });
+
+            const bodyText = await response.text();
+            if (!response.ok) {
+              setNotice("Не удалось выполнить действие.");
+              return;
+            }
+
+            const parsed = new DOMParser().parseFromString(bodyText, "text/html");
+            const nextRoot = parsed.querySelector("[data-local-accounts-root][data-account-blocks-source='server']");
+            const currentRoot = getAccountsRoot();
+            if (!(nextRoot instanceof HTMLElement) || !(currentRoot instanceof HTMLElement)) {
+              if (response.url) {
+                window.history.replaceState({}, "", response.url);
+              }
+              return;
+            }
+
+            currentRoot.replaceWith(nextRoot);
+            if (response.url) {
+              window.history.replaceState({}, "", response.url);
+            }
+            requestAnimationFrame(() => {
+              window.scrollTo(scrollX, scrollY);
+            });
+          } catch (_error) {
+            setNotice("Не удалось выполнить действие.");
+          } finally {
+            if (submitButton instanceof HTMLButtonElement) {
+              submitButton.disabled = false;
+            }
+            form.dataset.accountBlockSubmitting = "false";
+          }
+        },
+        true,
+      );
     })();
   </script>
   <script src="/static/cabinet-local-accounts.js"></script>

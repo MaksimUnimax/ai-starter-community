@@ -55,11 +55,13 @@ def test_stylesheet_is_served(client):
     assert ".account-actions--view" in response.text
     assert ".account-actions--edit" in response.text
     assert ".account-action-form" in response.text
-    assert "grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));" in response.text
+    assert "grid-template-columns: repeat(auto-fill, minmax(260px, 280px));" in response.text
+    assert "justify-content: start;" in response.text
     assert "align-items: stretch;" in response.text
     assert "display: flex;" in response.text
     assert "flex-direction: column;" in response.text
     assert "height: 100%;" in response.text
+    assert "max-width: 280px;" in response.text
     assert "margin-top: auto;" in response.text
     assert ".accounts-builder .select {" in response.text
     assert "min-height: 38px;" in response.text
@@ -119,6 +121,17 @@ def test_stylesheet_is_served(client):
     assert "После активации блок работает" not in template_text
     assert "60 дней" not in template_text
     assert "data-account-card-edit-form" in template_text
+    assert 'data-account-block-form="create"' in template_text
+    assert 'data-account-block-form="update"' in template_text
+    assert 'data-account-block-form="delete"' in template_text
+    assert 'data-account-block-form="activate"' in template_text
+    assert "fetch(form.action" in template_text
+    assert "preventDefault();" in template_text
+    assert "history.replaceState" in template_text
+    assert "window.scrollTo(scrollX, scrollY);" in template_text
+    assert 'window.location = "#accounts"' not in template_text
+    assert 'window.location.hash = "accounts"' not in template_text
+    assert "scrollIntoView" not in template_text
     assert "account-owner-group__title" not in template_text
     assert "account-owner-group__meta" not in template_text
     assert "account-card__owner-line" not in template_text

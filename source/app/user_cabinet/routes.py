@@ -178,7 +178,7 @@ def _cabinet_account_block_redirect(*, notice_key: str, owner_user_id: int | Non
     query = [f"account_blocks_notice={notice_key}"]
     if owner_user_id is not None:
         query.append(f"owner_id={int(owner_user_id)}")
-    return RedirectResponse(url=f"/cabinet?{'&'.join(query)}#accounts", status_code=303)
+    return RedirectResponse(url=f"/cabinet?{'&'.join(query)}", status_code=303)
 
 
 def _resolve_account_block_owner_id(*, request: Request, actor) -> int:
