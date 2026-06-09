@@ -146,26 +146,27 @@ def test_admin_can_create_edit_activate_and_delete_account_blocks(client, test_s
     owner_b = _create_verified_user(test_settings, "cab-ui-owner-b@example.com", "cabuiownerb")
     _login_as(client, test_settings, admin.email)
 
-    cabinet_response = client.get("/cabinet")
+    cabinet_response = client.get(f"/cabinet?owner_id={owner_a.id}")
     assert cabinet_response.status_code == 200
     assert "Администратор и модератор могут управлять блоками всех пользователей." in cabinet_response.text
     accounts_section = _extract_accounts_section(cabinet_response.text)
     builder_shell = _extract_builder_shell(accounts_section)
     assert "Добавить блок" in builder_shell
-    assert 'name="owner_user_id"' in builder_shell
+    assert "Владелец" not in builder_shell
+    assert 'name="owner_user_id"' not in builder_shell
     assert 'name="type"' in builder_shell
     assert 'name="login"' in builder_shell
     assert 'name="password_secret"' in builder_shell
     assert 'name="title"' not in builder_shell
     assert 'name="email"' not in builder_shell
+    assert f'action="/cabinet/account-blocks?owner_id={owner_a.id}"' in builder_shell
     assert "Сохранить" not in builder_shell
     assert "Удалить" not in builder_shell
     assert "Активировать" not in builder_shell
 
     create_response = client.post(
-        "/cabinet/account-blocks",
+        f"/cabinet/account-blocks?owner_id={owner_a.id}",
         data={
-            "owner_user_id": owner_a.id,
             "type": "server",
             "login": "admin-block-login",
             "password_secret": "admin-block-password",
@@ -187,7 +188,6 @@ def test_admin_can_create_edit_activate_and_delete_account_blocks(client, test_s
     update_response = client.post(
         f"/cabinet/account-blocks/{block_id}",
         data={
-            "owner_user_id": owner_b.id,
             "type": "mail",
             "title": "Should be ignored",
             "login": "updated-login",
@@ -230,6 +230,10 @@ def test_admin_can_create_edit_activate_and_delete_account_blocks(client, test_s
     assert "account-card__owner-line" not in accounts_section
     assert "Владелец:" not in accounts_section
     assert "Срок действия" not in accounts_section
+    assert '<div class="account-actions account-actions--view">' in accounts_section
+    assert f'<form class="account-action-form" method="post" action="/cabinet/account-blocks/{block_id}/delete">' in accounts_section
+    assert f'<form class="account-action-form" method="post" action="/cabinet/account-blocks/{block_id}/activate">' in accounts_section
+    assert "formaction=" not in accounts_section
     edit_form = _extract_first_edit_form(accounts_section)
     assert 'name="login"' in edit_form
     assert 'name="password_secret"' in edit_form
@@ -259,9 +263,8 @@ def test_moderator_can_manage_account_blocks_but_cannot_access_admin_dashboard(c
     assert admin_response.status_code == 403
 
     create_response = client.post(
-        "/cabinet/account-blocks",
+        f"/cabinet/account-blocks?owner_id={owner.id}",
         data={
-            "owner_user_id": owner.id,
             "type": "chatgpt",
             "login": "moderator-login",
             "password_secret": "moderator-password",
@@ -278,7 +281,6 @@ def test_moderator_can_manage_account_blocks_but_cannot_access_admin_dashboard(c
     update_response = client.post(
         f"/cabinet/account-blocks/{block_id}",
         data={
-            "owner_user_id": owner.id,
             "type": "server",
             "title": "Ignored title",
             "login": "moderator-login-updated",
@@ -317,7 +319,6 @@ def test_regular_user_cannot_post_account_block_management_actions(client, test_
     create_response = client.post(
         "/cabinet/account-blocks",
         data={
-            "owner_user_id": owner.id,
             "type": "chatgpt",
             "login": "nope",
             "password_secret": "nope",
@@ -328,7 +329,6 @@ def test_regular_user_cannot_post_account_block_management_actions(client, test_
     update_response = client.post(
         f"/cabinet/account-blocks/{block.id}",
         data={
-            "owner_user_id": owner.id,
             "type": "server",
             "title": "Should not update",
             "login": "nope",

@@ -54,10 +54,13 @@ def test_stylesheet_is_served(client):
     assert ".account-card__edit-form" in response.text
     assert ".account-actions--view" in response.text
     assert ".account-actions--edit" in response.text
-    assert "width: min(100%, 680px);" in response.text
-    assert "grid-template-columns: repeat(2, minmax(0, 1fr));" in response.text
-    assert "width: min(100%, 280px);" in response.text
-    assert "max-width: 300px;" in response.text
+    assert ".account-action-form" in response.text
+    assert "grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));" in response.text
+    assert "align-items: stretch;" in response.text
+    assert "display: flex;" in response.text
+    assert "flex-direction: column;" in response.text
+    assert "height: 100%;" in response.text
+    assert "margin-top: auto;" in response.text
     assert ".accounts-builder .select {" in response.text
     assert "min-height: 38px;" in response.text
     assert ".accounts-builder .button {" in response.text
@@ -110,6 +113,8 @@ def test_stylesheet_is_served(client):
     template_text = template_path.read_text(encoding="utf-8")
     assert 'name="title"' not in template_text
     assert 'name="email"' not in template_text
+    assert 'name="owner_user_id"' not in template_text
+    assert 'Владелец' not in template_text
     assert "Осталось после активации" not in template_text
     assert "data-account-card-edit-form" in template_text
     assert "account-owner-group__title" not in template_text

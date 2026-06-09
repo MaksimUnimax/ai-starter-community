@@ -42,17 +42,7 @@
 
       {% if account_blocks_manage_mode %}
         <div class="accounts-builder-shell">
-          <form class="accounts-builder accounts-builder--server" method="post" action="/cabinet/account-blocks">
-            <label class="form-row accounts-type-field">
-              <span>Владелец</span>
-              <select class="select" name="owner_user_id" required>
-                {% for owner in account_block_owner_options %}
-                  <option value="{{ owner.id }}" {% if owner.id == account_block_selected_owner_id %}selected{% endif %}>
-                    {{ owner.display_label }}{% if owner.role_label %} · {{ owner.role_label }}{% endif %}
-                  </option>
-                {% endfor %}
-              </select>
-            </label>
+          <form class="accounts-builder accounts-builder--server" method="post" action="/cabinet/account-blocks{% if account_blocks_manage_mode %}?owner_id={{ account_block_selected_owner_id }}{% endif %}">
             <label class="form-row accounts-type-field">
               <span>Тип блока</span>
               <select class="select" name="type" required>
@@ -126,8 +116,12 @@
                         {% if account_blocks_manage_mode %}
                           <div class="account-actions account-actions--view">
                             <button class="button button-secondary account-card__edit-toggle" type="button" data-account-card-edit-toggle>Редактировать</button>
-                            <button class="button button-secondary button-danger account-card__delete" type="submit" formaction="/cabinet/account-blocks/{{ block.id }}/delete" formnovalidate>Удалить</button>
-                            <button class="button button-primary account-card__activate" type="submit" formaction="/cabinet/account-blocks/{{ block.id }}/activate" formnovalidate>Активировать</button>
+                            <form class="account-action-form" method="post" action="/cabinet/account-blocks/{{ block.id }}/delete">
+                              <button class="button button-secondary button-danger account-card__delete" type="submit">Удалить</button>
+                            </form>
+                            <form class="account-action-form" method="post" action="/cabinet/account-blocks/{{ block.id }}/activate">
+                              <button class="button button-primary account-card__activate" type="submit">Активировать</button>
+                            </form>
                           </div>
                         {% endif %}
                       </div>

@@ -714,58 +714,20 @@ button:hover {
   gap: 12px;
 }
 
-.account-owner-group__header {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 10px;
-  align-items: flex-start;
-}
-
-.account-owner-group__intro {
-  flex: 1 1 240px;
-  min-width: 0;
-}
-
-.account-owner-group__title {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: clamp(1.15rem, 2vw, 1.45rem);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
-.account-owner-group__meta {
-  margin: 0;
-  color: var(--muted);
-  font-size: 0.9rem;
-}
-
-.account-owner-group__badge {
-  flex: 0 0 auto;
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: var(--accent-soft);
-  color: var(--accent-strong);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
 .accounts-grid {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 12px;
-  align-items: flex-start;
+  align-items: stretch;
 }
 
 .account-card {
-  display: grid;
-  flex: 0 1 280px;
-  width: min(100%, 280px);
-  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  min-width: 0;
+  max-width: none;
   gap: 10px;
   padding: 14px;
   border: 1px solid var(--border);
@@ -870,8 +832,11 @@ button:hover {
 .account-card__form,
 .account-card__readonly,
 .account-card__edit-form {
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
   gap: 12px;
+  min-height: 0;
 }
 
 .account-card__edit-form[hidden] {
@@ -893,6 +858,7 @@ button:hover {
 .account-card__details {
   display: grid;
   gap: 6px;
+  margin-top: auto;
 }
 
 .account-card__detail {
@@ -993,7 +959,18 @@ button:hover {
   align-items: center;
 }
 
+.account-actions--view {
+  margin-top: auto;
+}
+
+.account-action-form {
+  margin: 0;
+  display: flex;
+  flex: 1 1 120px;
+}
+
 .account-actions .button {
+  width: 100%;
   min-width: 0;
   min-height: 32px;
   padding: 7px 10px;
@@ -1006,6 +983,10 @@ button:hover {
 .account-actions--view .button,
 .account-actions--edit .button {
   flex: 1 1 120px;
+}
+
+.account-actions--view .account-action-form .button {
+  flex: 1 1 auto;
 }
 
 .account-card__save,

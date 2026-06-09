@@ -176,6 +176,12 @@ def _cabinet_account_block_redirect(*, notice_key: str, owner_user_id: int | Non
     return RedirectResponse(url=f"/cabinet?{'&'.join(query)}", status_code=303)
 
 
+def _resolve_account_block_owner_id(*, request: Request, actor) -> int:
+    if can_manage_account_blocks(actor):
+        return _selected_owner_id(request, int(actor.id))
+    return int(actor.id)
+
+
 def _parse_account_block_form_fields(
     *,
     owner_user_id: int,
@@ -396,7 +402,6 @@ def cabinet_change_password(
 @router.post("/cabinet/account-blocks")
 def cabinet_create_account_block(
     request: Request,
-    owner_user_id: int = Form(default=0),
     block_type: str = Form(alias="type", default=""),
     login: str = Form(default=""),
     password_secret: str = Form(default=""),
@@ -410,7 +415,7 @@ def cabinet_create_account_block(
         created_block = create_account_block(
             actor=user,
             data=_parse_account_block_form_fields(
-                owner_user_id=owner_user_id,
+                owner_user_id=_resolve_account_block_owner_id(request=request, actor=user),
                 block_type=block_type,
                 login=login,
                 password_secret=password_secret,
