@@ -107,24 +107,51 @@ def test_materials_shows_locked_state_without_access(client, test_settings):
     response = client.get("/materials")
     assert response.status_code == 200
     assert "/static/styles.css" in response.text
-    assert "Работа с ИИ" in response.text
-    assert "Курс для новичков без опыта программирования." in response.text
-    assert "Уроки курса" in response.text
-    assert "Как мы работаем: ChatGPT проектирует, Codex выполняет, пользователь проверяет" in response.text
-    assert "/materials/lessons/kak-my-rabotaem-chatgpt-codex-user" in response.text
-    assert "Вернуться в личный кабинет" in response.text
-    assert "/cabinet" in response.text
+    assert "Раздел «Работа с ИИ» закрыт" in response.text
+    assert "Доступ к материалам и урокам откроется после оплаты тарифа." in response.text
+    assert "К разделу материалов" not in response.text
+    assert "Уроки курса" not in response.text
+    assert "Как мы работаем: ChatGPT проектирует, Codex выполняет, пользователь проверяет" not in response.text
+    assert "/materials/lessons/kak-my-rabotaem-chatgpt-codex-user" not in response.text
     assert "Доступные тарифы" not in response.text
-    assert "Оплата" not in response.text
-    assert "Что дальше" not in response.text
-    assert "Раздел «Работа с ИИ» будет доступен после оплаты." not in response.text
-    assert "После первой оплаты доступ к разделу останется навсегда." not in response.text
     assert "Быстрый старт" not in response.text
-    assert "Как работать с AI-агентом" not in response.text
     assert "Команды для копирования" not in response.text
-    assert "/admin" not in response.text
     assert "Payment" not in response.text
     assert "Locked" not in response.text
+
+    lesson_response = client.get("/materials/lessons/kak-my-rabotaem-chatgpt-codex-user")
+    assert lesson_response.status_code == 200
+    assert "Как мы работаем: ChatGPT проектирует, Codex выполняет, пользователь проверяет" in lesson_response.text
+    assert "Урок и его материалы откроются после оплаты тарифа." in lesson_response.text
+    assert "lesson-content" not in lesson_response.text
+
+
+def test_access_status_alone_does_not_unlock_materials_or_cabinet(client, test_settings):
+    _prepare_and_login_verified_user(client, test_settings, "materials-status-only@example.com", "materialsstatus")
+    with _connect(test_settings) as conn:
+        conn.execute(
+            "UPDATE users SET access_status = 'activated' WHERE email = ?",
+            ("materials-status-only@example.com",),
+        )
+        conn.commit()
+
+    user = authenticate_user("materials-status-only@example.com", "Secret123", settings=test_settings)
+    assert user.access_status == "activated"
+    assert user.materials_access_granted_at is None
+    assert user_has_materials_access(user) is False
+
+    _login_verified_user(client, test_settings, "materials-status-only@example.com")
+    materials_response = client.get("/materials")
+    cabinet_response = client.get("/cabinet")
+    assert materials_response.status_code == 200
+    assert cabinet_response.status_code == 200
+    assert "Раздел «Работа с ИИ» закрыт" in materials_response.text
+    assert "Личный кабинет закрыт" in cabinet_response.text
+    assert "Доступ к материалам и урокам откроется после оплаты тарифа." in materials_response.text
+    assert "Доступ к кабинету и обучению откроется после оплаты тарифа." in cabinet_response.text
+    lesson_response = client.get("/materials/lessons/kak-my-rabotaem-chatgpt-codex-user")
+    assert lesson_response.status_code == 200
+    assert "Урок и его материалы откроются после оплаты тарифа." in lesson_response.text
 
 
 def test_materials_shows_placeholder_sections_when_access_granted(client, test_settings):
@@ -150,19 +177,17 @@ def test_cabinet_contains_materials_link_and_locked_hint(client, test_settings):
     response = client.get("/cabinet")
     assert response.status_code == 200
     assert "Главная" in response.text
-    assert "Обучающий блок" in response.text
-    assert "Обучение" in response.text
-    assert "Перейти к обучению" in response.text
-    assert "Обучающий проект" in response.text
-    assert "Скачать файл" in response.text
-    assert "Доступ откроется после оплаты." in response.text
-    assert response.text.count('class="button button-primary learning-button"') == 2
+    assert "Личный кабинет закрыт" in response.text
+    assert "Доступ к кабинету и обучению откроется после оплаты тарифа." in response.text
+    assert "Аккаунты" not in response.text
+    assert "/static/cabinet-local-accounts.js" not in response.text
+    assert "Обучающий блок" not in response.text
+    assert "Перейти к обучению" not in response.text
+    assert "Обучающий проект" not in response.text
+    assert "Скачать файл" not in response.text
     assert 'href="/materials/drafts/dair-smoke-20260529/"' not in response.text
     assert 'href="/cabinet/learning/project-file"' not in response.text
-    assert "Аккаунты" in response.text
-    assert "/static/cabinet-local-accounts.js" in response.text
-    assert "Пройдите обучение, затем скачайте файл, вставьте в чат ChatGPT и следуйте его инструкциям." in response.text
-    assert "Раздел «Работа с ИИ» будет доступен после оплаты." not in response.text
+    assert "Пройдите обучение, затем скачайте файл, вставьте в чат ChatGPT и следуйте его инструкциям." not in response.text
 
 
 def test_staff_roles_can_open_materials_without_payment_marker(client, test_settings):

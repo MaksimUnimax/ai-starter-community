@@ -62,55 +62,20 @@ def test_cabinet_displays_course_shell_without_tariffs_or_payment_noise(client, 
     assert cabinet_response.text.count('rel="icon" href="/static/favicon.svg" type="image/svg+xml"') == 1
     assert cabinet_response.text.count('rel="shortcut icon" href="/static/favicon.svg" type="image/svg+xml"') == 1
     assert "/static/styles.css" in cabinet_response.text
-    assert "Настройки" in cabinet_response.text
-    assert "⚙" not in cabinet_response.text
-    assert 'href="/cabinet/settings"' in cabinet_response.text
-    assert "/static/cabinet-local-accounts.js" in cabinet_response.text
-    assert "Главная" in cabinet_response.text
-    assert "Обучающий блок" in cabinet_response.text
-    assert "Обучение" in cabinet_response.text
-    assert "Работа с ИИ" not in cabinet_response.text
-    assert "Обучающий проект" in cabinet_response.text
-    assert "Перейти к обучению" in cabinet_response.text
-    assert "Скачать файл" in cabinet_response.text
-    assert "Пройдите обучение, затем скачайте файл, вставьте в чат ChatGPT и следуйте его инструкциям." in cabinet_response.text
-    assert cabinet_response.text.count('class="button button-primary learning-button"') == 2
-    assert "Доступ откроется после оплаты." in cabinet_response.text
-    assert 'href="/materials/drafts/dair-smoke-20260529/"' not in cabinet_response.text
-    assert 'href="/cabinet/learning/project-file"' not in cabinet_response.text
+    assert "Личный кабинет закрыт" in cabinet_response.text
+    assert "Доступ к кабинету и обучению откроется после оплаты тарифа." in cabinet_response.text
+    assert "Аккаунты" not in cabinet_response.text
+    assert "Обучающий блок" not in cabinet_response.text
+    assert "Обучающий проект" not in cabinet_response.text
+    assert "Перейти к обучению" not in cabinet_response.text
+    assert "Скачать файл" not in cabinet_response.text
+    assert "/static/cabinet-local-accounts.js" not in cabinet_response.text
     assert "raw.githubusercontent.com" not in cabinet_response.text
-    accounts_section = _extract_accounts_section(cabinet_response.text)
-    assert cabinet_response.text.index("Обучающий блок") < cabinet_response.text.index("Аккаунты")
-    assert cabinet_response.text.index('data-local-accounts-root') < cabinet_response.text.index('data-prompts-library-root')
-    assert "Аккаунты" in accounts_section
-    assert "Данные хранятся на сервере и доступны после входа в кабинет с любого устройства." in accounts_section
-    assert "Данные сохраняются только в этом браузере." not in accounts_section
-    assert "Добавить блок" not in accounts_section
-    assert "Тип нового блока" not in accounts_section
-    assert "Активировать" not in accounts_section
-    assert "Сохранить" not in accounts_section
-    assert "Удалить" not in accounts_section
-    assert "Скопировать" not in accounts_section
-    assert "Пока нет ни одного блока." in accounts_section
-    assert "Администратор или модератор добавит их позже." in accounts_section
-    assert "Личный кабинет" not in accounts_section
-    assert '<h2 class="section-title">Аккаунт</h2>' not in accounts_section
-    assert cabinet_response.text.index('data-prompts-library-root') < cabinet_response.text.index('data-paid-options-root')
-    assert cabinet_response.text.index('data-paid-options-root') > cabinet_response.text.index('data-prompts-library-root')
-    assert "Активация опций" in cabinet_response.text
-    assert "Пока нет активных опций для подключения." in cabinet_response.text
-    assert "Доступно для подключения:" not in cabinet_response.text
-    assert "Сейчас активных опций:" not in cabinet_response.text
-    assert "Купить" not in cabinet_response.text
+    assert "Активация опций" not in cabinet_response.text
     assert "Доступные тарифы" not in cabinet_response.text
     assert "Что дальше" not in cabinet_response.text
-    assert "Раздел «Работа с ИИ» будет доступен после оплаты." not in cabinet_response.text
-    assert "активирован" not in cabinet_response.text
-    assert "доступен по роли" not in cabinet_response.text
     assert "Стартовый доступ" not in cabinet_response.text
     assert "Последний платёж" not in cabinet_response.text
-    assert '/admin/payments' not in cabinet_response.text
-    assert '/cabinet/payments' not in cabinet_response.text
 
 
 def test_cabinet_shows_active_learning_links_when_access_granted(client, test_settings):

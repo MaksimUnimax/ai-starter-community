@@ -53,6 +53,15 @@ def _login_as(client, test_settings, email: str):
     return user
 
 
+def _grant_materials_access(test_settings, email: str) -> None:
+    with _connect(test_settings) as conn:
+        conn.execute(
+            "UPDATE users SET materials_access_granted_at = CURRENT_TIMESTAMP WHERE email = ?",
+            (email,),
+        )
+        conn.commit()
+
+
 def _extract_accounts_section(body_text: str) -> str:
     start_marker = '<section id="accounts" class="card stack accounts-card" data-local-accounts-root data-account-blocks-source="server">'
     end_marker = '\n  <section class="card stack prompts-library-card" data-prompts-library-root>'
@@ -86,6 +95,7 @@ def _extract_first_edit_form(accounts_section: str) -> str:
 def test_user_sees_compact_server_backed_account_blocks_and_copy_only_controls(client, test_settings):
     admin = _create_verified_user(test_settings, "cab-ui-admin@example.com", "cabuiadmin", role="admin")
     owner = _create_verified_user(test_settings, "cab-ui-owner@example.com", "cabuiowner")
+    _grant_materials_access(test_settings, owner.email)
 
     active_block = create_account_block(
         actor=admin,
@@ -478,6 +488,7 @@ def test_regular_user_cannot_post_account_block_management_actions(client, test_
 def test_expired_account_block_shows_finished_day_counter_without_active_label(client, test_settings):
     admin = _create_verified_user(test_settings, "cab-ui-expire-admin@example.com", "cabuiexpireadmin", role="admin")
     owner = _create_verified_user(test_settings, "cab-ui-expire-owner@example.com", "cabuiexpireowner")
+    _grant_materials_access(test_settings, owner.email)
     block = create_account_block(
         actor=admin,
         data=AccountBlockCreateInput(

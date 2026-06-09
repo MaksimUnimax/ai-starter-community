@@ -346,19 +346,17 @@ def test_route_flow_login_cabinet_logout_still_works(client, test_settings):
     assert cabinet_response.status_code == 200
     assert "route@example.com" in cabinet_response.text
     assert "routeuser" in cabinet_response.text
-    assert "Аккаунты" in cabinet_response.text
-    assert "/static/cabinet-local-accounts.js" in cabinet_response.text
+    assert "Личный кабинет закрыт" in cabinet_response.text
+    assert "Доступ к кабинету и обучению откроется после оплаты тарифа." in cabinet_response.text
+    assert "Аккаунты" not in cabinet_response.text
+    assert "/static/cabinet-local-accounts.js" not in cabinet_response.text
     assert "Главная" in cabinet_response.text
-    assert "Обучающий блок" in cabinet_response.text
-    assert "Обучение" in cabinet_response.text
-    assert "Обучающий проект" in cabinet_response.text
-    assert "Перейти к обучению" in cabinet_response.text
-    assert "Скачать файл" in cabinet_response.text
-    assert "Пройдите обучение, затем скачайте файл, вставьте в чат ChatGPT и следуйте его инструкциям." in cabinet_response.text
-    assert "Доступ откроется после оплаты." in cabinet_response.text
+    assert "Обучающий блок" not in cabinet_response.text
+    assert "Обучающий проект" not in cabinet_response.text
+    assert "Перейти к обучению" not in cabinet_response.text
+    assert "Скачать файл" not in cabinet_response.text
     assert 'href="/materials/drafts/dair-smoke-20260529/"' not in cabinet_response.text
     assert 'href="/cabinet/learning/project-file"' not in cabinet_response.text
-    assert "Доступные тарифы" not in cabinet_response.text
     assert "Выйти" in cabinet_response.text
 
     logout_response = client.post("/logout", follow_redirects=False)
@@ -616,19 +614,17 @@ def test_cabinet_shows_logout_button_and_access_text(client, test_settings):
     assert cabinet_response.status_code == 200
     assert "cabinetux@example.com" in cabinet_response.text
     assert "cabinetux" in cabinet_response.text
-    assert "Аккаунты" in cabinet_response.text
+    assert "Личный кабинет закрыт" in cabinet_response.text
+    assert "Доступ к кабинету и обучению откроется после оплаты тарифа." in cabinet_response.text
+    assert "Аккаунты" not in cabinet_response.text
     assert "Добавить блок" not in cabinet_response.text
     assert "Главная" in cabinet_response.text
-    assert "Обучающий блок" in cabinet_response.text
-    assert "Обучение" in cabinet_response.text
-    assert "Обучающий проект" in cabinet_response.text
-    assert "Перейти к обучению" in cabinet_response.text
-    assert "Скачать файл" in cabinet_response.text
-    assert "Пройдите обучение, затем скачайте файл, вставьте в чат ChatGPT и следуйте его инструкциям." in cabinet_response.text
-    assert "Доступ откроется после оплаты." in cabinet_response.text
+    assert "Обучающий блок" not in cabinet_response.text
+    assert "Обучающий проект" not in cabinet_response.text
+    assert "Перейти к обучению" not in cabinet_response.text
+    assert "Скачать файл" not in cabinet_response.text
     assert 'href="/materials/drafts/dair-smoke-20260529/"' not in cabinet_response.text
     assert 'href="/cabinet/learning/project-file"' not in cabinet_response.text
-    assert "Доступные тарифы" not in cabinet_response.text
     assert "Выйти" in cabinet_response.text
     assert "/static/styles.css" in cabinet_response.text
     assert "Работа с ИИ" not in cabinet_response.text

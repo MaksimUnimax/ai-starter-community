@@ -25,6 +25,7 @@ templates = Jinja2Templates(directory=str(Path(__file__).resolve().parent / "tem
 templates.env.loader = ChoiceLoader(
     [
         templates.env.loader,
+        FileSystemLoader(str(Path(__file__).resolve().parents[1] / "user_cabinet" / "templates")),
         FileSystemLoader(str(Path(__file__).resolve().parents[1] / "shared" / "templates")),
     ]
 )
@@ -61,12 +62,50 @@ def _template(request: Request, template_name: str, **context) -> HTMLResponse:
     return templates.TemplateResponse(request, template_name, payload)
 
 
+def _locked_response(
+    request: Request,
+    *,
+    title: str,
+    locked_title: str,
+    locked_message: str,
+    locked_action_label: str = "На главную",
+    locked_action_url: str = "/",
+    locked_secondary_label: str | None = None,
+    locked_secondary_url: str | None = None,
+    current_user=None,
+):
+    return _template(
+        request,
+        "access_locked.html",
+        title=title,
+        locked_title=locked_title,
+        locked_message=locked_message,
+        locked_action_label=locked_action_label,
+        locked_action_url=locked_action_url,
+        locked_secondary_label=locked_secondary_label,
+        locked_secondary_url=locked_secondary_url,
+        current_user=current_user,
+    )
+
+
 @router.get("/materials", response_class=HTMLResponse)
 def materials_page(request: Request):
     settings = get_settings()
     user = get_current_user_from_cookies(request.cookies, settings=settings)
     if user is None:
         return RedirectResponse(url="/login", status_code=303)
+    if not user_has_materials_access(user):
+        return _locked_response(
+            request,
+            title="Работа с ИИ",
+            locked_title="Раздел «Работа с ИИ» закрыт",
+            locked_message="Доступ к материалам и урокам откроется после оплаты тарифа.",
+            locked_action_label="На главную",
+            locked_action_url="/",
+            locked_secondary_label="В личный кабинет",
+            locked_secondary_url="/cabinet",
+            current_user=user,
+        )
     course = load_course()
     return _template(
         request,
@@ -100,6 +139,18 @@ def lesson_page(request: Request, slug: str):
         lesson = get_lesson(slug)
     except LessonNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
+    if not user_has_materials_access(user):
+        return _locked_response(
+            request,
+            title=lesson["title"],
+            locked_title=lesson["title"],
+            locked_message="Урок и его материалы откроются после оплаты тарифа.",
+            locked_action_label="К разделу материалов",
+            locked_action_url="/materials",
+            locked_secondary_label="На главную",
+            locked_secondary_url="/",
+            current_user=user,
+        )
     return _template(
         request,
         "lesson.html",

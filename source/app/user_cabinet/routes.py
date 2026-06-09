@@ -362,6 +362,28 @@ def _template(request: Request, template_name: str, **context) -> HTMLResponse:
     return templates.TemplateResponse(request, template_name, payload)
 
 
+def _locked_response(
+    request: Request,
+    *,
+    title: str,
+    locked_title: str,
+    locked_message: str,
+    locked_action_label: str = "На главную",
+    locked_action_url: str = "/",
+    current_user=None,
+):
+    return _template(
+        request,
+        "access_locked.html",
+        title=title,
+        locked_title=locked_title,
+        locked_message=locked_message,
+        locked_action_label=locked_action_label,
+        locked_action_url=locked_action_url,
+        current_user=current_user,
+    )
+
+
 def _password_change_message(exc: ValidationError | UnauthorizedError | AuthError) -> str:
     message = str(exc)
     normalized = message.lower()
@@ -392,6 +414,16 @@ def cabinet_page(request: Request):
     settings, user, redirect_response = _require_authenticated_user(request)
     if redirect_response is not None:
         return redirect_response
+    if not user_has_materials_access(user):
+        return _locked_response(
+            request,
+            title="Личный кабинет",
+            locked_title="Личный кабинет закрыт",
+            locked_message="Доступ к кабинету и обучению откроется после оплаты тарифа.",
+            locked_action_label="На главную",
+            locked_action_url="/",
+            current_user=user,
+        )
     learning_access = user_has_materials_access(user)
     active_paid_options = _active_paid_options_for_cabinet(settings)
     account_block_context = _account_block_management_context(user, settings, request)
