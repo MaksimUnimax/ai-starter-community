@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="stack">
+    <div class="card stack">
+      <p class="muted">Доступ ограничен</p>
+      <h1 class="section-title">{{ locked_title }}</h1>
+      <p class="form-help">{{ locked_message }}</p>
+      {% if current_user %}
+        <p class="form-help">Вы вошли как {{ current_user.email }}{% if current_user.login %} · {{ current_user.login }}{% endif %}.</p>
+      {% endif %}
+      <div class="actions">
+        <a class="button button-primary" href="{{ locked_action_url }}">{{ locked_action_label }}</a>
+        {% if locked_secondary_label and locked_secondary_url %}
+          <a class="button button-secondary" href="{{ locked_secondary_url }}">{{ locked_secondary_label }}</a>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+{% endblock %}
