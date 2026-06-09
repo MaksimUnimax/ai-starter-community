@@ -147,8 +147,12 @@ def test_cabinet_prompts_library_script_is_served(client):
 
 
 def test_global_templates_link_to_favicon():
+    public_landing = (Path(__file__).resolve().parents[1] / "app" / "public_landing/templates/index.html").read_text(encoding="utf-8")
     shared_base = (Path(__file__).resolve().parents[1] / "app" / "shared/templates/base.html").read_text(encoding="utf-8")
     admin_base = (Path(__file__).resolve().parents[1] / "app" / "admin/templates/base.html").read_text(encoding="utf-8")
+
+    assert 'rel="icon" href="/static/favicon.svg" type="image/svg+xml"' in public_landing
+    assert 'rel="shortcut icon" href="/static/favicon.svg" type="image/svg+xml"' in public_landing
 
     for template in (shared_base, admin_base):
         assert 'rel="icon" href="/static/favicon.svg" type="image/svg+xml"' in template

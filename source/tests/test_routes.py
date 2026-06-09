@@ -43,6 +43,8 @@ def _make_authenticated_user(client, test_settings, email: str = "landing@exampl
 def test_landing_page(client):
     response = client.get("/")
     assert response.status_code == 200
+    assert response.text.count('rel="icon" href="/static/favicon.svg" type="image/svg+xml"') == 1
+    assert response.text.count('rel="shortcut icon" href="/static/favicon.svg" type="image/svg+xml"') == 1
     assert "OpenScript — Первый ИИ-бот без опыта" in response.text
     assert "Создайте первого ИИ-бота без опыта в программировании" in response.text
     assert "Начать первый проект" in response.text

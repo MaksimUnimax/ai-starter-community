@@ -59,6 +59,8 @@ def test_cabinet_displays_course_shell_without_tariffs_or_payment_noise(client, 
 
     cabinet_response = client.get("/cabinet")
     assert cabinet_response.status_code == 200
+    assert cabinet_response.text.count('rel="icon" href="/static/favicon.svg" type="image/svg+xml"') == 1
+    assert cabinet_response.text.count('rel="shortcut icon" href="/static/favicon.svg" type="image/svg+xml"') == 1
     assert "/static/styles.css" in cabinet_response.text
     assert "Настройки" in cabinet_response.text
     assert "⚙" not in cabinet_response.text
