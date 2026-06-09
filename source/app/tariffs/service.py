@@ -158,6 +158,7 @@ def _tariff_from_row(row) -> TariffPublic:
         price_amount_minor=int(row["price_amount_minor"]),
         currency=str(row["currency"]),
         status=str(row["status"]),
+        show_on_homepage=bool(row["show_on_homepage"]),
         sort_order=int(row["sort_order"]),
         created_at=str(row["created_at"]),
         updated_at=str(row["updated_at"]),
@@ -272,10 +273,11 @@ def _coerce_create_payload(
     price_amount_minor,
     currency: str | None,
     status: str | None,
+    show_on_homepage,
     sort_order,
 ) -> dict:
     if data is not None:
-        if any(value is not None for value in (code, title, description, price_amount_minor, currency, status, sort_order)):
+        if any(value is not None for value in (code, title, description, price_amount_minor, currency, status, show_on_homepage, sort_order)):
             raise ValidationError("pass either data or keyword arguments, not both")
         return asdict(data)
     return {
@@ -285,6 +287,7 @@ def _coerce_create_payload(
         "price_amount_minor": price_amount_minor,
         "currency": currency,
         "status": status,
+        "show_on_homepage": show_on_homepage,
         "sort_order": sort_order,
     }
 
@@ -297,10 +300,11 @@ def _coerce_update_payload(
     price_amount_minor,
     currency,
     status,
+    show_on_homepage,
     sort_order,
 ) -> dict:
     if data is not None:
-        if any(value is not _UNSET for value in (title, description, price_amount_minor, currency, status, sort_order)):
+        if any(value is not _UNSET for value in (title, description, price_amount_minor, currency, status, show_on_homepage, sort_order)):
             raise ValidationError("pass either data or keyword arguments, not both")
         return asdict(data)
     return {
@@ -309,6 +313,7 @@ def _coerce_update_payload(
         "price_amount_minor": price_amount_minor,
         "currency": currency,
         "status": status,
+        "show_on_homepage": show_on_homepage,
         "sort_order": sort_order,
     }
 
@@ -394,6 +399,7 @@ def create_tariff(
     price_amount_minor=None,
     currency: str | None = None,
     status: str | None = None,
+    show_on_homepage=None,
     sort_order=None,
     settings: Settings | None = None,
 ) -> TariffPublic:
@@ -405,6 +411,7 @@ def create_tariff(
         price_amount_minor=price_amount_minor,
         currency=currency,
         status=status,
+        show_on_homepage=show_on_homepage,
         sort_order=sort_order,
     )
     normalized_title = _normalize_title(payload["title"])
@@ -412,6 +419,7 @@ def create_tariff(
     normalized_price = _normalize_int(payload["price_amount_minor"], "price_amount_minor", allow_none=False, minimum=0)
     normalized_currency = _normalize_currency("RUB" if payload["currency"] is None else payload["currency"])
     normalized_status = _normalize_status("active" if payload["status"] is None else payload["status"])
+    normalized_show_on_homepage = _normalize_boolish(False if payload["show_on_homepage"] is None else payload["show_on_homepage"], "show_on_homepage")
     normalized_sort_order = _normalize_int(0 if payload["sort_order"] is None else payload["sort_order"], "sort_order", allow_none=False, minimum=0)
 
     resolved = _settings(settings)
@@ -428,9 +436,9 @@ def create_tariff(
                     """
                     INSERT INTO tariffs (
                         code, title, description, price_amount_minor, currency,
-                        status, sort_order, created_at, updated_at
+                        status, show_on_homepage, sort_order, created_at, updated_at
                     )
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """,
                     (
                         normalized_code,
@@ -439,6 +447,7 @@ def create_tariff(
                         normalized_price,
                         normalized_currency,
                         normalized_status,
+                        normalized_show_on_homepage,
                         normalized_sort_order,
                         now_iso,
                         now_iso,
@@ -464,6 +473,7 @@ def update_tariff(
     price_amount_minor=_UNSET,
     currency=_UNSET,
     status=_UNSET,
+    show_on_homepage=_UNSET,
     sort_order=_UNSET,
     settings: Settings | None = None,
 ) -> TariffPublic:
@@ -475,6 +485,7 @@ def update_tariff(
         price_amount_minor=price_amount_minor,
         currency=currency,
         status=status,
+        show_on_homepage=show_on_homepage,
         sort_order=sort_order,
     )
     updates: dict[str, object] = {}
@@ -492,6 +503,8 @@ def update_tariff(
         if payload["status"] is None:
             raise ValidationError("status is required")
         updates["status"] = _normalize_status(payload["status"])
+    if payload["show_on_homepage"] is not _UNSET and payload["show_on_homepage"] is not None:
+        updates["show_on_homepage"] = _normalize_boolish(payload["show_on_homepage"], "show_on_homepage")
     if payload["sort_order"] is not _UNSET:
         updates["sort_order"] = _normalize_int(payload["sort_order"], "sort_order", minimum=0)
 
@@ -513,6 +526,20 @@ def update_tariff(
         if updated is None:
             raise CatalogError("tariff update failed")
         return _tariff_from_row(updated)
+
+
+def get_homepage_tariff(settings: Settings | None = None) -> TariffPublic | None:
+    with _connection(settings) as connection:
+        row = connection.execute(
+            """
+            SELECT *
+            FROM tariffs
+            WHERE status = 'active' AND show_on_homepage = 1
+            ORDER BY sort_order ASC, id ASC, code ASC
+            LIMIT 1
+            """
+        ).fetchone()
+        return _tariff_from_row(row) if row is not None else None
 
 
 def archive_tariff(code: str, settings: Settings | None = None) -> bool:
@@ -757,6 +784,7 @@ def upsert_tariff(
     currency: str = "RUB",
     description: str | None = None,
     status: str = "active",
+    show_on_homepage: bool = False,
     sort_order: int = 0,
     settings: Settings | None = None,
 ) -> TariffPublic:
@@ -772,6 +800,7 @@ def upsert_tariff(
         currency=currency,
         description=description,
         status=status,
+        show_on_homepage=show_on_homepage,
         sort_order=sort_order,
         settings=settings,
     )
@@ -828,6 +857,7 @@ def seed_initial_catalog(database_path: str | None = None, settings: Settings | 
             price_amount_minor=499000,
             currency="RUB",
             status="active",
+            show_on_homepage=True,
             sort_order=0,
             settings=resolved,
         )

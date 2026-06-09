@@ -20,6 +20,7 @@
           <th>Цена, ₽</th>
           <th>Валюта</th>
           <th>Статус</th>
+          <th>На главной</th>
           <th>Порядок сортировки</th>
           <th>Включённые опции</th>
           <th>Создан</th>
@@ -36,6 +37,7 @@
             <td>{{ tariff.price_display }}</td>
             <td>{{ tariff.currency }}</td>
             <td>{{ tariff.status_label }}</td>
+            <td>{{ tariff.show_on_homepage_label }}</td>
             <td>{{ tariff.sort_order }}</td>
             <td>{{ tariff.included_options_summary }}</td>
             <td>{{ tariff.created_at }}</td>
@@ -52,7 +54,7 @@
           </tr>
         {% else %}
           <tr>
-            <td colspan="11">Тарифов пока нет.</td>
+            <td colspan="12">Тарифов пока нет.</td>
           </tr>
         {% endfor %}
       </tbody>

@@ -52,6 +52,7 @@ def test_seed_creates_starter_catalog_and_links(test_settings):
     assert tariff.price_amount_minor == 499000
     assert tariff.currency == "RUB"
     assert tariff.status == "active"
+    assert tariff.show_on_homepage is True
 
     option_codes = {option.code for option in list_paid_options(settings=test_settings)}
     assert {"ai_gpt_tool", "server", "vpn"} <= option_codes
@@ -79,6 +80,58 @@ def test_seed_is_idempotent_and_does_not_duplicate_rows(test_settings):
     assert counts_after["tariffs"] == 1
     assert counts_after["paid_options"] == 3
     assert counts_after["tariff_options"] == 3
+
+
+def test_initialize_database_adds_show_on_homepage_to_existing_tariffs_table(tmp_path):
+    db_path = tmp_path / "legacy_catalog.sqlite3"
+    with sqlite3.connect(str(db_path)) as conn:
+        conn.execute(
+            """
+            CREATE TABLE tariffs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                code TEXT UNIQUE NOT NULL,
+                title TEXT NOT NULL,
+                description TEXT NULL,
+                price_amount_minor INTEGER NOT NULL,
+                currency TEXT NOT NULL DEFAULT 'RUB',
+                status TEXT NOT NULL DEFAULT 'active',
+                sort_order INTEGER NOT NULL DEFAULT 0,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            )
+            """
+        )
+        conn.execute(
+            """
+            INSERT INTO tariffs (
+                code, title, description, price_amount_minor, currency,
+                status, sort_order, created_at, updated_at
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                "legacy_tariff",
+                "Legacy tariff",
+                "Legacy tariff description",
+                123000,
+                "RUB",
+                "active",
+                0,
+                "2026-06-09T00:00:00Z",
+                "2026-06-09T00:00:00Z",
+            ),
+        )
+        conn.commit()
+
+    initialize_database(str(db_path))
+
+    with sqlite3.connect(str(db_path)) as conn:
+        conn.row_factory = sqlite3.Row
+        columns = {row["name"] for row in conn.execute("PRAGMA table_info(tariffs)").fetchall()}
+        assert "show_on_homepage" in columns
+        row = conn.execute("SELECT show_on_homepage FROM tariffs WHERE code = ?", ("legacy_tariff",)).fetchone()
+        assert row is not None
+        assert row["show_on_homepage"] == 0
 
 
 def test_seed_does_not_overwrite_existing_manual_changes(test_settings):

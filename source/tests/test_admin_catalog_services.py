@@ -49,6 +49,7 @@ def test_create_tariff_accepts_dataclass_input_and_persists(test_settings):
             price_amount_minor=123456,
             currency="rub",
             status="hidden",
+            show_on_homepage=True,
             sort_order=5,
         ),
         settings=test_settings,
@@ -60,6 +61,7 @@ def test_create_tariff_accepts_dataclass_input_and_persists(test_settings):
     assert tariff.price_amount_minor == 123456
     assert tariff.currency == "RUB"
     assert tariff.status == "hidden"
+    assert tariff.show_on_homepage is True
     assert tariff.sort_order == 5
 
 
@@ -130,6 +132,7 @@ def test_update_tariff_edits_allowed_fields_and_keeps_code(test_settings):
             price_amount_minor=2500,
             currency="usd",
             status="hidden",
+            show_on_homepage=True,
             sort_order=9,
         ),
         settings=test_settings,
@@ -141,6 +144,7 @@ def test_update_tariff_edits_allowed_fields_and_keeps_code(test_settings):
     assert updated.price_amount_minor == 2500
     assert updated.currency == "USD"
     assert updated.status == "hidden"
+    assert updated.show_on_homepage is True
     assert updated.sort_order == 9
 
 
@@ -162,6 +166,41 @@ def test_archive_tariff_hides_it_from_public_listing_and_admin_listing_keeps_it(
     assert created.code in admin_codes
     archived = tariff_service.get_tariff_by_code(created.code, settings=test_settings)
     assert archived is not None and archived.status == "archived"
+
+
+def test_get_homepage_tariff_prefers_active_show_on_homepage_tariff_with_lowest_sort_order(test_settings):
+    tariff_service.create_tariff(
+        code="homepage_later",
+        title="Homepage later",
+        price_amount_minor=1000,
+        status="active",
+        show_on_homepage=True,
+        sort_order=5,
+        settings=test_settings,
+    )
+    tariff_service.create_tariff(
+        code="homepage_first",
+        title="Homepage first",
+        price_amount_minor=2000,
+        status="active",
+        show_on_homepage=True,
+        sort_order=1,
+        settings=test_settings,
+    )
+    tariff_service.create_tariff(
+        code="homepage_inactive",
+        title="Homepage inactive",
+        price_amount_minor=3000,
+        status="hidden",
+        show_on_homepage=True,
+        sort_order=0,
+        settings=test_settings,
+    )
+
+    homepage_tariff = tariff_service.get_homepage_tariff(settings=test_settings)
+    assert homepage_tariff is not None
+    assert homepage_tariff.code == "homepage_first"
+    assert homepage_tariff.show_on_homepage is True
 
 
 def test_get_tariff_with_options_returns_tariff_and_linked_options(test_settings):

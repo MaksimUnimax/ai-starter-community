@@ -90,6 +90,7 @@ CREATE TABLE IF NOT EXISTS tariffs (
     price_amount_minor INTEGER NOT NULL,
     currency TEXT NOT NULL DEFAULT 'RUB',
     status TEXT NOT NULL DEFAULT 'active',
+    show_on_homepage INTEGER NOT NULL DEFAULT 0,
     sort_order INTEGER NOT NULL DEFAULT 0,
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL
@@ -146,6 +147,7 @@ def initialize_database(path: Path | str) -> None:
         connection.execute("PRAGMA foreign_keys = ON")
         connection.executescript(SCHEMA_SQL)
         _ensure_users_materials_access_granted_at_column(connection)
+        _ensure_tariffs_show_on_homepage_column(connection)
 
 
 def _ensure_users_materials_access_granted_at_column(connection: sqlite3.Connection) -> None:
@@ -155,3 +157,12 @@ def _ensure_users_materials_access_granted_at_column(connection: sqlite3.Connect
     }
     if "materials_access_granted_at" not in columns:
         connection.execute("ALTER TABLE users ADD COLUMN materials_access_granted_at TEXT NULL")
+
+
+def _ensure_tariffs_show_on_homepage_column(connection: sqlite3.Connection) -> None:
+    columns = {
+        row[1]
+        for row in connection.execute("PRAGMA table_info(tariffs)").fetchall()
+    }
+    if "show_on_homepage" not in columns:
+        connection.execute("ALTER TABLE tariffs ADD COLUMN show_on_homepage INTEGER NOT NULL DEFAULT 0")

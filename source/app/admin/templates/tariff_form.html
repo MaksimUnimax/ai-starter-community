@@ -71,6 +71,15 @@
       </label>
 
       <label class="form-row">
+        <span>Отображать на главной</span>
+        <input type="checkbox" name="show_on_homepage" value="1" {% if form_data.show_on_homepage == "1" %}checked{% endif %}>
+        <span class="form-help">Активный тариф с этим флагом может быть выбран для публичного блока цен.</span>
+        {% if errors.show_on_homepage %}
+          <span class="alert alert-error">{{ errors.show_on_homepage }}</span>
+        {% endif %}
+      </label>
+
+      <label class="form-row">
         <span>Порядок сортировки</span>
         <input class="input" type="number" name="sort_order" min="0" step="1" value="{{ form_data.sort_order }}">
         {% if errors.sort_order %}

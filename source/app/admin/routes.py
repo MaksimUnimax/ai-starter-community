@@ -432,6 +432,7 @@ def _empty_tariff_form_data() -> dict[str, str]:
         "price_rub": "",
         "currency": "RUB",
         "status": "active",
+        "show_on_homepage": "0",
         "sort_order": "0",
     }
 
@@ -444,6 +445,7 @@ def _tariff_form_data_from_tariff(tariff) -> dict[str, str]:
         "price_rub": _format_price_input(tariff.price_amount_minor),
         "currency": tariff.currency,
         "status": tariff.status,
+        "show_on_homepage": "1" if tariff.show_on_homepage else "0",
         "sort_order": str(tariff.sort_order),
     }
 
@@ -456,6 +458,7 @@ def _tariff_form_data_from_form(form) -> dict[str, str]:
         "price_rub": _normalize_text(form.get("price_rub")),
         "currency": _normalize_text(form.get("currency")) or "RUB",
         "status": _normalize_text(form.get("status")) or "active",
+        "show_on_homepage": "1" if _checkbox_is_true(form.get("show_on_homepage")) else "0",
         "sort_order": _normalize_text(form.get("sort_order")) or "0",
     }
 
@@ -541,6 +544,7 @@ def _validate_tariff_form_input(
     raw_price_rub: str | None = None,
     raw_currency: str | None = None,
     raw_status: str | None = None,
+    raw_show_on_homepage=None,
     raw_sort_order: str | None = None,
     include_code: bool = True,
 ) -> tuple[dict[str, object], dict[str, str]]:
@@ -551,6 +555,7 @@ def _validate_tariff_form_input(
     price_minor, price_error = _parse_positive_money_to_minor(raw_price_rub)
     currency = (_normalize_text(raw_currency) or "RUB").upper()
     status = (_normalize_text(raw_status) or "active").lower()
+    show_on_homepage = _checkbox_is_true(raw_show_on_homepage)
     sort_order, sort_error = _parse_non_negative_int(raw_sort_order, "sort_order")
 
     if include_code:
@@ -589,6 +594,7 @@ def _validate_tariff_form_input(
         "price_amount_minor": price_minor,
         "currency": currency,
         "status": status,
+        "show_on_homepage": show_on_homepage,
         "sort_order": sort_order if sort_order is not None else 0,
     }
     return payload, errors
@@ -882,6 +888,7 @@ def _tariffs_for_admin(settings):
                 "price_display": _format_minor_amount(tariff.price_amount_minor),
                 "currency": tariff.currency,
                 "status_label": _status_label(tariff.status),
+                "show_on_homepage_label": "Да" if tariff.show_on_homepage else "Нет",
                 "sort_order": tariff.sort_order,
                 "included_options_summary": ", ".join(option["title"] for option in linked_options) if linked_options else "—",
                 "created_at": tariff.created_at,
@@ -1240,6 +1247,7 @@ async def admin_tariffs_new_submit(request: Request):
         raw_price_rub=form.get("price_rub"),
         raw_currency=form.get("currency"),
         raw_status=form.get("status"),
+        raw_show_on_homepage=form.get("show_on_homepage"),
         raw_sort_order=form.get("sort_order"),
         include_code=True,
     )
@@ -1307,6 +1315,7 @@ async def admin_tariffs_edit_submit(request: Request, code: str):
         raw_price_rub=form.get("price_rub"),
         raw_currency=form.get("currency"),
         raw_status=form.get("status"),
+        raw_show_on_homepage=form.get("show_on_homepage"),
         raw_sort_order=form.get("sort_order"),
         include_code=False,
     )
@@ -1332,6 +1341,7 @@ async def admin_tariffs_edit_submit(request: Request, code: str):
                 price_amount_minor=payload["price_amount_minor"],
                 currency=payload["currency"],
                 status=payload["status"],
+                show_on_homepage=payload["show_on_homepage"],
                 sort_order=payload["sort_order"],
             ),
             settings=settings,

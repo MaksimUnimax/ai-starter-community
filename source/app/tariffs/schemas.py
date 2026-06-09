@@ -14,6 +14,7 @@ class TariffPublic:
     price_amount_minor: int
     currency: str
     status: str
+    show_on_homepage: bool
     sort_order: int
     created_at: str
     updated_at: str
@@ -29,6 +30,7 @@ class TariffCreateInput:
     price_amount_minor: int = 0
     currency: str = "RUB"
     status: str = "active"
+    show_on_homepage: bool = False
     sort_order: int = 0
     code: str | None = None
 
@@ -40,6 +42,7 @@ class TariffUpdateInput:
     price_amount_minor: int | None = None
     currency: str | None = None
     status: str | None = None
+    show_on_homepage: bool | None = None
     sort_order: int | None = None
 
 
