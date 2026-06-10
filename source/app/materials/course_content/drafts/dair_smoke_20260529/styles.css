@@ -918,17 +918,17 @@ button:hover,
 
 .practice-carousel-slide.is-active {
   display: grid;
-  gap: 14px;
+  gap: 12px;
 }
 
 .practice-carousel-window {
   display: grid;
-  gap: 14px;
-  padding: 18px;
+  gap: 10px;
+  padding: 12px;
   overflow: hidden;
   border: 1px solid var(--border);
   border-radius: 24px;
-  background: linear-gradient(180deg, #111722 0%, #0b1117 100%);
+  background: linear-gradient(180deg, #10161f 0%, #0b1117 100%);
   box-shadow: 0 16px 34px rgba(42, 33, 24, 0.08);
 }
 
@@ -960,18 +960,19 @@ button:hover,
 }
 
 .practice-carousel-image-frame {
-  aspect-ratio: 16 / 10;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 18px;
   background: #0a1017;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+  line-height: 0;
 }
 
 .practice-carousel-image-frame img {
   display: block;
   width: 100%;
-  height: 100%;
+  height: auto;
+  max-width: 100%;
   object-fit: contain;
   object-position: center;
 }
@@ -1199,7 +1200,7 @@ button:hover,
   }
 
   .practice-carousel-window {
-    padding: 14px;
+    padding: 10px;
   }
 
   .practice-carousel-slide-caption h5 {

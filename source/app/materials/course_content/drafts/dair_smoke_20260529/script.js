@@ -560,39 +560,33 @@ const courseData = {
             </ol>
             <p><a href="https://github.com/" target="_blank" rel="noreferrer">https://github.com/</a></p>
             <ol start="2">
-              <li>Нажмите кнопку Sign up.</li>
+              <li>Перейдите к созданию аккаунта.</li>
             </ol>
             <p>Можно сразу открыть страницу регистрации:</p>
             <p><a href="https://github.com/signup" target="_blank" rel="noreferrer">https://github.com/signup</a></p>
             <ol start="3">
-              <li>Введите email.</li>
+              <li>Введите email, пароль и username.</li>
             </ol>
             <p>Используйте почту, к которой у вас есть постоянный доступ.</p>
-            <ol start="4">
-              <li>Придумайте пароль.</li>
-            </ol>
             <p>Не отправляйте пароль в ChatGPT, Codex, Telegram или любой другой чат.</p>
-            <ol start="5">
-              <li>Придумайте username.</li>
-            </ol>
             <p>Username — это имя аккаунта на GitHub. Оно будет видно в профиле и рядом с действиями на GitHub.</p>
-            <ol start="6">
+            <ol start="4">
               <li>Пройдите проверку GitHub, если она появится.</li>
             </ol>
             <p>GitHub может попросить подтвердить, что вы не робот.</p>
-            <ol start="7">
-              <li>Подтвердите email.</li>
+            <ol start="5">
+              <li>Подтвердите email, если GitHub попросит.</li>
             </ol>
             <p>Откройте почту, найдите письмо от GitHub и подтвердите адрес.</p>
             <p>Это важно: без подтверждённого email часть действий на GitHub может быть недоступна.</p>
-            <ol start="8">
-              <li>Войдите в аккаунт.</li>
+            <ol start="6">
+              <li>Войдите в аккаунт и проверьте, что открылся dashboard или профиль.</li>
             </ol>
             <p>Если после регистрации GitHub не вошёл автоматически, откройте:</p>
             <p><a href="https://github.com/login" target="_blank" rel="noreferrer">https://github.com/login</a></p>
             <p>Введите данные аккаунта и войдите.</p>
-            <p><strong>Что должно получиться</strong></p>
             <p>К концу урока у вас должен быть зарегистрированный и авторизованный аккаунт GitHub.</p>
+            <p><strong>Что должно получиться</strong></p>
             <p>Проверка:</p>
             <ul>
               <li>открывается <a href="https://github.com/" target="_blank" rel="noreferrer">https://github.com/</a>;</li>
@@ -677,39 +671,33 @@ const courseData = {
         </ol>
         <p><a href="https://github.com/" target="_blank" rel="noreferrer">https://github.com/</a></p>
         <ol start="2">
-          <li>Нажмите кнопку Sign up.</li>
+          <li>Перейдите к созданию аккаунта.</li>
         </ol>
         <p>Можно сразу открыть страницу регистрации:</p>
         <p><a href="https://github.com/signup" target="_blank" rel="noreferrer">https://github.com/signup</a></p>
         <ol start="3">
-          <li>Введите email.</li>
+          <li>Введите email, пароль и username.</li>
         </ol>
         <p>Используйте почту, к которой у вас есть постоянный доступ.</p>
-        <ol start="4">
-          <li>Придумайте пароль.</li>
-        </ol>
         <p>Не отправляйте пароль в ChatGPT, Codex, Telegram или любой другой чат.</p>
-        <ol start="5">
-          <li>Придумайте username.</li>
-        </ol>
         <p>Username — это имя аккаунта на GitHub. Оно будет видно в профиле и рядом с действиями на GitHub.</p>
-        <ol start="6">
+        <ol start="4">
           <li>Пройдите проверку GitHub, если она появится.</li>
         </ol>
         <p>GitHub может попросить подтвердить, что вы не робот.</p>
-        <ol start="7">
-          <li>Подтвердите email.</li>
+        <ol start="5">
+          <li>Подтвердите email, если GitHub попросит.</li>
         </ol>
         <p>Откройте почту, найдите письмо от GitHub и подтвердите адрес.</p>
         <p>Это важно: без подтверждённого email часть действий на GitHub может быть недоступна.</p>
-        <ol start="8">
-          <li>Войдите в аккаунт.</li>
+        <ol start="6">
+          <li>Войдите в аккаунт и проверьте, что открылся dashboard или профиль.</li>
         </ol>
         <p>Если после регистрации GitHub не вошёл автоматически, откройте:</p>
         <p><a href="https://github.com/login" target="_blank" rel="noreferrer">https://github.com/login</a></p>
         <p>Введите данные аккаунта и войдите.</p>
-        <p><strong>Что должно получиться</strong></p>
         <p>К концу урока у вас должен быть зарегистрированный и авторизованный аккаунт GitHub.</p>
+        <p><strong>Что должно получиться</strong></p>
         <p>Проверка:</p>
         <ul>
           <li>открывается <a href="https://github.com/" target="_blank" rel="noreferrer">https://github.com/</a>;</li>
@@ -3483,33 +3471,33 @@ function renderGitPracticeCarousel() {
     },
     {
       stepLabel: "Шаг 2",
-      title: "Нажмите Sign up",
+      title: "Перейдите к созданию аккаунта",
       image: "/static/course-assets/dair-smoke-20260529/git-carousel/github-step-02.png",
-      alt: "Шаг 2. Нажмите Sign up"
+      alt: "Шаг 2. Перейдите к созданию аккаунта"
     },
     {
       stepLabel: "Шаг 3",
-      title: "Введите email и пароль",
+      title: "Введите email, пароль и username",
       image: "/static/course-assets/dair-smoke-20260529/git-carousel/github-step-03.png",
-      alt: "Шаг 3. Введите email и пароль"
+      alt: "Шаг 3. Введите email, пароль и username"
     },
     {
       stepLabel: "Шаг 4",
-      title: "Выберите username",
+      title: "Пройдите проверку GitHub",
       image: "/static/course-assets/dair-smoke-20260529/git-carousel/github-step-04.png",
-      alt: "Шаг 4. Выберите username"
+      alt: "Шаг 4. Пройдите проверку GitHub"
     },
     {
       stepLabel: "Шаг 5",
-      title: "Пройдите проверку GitHub",
+      title: "Войдите в аккаунт",
       image: "/static/course-assets/dair-smoke-20260529/git-carousel/github-step-05.png",
-      alt: "Шаг 5. Пройдите проверку GitHub"
+      alt: "Шаг 5. Войдите в аккаунт"
     },
     {
       stepLabel: "Шаг 6",
-      title: "Подтвердите email и войдите",
+      title: "Проверьте, что аккаунт открыт",
       image: "/static/course-assets/dair-smoke-20260529/git-carousel/github-step-06.png",
-      alt: "Шаг 6. Подтвердите email и войдите"
+      alt: "Шаг 6. Проверьте, что аккаунт открыт"
     }
   ];
 
