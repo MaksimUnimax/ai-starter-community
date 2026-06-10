@@ -977,6 +977,218 @@ button:hover,
   object-position: center;
 }
 
+.practice-carousel-placeholder-frame {
+  display: grid;
+  gap: 14px;
+  width: 100%;
+  min-height: clamp(320px, 46vw, 560px);
+  aspect-ratio: 2.08 / 1;
+  padding: clamp(14px, 1.8vw, 20px);
+  overflow: hidden;
+  border: 1px solid rgba(42, 33, 24, 0.08);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at top left, rgba(196, 92, 38, 0.14), transparent 32%),
+    linear-gradient(180deg, #f8f1e7 0%, #eee1d2 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+.practice-carousel-placeholder-windowbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: #121820;
+  color: #f3f7fb;
+}
+
+.practice-carousel-placeholder-window-dots {
+  display: flex;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+
+.practice-carousel-placeholder-window-dots span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.practice-carousel-placeholder-window-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  text-align: center;
+  color: rgba(243, 247, 251, 0.88);
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.practice-carousel-placeholder-window-badge {
+  flex: 0 0 auto;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 0.74rem;
+  white-space: nowrap;
+}
+
+.practice-carousel-placeholder-body {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.95fr) minmax(0, 1.05fr);
+  gap: 14px;
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+.practice-carousel-placeholder-column {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  align-content: start;
+}
+
+.practice-carousel-placeholder-card,
+.practice-carousel-placeholder-panel {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(42, 33, 24, 0.08);
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 10px 22px rgba(42, 33, 24, 0.04);
+}
+
+.practice-carousel-placeholder-card-kicker {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.practice-carousel-placeholder-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.practice-carousel-placeholder-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(42, 33, 24, 0.08);
+  color: var(--text);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.practice-carousel-placeholder-chip.is-active {
+  background: rgba(196, 92, 38, 0.16);
+  color: var(--accent-strong);
+}
+
+.practice-carousel-placeholder-line {
+  display: block;
+  height: 14px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(42, 33, 24, 0.12), rgba(42, 33, 24, 0.22), rgba(42, 33, 24, 0.12));
+}
+
+.practice-carousel-placeholder-line.is-strong {
+  height: 18px;
+  background: linear-gradient(90deg, rgba(42, 33, 24, 0.72), rgba(42, 33, 24, 0.86), rgba(42, 33, 24, 0.72));
+}
+
+.practice-carousel-placeholder-terminal {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid rgba(10, 16, 23, 0.12);
+  border-radius: 16px;
+  background: linear-gradient(180deg, #121820 0%, #0c1117 100%);
+  color: #edf4fb;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+}
+
+.practice-carousel-placeholder-terminal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: rgba(237, 244, 251, 0.8);
+  font-size: 0.82rem;
+}
+
+.practice-carousel-placeholder-terminal-prompt {
+  font-family: var(--font-mono);
+  color: var(--accent);
+}
+
+.practice-carousel-placeholder-terminal .practice-carousel-placeholder-line {
+  background: rgba(237, 244, 251, 0.14);
+}
+
+.practice-carousel-placeholder-terminal .practice-carousel-placeholder-line.is-strong {
+  background: rgba(237, 244, 251, 0.42);
+}
+
+.practice-carousel-placeholder-chat-bubble {
+  display: inline-flex;
+  max-width: 100%;
+  padding: 14px 16px;
+  border-radius: 18px 18px 18px 8px;
+  background: rgba(196, 92, 38, 0.12);
+  color: var(--text);
+  font-size: 1rem;
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1px rgba(196, 92, 38, 0.14);
+}
+
+.practice-carousel-placeholder-checklist {
+  display: grid;
+  gap: 10px;
+}
+
+.practice-carousel-placeholder-checkitem {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: var(--text);
+  font-size: 0.92rem;
+}
+
+.practice-carousel-placeholder-checkitem::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  margin-top: 0.45em;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 4px rgba(196, 92, 38, 0.12);
+}
+
+.practice-carousel-placeholder-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
 .module-grid {
   display: grid;
   gap: 14px;
@@ -1201,6 +1413,34 @@ button:hover,
 
   .practice-carousel-window {
     padding: 10px;
+  }
+
+  .practice-carousel-placeholder-frame {
+    aspect-ratio: auto;
+    min-height: 0;
+  }
+
+  .practice-carousel-placeholder-body {
+    grid-template-columns: 1fr;
+  }
+
+  .practice-carousel-placeholder-windowbar {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  .practice-carousel-placeholder-window-title {
+    order: 3;
+    flex-basis: 100%;
+    text-align: left;
+  }
+
+  .practice-carousel-placeholder-window-badge {
+    margin-left: auto;
+  }
+
+  .practice-carousel-placeholder-footer {
+    flex-direction: column;
   }
 
   .practice-carousel-slide-caption h5 {
