@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS account_blocks (
     activated_by_user_id INTEGER NULL REFERENCES users(id) ON DELETE SET NULL,
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL,
-    CHECK (type IN ('chatgpt', 'server', 'mail')),
+    CHECK (type IN ('chatgpt', 'server', 'mail', 'vpn')),
     CHECK (status IN ('inactive', 'active', 'expired'))
 );
 
@@ -146,8 +146,95 @@ def initialize_database(path: Path | str) -> None:
     with sqlite3.connect(str(db_path)) as connection:
         connection.execute("PRAGMA foreign_keys = ON")
         connection.executescript(SCHEMA_SQL)
+        _ensure_account_blocks_type_vpn(connection)
         _ensure_users_materials_access_granted_at_column(connection)
         _ensure_tariffs_show_on_homepage_column(connection)
+
+
+def _ensure_account_blocks_type_vpn(connection: sqlite3.Connection) -> None:
+    row = connection.execute(
+        "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'account_blocks'",
+    ).fetchone()
+    schema_sql = str(row[0]) if row is not None and row[0] is not None else ""
+    if "vpn" in schema_sql.lower():
+        return
+
+    connection.execute("PRAGMA foreign_keys = OFF")
+    try:
+        connection.executescript(
+            """
+            ALTER TABLE account_blocks RENAME TO account_blocks_legacy;
+
+            CREATE TABLE account_blocks (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                owner_user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                type TEXT NOT NULL,
+                title TEXT NOT NULL,
+                login TEXT NOT NULL DEFAULT '',
+                password_secret TEXT NOT NULL DEFAULT '',
+                email TEXT NULL,
+                status TEXT NOT NULL DEFAULT 'inactive',
+                duration_days INTEGER NOT NULL DEFAULT 60,
+                activated_at TEXT NULL,
+                expires_at TEXT NULL,
+                created_by_user_id INTEGER NULL REFERENCES users(id) ON DELETE SET NULL,
+                updated_by_user_id INTEGER NULL REFERENCES users(id) ON DELETE SET NULL,
+                activated_by_user_id INTEGER NULL REFERENCES users(id) ON DELETE SET NULL,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                CHECK (type IN ('chatgpt', 'server', 'mail', 'vpn')),
+                CHECK (status IN ('inactive', 'active', 'expired'))
+            );
+
+            INSERT INTO account_blocks (
+                id,
+                owner_user_id,
+                type,
+                title,
+                login,
+                password_secret,
+                email,
+                status,
+                duration_days,
+                activated_at,
+                expires_at,
+                created_by_user_id,
+                updated_by_user_id,
+                activated_by_user_id,
+                created_at,
+                updated_at
+            )
+            SELECT
+                id,
+                owner_user_id,
+                type,
+                title,
+                login,
+                password_secret,
+                email,
+                status,
+                duration_days,
+                activated_at,
+                expires_at,
+                created_by_user_id,
+                updated_by_user_id,
+                activated_by_user_id,
+                created_at,
+                updated_at
+            FROM account_blocks_legacy;
+
+            DROP TABLE account_blocks_legacy;
+            """
+        )
+        connection.executescript(
+            """
+            CREATE INDEX IF NOT EXISTS idx_account_blocks_owner_user_id ON account_blocks(owner_user_id);
+            CREATE INDEX IF NOT EXISTS idx_account_blocks_owner_user_type ON account_blocks(owner_user_id, type);
+            CREATE INDEX IF NOT EXISTS idx_account_blocks_status ON account_blocks(status);
+            """
+        )
+    finally:
+        connection.execute("PRAGMA foreign_keys = ON")
 
 
 def _ensure_users_materials_access_granted_at_column(connection: sqlite3.Connection) -> None:

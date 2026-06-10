@@ -78,6 +78,8 @@ def test_admin_can_search_user_by_email_and_manage_selected_user_blocks(client, 
     assert "Платная опция" not in body
     assert "Без привязки" not in body
     assert 'name="account_blocks_user_email"' in body
+    assert 'value="vpn"' in body
+    assert "ВПН" in body
     assert 'data-account-block-duration-input' in body
     assert 'name="duration_days" type="number" min="1" value="30"' in body
     assert f'action="/admin/account-blocks?{urlencode({"account_blocks_user_email": owner.email})}' in body
@@ -105,6 +107,27 @@ def test_admin_can_search_user_by_email_and_manage_selected_user_blocks(client, 
     assert row["title"] == "Сервер"
     assert int(row["owner_user_id"]) == owner.id
     assert int(row["duration_days"]) == 30
+
+    vpn_create_response = client.post(
+        f"/admin/account-blocks?{urlencode({'account_blocks_user_email': owner.email})}",
+        data={
+            "type": "vpn",
+            "duration_days": "",
+            "login": "",
+            "password_secret": "",
+        },
+        follow_redirects=False,
+    )
+    assert vpn_create_response.status_code == 303
+    with _connect(test_settings) as conn:
+        vpn_row = conn.execute(
+            "SELECT * FROM account_blocks WHERE type = ? AND owner_user_id = ? ORDER BY id DESC LIMIT 1",
+            ("vpn", owner.id),
+        ).fetchone()
+    assert vpn_row is not None
+    assert vpn_row["title"] == "ВПН"
+    assert vpn_row["login"] == ""
+    assert vpn_row["password_secret"] == ""
 
     override_response = client.post(
         f"/admin/account-blocks?{urlencode({'account_blocks_user_email': owner.email})}",

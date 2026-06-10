@@ -61,7 +61,7 @@ def _grant_materials_access(test_settings, email: str) -> None:
 
 
 def _extract_accounts_section(body_text: str) -> str:
-    start_marker = '<section id="accounts" class="card stack accounts-card" data-local-accounts-root data-account-blocks-source="server">'
+    start_marker = '<section id="accounts" class="card stack accounts-card'
     end_marker = '\n  <section class="card stack prompts-library-card" data-prompts-library-root>'
     start = body_text.find(start_marker)
     end = body_text.find(end_marker, start)
@@ -115,10 +115,20 @@ def test_user_sees_compact_server_backed_account_blocks_and_copy_only_controls(c
         ),
         settings=test_settings,
     )
+    vpn_block = create_account_block(
+        actor=admin,
+        data=AccountBlockCreateInput(
+            owner_user_id=owner.id,
+            type="vpn",
+        ),
+        settings=test_settings,
+    )
 
     fixed_now = datetime(2026, 6, 8, 12, 0, 0, tzinfo=timezone.utc)
     with patch("app.account_blocks.service.utc_now", return_value=fixed_now):
         activate_account_block(actor=admin, block_id=active_block.id, settings=test_settings)
+    with patch("app.account_blocks.service.utc_now", return_value=fixed_now):
+        activate_account_block(actor=admin, block_id=vpn_block.id, settings=test_settings)
 
     _login_as(client, test_settings, owner.email)
     with patch("app.account_blocks.service.utc_now", return_value=fixed_now):
@@ -144,6 +154,7 @@ def test_user_sees_compact_server_backed_account_blocks_and_copy_only_controls(c
     assert "data-account-card-edit-form" not in accounts_section
     assert "Скопировать" in accounts_section
     assert "ChatGPT" in accounts_section
+    assert "ВПН" in accounts_section
     assert "Почта" not in accounts_section
     assert "Осталось 60 дней" in accounts_section
     assert "Не активирован" not in accounts_section
@@ -162,6 +173,10 @@ def test_user_sees_compact_server_backed_account_blocks_and_copy_only_controls(c
     assert "Платная опция" not in accounts_section
     assert "Без привязки" not in accounts_section
     assert "Продлить активацию" not in accounts_section
+    assert "Открыть сайт Amnezia VPN" in accounts_section
+    assert "Просмотрите ролик. IP сервера возьмите из блока «Сервер»." in accounts_section
+    assert "Показать видеоинструкцию" in accounts_section
+    assert "amnezia-vpn-guide.mp4" in accounts_section
 
 
 def test_user_with_no_active_account_blocks_sees_new_empty_state(client, test_settings):

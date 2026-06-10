@@ -24,7 +24,7 @@ from .schemas import (
 )
 
 
-ACCOUNT_BLOCK_TYPES = ("chatgpt", "server", "mail")
+ACCOUNT_BLOCK_TYPES = ("chatgpt", "server", "mail", "vpn")
 ACCOUNT_BLOCK_ACTIVE_STATUS = "active"
 ACCOUNT_BLOCK_INACTIVE_STATUS = "inactive"
 ACCOUNT_BLOCK_EXPIRED_STATUS = "expired"
@@ -41,6 +41,7 @@ ACCOUNT_BLOCK_TYPE_LABELS = {
     "chatgpt": "ChatGPT",
     "server": "Сервер",
     "mail": "Почта",
+    "vpn": "ВПН",
 }
 
 

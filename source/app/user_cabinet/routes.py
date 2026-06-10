@@ -63,6 +63,7 @@ ACCOUNT_BLOCK_TYPE_LABELS = {
     "chatgpt": "ChatGPT",
     "server": "Сервер",
     "mail": "Почта",
+    "vpn": "ВПН",
 }
 ACCOUNT_BLOCK_STATUS_LABELS = {
     "active": "Активно",
@@ -450,6 +451,7 @@ def cabinet_page(request: Request):
             {"value": "chatgpt", "label": "ChatGPT"},
             {"value": "server", "label": "Сервер"},
             {"value": "mail", "label": "Почта"},
+            {"value": "vpn", "label": "ВПН"},
         ],
         **account_block_context,
     )

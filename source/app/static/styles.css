@@ -1232,6 +1232,56 @@ button:hover {
   line-height: 1.35;
 }
 
+.accounts-card--cabinet .accounts-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  justify-content: start;
+  align-items: stretch;
+}
+
+.accounts-card--cabinet .account-card {
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+}
+
+.accounts-card--cabinet .account-card__headline {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.accounts-card--cabinet .account-card__title-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px 10px;
+  align-items: start;
+}
+
+.accounts-card--cabinet .account-card__title {
+  overflow-wrap: anywhere;
+}
+
+.accounts-card--cabinet .account-card__badges {
+  align-items: flex-start;
+}
+
+.accounts-card--cabinet .account-field__control {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.accounts-card--cabinet .account-card__details {
+  align-items: start;
+}
+
+.accounts-card--cabinet .account-card__detail {
+  min-height: 1.35em;
+}
+
 .account-card--vpn {
   border-color: rgba(196, 92, 38, 0.26);
   background: linear-gradient(180deg, #fffdf8 0%, #fff7ee 100%);
@@ -1422,6 +1472,45 @@ button:hover {
 .accounts-notice {
   min-height: 1.5em;
   color: var(--muted);
+}
+
+@media (max-width: 980px) {
+  .accounts-card--cabinet .accounts-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .accounts-card--cabinet .accounts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .accounts-card--cabinet .account-card {
+    width: 100%;
+    max-width: none;
+    flex-basis: 100%;
+  }
+
+  .accounts-card--cabinet .account-card__title-row {
+    grid-template-columns: 1fr;
+  }
+
+  .accounts-card--cabinet .account-card__badges {
+    justify-content: flex-start;
+  }
+
+  .accounts-card--cabinet .account-field__control {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .accounts-card--cabinet .account-copy-button {
+    width: 100%;
+  }
+
+  .accounts-card--cabinet .account-card__detail {
+    min-height: 0;
+  }
 }
 
 .prompts-library-card {

@@ -64,6 +64,11 @@ def test_account_blocks_table_and_supported_types_exist(test_settings):
             for row in conn.execute("SELECT name FROM sqlite_master WHERE type = 'table'").fetchall()
         }
         assert "account_blocks" in tables
+        create_sql_row = conn.execute(
+            "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'account_blocks'"
+        ).fetchone()
+        assert create_sql_row is not None
+        assert "vpn" in str(create_sql_row["sql"]).lower()
         columns = {
             row["name"]
             for row in conn.execute("PRAGMA table_info(account_blocks)").fetchall()
@@ -128,6 +133,20 @@ def test_admin_and_moderator_can_create_update_list_and_delete_blocks_with_deriv
     assert moderator_block.title == "Почта"
     assert moderator_block.email == other_owner.email
 
+    vpn_block = create_account_block(
+        actor=admin,
+        data=AccountBlockCreateInput(
+            owner_user_id=owner.id,
+            type="vpn",
+        ),
+        settings=test_settings,
+    )
+    assert vpn_block.owner_user_id == owner.id
+    assert vpn_block.title == "ВПН"
+    assert vpn_block.login == ""
+    vpn_copy_data = get_account_block_copy_data(actor=admin, block_id=vpn_block.id, settings=test_settings)
+    assert vpn_copy_data.password_secret == ""
+
     updated_block = update_account_block(
         actor=moderator,
         block_id=admin_block.id,
@@ -149,10 +168,10 @@ def test_admin_and_moderator_can_create_update_list_and_delete_blocks_with_deriv
     assert updated_block.email is None
 
     all_blocks = list_account_blocks_for_viewer(admin, settings=test_settings)
-    assert {block.id for block in all_blocks} == {admin_block.id, moderator_block.id}
+    assert {block.id for block in all_blocks} == {admin_block.id, moderator_block.id, vpn_block.id}
 
     owner_blocks = list_account_blocks_for_viewer(owner, settings=test_settings)
-    assert [block.id for block in owner_blocks] == [admin_block.id]
+    assert {block.id for block in owner_blocks} == {admin_block.id, vpn_block.id}
 
     copy_data = get_account_block_copy_data(actor=other_owner, block_id=moderator_block.id, settings=test_settings)
     assert copy_data.login == "mail-login"

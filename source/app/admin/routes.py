@@ -216,6 +216,7 @@ def _account_block_card_context(block, copy_data, owner_summary: dict[str, objec
             "chatgpt": "ChatGPT",
             "server": "Сервер",
             "mail": "Почта",
+            "vpn": "ВПН",
         }.get(block.type, block.type),
         "title": block.title,
         "login": copy_data.login,
@@ -323,6 +324,7 @@ def _admin_account_block_page_context(user, settings, request: Request) -> dict[
             {"value": "chatgpt", "label": "ChatGPT"},
             {"value": "server", "label": "Сервер"},
             {"value": "mail", "label": "Почта"},
+            {"value": "vpn", "label": "ВПН"},
         ],
     }
 
