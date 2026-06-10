@@ -41,7 +41,6 @@ class SMTPProfile:
     password_name: str
     use_tls_name: str
     use_starttls_name: str
-    fallback_reason: str | None = None
 
     @property
     def configured(self) -> bool:
@@ -59,47 +58,27 @@ def _resolved_settings(settings: Settings | None = None) -> Settings:
 
 
 def _smtp_profile_from_settings(settings: Settings, smtp_channel: str) -> SMTPProfile:
-    if smtp_channel == "primary":
-        return SMTPProfile(
-            channel="primary",
-            from_address=settings.email_from_address,
-            from_name=settings.email_from_name,
-            host=settings.smtp_host,
-            port=settings.smtp_port,
-            username=settings.smtp_username,
-            password=settings.smtp_password,
-            use_tls=settings.smtp_use_tls,
-            use_starttls=settings.smtp_use_starttls,
-            timeout_seconds=settings.smtp_timeout_seconds,
-            from_address_name="EMAIL_FROM_ADDRESS",
-            host_name="SMTP_HOST",
-            port_name="SMTP_PORT",
-            username_name="SMTP_USERNAME",
-            password_name="SMTP_PASSWORD",
-            use_tls_name="SMTP_USE_TLS",
-            use_starttls_name="SMTP_USE_STARTTLS",
-        )
-    if smtp_channel == "secondary_resend":
-        return SMTPProfile(
-            channel="secondary_resend",
-            from_address=settings.email_resend_from_address,
-            from_name=settings.email_resend_from_name,
-            host=settings.email_resend_smtp_host,
-            port=settings.email_resend_smtp_port,
-            username=settings.email_resend_smtp_username,
-            password=settings.email_resend_smtp_password,
-            use_tls=settings.email_resend_smtp_use_tls,
-            use_starttls=settings.email_resend_smtp_use_starttls,
-            timeout_seconds=settings.email_resend_smtp_timeout_seconds,
-            from_address_name="EMAIL_RESEND_FROM_ADDRESS",
-            host_name="EMAIL_RESEND_SMTP_HOST",
-            port_name="EMAIL_RESEND_SMTP_PORT",
-            username_name="EMAIL_RESEND_SMTP_USERNAME",
-            password_name="EMAIL_RESEND_SMTP_PASSWORD",
-            use_tls_name="EMAIL_RESEND_SMTP_USE_TLS",
-            use_starttls_name="EMAIL_RESEND_SMTP_USE_STARTTLS",
-        )
-    raise SMTPConfigError(f"unsupported smtp channel: {smtp_channel}")
+    if smtp_channel not in {"primary", "registration"}:
+        raise SMTPConfigError(f"unsupported smtp channel: {smtp_channel}")
+    return SMTPProfile(
+        channel="primary",
+        from_address=settings.email_from_address,
+        from_name=settings.email_from_name,
+        host=settings.smtp_host,
+        port=settings.smtp_port,
+        username=settings.smtp_username,
+        password=settings.smtp_password,
+        use_tls=settings.smtp_use_tls,
+        use_starttls=settings.smtp_use_starttls,
+        timeout_seconds=settings.smtp_timeout_seconds,
+        from_address_name="EMAIL_FROM_ADDRESS",
+        host_name="SMTP_HOST",
+        port_name="SMTP_PORT",
+        username_name="SMTP_USERNAME",
+        password_name="SMTP_PASSWORD",
+        use_tls_name="SMTP_USE_TLS",
+        use_starttls_name="SMTP_USE_STARTTLS",
+    )
 
 
 def build_smtp_profile(settings: Settings | None = None, *, smtp_channel: str = "primary") -> SMTPProfile:
