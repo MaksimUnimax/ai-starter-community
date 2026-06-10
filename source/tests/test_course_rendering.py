@@ -328,6 +328,16 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Старт проекта: сначала документация, потом разработка" in script_response.text
     assert "ChatGPT выступает как ведущий специалист" in script_response.text
     assert "Git: история, commit, push и откат" in script_response.text
+    assert "Вам не нужно заучивать команды, термины и точный порядок работы с Git" in script_response.text
+    assert "ChatGPT мог контролировать работу Codex" in script_response.text
+    assert "не только по отчёту" in script_response.text
+    assert "отчёту <strong>Codex</strong>" in script_response.text
+    assert "фактическим изменениям" in script_response.text
+    assert "Репозиторий" in script_response.text
+    assert "Публичный репозиторий" in script_response.text
+    assert "Приватный репозиторий" in script_response.text
+    assert "без секретов" in script_response.text
+    assert "Главный смысл Git для ученика" not in script_response.text
     assert "Урок 7 — Процесс работы" in script_response.text
     assert 'navTitle: "Урок 7 — Процесс работы"' in script_response.text
     assert 'title: "Процесс работы"' in script_response.text
@@ -368,6 +378,12 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     lesson5_section = script_response.text[lesson5_start:lesson6_start]
     lesson6_section = script_response.text[lesson6_start:lesson7_start]
     assert "В следующем уроке разберём Codex, AGENTS.md, Skills, токены и роль модели." in lesson3_section
+    assert "Вам не нужно заучивать команды, термины и точный порядок работы с Git" in lesson3_section
+    assert "ChatGPT мог контролировать работу Codex" in lesson3_section
+    assert "Репозиторий" in lesson3_section
+    assert "Публичный репозиторий" in lesson3_section
+    assert "Приватный репозиторий" in lesson3_section
+    assert "без секретов" in lesson3_section
     assert "Перейти к уроку 4" in lesson3_section
     assert "В следующем уроке разберём PowerShell, Terminal и подключение к серверу." in lesson4_section
     assert "Перейти к уроку 5" in lesson4_section
@@ -644,7 +660,7 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "https://github.com/" in lesson3_task_section
     assert "https://github.com/signup" in lesson3_task_section
     assert "https://github.com/login" in lesson3_task_section
-    assert "К концу урока у ученика должен быть зарегистрированный и авторизованный аккаунт GitHub" in lesson3_task_section
+    assert "К концу урока у вас должен быть зарегистрированный и авторизованный аккаунт GitHub" in lesson3_task_section
     assert "подтвердите email" in lesson3_task_section.lower()
     assert "Что нельзя делать" not in lesson3_task_section
     assert "не отправляйте пароль в чат" not in lesson3_task_section
@@ -704,9 +720,14 @@ def test_git_backed_course_map_page_requires_learning_access(client, test_settin
     locked_styles = client.get("/materials/drafts/dair-smoke-20260529/styles.css", follow_redirects=False)
     locked_script = client.get("/materials/drafts/dair-smoke-20260529/script.js", follow_redirects=False)
 
-    assert locked_page.status_code == 403
+    assert locked_page.status_code == 200
     assert locked_styles.status_code == 403
     assert locked_script.status_code == 403
+    assert "Работа с ИИ" in locked_page.text
+    assert "Вступление к курсу" in locked_page.text
+    assert "Полный доступ откроется после оплаты тарифа." in locked_page.text
+    assert "quiz-list" not in locked_page.text
+    assert "lesson-shell" not in locked_page.text
 
     with _connect(test_settings) as conn:
         conn.execute(
