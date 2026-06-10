@@ -603,6 +603,14 @@ const courseData = {
           `
         },
         {
+          label: "Визуальный блок",
+          title: "Визуальная инструкция",
+          html: `
+            <p class="practice-carousel-subtitle">Пробный формат карусели для практического задания</p>
+            ${renderGitPracticeCarousel()}
+          `
+        },
+        {
           label: "Итог",
           title: "Главный вывод",
           html: `
@@ -3417,7 +3425,8 @@ const state = {
   flippedCards: new Set(),
   solvedQuestions: new Set(),
   answeredQuestions: {},
-  openStarterPromptIds: new Set()
+  openStarterPromptIds: new Set(),
+  practiceCarouselState: Object.create(null)
 };
 
 const legacySectionAliases = {
@@ -3464,6 +3473,268 @@ function escapeHTML(value) {
     .replaceAll("\"", "&quot;");
 }
 
+function renderGitPracticeCarousel() {
+  const slides = [
+    {
+      stepLabel: "Шаг 1",
+      title: "Откройте GitHub",
+      url: "github.com",
+      chip: "Главная страница",
+      body: `
+        <div class="practice-carousel-screen practice-carousel-screen--split">
+          <div class="practice-carousel-screen-hero">
+            <span class="practice-carousel-step-label">Шаг 1</span>
+            <h5>Откройте GitHub</h5>
+            <p>Сначала откройте главный сайт и убедитесь, что вы на правильной странице для регистрации.</p>
+            <div class="practice-carousel-inline-actions" aria-hidden="true">
+              <span class="practice-carousel-mock-button practice-carousel-mock-button--accent">Sign up</span>
+              <span class="practice-carousel-mock-button">Explore</span>
+            </div>
+          </div>
+          <div class="practice-carousel-screen-panel">
+            <div class="practice-carousel-screen-card practice-carousel-screen-card--highlight">
+              <strong>Start here</strong>
+              <span>Стартовая точка для нового аккаунта</span>
+            </div>
+            <div class="practice-carousel-screen-card">
+              <strong>Sign in</strong>
+              <span>Если аккаунт уже существует</span>
+            </div>
+            <div class="practice-carousel-screen-card">
+              <strong>Search</strong>
+              <span>Пример второй панели для визуальной плотности</span>
+            </div>
+          </div>
+        </div>
+      `
+    },
+    {
+      stepLabel: "Шаг 2",
+      title: "Нажмите Sign up",
+      url: "github.com/signup",
+      chip: "Форма регистрации",
+      body: `
+        <div class="practice-carousel-screen practice-carousel-screen--form">
+          <div class="practice-carousel-screen-main">
+            <span class="practice-carousel-step-label">Шаг 2</span>
+            <h5>Нажмите Sign up</h5>
+            <p>Откроется форма регистрации с полями email, пароля и username.</p>
+            <div class="practice-carousel-form-card">
+              <div class="practice-carousel-form-row">
+                <span>Email address</span>
+                <div class="practice-carousel-mock-input"></div>
+              </div>
+              <div class="practice-carousel-form-row">
+                <span>Password</span>
+                <div class="practice-carousel-mock-input"></div>
+              </div>
+              <div class="practice-carousel-form-row">
+                <span>Username</span>
+                <div class="practice-carousel-mock-input practice-carousel-mock-input--short"></div>
+              </div>
+              <span class="practice-carousel-mock-button practice-carousel-mock-button--accent">Sign up</span>
+            </div>
+          </div>
+          <div class="practice-carousel-screen-panel">
+            <div class="practice-carousel-screen-card practice-carousel-screen-card--highlight">
+              <strong>Form shell</strong>
+              <span>Позже сюда подставится настоящий скриншот регистрации.</span>
+            </div>
+            <div class="practice-carousel-screen-card">
+              <strong>Tip</strong>
+              <span>Размер карточки уже резервирует место под реальный экран.</span>
+            </div>
+          </div>
+        </div>
+      `
+    },
+    {
+      stepLabel: "Шаг 3",
+      title: "Введите email и пароль",
+      url: "github.com/signup",
+      chip: "Поля ввода",
+      body: `
+        <div class="practice-carousel-screen practice-carousel-screen--form">
+          <div class="practice-carousel-screen-main">
+            <span class="practice-carousel-step-label">Шаг 3</span>
+            <h5>Введите email и пароль</h5>
+            <p>Поля должны быть читаемыми, с понятным фокусом и достаточным пространством для будущего скриншота.</p>
+            <div class="practice-carousel-form-card">
+              <div class="practice-carousel-form-row practice-carousel-form-row--active">
+                <span>Email address</span>
+                <div class="practice-carousel-mock-input">
+                  <span class="practice-carousel-mock-value">unymax2016@example.com</span>
+                </div>
+              </div>
+              <div class="practice-carousel-form-row practice-carousel-form-row--active">
+                <span>Password</span>
+                <div class="practice-carousel-mock-input">
+                  <span class="practice-carousel-mock-value practice-carousel-mock-value--dots">••••••••••</span>
+                </div>
+              </div>
+              <div class="practice-carousel-mock-helper">
+                Используйте почту, к которой у вас есть постоянный доступ, и не отправляйте пароль в чат.
+              </div>
+            </div>
+          </div>
+          <div class="practice-carousel-screen-panel">
+            <div class="practice-carousel-screen-card practice-carousel-screen-card--highlight">
+              <strong>Focus</strong>
+              <span>Форма показывает, где вводить email и пароль.</span>
+            </div>
+            <div class="practice-carousel-screen-card">
+              <strong>Button</strong>
+              <span>Кнопка регистрации остаётся заметной и доступной.</span>
+            </div>
+          </div>
+        </div>
+      `
+    },
+    {
+      stepLabel: "Шаг 4",
+      title: "Выберите username",
+      url: "github.com/signup",
+      chip: "Проверка имени",
+      body: `
+        <div class="practice-carousel-screen practice-carousel-screen--form">
+          <div class="practice-carousel-screen-main">
+            <span class="practice-carousel-step-label">Шаг 4</span>
+            <h5>Выберите username</h5>
+            <p>Покажите, что имя аккаунта можно проверить до завершения регистрации.</p>
+            <div class="practice-carousel-form-card">
+              <div class="practice-carousel-form-row">
+                <span>Username</span>
+                <div class="practice-carousel-mock-input practice-carousel-mock-input--wide">
+                  <span class="practice-carousel-mock-value">openscript-student</span>
+                </div>
+              </div>
+              <div class="practice-carousel-status practice-carousel-status--success">
+                Username available
+              </div>
+              <div class="practice-carousel-inline-actions" aria-hidden="true">
+                <span class="practice-carousel-mock-button">Back</span>
+                <span class="practice-carousel-mock-button practice-carousel-mock-button--accent">Continue</span>
+              </div>
+            </div>
+          </div>
+          <div class="practice-carousel-screen-panel">
+            <div class="practice-carousel-screen-card practice-carousel-screen-card--highlight">
+              <strong>Availability</strong>
+              <span>Статус имени можно показать заметным бейджем.</span>
+            </div>
+            <div class="practice-carousel-screen-card">
+              <strong>Readability</strong>
+              <span>Поле username и подсказки должны читаться с первого взгляда.</span>
+            </div>
+          </div>
+        </div>
+      `
+    },
+    {
+      stepLabel: "Шаг 5",
+      title: "Подтвердите email и войдите",
+      url: "github.com/login",
+      chip: "Финальный вход",
+      body: `
+        <div class="practice-carousel-screen practice-carousel-screen--split practice-carousel-screen--final">
+          <div class="practice-carousel-screen-hero">
+            <span class="practice-carousel-step-label">Шаг 5</span>
+            <h5>Подтвердите email и войдите</h5>
+            <p>Покажите, что после подтверждения почты пользователь может вернуться к входу и продолжить работу.</p>
+            <div class="practice-carousel-mock-mail">
+              <strong>Письмо подтверждения</strong>
+              <span>Подтвердите email перед входом.</span>
+            </div>
+          </div>
+          <div class="practice-carousel-screen-panel">
+            <div class="practice-carousel-form-card">
+              <div class="practice-carousel-form-row">
+                <span>Username or email address</span>
+                <div class="practice-carousel-mock-input practice-carousel-mock-input--wide">
+                  <span class="practice-carousel-mock-value">unymax2016@example.com</span>
+                </div>
+              </div>
+              <div class="practice-carousel-form-row">
+                <span>Password</span>
+                <div class="practice-carousel-mock-input practice-carousel-mock-input--wide">
+                  <span class="practice-carousel-mock-value practice-carousel-mock-value--dots">••••••••••</span>
+                </div>
+              </div>
+              <span class="practice-carousel-mock-button practice-carousel-mock-button--accent">Sign in</span>
+            </div>
+            <div class="practice-carousel-screen-card">
+              <strong>Finish</strong>
+              <span>Последний шаг показывает и подтверждение email, и экран входа.</span>
+            </div>
+          </div>
+        </div>
+      `
+    }
+  ];
+
+  return `
+    <div class="practice-carousel" data-practice-carousel="github-registration">
+      <div class="practice-carousel-toolbar">
+        <div class="practice-carousel-note-wrap">
+          <p class="practice-carousel-note">Позже здесь будут реальные скриншоты GitHub.</p>
+        </div>
+        <div class="practice-carousel-controls" role="group" aria-label="Навигация по карусели">
+          <button class="ghost-button practice-carousel-nav" type="button" data-practice-carousel-prev>Назад</button>
+          <button class="primary-button practice-carousel-nav" type="button" data-practice-carousel-next>Дальше</button>
+        </div>
+      </div>
+      <div class="practice-carousel-stepbar" role="tablist" aria-label="Шаги визуальной инструкции">
+        ${slides
+          .map(
+            (slide, index) => `
+              <button
+                class="practice-carousel-step ${index === 0 ? "is-active" : ""}"
+                type="button"
+                data-practice-carousel-step="${index}"
+                id="practice-carousel-step-${index}"
+                role="tab"
+                aria-selected="${index === 0 ? "true" : "false"}"
+                aria-controls="practice-carousel-slide-${index}"
+              >
+                ${escapeHTML(slide.stepLabel)}
+              </button>
+            `
+          )
+          .join("")}
+      </div>
+      <div class="practice-carousel-stage">
+        ${slides
+          .map(
+            (slide, index) => `
+              <section
+                class="practice-carousel-slide ${index === 0 ? "is-active" : ""}"
+                data-practice-carousel-slide="${index}"
+                id="practice-carousel-slide-${index}"
+                role="tabpanel"
+                aria-labelledby="practice-carousel-step-${index}"
+                aria-hidden="${index === 0 ? "false" : "true"}"
+              >
+                <div class="practice-carousel-window">
+                  <div class="practice-carousel-window-bar" aria-hidden="true">
+                    <div class="practice-carousel-window-dots">
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </div>
+                    <div class="practice-carousel-window-url">${escapeHTML(slide.url)}</div>
+                    <div class="practice-carousel-window-chip">${escapeHTML(slide.chip)}</div>
+                  </div>
+                  ${slide.body}
+                </div>
+              </section>
+            `
+          )
+          .join("")}
+      </div>
+    </div>
+  `;
+}
+
 function renderNavigation() {
   navRoot.innerHTML = courseData.sections
     .map((section) => {
@@ -3485,6 +3756,65 @@ function flashcardKey(sectionId, index) {
 
 function quizKey(sectionId, index) {
   return `${sectionId}:${index}`;
+}
+
+function getPracticeCarouselKey(carousel) {
+  return carousel?.dataset?.practiceCarousel || "default";
+}
+
+function updatePracticeCarouselUI(carousel, activeIndex) {
+  if (!carousel) {
+    return;
+  }
+
+  const slides = Array.from(carousel.querySelectorAll("[data-practice-carousel-slide]"));
+  const stepButtons = Array.from(carousel.querySelectorAll("[data-practice-carousel-step]"));
+  if (slides.length === 0 || stepButtons.length === 0) {
+    return;
+  }
+
+  const normalizedIndex = Math.max(0, Math.min(activeIndex, slides.length - 1));
+
+  slides.forEach((slide, index) => {
+    const isActive = index === normalizedIndex;
+    slide.classList.toggle("is-active", isActive);
+    slide.hidden = !isActive;
+    slide.setAttribute("aria-hidden", String(!isActive));
+  });
+
+  stepButtons.forEach((button, index) => {
+    const isActive = index === normalizedIndex;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-selected", String(isActive));
+  });
+
+  const prevButton = carousel.querySelector("[data-practice-carousel-prev]");
+  const nextButton = carousel.querySelector("[data-practice-carousel-next]");
+  if (prevButton) {
+    prevButton.disabled = normalizedIndex === 0;
+  }
+  if (nextButton) {
+    nextButton.disabled = normalizedIndex === slides.length - 1;
+  }
+}
+
+function syncPracticeCarousels(root = activeSectionRoot) {
+  const carousels = root.querySelectorAll("[data-practice-carousel]");
+  carousels.forEach((carousel) => {
+    const key = getPracticeCarouselKey(carousel);
+    const activeIndex = state.practiceCarouselState[key] ?? 0;
+    updatePracticeCarouselUI(carousel, activeIndex);
+  });
+}
+
+function setPracticeCarouselIndex(carousel, activeIndex) {
+  if (!carousel) {
+    return;
+  }
+
+  const key = getPracticeCarouselKey(carousel);
+  state.practiceCarouselState[key] = activeIndex;
+  updatePracticeCarouselUI(carousel, activeIndex);
 }
 
 function renderLessonBlocks(section) {
@@ -3926,6 +4256,7 @@ function renderActiveSection() {
   activeSectionRoot.innerHTML = renderSectionContent(section);
   renderNavigation();
   updateProgress();
+  syncPracticeCarousels(activeSectionRoot);
 }
 
 function scrollToActiveLesson() {
@@ -3996,6 +4327,45 @@ document.addEventListener("click", (event) => {
   const nextButton = event.target.closest("[data-section-next]");
   if (nextButton) {
     setActiveSection(nextButton.dataset.section, { scroll: true });
+    return;
+  }
+
+  const practiceCarouselStep = event.target.closest("[data-practice-carousel-step]");
+  if (practiceCarouselStep) {
+    const carousel = practiceCarouselStep.closest("[data-practice-carousel]");
+    if (!carousel) {
+      return;
+    }
+    const activeIndex = Number(practiceCarouselStep.dataset.practiceCarouselStep);
+    if (Number.isNaN(activeIndex)) {
+      return;
+    }
+    setPracticeCarouselIndex(carousel, activeIndex);
+    return;
+  }
+
+  const practiceCarouselPrev = event.target.closest("[data-practice-carousel-prev]");
+  if (practiceCarouselPrev) {
+    const carousel = practiceCarouselPrev.closest("[data-practice-carousel]");
+    if (!carousel) {
+      return;
+    }
+    const key = getPracticeCarouselKey(carousel);
+    const currentIndex = state.practiceCarouselState[key] ?? 0;
+    setPracticeCarouselIndex(carousel, Math.max(0, currentIndex - 1));
+    return;
+  }
+
+  const practiceCarouselNext = event.target.closest("[data-practice-carousel-next]");
+  if (practiceCarouselNext) {
+    const carousel = practiceCarouselNext.closest("[data-practice-carousel]");
+    if (!carousel) {
+      return;
+    }
+    const slides = carousel.querySelectorAll("[data-practice-carousel-slide]");
+    const key = getPracticeCarouselKey(carousel);
+    const currentIndex = state.practiceCarouselState[key] ?? 0;
+    setPracticeCarouselIndex(carousel, Math.min(slides.length - 1, currentIndex + 1));
     return;
   }
 

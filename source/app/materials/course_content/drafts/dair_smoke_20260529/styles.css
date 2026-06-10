@@ -834,6 +834,351 @@ button:hover,
   padding-left: 18px;
 }
 
+.practice-carousel-subtitle {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 0.98rem;
+}
+
+.practice-carousel {
+  display: grid;
+  gap: 14px;
+}
+
+.practice-carousel-toolbar {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.practice-carousel-note-wrap {
+  flex: 1 1 320px;
+}
+
+.practice-carousel-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.94rem;
+}
+
+.practice-carousel-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.practice-carousel-nav {
+  min-height: 40px;
+  padding: 10px 16px;
+  font-size: 0.88rem;
+  white-space: nowrap;
+}
+
+.practice-carousel-stepbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.practice-carousel-step {
+  min-height: 40px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.86rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.practice-carousel-step.is-active,
+.practice-carousel-step[aria-selected="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  box-shadow: 0 10px 20px rgba(196, 92, 38, 0.12);
+}
+
+.practice-carousel-stage {
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.practice-carousel-slide {
+  display: none;
+}
+
+.practice-carousel-slide.is-active {
+  display: grid;
+}
+
+.practice-carousel-window {
+  display: grid;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: linear-gradient(180deg, #fffdf9 0%, #f8f1e6 100%);
+  box-shadow: 0 16px 34px rgba(42, 33, 24, 0.08);
+}
+
+.practice-carousel-window-bar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.practice-carousel-window-dots {
+  display: inline-flex;
+  gap: 6px;
+}
+
+.practice-carousel-window-dots span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #e6d7c7;
+}
+
+.practice-carousel-window-url {
+  min-width: 0;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-carousel-window-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.practice-carousel-screen {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+}
+
+.practice-carousel-screen--split,
+.practice-carousel-screen--form {
+  grid-template-columns: minmax(0, 1.1fr) minmax(220px, 0.9fr);
+  align-items: stretch;
+}
+
+.practice-carousel-screen-hero,
+.practice-carousel-screen-main,
+.practice-carousel-screen-panel {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+  min-width: 0;
+}
+
+.practice-carousel-step-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  padding: 0 0 0 0;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.practice-carousel-screen h5 {
+  margin: 0;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: clamp(1.12rem, 2vw, 1.55rem);
+  line-height: 1.15;
+}
+
+.practice-carousel-screen p {
+  margin: 0;
+  color: var(--text);
+  line-height: 1.45;
+}
+
+.practice-carousel-screen-panel {
+  align-content: stretch;
+}
+
+.practice-carousel-screen-card,
+.practice-carousel-form-card {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 6px 14px rgba(42, 33, 24, 0.04);
+}
+
+.practice-carousel-screen-card--highlight {
+  border-color: rgba(196, 92, 38, 0.22);
+  background: var(--accent-soft);
+}
+
+.practice-carousel-screen-card strong,
+.practice-carousel-form-card strong {
+  color: var(--text);
+  font-size: 0.95rem;
+  line-height: 1.25;
+}
+
+.practice-carousel-screen-card span,
+.practice-carousel-form-card span {
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+.practice-carousel-inline-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.practice-carousel-mock-button,
+.practice-carousel-mock-input,
+.practice-carousel-status,
+.practice-carousel-mock-mail {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+
+.practice-carousel-mock-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 0 14px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.84rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.practice-carousel-mock-button--accent {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.practice-carousel-form-card {
+  gap: 10px;
+}
+
+.practice-carousel-form-row {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.practice-carousel-form-row--active .practice-carousel-mock-input {
+  border-color: rgba(196, 92, 38, 0.34);
+  box-shadow: 0 0 0 3px rgba(196, 92, 38, 0.1);
+}
+
+.practice-carousel-mock-input {
+  display: flex;
+  align-items: center;
+  min-height: 42px;
+  padding: 0 14px;
+  background: #fff;
+}
+
+.practice-carousel-mock-input--short {
+  max-width: 220px;
+}
+
+.practice-carousel-mock-input--wide {
+  width: 100%;
+}
+
+.practice-carousel-mock-value {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--text);
+  font-size: 0.92rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-carousel-mock-value--dots {
+  letter-spacing: 0.24em;
+}
+
+.practice-carousel-mock-helper {
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(196, 92, 38, 0.08);
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.practice-carousel-status {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 12px;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.practice-carousel-status--success {
+  border-color: rgba(71, 100, 74, 0.22);
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.practice-carousel-mock-mail {
+  display: grid;
+  gap: 6px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.84);
+}
+
+.practice-carousel-mock-mail strong {
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.practice-carousel-mock-mail span {
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
 .module-grid {
   display: grid;
   gap: 14px;
@@ -1031,6 +1376,43 @@ button:hover,
   .lesson-shell .section-body > .callout:not([data-starter-prompt-panel]) li,
   .lesson-shell .section-body > .next-step-card p {
     font-size: 16px;
+  }
+
+  .practice-carousel-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .practice-carousel-controls {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .practice-carousel-controls .practice-carousel-nav {
+    flex: 1 1 140px;
+  }
+
+  .practice-carousel-nav {
+    flex: 1 1 0;
+  }
+
+  .practice-carousel-step {
+    flex: 1 1 120px;
+  }
+
+  .practice-carousel-window-bar {
+    grid-template-columns: 1fr;
+    justify-items: start;
+  }
+
+  .practice-carousel-screen,
+  .practice-carousel-screen--split,
+  .practice-carousel-screen--form {
+    grid-template-columns: 1fr;
+  }
+
+  .practice-carousel-screen {
+    padding: 14px;
   }
 
   .hero-actions {
