@@ -117,7 +117,7 @@ def test_login_and_register_pages(client):
     assert '<form class="form" method="post" action="/register">' in register_response.text
     assert 'name="email"' in register_response.text
     assert 'name="login"' in register_response.text
-    assert "Можно использовать латинские буквы, цифры, подчёркивание, дефис и точку. Кириллица не поддерживается." in register_response.text
+    assert "Можно использовать латинские буквы, цифры, подчёркивание, дефис или точку." in register_response.text
     assert "/static/styles.css" in login_response.text
     assert "/static/styles.css" in register_response.text
     assert "Электронная почта или логин" in login_response.text
@@ -141,9 +141,8 @@ def test_register_page_shows_russian_login_validation_message(client):
     )
     assert response.status_code == 200
     assert "Логин содержит недопустимые символы." in response.text
-    assert "Кириллица не поддерживается." in response.text
     assert "login must use lowercase letters, digits, underscore or hyphen" not in response.text
-    assert "Можно использовать латинские буквы, цифры, подчёркивание, дефис и точку. Кириллица не поддерживается." in response.text
+    assert "Логин содержит недопустимые символы. Используйте латинские буквы, цифры, подчёркивание, дефис или точку." in response.text
 
 
 def test_auth_utility_pages_use_shared_base_and_styles(client):
