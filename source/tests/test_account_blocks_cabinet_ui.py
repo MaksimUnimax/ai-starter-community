@@ -175,7 +175,11 @@ def test_user_sees_compact_server_backed_account_blocks_and_copy_only_controls(c
     assert "Продлить активацию" not in accounts_section
     assert "Открыть сайт Amnezia VPN" in accounts_section
     assert "Просмотрите ролик. IP сервера возьмите из блока «Сервер»." in accounts_section
-    assert "Показать видеоинструкцию" in accounts_section
+    assert "После просмотра откройте сайт Amnezia VPN и используйте IP из блока «Сервер»." in accounts_section
+    assert "Показать видеоинструкцию" not in accounts_section
+    assert "vpn-card__video-disclosure" not in accounts_section
+    assert "account-vpn-panel" in accounts_section
+    assert "<video" in accounts_section
     assert "amnezia-vpn-guide.mp4" in accounts_section
 
 

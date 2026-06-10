@@ -1282,6 +1282,41 @@ button:hover {
   min-height: 1.35em;
 }
 
+.accounts-card--cabinet .account-vpn-panel {
+  width: 100%;
+  max-width: none;
+  margin-top: 16px;
+  padding: 20px;
+}
+
+.accounts-card--cabinet .account-vpn-panel__body {
+  display: grid;
+  gap: 16px;
+}
+
+.accounts-card--cabinet .account-vpn-panel__details {
+  gap: 8px;
+}
+
+.accounts-card--cabinet .account-vpn-panel .vpn-card__body {
+  display: grid;
+  gap: 14px;
+}
+
+.accounts-card--cabinet .account-vpn-panel .vpn-card__link {
+  width: min(100%, 360px);
+}
+
+.accounts-card--cabinet .account-vpn-panel .vpn-card__video-panel {
+  width: 100%;
+  max-width: 840px;
+}
+
+.accounts-card--cabinet .account-vpn-panel .vpn-card__video {
+  width: 100%;
+  max-width: 100%;
+}
+
 .account-card--vpn {
   border-color: rgba(196, 92, 38, 0.26);
   background: linear-gradient(180deg, #fffdf8 0%, #fff7ee 100%);
