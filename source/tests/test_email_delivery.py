@@ -6,7 +6,13 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from app.auth.service import AuthError, create_password_reset_request, register_user, verify_email
+from app.auth.service import (
+    AuthError,
+    create_password_reset_request,
+    register_user,
+    resend_verification_request,
+    verify_email,
+)
 from app.core.config import Settings
 from app.notifications.email_service import (
     EmailConfigError,
@@ -48,6 +54,15 @@ def _smtp_settings(**overrides) -> Settings:
         "smtp_use_tls": False,
         "smtp_use_starttls": True,
         "smtp_timeout_seconds": 10,
+        "email_resend_from_address": None,
+        "email_resend_from_name": None,
+        "email_resend_smtp_host": None,
+        "email_resend_smtp_port": None,
+        "email_resend_smtp_username": None,
+        "email_resend_smtp_password": None,
+        "email_resend_smtp_use_tls": False,
+        "email_resend_smtp_use_starttls": True,
+        "email_resend_smtp_timeout_seconds": 10,
         "email_verification_token_expiry_hours": 24,
         "password_reset_token_expiry_minutes": 30,
     }
@@ -121,6 +136,74 @@ def test_outbox_mode_preserves_current_behavior(test_settings):
     assert "/verify-email/" in row["body_text"]
 
 
+def test_outbox_confirmation_resend_uses_secondary_when_configured(tmp_path):
+    settings = _smtp_settings(
+        database_path=str(tmp_path / "outbox-secondary.sqlite3"),
+        email_mode="outbox",
+        email_resend_from_address="no-reply@openscript.ru",
+        email_resend_from_name="OpenScript",
+        email_resend_smtp_host="smtp.mailtrap.example",
+        email_resend_smtp_port=2525,
+        email_resend_smtp_username="mailtrap-user",
+        email_resend_smtp_password="mailtrap-pass",
+        email_resend_smtp_use_starttls=True,
+    )
+    user = register_user(
+        email="secondary@example.com",
+        login="secondaryuser",
+        password="Secret123",
+        repeat_password="Secret123",
+        settings=settings,
+    )
+    initial_row = _fetch_one(
+        settings,
+        "SELECT * FROM email_outbox WHERE recipient_email = ? AND template_key = ? ORDER BY id ASC LIMIT 1",
+        (user.email, "email_verification"),
+    )
+    assert initial_row["purpose"] == "confirmation_initial"
+    assert initial_row["smtp_channel"] == "primary"
+    assert initial_row["from_address"] == "no-reply@example.com"
+    assert initial_row["provider_configured"] == 1
+    assert initial_row["fallback_reason"] is None
+
+    assert resend_verification_request(user.email, settings=settings) is True
+    resend_row = _fetch_one(
+        settings,
+        "SELECT * FROM email_outbox WHERE recipient_email = ? AND template_key = ? ORDER BY id DESC LIMIT 1",
+        (user.email, "email_verification"),
+    )
+    assert resend_row["purpose"] == "confirmation_resend"
+    assert resend_row["smtp_channel"] == "secondary_resend"
+    assert resend_row["from_address"] == "no-reply@openscript.ru"
+    assert resend_row["provider_configured"] == 1
+    assert resend_row["fallback_reason"] is None
+
+
+def test_confirmation_resend_falls_back_to_primary_without_secondary(tmp_path):
+    settings = _smtp_settings(
+        database_path=str(tmp_path / "outbox-fallback.sqlite3"),
+        email_mode="outbox",
+    )
+    user = register_user(
+        email="fallback@example.com",
+        login="fallbackuser",
+        password="Secret123",
+        repeat_password="Secret123",
+        settings=settings,
+    )
+    assert resend_verification_request(user.email, settings=settings) is True
+    resend_row = _fetch_one(
+        settings,
+        "SELECT * FROM email_outbox WHERE recipient_email = ? AND template_key = ? ORDER BY id DESC LIMIT 1",
+        (user.email, "email_verification"),
+    )
+    assert resend_row["purpose"] == "confirmation_resend"
+    assert resend_row["smtp_channel"] == "primary"
+    assert resend_row["from_address"] == "no-reply@example.com"
+    assert resend_row["provider_configured"] == 1
+    assert resend_row["fallback_reason"] == "secondary_smtp_not_configured_falling_back_to_primary"
+
+
 def test_smtp_verification_send_uses_starttls_and_no_login_when_credentials_missing(tmp_path):
     settings = _smtp_settings(database_path=str(tmp_path / "smtp-success.sqlite3"))
     with patch("app.notifications.smtp_adapter.smtplib.SMTP") as smtp_cls:
@@ -142,6 +225,10 @@ def test_smtp_verification_send_uses_starttls_and_no_login_when_credentials_miss
     assert row["status"] == "sent"
     assert row["body_text"] == "[redacted: sent via smtp]"
     assert "/verify-email/" not in row["body_text"]
+    assert row["purpose"] == "confirmation_initial"
+    assert row["smtp_channel"] == "primary"
+    assert row["from_address"] == "no-reply@example.com"
+    assert row["provider_configured"] == 1
 
 
 def test_smtp_reset_send_uses_login_when_credentials_present(tmp_path):
@@ -169,6 +256,9 @@ def test_smtp_reset_send_uses_login_when_credentials_present(tmp_path):
     row = _fetch_one(settings, "SELECT * FROM email_outbox ORDER BY id DESC LIMIT 1")
     assert row["status"] == "sent"
     assert row["body_text"] == "[redacted: sent via smtp]"
+    assert row["purpose"] == "password_reset"
+    assert row["smtp_channel"] == "primary"
+    assert row["provider_configured"] == 1
 
 
 def test_smtp_ssl_branch_uses_smpt_ssl(tmp_path):
@@ -190,6 +280,45 @@ def test_smtp_ssl_branch_uses_smpt_ssl(tmp_path):
     smtp_ssl_cls.assert_called_once()
     smtp_client.starttls.assert_not_called()
     smtp_client.send_message.assert_called_once()
+
+
+def test_smtp_resend_uses_secondary_provider_and_redacts_body(tmp_path):
+    settings = _smtp_settings(
+        database_path=str(tmp_path / "smtp-secondary.sqlite3"),
+        email_mode="smtp",
+        email_resend_from_address="no-reply@openscript.ru",
+        email_resend_from_name="OpenScript",
+        email_resend_smtp_host="smtp.mailtrap.example",
+        email_resend_smtp_port=2525,
+        email_resend_smtp_username="mailtrap-user",
+        email_resend_smtp_password="mailtrap-pass",
+        email_resend_smtp_use_starttls=True,
+    )
+    with patch("app.notifications.smtp_adapter.smtplib.SMTP") as smtp_cls:
+        smtp_client = MagicMock()
+        smtp_cls.return_value.__enter__.return_value = smtp_client
+
+        email_id = send_email_verification(
+            "user@example.com",
+            "http://127.0.0.1:8089/verify-email/token",
+            settings=settings,
+            purpose="confirmation_resend",
+        )
+
+    assert email_id > 0
+    smtp_client.starttls.assert_called_once()
+    smtp_client.login.assert_called_once_with("mailtrap-user", "mailtrap-pass")
+    smtp_client.send_message.assert_called_once()
+
+    row = _fetch_one(settings, "SELECT * FROM email_outbox ORDER BY id DESC LIMIT 1")
+    assert row["status"] == "sent"
+    assert row["body_text"] == "[redacted: sent via smtp]"
+    assert row["purpose"] == "confirmation_resend"
+    assert row["smtp_channel"] == "secondary_resend"
+    assert row["from_address"] == "no-reply@openscript.ru"
+    assert row["provider_configured"] == 1
+    assert row["fallback_reason"] is None
+    assert "/verify-email/" not in row["body_text"]
 
 
 def test_smtp_delivery_failure_marks_audit_failed(tmp_path):

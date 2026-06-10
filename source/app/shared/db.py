@@ -51,6 +51,11 @@ CREATE TABLE IF NOT EXISTS email_outbox (
     subject TEXT NOT NULL,
     body_text TEXT NOT NULL,
     template_key TEXT NOT NULL,
+    purpose TEXT NOT NULL DEFAULT 'unspecified',
+    smtp_channel TEXT NOT NULL DEFAULT 'primary',
+    from_address TEXT NULL,
+    provider_configured INTEGER NOT NULL DEFAULT 0,
+    fallback_reason TEXT NULL,
     status TEXT NOT NULL DEFAULT 'queued',
     created_at TEXT NOT NULL,
     sent_at TEXT NULL,
@@ -121,6 +126,7 @@ def initialize_database(path: Path | str) -> None:
         connection.execute("PRAGMA foreign_keys = ON")
         connection.executescript(SCHEMA_SQL)
         _ensure_users_materials_access_granted_at_column(connection)
+        _ensure_email_outbox_delivery_metadata_columns(connection)
 
 
 def _ensure_users_materials_access_granted_at_column(connection: sqlite3.Connection) -> None:
@@ -130,3 +136,20 @@ def _ensure_users_materials_access_granted_at_column(connection: sqlite3.Connect
     }
     if "materials_access_granted_at" not in columns:
         connection.execute("ALTER TABLE users ADD COLUMN materials_access_granted_at TEXT NULL")
+
+
+def _ensure_email_outbox_delivery_metadata_columns(connection: sqlite3.Connection) -> None:
+    columns = {
+        row[1]
+        for row in connection.execute("PRAGMA table_info(email_outbox)").fetchall()
+    }
+    if "purpose" not in columns:
+        connection.execute("ALTER TABLE email_outbox ADD COLUMN purpose TEXT NOT NULL DEFAULT 'unspecified'")
+    if "smtp_channel" not in columns:
+        connection.execute("ALTER TABLE email_outbox ADD COLUMN smtp_channel TEXT NOT NULL DEFAULT 'primary'")
+    if "from_address" not in columns:
+        connection.execute("ALTER TABLE email_outbox ADD COLUMN from_address TEXT NULL")
+    if "provider_configured" not in columns:
+        connection.execute("ALTER TABLE email_outbox ADD COLUMN provider_configured INTEGER NOT NULL DEFAULT 0")
+    if "fallback_reason" not in columns:
+        connection.execute("ALTER TABLE email_outbox ADD COLUMN fallback_reason TEXT NULL")

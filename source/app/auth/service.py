@@ -463,7 +463,12 @@ def register_user(
 
     verification_link = _build_public_url(resolved, f"/verify-email/{verification_token}")
     try:
-        send_email_verification(normalized_email, verification_link, settings=resolved)
+        send_email_verification(
+            normalized_email,
+            verification_link,
+            settings=resolved,
+            purpose="confirmation_initial",
+        )
     except (EmailModeError, EmailConfigError, EmailDeliveryError) as exc:
         _raise_email_delivery_error(exc)
     user = _fetch_user_by_id(user_id, settings=resolved)
@@ -507,7 +512,12 @@ def resend_verification_request(email: str, settings: Settings | None = None) ->
 
     verification_link = _build_public_url(resolved, f"/verify-email/{verification_token}")
     try:
-        send_email_verification(normalized_email, verification_link, settings=resolved)
+        send_email_verification(
+            normalized_email,
+            verification_link,
+            settings=resolved,
+            purpose="confirmation_resend",
+        )
     except (EmailModeError, EmailConfigError, EmailDeliveryError) as exc:
         _raise_email_delivery_error(exc)
     return True
