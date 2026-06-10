@@ -111,19 +111,25 @@
           <article class="account-card{% if block.type == 'vpn' %} account-card--vpn{% endif %}">
             <header class="account-card__header">
               <div class="stack account-card__headline">
-                <div class="account-card__title-row">
-                  <h3 class="account-card__title">{{ block.title }}</h3>
-                  <div class="account-card__badges">
-                    <span class="account-card__type-badge">{{ block.type_label }}</span>
-                    {% if block.is_active %}
-                      <span class="account-card__status-badge account-card__status-badge--active">Активно</span>
-                    {% elif block.is_expired %}
-                      <span class="account-card__status-badge account-card__status-badge--expired">{{ block.status_label }}</span>
-                    {% else %}
-                      <span class="account-card__status-badge account-card__status-badge--inactive">{{ block.status_label }}</span>
-                    {% endif %}
+                {% if block.type == 'vpn' %}
+                  <div class="account-card__title-row account-card__title-row--vpn">
+                    <h3 class="account-card__title">ВПН</h3>
                   </div>
-                </div>
+                {% else %}
+                  <div class="account-card__title-row">
+                    <h3 class="account-card__title">{{ block.title }}</h3>
+                    <div class="account-card__badges">
+                      <span class="account-card__type-badge">{{ block.type_label }}</span>
+                      {% if block.is_active %}
+                        <span class="account-card__status-badge account-card__status-badge--active">Активно</span>
+                      {% elif block.is_expired %}
+                        <span class="account-card__status-badge account-card__status-badge--expired">{{ block.status_label }}</span>
+                      {% else %}
+                        <span class="account-card__status-badge account-card__status-badge--inactive">{{ block.status_label }}</span>
+                      {% endif %}
+                    </div>
+                  </div>
+                {% endif %}
                 {% if account_blocks_manage_mode %}
                   <p class="form-help account-card__owner-line">Пользователь: {{ account_block_selected_user_summary.email }} · {{ account_block_selected_user_summary.login }}</p>
                 {% endif %}
@@ -132,11 +138,28 @@
 
             <div class="account-card__body">
               {% if block.type == 'vpn' %}
-                <div class="account-card__details">
-                  <p class="account-card__detail">{{ block.activation_summary }}</p>
-                  <p class="account-card__detail">Просмотрите ролик. IP сервера возьмите из блока «Сервер».</p>
-                </div>
-                <div class="account-card__vpn vpn-card__body">
+                <div class="account-card__vpn account-vpn-panel vpn-card__body">
+                  <div class="vpn-card__video-panel">
+                    <video
+                      class="vpn-card__video"
+                      controls
+                      preload="metadata"
+                      src="/static/videos/amnezia-vpn-guide.mp4"
+                    ></video>
+                  </div>
+
+                  <div class="account-card__details account-vpn-panel__details">
+                    <p class="account-card__detail">Просмотрите ролик. IP сервера возьмите из блока «Сервер».</p>
+                    <p class="account-card__detail">После просмотра откройте сайт Amnezia VPN и используйте IP из блока «Сервер».</p>
+                    <p class="account-card__detail">
+                      Видео взято с канала
+                      <a href="https://www.youtube.com/@TechTalk_NotDead" target="_blank" rel="noreferrer">Tech Talk</a>.
+                      Благодарим канал
+                      <a href="https://www.youtube.com/@TechTalk_NotDead" target="_blank" rel="noreferrer">Tech Talk</a>
+                      за видео. Лайк и подписка приветствуются.
+                    </p>
+                  </div>
+
                   <a
                     class="button button-primary vpn-card__link"
                     href="https://m-d0d72068b914-3w5hsuiikq-ez.a.run.app/ru"
@@ -145,18 +168,6 @@
                   >
                     Открыть сайт Amnezia VPN
                   </a>
-
-                  <details class="vpn-card__video-disclosure">
-                    <summary class="button button-secondary vpn-card__video-summary">Показать видеоинструкцию</summary>
-                    <div class="vpn-card__video-panel">
-                      <video
-                        class="vpn-card__video"
-                        controls
-                        preload="metadata"
-                        src="/static/videos/amnezia-vpn-guide.mp4"
-                      ></video>
-                    </div>
-                  </details>
                 </div>
                 {% if account_blocks_manage_mode %}
                   <div class="account-actions account-actions--view">
@@ -182,6 +193,7 @@
                   </div>
                 {% endif %}
               {% else %}
+
                 <div class="account-card__readonly" data-account-card-view>
                   <label class="account-field">
                     <span>Логин</span>

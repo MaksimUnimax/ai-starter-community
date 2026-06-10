@@ -1246,6 +1246,10 @@ button:hover {
   min-width: 0;
 }
 
+.accounts-card--cabinet .account-card--vpn {
+  grid-column: 1 / -1;
+}
+
 .accounts-card--cabinet .account-card__headline {
   display: grid;
   gap: 6px;
@@ -1260,7 +1264,10 @@ button:hover {
 }
 
 .accounts-card--cabinet .account-card__title {
-  overflow-wrap: anywhere;
+  word-break: normal;
+  overflow-wrap: normal;
+  white-space: nowrap;
+  hyphens: none;
 }
 
 .accounts-card--cabinet .account-card__badges {
@@ -1287,36 +1294,38 @@ button:hover {
   background: linear-gradient(180deg, #fffdf8 0%, #fff7ee 100%);
 }
 
+.accounts-card--cabinet .account-card--vpn .account-card__header {
+  align-items: flex-start;
+}
+
+.accounts-card--cabinet .account-card--vpn .account-card__title-row {
+  grid-template-columns: 1fr;
+}
+
+.accounts-card--cabinet .account-card--vpn .account-card__badges {
+  display: none;
+}
+
 .vpn-card__body {
-  gap: 10px;
+  display: grid;
+  gap: 14px;
 }
 
 .vpn-card__link {
-  width: 100%;
+  width: fit-content;
+  max-width: 100%;
+  justify-self: start;
+  padding-inline: 18px;
+  min-width: 220px;
   justify-content: center;
   text-align: center;
   text-decoration: none;
 }
 
-.vpn-card__video-disclosure {
-  display: grid;
-  gap: 10px;
-}
-
-.vpn-card__video-disclosure summary {
-  list-style: none;
-  cursor: pointer;
-  width: 100%;
-}
-
-.vpn-card__video-disclosure summary::-webkit-details-marker {
-  display: none;
-}
-
 .vpn-card__video-panel {
   display: grid;
-  gap: 10px;
-  padding: 10px;
+  gap: 12px;
+  padding: 12px;
   border: 1px solid rgba(234, 223, 206, 0.9);
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.86);
@@ -1329,6 +1338,14 @@ button:hover {
   border-radius: 12px;
   background: #000;
   aspect-ratio: 16 / 9;
+}
+
+.accounts-card--cabinet .account-card--vpn .account-card__details {
+  gap: 8px;
+}
+
+.accounts-card--cabinet .account-card--vpn .account-card__detail {
+  margin: 0;
 }
 
 .account-card__delete {

@@ -90,6 +90,15 @@ def _extract_first_edit_form(accounts_section: str) -> str:
     return accounts_section[start:end]
 
 
+def _extract_vpn_section(accounts_section: str) -> str:
+    start_marker = '<article class="account-card account-card--vpn">'
+    start = accounts_section.find(start_marker)
+    assert start != -1
+    end = accounts_section.find("</article>", start)
+    assert end != -1
+    return accounts_section[start:end]
+
+
 def test_user_sees_compact_server_backed_account_blocks_and_copy_only_controls(client, test_settings):
     admin = _create_verified_user(test_settings, "cab-ui-admin@example.com", "cabuiadmin", role="admin")
     owner = _create_verified_user(test_settings, "cab-ui-owner@example.com", "cabuiowner")
@@ -175,8 +184,20 @@ def test_user_sees_compact_server_backed_account_blocks_and_copy_only_controls(c
     assert "Продлить активацию" not in accounts_section
     assert "Открыть сайт Amnezia VPN" in accounts_section
     assert "Просмотрите ролик. IP сервера возьмите из блока «Сервер»." in accounts_section
-    assert "Показать видеоинструкцию" in accounts_section
-    assert "amnezia-vpn-guide.mp4" in accounts_section
+    assert "Видео взято с канала" in accounts_section
+    assert "Tech Talk" in accounts_section
+    assert "https://www.youtube.com/@TechTalk_NotDead" in accounts_section
+    assert "Благодарим канал" in accounts_section
+    assert "Лайк и подписка приветствуются" in accounts_section
+
+    vpn_section = _extract_vpn_section(accounts_section)
+    assert "account-card__type-badge" not in vpn_section
+    assert "account-card__status-badge" not in vpn_section
+    assert "Осталось" not in vpn_section
+    assert "АКТИВНО" not in vpn_section
+    assert "Показать видеоинструкцию" not in vpn_section
+    assert "amnezia-vpn-guide.mp4" in vpn_section
+    assert "<video" in vpn_section
 
 
 def test_user_with_no_active_account_blocks_sees_new_empty_state(client, test_settings):
