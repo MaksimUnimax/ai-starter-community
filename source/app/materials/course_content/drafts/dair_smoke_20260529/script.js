@@ -1966,6 +1966,12 @@ ChatGPT вставляет тексты документов в prompt для Co
           <p>Вы готовы перейти к следующему уроку, когда <strong>ChatGPT</strong> объяснил вам:</p>
           <p><strong>проектная основа создана, приложение и документация находятся в GitHub, Codex готов как исполнитель, следующий безопасный run определён.</strong></p>
         </section>
+        <section class="callout">
+          <span class="block-label">Визуальный блок</span>
+          <h4>Визуальная инструкция</h4>
+          <p class="practice-carousel-subtitle">Пробный формат карусели для практического задания</p>
+          ${renderProjectStartCarousel()}
+        </section>
       `,
       contentHtml: ``,
       quizzes: [
@@ -3525,12 +3531,30 @@ function renderPracticePlaceholderFrame({ title, badge, leftHtml, rightHtml, foo
   `;
 }
 
+function renderPracticeCarouselAttribute(carouselKey) {
+  switch (carouselKey) {
+    case "github-registration":
+      return 'data-practice-carousel="github-registration"';
+    case "prefix-extension":
+      return 'data-practice-carousel="prefix-extension"';
+    case "docs-update-new-dialog":
+      return 'data-practice-carousel="docs-update-new-dialog"';
+    case "codex-first-connection":
+      return 'data-practice-carousel="codex-first-connection"';
+    case "project-start":
+      return 'data-practice-carousel="project-start"';
+    default:
+      return `data-practice-carousel="${escapeHTML(carouselKey || "default")}"`;
+  }
+}
+
 function renderPracticeCarousel({ carouselKey, note, slides }) {
   const safeKey = carouselKey || "default";
   const idPrefix = `practice-carousel-${safeKey}`;
+  const carouselAttribute = renderPracticeCarouselAttribute(safeKey);
 
   return `
-    <div class="practice-carousel" data-practice-carousel="${escapeHTML(safeKey)}">
+    <div class="practice-carousel" ${carouselAttribute}>
       <div class="practice-carousel-toolbar">
         <div class="practice-carousel-note-wrap">
           <p class="practice-carousel-note">${escapeHTML(note)}</p>
@@ -4242,6 +4266,204 @@ function renderDocsPracticeCarousel() {
 
   return renderPracticeCarousel({
     carouselKey: "docs-update-new-dialog",
+    note: "Позже здесь будут реальные скриншоты.",
+    slides
+  });
+}
+
+function renderProjectStartCarousel() {
+  const slides = [
+    {
+      stepLabel: "Шаг 1",
+      title: "Откройте стартовый prompt",
+      mockHtml: renderPracticePlaceholderFrame({
+        title: "Start prompt",
+        badge: "Documentation",
+        leftHtml: `
+          <div class="practice-carousel-placeholder-panel">
+            <span class="practice-carousel-placeholder-card-kicker">Prompt</span>
+            <div class="practice-carousel-placeholder-chip-row">
+              ${practicePlaceholderChip("start prompt", true)}
+              ${practicePlaceholderChip("идея проекта")}
+            </div>
+            ${practicePlaceholderLine("84%", "is-strong")}
+            ${practicePlaceholderLine("62%")}
+          </div>
+        `,
+        rightHtml: `
+          <div class="practice-carousel-placeholder-terminal">
+            <div class="practice-carousel-placeholder-terminal-head">
+              <span>Чтение</span>
+              <span class="practice-carousel-placeholder-terminal-prompt">docs</span>
+            </div>
+            ${practicePlaceholderLine("88%", "is-strong")}
+            ${practicePlaceholderLine("70%")}
+            ${practicePlaceholderLine("50%")}
+          </div>
+        `,
+        footerHtml: "Откройте стартовый prompt и начните с описания идеи проекта."
+      })
+    },
+    {
+      stepLabel: "Шаг 2",
+      title: "Вставьте prompt в ChatGPT",
+      mockHtml: renderPracticePlaceholderFrame({
+        title: "ChatGPT",
+        badge: "Paste",
+        leftHtml: `
+          <div class="practice-carousel-placeholder-terminal">
+            <div class="practice-carousel-placeholder-terminal-head">
+              <span>Новый чат</span>
+              <span class="practice-carousel-placeholder-terminal-prompt">paste</span>
+            </div>
+            ${practicePlaceholderLine("90%", "is-strong")}
+            ${practicePlaceholderLine("74%")}
+            ${practicePlaceholderLine("52%")}
+          </div>
+        `,
+        rightHtml: `
+          <div class="practice-carousel-placeholder-panel">
+            <span class="practice-carousel-placeholder-card-kicker">Action</span>
+            <div class="practice-carousel-placeholder-chat-bubble">
+              Вставьте prompt и опишите идею простыми словами
+            </div>
+          </div>
+        `,
+        footerHtml: "Вставьте prompt в ChatGPT и начните диалог."
+      })
+    },
+    {
+      stepLabel: "Шаг 3",
+      title: "Ответьте на уточняющие вопросы",
+      mockHtml: renderPracticePlaceholderFrame({
+        title: "Уточнение",
+        badge: "Questions",
+        leftHtml: `
+          <div class="practice-carousel-placeholder-panel">
+            <span class="practice-carousel-placeholder-card-kicker">Вопросы</span>
+            <div class="practice-carousel-placeholder-chip-row">
+              ${practicePlaceholderChip("для кого", true)}
+              ${practicePlaceholderChip("цель")}
+              ${practicePlaceholderChip("ограничения")}
+            </div>
+            ${practicePlaceholderLine("82%", "is-strong")}
+            ${practicePlaceholderLine("58%")}
+          </div>
+        `,
+        rightHtml: `
+          <div class="practice-carousel-placeholder-chat-bubble">
+            Не знаю, объясни простыми словами и предложи лучший вариант
+          </div>
+        `,
+        footerHtml: "Ответьте на вопросы по смыслу проекта, не по техстеку."
+      })
+    },
+    {
+      stepLabel: "Шаг 4",
+      title: "Проверьте документы проекта",
+      mockHtml: renderPracticePlaceholderFrame({
+        title: "Project docs",
+        badge: "Markdown",
+        leftHtml: `
+          <div class="practice-carousel-placeholder-panel">
+            <span class="practice-carousel-placeholder-card-kicker">Файлы</span>
+            <div class="practice-carousel-placeholder-checklist">
+              <div class="practice-carousel-placeholder-checkitem">technical_spec.md</div>
+              <div class="practice-carousel-placeholder-checkitem">roadmap.md</div>
+              <div class="practice-carousel-placeholder-checkitem">rules.md</div>
+              <div class="practice-carousel-placeholder-checkitem">current_status.md</div>
+              <div class="practice-carousel-placeholder-checkitem">module_map.md</div>
+              <div class="practice-carousel-placeholder-checkitem">start_prompt_for_next_chat.md</div>
+            </div>
+          </div>
+        `,
+        rightHtml: `
+          <div class="practice-carousel-placeholder-terminal">
+            <div class="practice-carousel-placeholder-terminal-head">
+              <span>Проверка</span>
+              <span class="practice-carousel-placeholder-terminal-prompt">docs</span>
+            </div>
+            ${practicePlaceholderLine("86%", "is-strong")}
+            ${practicePlaceholderLine("64%")}
+            ${practicePlaceholderLine("48%")}
+          </div>
+        `,
+        footerHtml: "Проверьте, что документы проекта созданы и понятны."
+      })
+    },
+    {
+      stepLabel: "Шаг 5",
+      title: "Настройте связь с GitHub и Codex",
+      mockHtml: renderPracticePlaceholderFrame({
+        title: "GitHub + Codex",
+        badge: "Connection",
+        leftHtml: `
+          <div class="practice-carousel-placeholder-terminal">
+            <div class="practice-carousel-placeholder-terminal-head">
+              <span>GitHub repo</span>
+              <span class="practice-carousel-placeholder-terminal-prompt">ssh</span>
+            </div>
+            <div class="practice-carousel-placeholder-chip-row">
+              ${practicePlaceholderChip("GitHub", true)}
+              ${practicePlaceholderChip("Codex")}
+              ${practicePlaceholderChip("SSH key")}
+            </div>
+            ${practicePlaceholderLine("88%", "is-strong")}
+            ${practicePlaceholderLine("70%")}
+          </div>
+        `,
+        rightHtml: `
+          <div class="practice-carousel-placeholder-panel">
+            <span class="practice-carousel-placeholder-card-kicker">Связь</span>
+            <div class="practice-carousel-placeholder-chip-row">
+              ${practicePlaceholderChip("ChatGPT", true)}
+              ${practicePlaceholderChip("GitHub")}
+              ${practicePlaceholderChip("Codex")}
+            </div>
+            ${practicePlaceholderLine("82%", "is-strong")}
+            ${practicePlaceholderLine("56%")}
+          </div>
+        `,
+        footerHtml: "Настройте связь между ChatGPT, GitHub и Codex, если это требуется."
+      })
+    },
+    {
+      stepLabel: "Шаг 6",
+      title: "Проверьте итог в GitHub",
+      mockHtml: renderPracticePlaceholderFrame({
+        title: "GitHub",
+        badge: "Result",
+        leftHtml: `
+          <div class="practice-carousel-placeholder-panel">
+            <span class="practice-carousel-placeholder-card-kicker">Проверка</span>
+            <div class="practice-carousel-placeholder-checklist">
+              <div class="practice-carousel-placeholder-checkitem">документы лежат в GitHub</div>
+              <div class="practice-carousel-placeholder-checkitem">commit/push сделаны</div>
+              <div class="practice-carousel-placeholder-checkitem">ChatGPT может читать и проверять repo</div>
+            </div>
+          </div>
+        `,
+        rightHtml: `
+          <div class="practice-carousel-placeholder-terminal">
+            <div class="practice-carousel-placeholder-terminal-head">
+              <span>Итог</span>
+              <span class="practice-carousel-placeholder-terminal-prompt">ok</span>
+            </div>
+            <div class="practice-carousel-placeholder-chip-row">
+              ${practicePlaceholderChip("готово", true)}
+              ${practicePlaceholderChip("проверено")}
+            </div>
+            ${practicePlaceholderLine("86%", "is-strong")}
+            ${practicePlaceholderLine("64%")}
+          </div>
+        `,
+        footerHtml: "Проверьте результат в GitHub и убедитесь, что основа проекта готова."
+      })
+    }
+  ];
+
+  return renderPracticeCarousel({
+    carouselKey: "project-start",
     note: "Позже здесь будут реальные скриншоты.",
     slides
   });
