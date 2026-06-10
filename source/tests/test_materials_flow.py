@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import re
 import sqlite3
 from urllib.parse import unquote
 
@@ -44,6 +45,12 @@ def _set_homepage_tariff(test_settings, *, price_amount_minor: int = 699000, tit
         price_amount_minor=price_amount_minor,
         settings=test_settings,
     )
+
+
+def _extract_course_access_badge(body_text: str) -> str:
+    match = re.search(r'<div class="course-access-badge"[^>]*>(.*?)</div>', body_text, re.S)
+    assert match is not None
+    return match.group(1)
 
 
 def _prepare_verified_user(
@@ -107,6 +114,7 @@ def test_shared_stylesheet_uses_main_page_theme(client):
     assert "--primary: #c45c26;" in response.text
     assert "font-family: var(--font-display);" in response.text
     assert ".learning-card-note," in response.text
+    assert ".course-access-badge {" in response.text
     assert "width: min(60ch, 100%);" in response.text
     assert "margin-left: auto;" in response.text
     assert "margin-right: auto;" in response.text
@@ -131,6 +139,9 @@ def test_materials_shows_locked_state_without_access(client, test_settings):
     assert "4 990 ₽" not in response.text
     assert "Полный доступ откроется после оплаты тарифа." in response.text
     assert "Сейчас вы видите вводную часть и тариф для оплаты." not in response.text
+    badge = _extract_course_access_badge(response.text)
+    assert "materialslocked" in badge
+    assert "materials-locked@example.com" not in badge
     assert "К разделу материалов" not in response.text
     assert "Уроки курса" not in response.text
     assert "Как мы работаем: ChatGPT проектирует, Codex выполняет, пользователь проверяет" not in response.text
@@ -171,6 +182,9 @@ def test_draft_learning_route_shows_paywall_for_unpaid_user_and_full_course_for_
     assert "Стартовый доступ — 6 990 ₽" in locked_response.text
     assert "Полный доступ откроется после оплаты тарифа." in locked_response.text
     assert "Сейчас вы видите вводную часть и тариф для оплаты." not in locked_response.text
+    badge = _extract_course_access_badge(locked_response.text)
+    assert "materialsdraftlocked" in badge
+    assert "materials-draft-locked@example.com" not in badge
     assert "quiz-list" not in locked_response.text
     assert "lesson-shell" not in locked_response.text
 
@@ -256,7 +270,8 @@ def test_cabinet_contains_materials_link_and_locked_hint(client, test_settings):
     assert "Перейти к обучению" not in response.text
     assert "Обучающий проект" not in response.text
     assert "Скачать файл" not in response.text
-    assert 'href="/materials/drafts/dair-smoke-20260529/"' not in response.text
+    assert 'href="/materials/drafts/dair-smoke-20260529/"' in response.text
+    assert response.text.count('href="/materials/drafts/dair-smoke-20260529/"') >= 2
     assert 'href="/cabinet/learning/project-file"' not in response.text
     assert "Пройдите обучение, затем скачайте файл, вставьте в чат ChatGPT и следуйте его инструкциям." not in response.text
 

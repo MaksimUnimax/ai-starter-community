@@ -17,7 +17,7 @@
           <p class="course-note">Курс показывает, как вести проектную работу с ИИ без ручного написания кода: от простой идеи до проверенного результата.</p>
           {% if current_user %}
             <div class="course-access-badge" role="status" aria-live="polite">
-              <p>Вы вошли как {{ current_user.email }}{% if current_user.login %} · {{ current_user.login }}{% endif %}.</p>
+              <p>Вы вошли как {{ current_user.login }}.</p>
               <p>Полный доступ откроется после оплаты тарифа.</p>
             </div>
           {% endif %}

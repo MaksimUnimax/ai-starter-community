@@ -426,7 +426,7 @@ def cabinet_page(request: Request):
             locked_action_label="На главную",
             locked_action_url="/",
             locked_secondary_label="К обучению",
-            locked_secondary_url="/materials",
+            locked_secondary_url=LEARNING_COURSE_URL,
             current_user=user,
         )
     learning_access = user_has_materials_access(user)

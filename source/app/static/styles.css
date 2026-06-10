@@ -145,17 +145,19 @@ a:hover {
 }
 
 .course-access-badge {
-  display: inline-flex;
+  display: flex;
   flex-direction: column;
   gap: 4px;
-  align-items: flex-start;
-  margin-top: 18px;
+  align-items: center;
+  justify-content: center;
+  width: min(100%, 34rem);
+  margin: 18px auto 0;
   padding: 12px 14px;
   border-radius: 16px;
   border: 1px solid rgba(196, 92, 38, 0.2);
   background: rgba(255, 255, 255, 0.82);
   box-shadow: 0 10px 24px rgba(42, 33, 24, 0.05);
-  text-align: left;
+  text-align: center;
 }
 
 .course-access-badge p {
