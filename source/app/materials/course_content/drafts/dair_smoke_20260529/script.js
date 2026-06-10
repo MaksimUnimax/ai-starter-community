@@ -603,6 +603,14 @@ const courseData = {
           `
         },
         {
+          label: "Визуальный блок",
+          title: "Визуальная инструкция",
+          html: `
+            <p class="practice-carousel-subtitle">Пошаговая регистрация GitHub</p>
+            ${renderGitPracticeCarousel()}
+          `
+        },
+        {
           label: "Итог",
           title: "Главный вывод",
           html: `
@@ -3417,7 +3425,8 @@ const state = {
   flippedCards: new Set(),
   solvedQuestions: new Set(),
   answeredQuestions: {},
-  openStarterPromptIds: new Set()
+  openStarterPromptIds: new Set(),
+  practiceCarouselState: Object.create(null)
 };
 
 const legacySectionAliases = {
@@ -3464,6 +3473,112 @@ function escapeHTML(value) {
     .replaceAll("\"", "&quot;");
 }
 
+function renderGitPracticeCarousel() {
+  const slides = [
+    {
+      stepLabel: "Шаг 1",
+      title: "Откройте GitHub",
+      image: "assets/git-carousel/github-step-01.png",
+      alt: "Шаг 1. Откройте GitHub"
+    },
+    {
+      stepLabel: "Шаг 2",
+      title: "Нажмите Sign up",
+      image: "assets/git-carousel/github-step-02.png",
+      alt: "Шаг 2. Нажмите Sign up"
+    },
+    {
+      stepLabel: "Шаг 3",
+      title: "Введите email и пароль",
+      image: "assets/git-carousel/github-step-03.png",
+      alt: "Шаг 3. Введите email и пароль"
+    },
+    {
+      stepLabel: "Шаг 4",
+      title: "Выберите username",
+      image: "assets/git-carousel/github-step-04.png",
+      alt: "Шаг 4. Выберите username"
+    },
+    {
+      stepLabel: "Шаг 5",
+      title: "Пройдите проверку GitHub",
+      image: "assets/git-carousel/github-step-05.png",
+      alt: "Шаг 5. Пройдите проверку GitHub"
+    },
+    {
+      stepLabel: "Шаг 6",
+      title: "Подтвердите email и войдите",
+      image: "assets/git-carousel/github-step-06.png",
+      alt: "Шаг 6. Подтвердите email и войдите"
+    }
+  ];
+
+  return `
+    <div class="practice-carousel" data-practice-carousel="github-registration">
+      <div class="practice-carousel-toolbar">
+        <div class="practice-carousel-note-wrap">
+          <p class="practice-carousel-note">Скриншоты показывают примерный путь регистрации. GitHub может менять внешний вид страниц.</p>
+        </div>
+        <div class="practice-carousel-controls" role="group" aria-label="Навигация по карусели">
+          <button class="ghost-button practice-carousel-nav" type="button" data-practice-carousel-prev>Назад</button>
+          <button class="primary-button practice-carousel-nav" type="button" data-practice-carousel-next>Дальше</button>
+        </div>
+      </div>
+      <div class="practice-carousel-stepbar" role="tablist" aria-label="Шаги визуальной инструкции">
+        ${slides
+          .map(
+            (slide, index) => `
+              <button
+                class="practice-carousel-step ${index === 0 ? "is-active" : ""}"
+                type="button"
+                data-practice-carousel-step="${index}"
+                id="practice-carousel-step-${index}"
+                role="tab"
+                aria-selected="${index === 0 ? "true" : "false"}"
+                aria-controls="practice-carousel-slide-${index}"
+              >
+                ${escapeHTML(slide.stepLabel)}
+              </button>
+            `
+          )
+          .join("")}
+      </div>
+      <div class="practice-carousel-stage">
+        ${slides
+          .map(
+            (slide, index) => `
+              <section
+                class="practice-carousel-slide ${index === 0 ? "is-active" : ""}"
+                data-practice-carousel-slide="${index}"
+                id="practice-carousel-slide-${index}"
+                role="tabpanel"
+                aria-labelledby="practice-carousel-step-${index}"
+                aria-hidden="${index === 0 ? "false" : "true"}"
+              >
+                <div class="practice-carousel-window">
+                  <div class="practice-carousel-slide-caption">
+                    <span class="practice-carousel-step-label">${escapeHTML(slide.stepLabel)}</span>
+                    <h5>${escapeHTML(slide.title)}</h5>
+                  </div>
+                  <div class="practice-carousel-image-frame">
+                    <img
+                      src="${escapeHTML(slide.image)}"
+                      alt="${escapeHTML(slide.alt)}"
+                      loading="${index === 0 ? "eager" : "lazy"}"
+                      decoding="async"
+                      draggable="false"
+                    >
+                  </div>
+                </div>
+              </section>
+            `
+          )
+          .join("")}
+      </div>
+    </div>
+  `;
+}
+
 function renderNavigation() {
   navRoot.innerHTML = courseData.sections
     .map((section) => {
@@ -3477,6 +3592,65 @@ function renderNavigation() {
       `;
     })
     .join("");
+}
+
+function getPracticeCarouselKey(carousel) {
+  return carousel?.dataset?.practiceCarousel || "default";
+}
+
+function updatePracticeCarouselUI(carousel, activeIndex) {
+  if (!carousel) {
+    return;
+  }
+
+  const slides = Array.from(carousel.querySelectorAll("[data-practice-carousel-slide]"));
+  const stepButtons = Array.from(carousel.querySelectorAll("[data-practice-carousel-step]"));
+  if (slides.length === 0 || stepButtons.length === 0) {
+    return;
+  }
+
+  const normalizedIndex = Math.max(0, Math.min(activeIndex, slides.length - 1));
+
+  slides.forEach((slide, index) => {
+    const isActive = index === normalizedIndex;
+    slide.classList.toggle("is-active", isActive);
+    slide.hidden = !isActive;
+    slide.setAttribute("aria-hidden", String(!isActive));
+  });
+
+  stepButtons.forEach((button, index) => {
+    const isActive = index === normalizedIndex;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-selected", String(isActive));
+  });
+
+  const prevButton = carousel.querySelector("[data-practice-carousel-prev]");
+  const nextButton = carousel.querySelector("[data-practice-carousel-next]");
+  if (prevButton) {
+    prevButton.disabled = normalizedIndex === 0;
+  }
+  if (nextButton) {
+    nextButton.disabled = normalizedIndex === slides.length - 1;
+  }
+}
+
+function syncPracticeCarousels(root = activeSectionRoot) {
+  const carousels = root.querySelectorAll("[data-practice-carousel]");
+  carousels.forEach((carousel) => {
+    const key = getPracticeCarouselKey(carousel);
+    const activeIndex = state.practiceCarouselState[key] ?? 0;
+    updatePracticeCarouselUI(carousel, activeIndex);
+  });
+}
+
+function setPracticeCarouselIndex(carousel, activeIndex) {
+  if (!carousel) {
+    return;
+  }
+
+  const key = getPracticeCarouselKey(carousel);
+  state.practiceCarouselState[key] = activeIndex;
+  updatePracticeCarouselUI(carousel, activeIndex);
 }
 
 function flashcardKey(sectionId, index) {
@@ -3926,6 +4100,7 @@ function renderActiveSection() {
   activeSectionRoot.innerHTML = renderSectionContent(section);
   renderNavigation();
   updateProgress();
+  syncPracticeCarousels(activeSectionRoot);
 }
 
 function scrollToActiveLesson() {
@@ -3996,6 +4171,45 @@ document.addEventListener("click", (event) => {
   const nextButton = event.target.closest("[data-section-next]");
   if (nextButton) {
     setActiveSection(nextButton.dataset.section, { scroll: true });
+    return;
+  }
+
+  const practiceCarouselStep = event.target.closest("[data-practice-carousel-step]");
+  if (practiceCarouselStep) {
+    const carousel = practiceCarouselStep.closest("[data-practice-carousel]");
+    if (!carousel) {
+      return;
+    }
+    const activeIndex = Number(practiceCarouselStep.dataset.practiceCarouselStep);
+    if (Number.isNaN(activeIndex)) {
+      return;
+    }
+    setPracticeCarouselIndex(carousel, activeIndex);
+    return;
+  }
+
+  const practiceCarouselPrev = event.target.closest("[data-practice-carousel-prev]");
+  if (practiceCarouselPrev) {
+    const carousel = practiceCarouselPrev.closest("[data-practice-carousel]");
+    if (!carousel) {
+      return;
+    }
+    const key = getPracticeCarouselKey(carousel);
+    const currentIndex = state.practiceCarouselState[key] ?? 0;
+    setPracticeCarouselIndex(carousel, Math.max(0, currentIndex - 1));
+    return;
+  }
+
+  const practiceCarouselNext = event.target.closest("[data-practice-carousel-next]");
+  if (practiceCarouselNext) {
+    const carousel = practiceCarouselNext.closest("[data-practice-carousel]");
+    if (!carousel) {
+      return;
+    }
+    const slides = carousel.querySelectorAll("[data-practice-carousel-slide]");
+    const key = getPracticeCarouselKey(carousel);
+    const currentIndex = state.practiceCarouselState[key] ?? 0;
+    setPracticeCarouselIndex(carousel, Math.min(slides.length - 1, currentIndex + 1));
     return;
   }
 
