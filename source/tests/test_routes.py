@@ -100,6 +100,11 @@ def test_login_and_register_pages(client):
     assert "Не пришло письмо подтверждения?" in check_email_response.text
     assert "/resend-verification" in check_email_response.text
     assert "Повторная отправка письма подтверждения" in resend_response.text
+    assert "Регистрация временно закрыта" not in register_response.text
+    assert "Создание аккаунта" in register_response.text
+    assert '<form class="form" method="post" action="/register">' in register_response.text
+    assert 'name="email"' in register_response.text
+    assert 'name="login"' in register_response.text
     assert "/static/styles.css" in login_response.text
     assert "/static/styles.css" in register_response.text
     assert "Электронная почта или логин" in login_response.text
