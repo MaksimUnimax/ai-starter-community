@@ -550,13 +550,13 @@ const courseData = {
           label: "Практическое задание",
           title: "Зарегистрировать аккаунт GitHub",
           html: `
-            <p>GitHub нужен, чтобы вы могли видеть проект, историю изменений, commits и результат работы.</p>
-            <p>Вам не нужно писать код руками, но нужен аккаунт GitHub, чтобы понимать, где хранится проект и как ChatGPT проверяет изменения.</p>
+            <p><strong>GitHub</strong> нужен, чтобы вы могли видеть проект, историю изменений, <strong>commits</strong> и результат работы.</p>
+            <p>Вам не нужно писать код руками, но нужен аккаунт <strong>GitHub</strong>, чтобы понимать, где хранится проект и как <strong>ChatGPT</strong> проверяет изменения.</p>
             <p><strong>Что нужно сделать</strong></p>
-            <p>Зарегистрировать аккаунт GitHub и войти в него.</p>
+            <p>Зарегистрировать аккаунт <strong>GitHub</strong> и войти в него.</p>
             <p><strong>Пошаговая инструкция</strong></p>
             <ol>
-              <li>Откройте сайт GitHub:</li>
+              <li>Откройте сайт <strong>GitHub</strong> и нажмите Sign in:</li>
             </ol>
             <p><a href="https://github.com/" target="_blank" rel="noreferrer">https://github.com/</a></p>
             <ol start="2">
@@ -565,34 +565,34 @@ const courseData = {
             <p>Можно сразу открыть страницу регистрации:</p>
             <p><a href="https://github.com/signup" target="_blank" rel="noreferrer">https://github.com/signup</a></p>
             <ol start="3">
-              <li>Введите email, пароль и username.</li>
+              <li>Введите <strong>email</strong>, пароль и <strong>username</strong>.</li>
             </ol>
             <p>Используйте почту, к которой у вас есть постоянный доступ.</p>
-            <p>Не отправляйте пароль в ChatGPT, Codex, Telegram или любой другой чат.</p>
-            <p>Username — это имя аккаунта на GitHub. Оно будет видно в профиле и рядом с действиями на GitHub.</p>
+            <p>Не отправляйте пароль в <strong>ChatGPT</strong>, <strong>Codex</strong>, <strong>Telegram</strong> или любой другой чат.</p>
+            <p><strong>Username</strong> — это имя аккаунта на <strong>GitHub</strong>. Оно будет видно в <strong>профиле</strong> и рядом с действиями на <strong>GitHub</strong>.</p>
             <ol start="4">
               <li>Пройдите проверку GitHub, если она появится.</li>
             </ol>
-            <p>GitHub может попросить подтвердить, что вы не робот.</p>
+            <p><strong>GitHub</strong> может попросить подтвердить, что вы не робот.</p>
             <ol start="5">
-              <li>Подтвердите email, если GitHub попросит.</li>
+              <li>Подтвердите <strong>email</strong>, если <strong>GitHub</strong> попросит.</li>
             </ol>
-            <p>Откройте почту, найдите письмо от GitHub и подтвердите адрес.</p>
-            <p>Это важно: без подтверждённого email часть действий на GitHub может быть недоступна.</p>
+            <p>Откройте почту, найдите письмо от <strong>GitHub</strong> и подтвердите адрес.</p>
+            <p>Это важно: без подтверждённого <strong>email</strong> часть действий на <strong>GitHub</strong> может быть недоступна.</p>
             <ol start="6">
-              <li>Войдите в аккаунт и проверьте, что открылся dashboard или профиль.</li>
+              <li>Войдите в аккаунт и проверьте, что открылся <strong>dashboard</strong> или <strong>профиль</strong>.</li>
             </ol>
             <p>Если после регистрации GitHub не вошёл автоматически, откройте:</p>
             <p><a href="https://github.com/login" target="_blank" rel="noreferrer">https://github.com/login</a></p>
-            <p>Введите данные аккаунта и войдите.</p>
-            <p>К концу урока у вас должен быть зарегистрированный и авторизованный аккаунт GitHub.</p>
+            <p>Введите данные аккаунта <strong>GitHub</strong> и войдите.</p>
+            <p>К концу урока у вас должен быть зарегистрированный и авторизованный аккаунт <strong>GitHub</strong>.</p>
             <p><strong>Что должно получиться</strong></p>
             <p>Проверка:</p>
             <ul>
               <li>открывается <a href="https://github.com/" target="_blank" rel="noreferrer">https://github.com/</a>;</li>
-              <li>видно, что вы вошли в аккаунт;</li>
-              <li>открывается ваш профиль;</li>
-              <li>email подтверждён.</li>
+              <li>видно, что вы вошли в аккаунт <strong>GitHub</strong>;</li>
+              <li>открывается ваш <strong>профиль</strong>;</li>
+              <li><strong>email</strong> подтверждён.</li>
             </ul>
           `
         },
@@ -3465,9 +3465,9 @@ function renderGitPracticeCarousel() {
   const slides = [
     {
       stepLabel: "Шаг 1",
-      title: "Откройте GitHub",
+      title: "Откройте GitHub и нажмите Sign in",
       image: "/static/course-assets/dair-smoke-20260529/git-carousel/github-step-01.png",
-      alt: "Шаг 1. Откройте GitHub"
+      alt: "Шаг 1. Откройте GitHub и нажмите Sign in"
     },
     {
       stepLabel: "Шаг 2",
