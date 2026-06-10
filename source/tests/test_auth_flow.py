@@ -98,6 +98,11 @@ def test_register_creates_unverified_user_and_outbox(test_settings):
     )
     assert outbox_row is not None
     assert outbox_row["template_key"] == "email_verification"
+    assert outbox_row["purpose"] == "confirmation_initial"
+    assert outbox_row["smtp_channel"] == "primary"
+    assert outbox_row["from_address"] == "no-reply@example.com"
+    assert outbox_row["provider_configured"] == 1
+    assert outbox_row["fallback_reason"] is None
     assert "/verify-email/" in outbox_row["body_text"]
 
 
@@ -391,6 +396,17 @@ def test_route_flow_register_verify_login_cabinet_logout(client, test_settings):
         ("route@example.com", "email_verification"),
     )["c"]
 
+    initial_outbox_row = _fetch_one(
+        test_settings,
+        "SELECT * FROM email_outbox WHERE recipient_email = ? AND template_key = ? ORDER BY id DESC LIMIT 1",
+        ("route@example.com", "email_verification"),
+    )
+    assert initial_outbox_row["purpose"] == "confirmation_initial"
+    assert initial_outbox_row["smtp_channel"] == "primary"
+    assert initial_outbox_row["from_address"] == "no-reply@example.com"
+    assert initial_outbox_row["provider_configured"] == 1
+    assert initial_outbox_row["fallback_reason"] is None
+
     resend_response = client.post("/resend-verification", data={}, follow_redirects=False)
     assert resend_response.status_code == 303
     assert resend_response.headers["location"] == "/check-email?resent=1"
@@ -424,6 +440,11 @@ def test_route_flow_register_verify_login_cabinet_logout(client, test_settings):
         "SELECT * FROM email_outbox WHERE recipient_email = ? AND template_key = ? ORDER BY id DESC LIMIT 1",
         ("route@example.com", "email_verification"),
     )
+    assert outbox_row["purpose"] == "confirmation_resend"
+    assert outbox_row["smtp_channel"] == "primary"
+    assert outbox_row["from_address"] == "no-reply@example.com"
+    assert outbox_row["provider_configured"] == 1
+    assert outbox_row["fallback_reason"] == "secondary_smtp_not_configured_falling_back_to_primary"
     verify_token = _extract_token_from_link(outbox_row["body_text"])
     verify_response = client.get(f"/verify-email/{verify_token}")
     assert verify_response.status_code == 200

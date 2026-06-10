@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from dataclasses import replace
+
 from app.core.config import Settings, get_settings
 from app.shared.db import get_connection, get_database_path, initialize_database
 from app.shared.utils import utc_now_iso
@@ -9,6 +11,8 @@ from app.notifications.smtp_adapter import (
     SMTPConfigError,
     SMTPDeliveryError,
     SMTPError,
+    SMTPProfile,
+    build_smtp_profile,
     send_smtp_email,
     validate_smtp_settings,
 )
@@ -27,6 +31,10 @@ class EmailDeliveryError(RuntimeError):
 
 
 SMTP_AUDIT_REDACTED_BODY = "[redacted: sent via smtp]"
+CONFIRMATION_INITIAL_PURPOSE = "confirmation_initial"
+CONFIRMATION_RESEND_PURPOSE = "confirmation_resend"
+PASSWORD_RESET_PURPOSE = "password_reset"
+SECONDARY_SMTP_FALLBACK_REASON = "secondary_smtp_not_configured_falling_back_to_primary"
 
 
 def _resolved_settings(settings: Settings | None = None) -> Settings:
@@ -43,6 +51,11 @@ def _record_email_outbox(
     body_text: str,
     template_key: str,
     *,
+    purpose: str,
+    smtp_channel: str,
+    from_address: str | None,
+    provider_configured: bool,
+    fallback_reason: str | None = None,
     status: str,
     error: str | None = None,
     sent_at: str | None = None,
@@ -56,15 +69,21 @@ def _record_email_outbox(
             """
             INSERT INTO email_outbox (
                 recipient_email, subject, body_text, template_key,
-                status, created_at, sent_at, error
+                purpose, smtp_channel, from_address, provider_configured,
+                fallback_reason, status, created_at, sent_at, error
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 recipient_email,
                 subject,
                 body_text,
                 template_key,
+                purpose,
+                smtp_channel,
+                from_address,
+                1 if provider_configured else 0,
+                fallback_reason,
                 status,
                 utc_now_iso(),
                 sent_at,
@@ -99,14 +118,27 @@ def _update_email_outbox(
         )
 
 
+def _resolved_smtp_profile(current_settings: Settings, purpose: str) -> SMTPProfile:
+    primary_profile = build_smtp_profile(current_settings, smtp_channel="primary")
+    if purpose == CONFIRMATION_RESEND_PURPOSE:
+        secondary_profile = build_smtp_profile(current_settings, smtp_channel="secondary_resend")
+        if secondary_profile.configured:
+            return secondary_profile
+        return replace(primary_profile, fallback_reason=SECONDARY_SMTP_FALLBACK_REASON)
+    return primary_profile
+
+
 def _queue_email(
     recipient_email: str,
     subject: str,
     body_text: str,
     template_key: str,
+    *,
+    purpose: str,
     settings: Settings | None = None,
 ) -> int:
     current_settings = _resolved_settings(settings)
+    profile = _resolved_smtp_profile(current_settings, purpose)
     mode = _email_mode(current_settings)
     if mode == "outbox":
         return _record_email_outbox(
@@ -114,12 +146,17 @@ def _queue_email(
             subject,
             body_text,
             template_key,
+            purpose=purpose,
+            smtp_channel=profile.channel,
+            from_address=profile.from_address,
+            provider_configured=profile.configured,
+            fallback_reason=profile.fallback_reason,
             status="queued",
             settings=current_settings,
         )
     if mode == "smtp":
         try:
-            validate_smtp_settings(current_settings)
+            validate_smtp_settings(current_settings, smtp_channel=profile.channel)
         except SMTPConfigError as exc:
             raise EmailConfigError(str(exc)) from exc
         email_id = _record_email_outbox(
@@ -127,6 +164,11 @@ def _queue_email(
             subject,
             SMTP_AUDIT_REDACTED_BODY,
             template_key,
+            purpose=purpose,
+            smtp_channel=profile.channel,
+            from_address=profile.from_address,
+            provider_configured=profile.configured,
+            fallback_reason=profile.fallback_reason,
             status="queued",
             settings=current_settings,
         )
@@ -136,6 +178,8 @@ def _queue_email(
                 subject=subject,
                 body_text=body_text,
                 settings=current_settings,
+                smtp_channel=profile.channel,
+                smtp_profile=profile,
             )
         except SMTPConfigError as exc:
             _update_email_outbox(
@@ -179,6 +223,8 @@ def send_email_verification(
     recipient_email: str,
     verification_link: str,
     settings: Settings | None = None,
+    *,
+    purpose: str = CONFIRMATION_INITIAL_PURPOSE,
 ) -> int:
     subject = "Подтверждение email"
     body_text = (
@@ -187,7 +233,14 @@ def send_email_verification(
         f"{verification_link}\n\n"
         "Если вы не регистрировались, просто игнорируйте это письмо."
     )
-    return _queue_email(recipient_email, subject, body_text, "email_verification", settings=settings)
+    return _queue_email(
+        recipient_email,
+        subject,
+        body_text,
+        "email_verification",
+        purpose=purpose,
+        settings=settings,
+    )
 
 
 def send_password_reset(
@@ -202,4 +255,11 @@ def send_password_reset(
         f"{reset_link}\n\n"
         "Если вы не запрашивали сброс, просто игнорируйте это письмо."
     )
-    return _queue_email(recipient_email, subject, body_text, "password_reset", settings=settings)
+    return _queue_email(
+        recipient_email,
+        subject,
+        body_text,
+        "password_reset",
+        purpose=PASSWORD_RESET_PURPOSE,
+        settings=settings,
+    )

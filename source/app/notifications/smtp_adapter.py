@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from email.message import EmailMessage
 from email.utils import formataddr
 import smtplib
@@ -21,28 +22,109 @@ class SMTPDeliveryError(SMTPError):
     """Raised when SMTP transport fails at runtime."""
 
 
+@dataclass(frozen=True)
+class SMTPProfile:
+    channel: str
+    from_address: str | None
+    from_name: str | None
+    host: str | None
+    port: int | None
+    username: str | None
+    password: str | None
+    use_tls: bool
+    use_starttls: bool
+    timeout_seconds: int
+    from_address_name: str
+    host_name: str
+    port_name: str
+    username_name: str
+    password_name: str
+    use_tls_name: str
+    use_starttls_name: str
+    fallback_reason: str | None = None
+
+    @property
+    def configured(self) -> bool:
+        if not self.from_address or not self.host or self.port is None or self.port <= 0:
+            return False
+        if bool(self.username) ^ bool(self.password):
+            return False
+        if self.use_tls and self.use_starttls:
+            return False
+        return True
+
+
 def _resolved_settings(settings: Settings | None = None) -> Settings:
     return settings or get_settings()
 
 
-def validate_smtp_settings(settings: Settings | None = None) -> Settings:
+def _smtp_profile_from_settings(settings: Settings, smtp_channel: str) -> SMTPProfile:
+    if smtp_channel == "primary":
+        return SMTPProfile(
+            channel="primary",
+            from_address=settings.email_from_address,
+            from_name=settings.email_from_name,
+            host=settings.smtp_host,
+            port=settings.smtp_port,
+            username=settings.smtp_username,
+            password=settings.smtp_password,
+            use_tls=settings.smtp_use_tls,
+            use_starttls=settings.smtp_use_starttls,
+            timeout_seconds=settings.smtp_timeout_seconds,
+            from_address_name="EMAIL_FROM_ADDRESS",
+            host_name="SMTP_HOST",
+            port_name="SMTP_PORT",
+            username_name="SMTP_USERNAME",
+            password_name="SMTP_PASSWORD",
+            use_tls_name="SMTP_USE_TLS",
+            use_starttls_name="SMTP_USE_STARTTLS",
+        )
+    if smtp_channel == "secondary_resend":
+        return SMTPProfile(
+            channel="secondary_resend",
+            from_address=settings.email_resend_from_address,
+            from_name=settings.email_resend_from_name,
+            host=settings.email_resend_smtp_host,
+            port=settings.email_resend_smtp_port,
+            username=settings.email_resend_smtp_username,
+            password=settings.email_resend_smtp_password,
+            use_tls=settings.email_resend_smtp_use_tls,
+            use_starttls=settings.email_resend_smtp_use_starttls,
+            timeout_seconds=settings.email_resend_smtp_timeout_seconds,
+            from_address_name="EMAIL_RESEND_FROM_ADDRESS",
+            host_name="EMAIL_RESEND_SMTP_HOST",
+            port_name="EMAIL_RESEND_SMTP_PORT",
+            username_name="EMAIL_RESEND_SMTP_USERNAME",
+            password_name="EMAIL_RESEND_SMTP_PASSWORD",
+            use_tls_name="EMAIL_RESEND_SMTP_USE_TLS",
+            use_starttls_name="EMAIL_RESEND_SMTP_USE_STARTTLS",
+        )
+    raise SMTPConfigError(f"unsupported smtp channel: {smtp_channel}")
+
+
+def build_smtp_profile(settings: Settings | None = None, *, smtp_channel: str = "primary") -> SMTPProfile:
     current_settings = _resolved_settings(settings)
+    return _smtp_profile_from_settings(current_settings, smtp_channel)
+
+
+def validate_smtp_settings(settings: Settings | None = None, *, smtp_channel: str = "primary") -> SMTPProfile:
+    profile = build_smtp_profile(settings, smtp_channel=smtp_channel)
     missing: list[str] = []
-    if not current_settings.email_from_address:
-        missing.append("EMAIL_FROM_ADDRESS")
-    if not current_settings.smtp_host:
-        missing.append("SMTP_HOST")
-    if current_settings.smtp_port is None:
-        missing.append("SMTP_PORT")
-    if bool(current_settings.smtp_username) ^ bool(current_settings.smtp_password):
-        missing.append("SMTP_USERNAME/SMTP_PASSWORD")
-    if current_settings.smtp_use_tls and current_settings.smtp_use_starttls:
-        raise SMTPConfigError("SMTP_USE_TLS and SMTP_USE_STARTTLS cannot both be true")
+    if not profile.from_address:
+        missing.append(profile.from_address_name)
+    if not profile.host:
+        missing.append(profile.host_name)
+    if profile.port is None:
+        missing.append(profile.port_name)
+    if bool(profile.username) ^ bool(profile.password):
+        missing.append(f"{profile.username_name}/{profile.password_name}")
+    if profile.use_tls and profile.use_starttls:
+        raise SMTPConfigError(f"{profile.use_tls_name} and {profile.use_starttls_name} cannot both be true")
     if missing:
         raise SMTPConfigError(f"missing required SMTP settings: {', '.join(missing)}")
-    if current_settings.smtp_port is not None and current_settings.smtp_port <= 0:
-        raise SMTPConfigError("SMTP_PORT must be a positive integer")
-    return current_settings
+    if profile.port is not None and profile.port <= 0:
+        raise SMTPConfigError(f"{profile.port_name} must be a positive integer")
+    return profile
 
 
 def _build_message(
@@ -50,12 +132,14 @@ def _build_message(
     recipient_email: str,
     subject: str,
     body_text: str,
-    settings: Settings,
+    profile: SMTPProfile,
+    settings: Settings | None = None,
 ) -> EmailMessage:
     message = EmailMessage()
-    from_name = settings.email_from_name or settings.app_name
+    current_settings = _resolved_settings(settings)
+    from_name = profile.from_name or current_settings.app_name
     message["Subject"] = subject
-    message["From"] = formataddr((from_name, settings.email_from_address or ""))
+    message["From"] = formataddr((from_name, profile.from_address or ""))
     message["To"] = recipient_email
     message.set_content(body_text)
     return message
@@ -67,35 +151,39 @@ def send_smtp_email(
     subject: str,
     body_text: str,
     settings: Settings | None = None,
+    smtp_channel: str = "primary",
+    smtp_profile: SMTPProfile | None = None,
 ) -> None:
-    current_settings = validate_smtp_settings(settings)
+    current_settings = _resolved_settings(settings)
+    current_profile = smtp_profile or validate_smtp_settings(current_settings, smtp_channel=smtp_channel)
     message = _build_message(
         recipient_email=recipient_email,
         subject=subject,
         body_text=body_text,
+        profile=current_profile,
         settings=current_settings,
     )
 
     try:
-        if current_settings.smtp_use_tls:
+        if current_profile.use_tls:
             with smtplib.SMTP_SSL(
-                current_settings.smtp_host,
-                current_settings.smtp_port,
-                timeout=current_settings.smtp_timeout_seconds,
+                current_profile.host,
+                current_profile.port,
+                timeout=current_profile.timeout_seconds,
             ) as client:
-                if current_settings.smtp_username and current_settings.smtp_password:
-                    client.login(current_settings.smtp_username, current_settings.smtp_password)
+                if current_profile.username and current_profile.password:
+                    client.login(current_profile.username, current_profile.password)
                 client.send_message(message)
         else:
             with smtplib.SMTP(
-                current_settings.smtp_host,
-                current_settings.smtp_port,
-                timeout=current_settings.smtp_timeout_seconds,
+                current_profile.host,
+                current_profile.port,
+                timeout=current_profile.timeout_seconds,
             ) as client:
-                if current_settings.smtp_use_starttls:
+                if current_profile.use_starttls:
                     client.starttls()
-                if current_settings.smtp_username and current_settings.smtp_password:
-                    client.login(current_settings.smtp_username, current_settings.smtp_password)
+                if current_profile.username and current_profile.password:
+                    client.login(current_profile.username, current_profile.password)
                 client.send_message(message)
     except SMTPError:
         raise

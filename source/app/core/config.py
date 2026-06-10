@@ -61,6 +61,15 @@ class Settings:
     smtp_use_tls: bool = False
     smtp_use_starttls: bool = True
     smtp_timeout_seconds: int = 10
+    email_resend_from_address: str | None = None
+    email_resend_from_name: str | None = None
+    email_resend_smtp_host: str | None = None
+    email_resend_smtp_port: int | None = None
+    email_resend_smtp_username: str | None = None
+    email_resend_smtp_password: str | None = None
+    email_resend_smtp_use_tls: bool = False
+    email_resend_smtp_use_starttls: bool = True
+    email_resend_smtp_timeout_seconds: int = 10
     email_verification_token_expiry_hours: int = 24
     password_reset_token_expiry_minutes: int = 30
 
@@ -90,6 +99,15 @@ def get_settings() -> Settings:
         smtp_use_tls=_env_bool("SMTP_USE_TLS", False),
         smtp_use_starttls=_env_bool("SMTP_USE_STARTTLS", True),
         smtp_timeout_seconds=_env_int("SMTP_TIMEOUT_SECONDS", 10),
+        email_resend_from_address=_env_optional_str("EMAIL_RESEND_FROM_ADDRESS"),
+        email_resend_from_name=_env_optional_str("EMAIL_RESEND_FROM_NAME"),
+        email_resend_smtp_host=_env_optional_str("EMAIL_RESEND_SMTP_HOST"),
+        email_resend_smtp_port=_env_optional_int("EMAIL_RESEND_SMTP_PORT"),
+        email_resend_smtp_username=_env_optional_str("EMAIL_RESEND_SMTP_USERNAME"),
+        email_resend_smtp_password=_env_optional_str("EMAIL_RESEND_SMTP_PASSWORD"),
+        email_resend_smtp_use_tls=_env_bool("EMAIL_RESEND_SMTP_USE_TLS", False),
+        email_resend_smtp_use_starttls=_env_bool("EMAIL_RESEND_SMTP_USE_STARTTLS", True),
+        email_resend_smtp_timeout_seconds=_env_int("EMAIL_RESEND_SMTP_TIMEOUT_SECONDS", 10),
         email_verification_token_expiry_hours=_env_int("EMAIL_VERIFICATION_TOKEN_EXPIRY_HOURS", 24),
         password_reset_token_expiry_minutes=_env_int("PASSWORD_RESET_TOKEN_EXPIRY_MINUTES", 30),
     )
