@@ -130,8 +130,11 @@ def test_user_sees_compact_server_backed_account_blocks_and_copy_only_controls(c
     assert 'id="accounts"' in response.text
 
     accounts_section = _extract_accounts_section(response.text)
-    assert "Данные хранятся на сервере и доступны после входа в кабинет с любого устройства." in accounts_section
-    assert "Данные сохраняются только в этом браузере." not in accounts_section
+    assert '<h2 class="section-title">Аккаунты</h2>' in accounts_section
+    assert "Тут появятся блоки с данными для авторизации после того, как администратор активирует опции. Обычно это занимает не более суток после оплаты." not in accounts_section
+    assert "Данные хранятся на сервере и доступны после входа в кабинет с любого устройства." not in accounts_section
+    assert "Вы видите только свои блоки" not in accounts_section
+    assert "Администратор или модератор добавит их позже" not in accounts_section
     assert "Добавить блок" not in accounts_section
     assert "Редактировать" not in accounts_section
     assert "Удалить" not in accounts_section
@@ -141,15 +144,17 @@ def test_user_sees_compact_server_backed_account_blocks_and_copy_only_controls(c
     assert "data-account-card-edit-form" not in accounts_section
     assert "Скопировать" in accounts_section
     assert "ChatGPT" in accounts_section
-    assert "Почта" in accounts_section
+    assert "Почта" not in accounts_section
     assert "Осталось 60 дней" in accounts_section
-    assert "Не активирован" in accounts_section
+    assert "Не активирован" not in accounts_section
     assert "Срок завершён" not in accounts_section
     assert "Осталось после активации" not in accounts_section
     assert "Владелец:" not in accounts_section
     assert "account-owner-group__title" not in accounts_section
     assert "account-owner-group__meta" not in accounts_section
     assert "account-card__owner-line" not in accounts_section
+    assert "owner-mail-login" not in accounts_section
+    assert "owner-mail-password" not in accounts_section
     assert "Срок действия" not in accounts_section
     assert "из 60" not in accounts_section
     assert "После активации блок работает 60 дней" not in accounts_section
@@ -157,6 +162,42 @@ def test_user_sees_compact_server_backed_account_blocks_and_copy_only_controls(c
     assert "Платная опция" not in accounts_section
     assert "Без привязки" not in accounts_section
     assert "Продлить активацию" not in accounts_section
+
+
+def test_user_with_no_active_account_blocks_sees_new_empty_state(client, test_settings):
+    admin = _create_verified_user(test_settings, "cab-ui-empty-admin@example.com", "cabuiemptyadmin", role="admin")
+    owner = _create_verified_user(test_settings, "cab-ui-empty-owner@example.com", "cabuiemptyowner")
+    _grant_materials_access(test_settings, owner.email)
+
+    create_account_block(
+        actor=admin,
+        data=AccountBlockCreateInput(
+            owner_user_id=owner.id,
+            type="mail",
+            login="inactive-mail-login",
+            password_secret="inactive-mail-password",
+        ),
+        settings=test_settings,
+    )
+
+    _login_as(client, test_settings, owner.email)
+    response = client.get("/cabinet")
+
+    assert response.status_code == 200
+    accounts_section = _extract_accounts_section(response.text)
+    assert '<h2 class="section-title">Аккаунты</h2>' in accounts_section
+    assert "Тут появятся блоки с данными для авторизации после того, как администратор активирует опции. Обычно это занимает не более суток после оплаты." in accounts_section
+    assert "Данные хранятся на сервере" not in accounts_section
+    assert "Вы видите только свои блоки" not in accounts_section
+    assert "Администратор или модератор добавит их позже" not in accounts_section
+    assert "Пока нет ни одного блока" not in accounts_section
+    assert "У этого пользователя пока нет блоков" not in accounts_section
+    assert "Найдите пользователя по email" not in accounts_section
+    assert "Скопировать" not in accounts_section
+    assert "account-card__title" not in accounts_section
+    assert "inactive-mail-login" not in accounts_section
+    assert "Неактивно" not in accounts_section
+    assert "Активно" not in accounts_section
 
 
 def test_moderator_can_search_user_by_email_and_manage_selected_user_blocks(client, test_settings):
@@ -167,7 +208,8 @@ def test_moderator_can_search_user_by_email_and_manage_selected_user_blocks(clie
 
     cabinet_response = client.get(f"/cabinet?account_blocks_user_email={owner_a.email}")
     assert cabinet_response.status_code == 200
-    assert "Администратор и модератор выбирают пользователя по email и управляют только его блоками." in cabinet_response.text
+    assert '<h2 class="section-title">Аккаунты</h2>' in cabinet_response.text
+    assert "Администратор и модератор выбирают пользователя по email и управляют только его блоками." not in cabinet_response.text
     assert "Email пользователя" in cabinet_response.text
     assert owner_a.email in cabinet_response.text
     accounts_section = _extract_accounts_section(cabinet_response.text)
@@ -494,8 +536,9 @@ def test_expired_account_block_shows_finished_day_counter_without_active_label(c
         response = client.get("/cabinet")
 
     accounts_section = _extract_accounts_section(response.text)
-    assert "Почта" in accounts_section
-    assert "Срок завершён" in accounts_section
+    assert "Тут появятся блоки с данными для авторизации после того, как администратор активирует опции. Обычно это занимает не более суток после оплаты." in accounts_section
+    assert "Почта" not in accounts_section
+    assert "Срок завершён" not in accounts_section
     assert "Осталось" not in accounts_section
     assert "Активно" not in accounts_section
     assert "Активен:" not in accounts_section

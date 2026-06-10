@@ -31,13 +31,7 @@
   <section id="accounts" class="card stack accounts-card" data-local-accounts-root data-account-blocks-source="server">
     <div class="accounts-header">
       <div class="stack accounts-intro">
-        <h2 class="section-title accounts-title">Аккаунты</h2>
-        <p class="form-help">Данные хранятся на сервере и доступны после входа в кабинет с любого устройства.</p>
-        {% if account_blocks_manage_mode %}
-          <p class="form-help accounts-role-note">Администратор и модератор выбирают пользователя по email и управляют только его блоками.</p>
-        {% else %}
-          <p class="form-help accounts-role-note">Вы видите только свои блоки. Редактирование доступно администратору и модератору.</p>
-        {% endif %}
+        <h2 class="section-title">Аккаунты</h2>
       </div>
 
       {% if account_blocks_manage_mode %}
@@ -202,17 +196,9 @@
         {% endfor %}
       </div>
     {% else %}
-      <p class="form-help accounts-empty">
-        {% if account_blocks_manage_mode %}
-          {% if account_block_selected_user_summary %}
-            У этого пользователя пока нет блоков. Добавьте первый выше.
-          {% else %}
-            Найдите пользователя по email, чтобы увидеть его блоки и добавить новый.
-          {% endif %}
-        {% else %}
-          Пока нет ни одного блока. Администратор или модератор добавит их позже.
-        {% endif %}
-      </p>
+      {% if not account_blocks_manage_mode or account_block_selected_user_summary %}
+        <p class="form-help accounts-empty">Тут появятся блоки с данными для авторизации после того, как администратор активирует опции. Обычно это занимает не более суток после оплаты.</p>
+      {% endif %}
     {% endif %}
   </section>
   <section class="card stack prompts-library-card" data-prompts-library-root>

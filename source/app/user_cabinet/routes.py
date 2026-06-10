@@ -191,13 +191,16 @@ def _account_block_management_context(user, settings, request: Request) -> dict[
     selected_owner_summary = _account_block_owner_summary(selected_user) if selected_user is not None else None
     selected_blocks = []
     if selected_user is not None:
+        visible_blocks = list_account_blocks_for_viewer(user, owner_user_id=int(selected_user.id), settings=settings)
+        if not manage_mode:
+            visible_blocks = [block for block in visible_blocks if block.is_active]
         selected_blocks = [
             _account_block_card_context(
                 block,
                 get_account_block_copy_data(actor=user, block_id=block.id, settings=settings),
                 selected_owner_summary,
             )
-            for block in list_account_blocks_for_viewer(user, owner_user_id=int(selected_user.id), settings=settings)
+            for block in visible_blocks
         ]
 
     return {
