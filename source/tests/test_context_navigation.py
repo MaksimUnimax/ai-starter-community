@@ -54,16 +54,17 @@ def test_anonymous_navigation_shows_public_links_and_login(client):
     response = client.get("/login")
     assert response.status_code == 200
     nav = _nav_block(response.text)
-    assert "Что вы получите" in nav
-    assert "Первый проект" in nav
-    assert "Как проходит работа" in nav
-    assert "Цена" in nav
-    assert "Войти" in nav
+    assert "Главная" in nav
+    assert "Вход" in nav
+    assert "Регистрация" in nav
     assert "Начать первый проект" not in nav
     assert "Личный кабинет" not in nav
     assert "Работа с ИИ" not in nav
     assert "Админ-панель" not in nav
-    assert "Регистрация" not in nav
+    assert "Что вы получите" not in nav
+    assert "Первый проект" not in nav
+    assert "Как проходит работа" not in nav
+    assert "Цена" not in nav
 
 
 def test_login_and_register_pages_link_to_each_other(client):

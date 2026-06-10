@@ -122,7 +122,7 @@ def test_admin_can_grant_and_revoke_paid_access(client, test_settings):
     materials_response = client.get("/materials")
     assert materials_response.status_code == 200
     assert "Работа с ИИ" in materials_response.text
-    assert "Полный доступ к урокам откроется после оплаты тарифа." not in materials_response.text
+    assert "Полный доступ откроется после оплаты тарифа." not in materials_response.text
 
     client.cookies.clear()
     _login_as(client, test_settings, "admin-grant-admin@example.com")
@@ -146,7 +146,7 @@ def test_admin_can_grant_and_revoke_paid_access(client, test_settings):
     assert "Обучение" in locked_materials.text
     assert "Вступление к курсу" in locked_materials.text
     assert "Стартовый доступ" in locked_materials.text
-    assert "Полный доступ к урокам откроется после оплаты тарифа." in locked_materials.text
+    assert "Полный доступ откроется после оплаты тарифа." in locked_materials.text
 
 
 def test_non_admins_cannot_grant_or_revoke_paid_access(client, test_settings):

@@ -144,6 +144,46 @@ a:hover {
   pointer-events: none;
 }
 
+.course-access-badge {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+  margin-top: 18px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(196, 92, 38, 0.2);
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 10px 24px rgba(42, 33, 24, 0.05);
+  text-align: left;
+}
+
+.course-access-badge p {
+  margin: 0;
+  font-size: 0.98rem;
+  line-height: 1.45;
+}
+
+.course-access-badge p:first-child {
+  font-weight: 600;
+}
+
+.password-field {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.password-field .input {
+  flex: 1 1 auto;
+}
+
+.password-toggle {
+  flex: 0 0 auto;
+  min-width: 142px;
+  white-space: nowrap;
+}
+
 .top-nav .nav-account-compact {
   display: flex;
   flex-direction: column;
@@ -2701,6 +2741,19 @@ html { scroll-behavior: smooth; }
 
   .course-head-actions .btn,
   .pricing-actions .btn {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .course-access-badge {
+    width: 100%;
+  }
+
+  .password-field {
+    flex-direction: column;
+  }
+
+  .password-toggle {
     width: 100%;
     min-width: 0;
   }

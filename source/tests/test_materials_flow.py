@@ -126,10 +126,11 @@ def test_materials_shows_locked_state_without_access(client, test_settings):
     assert "Что изучаем" in response.text
     assert "Зачем это нужно" in response.text
     assert "Где это применяется" in response.text
+    assert "course-access-badge" in response.text
     assert "Стартовый доступ — 6 990 ₽" in response.text
     assert "4 990 ₽" not in response.text
-    assert "Полный доступ к урокам откроется после оплаты тарифа." in response.text
-    assert "Сейчас вы видите вводную часть и тариф для оплаты." in response.text
+    assert "Полный доступ откроется после оплаты тарифа." in response.text
+    assert "Сейчас вы видите вводную часть и тариф для оплаты." not in response.text
     assert "К разделу материалов" not in response.text
     assert "Уроки курса" not in response.text
     assert "Как мы работаем: ChatGPT проектирует, Codex выполняет, пользователь проверяет" not in response.text
@@ -166,8 +167,10 @@ def test_draft_learning_route_shows_paywall_for_unpaid_user_and_full_course_for_
     assert "Что изучаем" in locked_response.text
     assert "Зачем это нужно" in locked_response.text
     assert "Где это применяется" in locked_response.text
+    assert "course-access-badge" in locked_response.text
     assert "Стартовый доступ — 6 990 ₽" in locked_response.text
-    assert "Полный доступ к урокам откроется после оплаты тарифа." in locked_response.text
+    assert "Полный доступ откроется после оплаты тарифа." in locked_response.text
+    assert "Сейчас вы видите вводную часть и тариф для оплаты." not in locked_response.text
     assert "quiz-list" not in locked_response.text
     assert "lesson-shell" not in locked_response.text
 
@@ -184,7 +187,7 @@ def test_draft_learning_route_shows_paywall_for_unpaid_user_and_full_course_for_
     assert "learning access required" not in paid_response.text
     assert "quiz-list" in paid_response.text
     assert "lesson-shell" in paid_response.text
-    assert "Полный доступ к урокам откроется после оплаты тарифа." not in paid_response.text
+    assert "Полный доступ откроется после оплаты тарифа." not in paid_response.text
     assert "Вступление к курсу" in paid_response.text
     assert "Стартовый доступ — 6 990 ₽" not in paid_response.text
 

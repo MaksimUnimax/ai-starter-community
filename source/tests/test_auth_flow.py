@@ -3,9 +3,11 @@ from __future__ import annotations
 import re
 import sqlite3
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
+from app.auth.routes import templates as auth_templates
 from app.auth.service import (
     ConflictError,
     NotFoundError,
@@ -295,13 +297,14 @@ def test_route_flow_register_page_is_closed(client, test_settings):
     assert register_response.status_code == 200
     assert "Регистрация временно закрыта" in register_response.text
     assert "Перейти ко входу" in register_response.text
-    assert "/login" in register_response.text
-    assert 'class="button button-secondary nav-pill" href="/#what-you-get"' in register_response.text
-    assert 'class="button button-secondary nav-pill" href="/#first-project"' in register_response.text
-    assert 'class="button button-secondary nav-pill" href="/#how-it-works"' in register_response.text
-    assert 'class="button button-secondary nav-pill" href="/#pricing"' in register_response.text
+    assert 'class="button button-secondary nav-pill" href="/"' in register_response.text
     assert 'class="button button-secondary nav-pill" href="/login"' in register_response.text
     assert 'class="button button-secondary nav-pill" href="/register"' in register_response.text
+    assert "Что вы получите" not in register_response.text
+    assert "Первый проект" not in register_response.text
+    assert "Как проходит работа" not in register_response.text
+    assert "Цена" not in register_response.text
+    assert 'class="button button-secondary nav-pill" href="/"' in register_response.text
     assert "Создать аккаунт" not in register_response.text
 
     register_post_response = client.post(
@@ -632,16 +635,13 @@ def test_login_and_reset_pages_show_clear_rules(client):
     assert "Электронная почта или логин" in login_response.text
     assert "Зарегистрироваться" in login_response.text
     assert "Забыли пароль?" in login_response.text
-    assert 'class="button button-secondary nav-pill" href="/#what-you-get"' in login_response.text
-    assert 'class="button button-secondary nav-pill" href="/#first-project"' in login_response.text
-    assert 'class="button button-secondary nav-pill" href="/#how-it-works"' in login_response.text
-    assert 'class="button button-secondary nav-pill" href="/#pricing"' in login_response.text
+    assert 'class="button button-secondary nav-pill" href="/"' in login_response.text
     assert 'class="button button-secondary nav-pill" href="/login"' in login_response.text
     assert 'class="button button-secondary nav-pill" href="/register"' in login_response.text
-    assert 'href="#what-you-get"' not in login_response.text
-    assert 'href="#first-project"' not in login_response.text
-    assert 'href="#how-it-works"' not in login_response.text
-    assert 'href="#pricing"' not in login_response.text
+    assert "Что вы получите" not in login_response.text
+    assert "Первый проект" not in login_response.text
+    assert "Как проходит работа" not in login_response.text
+    assert "Цена" not in login_response.text
     assert "Подтверждение почты" not in login_response.text
     assert "Не пришло письмо подтверждения?" not in login_response.text
     assert "/resend-verification" not in login_response.text
@@ -653,6 +653,28 @@ def test_login_and_reset_pages_show_clear_rules(client):
     assert "без пробелов внутри" in reset_response.text
     assert "Вернуться ко входу" in reset_response.text or "Войти" in reset_response.text
     assert "/static/styles.css" in login_response.text
+    assert 'data-password-field' in login_response.text
+    assert 'data-password-toggle' in login_response.text
+    assert 'auth-password-toggle.js' in login_response.text
+    assert 'Показать пароль' in login_response.text
+
+
+def test_register_template_supports_password_toggle_when_open():
+    register_template = auth_templates.env.get_template("register.html")
+    body = register_template.render(
+        request=SimpleNamespace(url=SimpleNamespace(path="/register")),
+        current_user=None,
+        title="Регистрация",
+        registration_closed=False,
+        email="",
+        login="",
+        error=None,
+        notice=None,
+    )
+    assert "Создать аккаунт" in body
+    assert 'data-password-field' in body
+    assert 'data-password-toggle' in body
+    assert 'auth-password-toggle.js' in body
 
 
 def test_cabinet_shows_logout_button_and_access_text(client, test_settings):

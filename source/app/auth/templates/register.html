@@ -39,11 +39,17 @@
         </label>
         <label class="form-row">
           <span>Пароль</span>
-          <input class="input" type="password" name="password" autocomplete="new-password">
+          <div class="password-field" data-password-field>
+            <input class="input" type="password" name="password" autocomplete="new-password" data-password-input>
+            <button class="button button-secondary password-toggle" type="button" data-password-toggle aria-pressed="false" aria-label="Показать пароль">Показать пароль</button>
+          </div>
         </label>
         <label class="form-row">
           <span>Повтор пароля</span>
-          <input class="input" type="password" name="repeat_password" autocomplete="new-password">
+          <div class="password-field" data-password-field>
+            <input class="input" type="password" name="repeat_password" autocomplete="new-password" data-password-input>
+            <button class="button button-secondary password-toggle" type="button" data-password-toggle aria-pressed="false" aria-label="Показать пароль">Показать пароль</button>
+          </div>
         </label>
         <button class="button button-primary" type="submit">Создать аккаунт</button>
       </form>
@@ -54,4 +60,6 @@
       <a class="button button-secondary" href="/login">Войти</a>
     </div>
   </section>
+
+  <script src="/static/auth-password-toggle.js" defer></script>
 {% endblock %}

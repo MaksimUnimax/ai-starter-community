@@ -16,7 +16,10 @@
           <p class="course-headline">Как разрабатывать с помощью ChatGPT и Codex</p>
           <p class="course-note">Курс показывает, как вести проектную работу с ИИ без ручного написания кода: от простой идеи до проверенного результата.</p>
           {% if current_user %}
-            <p class="form-help">Вы вошли как {{ current_user.email }}{% if current_user.login %} · {{ current_user.login }}{% endif %}. Полный доступ откроется после оплаты тарифа.</p>
+            <div class="course-access-badge" role="status" aria-live="polite">
+              <p>Вы вошли как {{ current_user.email }}{% if current_user.login %} · {{ current_user.login }}{% endif %}.</p>
+              <p>Полный доступ откроется после оплаты тарифа.</p>
+            </div>
           {% endif %}
         </div>
       </div>
@@ -43,11 +46,6 @@
           <p>Пользователю не нужно заранее знать программирование, дизайн, вёрстку, архитектуру, документацию или техническое задание. Достаточно описать, что он хочет получить. Дальше ChatGPT помогает продумать задачу, подготовить документы, спланировать внешний вид, разбить работу на шаги и дать Codex точное задание.</p>
         </section>
       </div>
-    </section>
-
-    <section class="card stack course-paywall-note">
-      <p class="muted">Полный доступ к урокам откроется после оплаты тарифа.</p>
-      <p class="form-help">Сейчас вы видите вводную часть и тариф для оплаты. После оплаты откроются все уроки курса и навигация по ним.</p>
     </section>
 
     {% set pricing_section_id = "pricing" %}
