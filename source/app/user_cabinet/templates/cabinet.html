@@ -105,8 +105,42 @@
       </div>
     {% endif %}
 
-    {% if account_block_blocks %}
-      <div class="accounts-grid">
+    <div class="accounts-grid">
+      <article class="account-card account-card--vpn">
+        <header class="account-card__header">
+          <div class="stack account-card__headline">
+            <div class="account-card__title-row">
+              <h3 class="account-card__title">ВПН</h3>
+            </div>
+            <p class="account-card__detail">Просмотрите ролик. IP сервера возьмите из блока «Сервер».</p>
+          </div>
+        </header>
+
+        <div class="account-card__body vpn-card__body">
+          <a
+            class="button button-primary vpn-card__link"
+            href="https://m-d0d72068b914-3w5hsuiikq-ez.a.run.app/ru"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Открыть сайт Amnezia VPN
+          </a>
+
+          <details class="vpn-card__video-disclosure">
+            <summary class="button button-secondary vpn-card__video-summary">Показать видеоинструкцию</summary>
+            <div class="vpn-card__video-panel">
+              <video
+                class="vpn-card__video"
+                controls
+                preload="metadata"
+                src="/static/videos/amnezia-vpn-guide.mp4"
+              ></video>
+            </div>
+          </details>
+        </div>
+      </article>
+
+      {% if account_block_blocks %}
         {% for block in account_block_blocks %}
           <article class="account-card">
             <header class="account-card__header">
@@ -194,12 +228,8 @@
             </div>
           </article>
         {% endfor %}
-      </div>
-    {% else %}
-      {% if not account_blocks_manage_mode or account_block_selected_user_summary %}
-        <p class="form-help accounts-empty">Тут появятся блоки с данными для авторизации после того, как администратор активирует опции. Обычно это занимает не более суток после оплаты.</p>
       {% endif %}
-    {% endif %}
+    </div>
   </section>
   <section class="card stack prompts-library-card" data-prompts-library-root>
     <div class="prompts-library-header">

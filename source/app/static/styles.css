@@ -1232,6 +1232,55 @@ button:hover {
   line-height: 1.35;
 }
 
+.account-card--vpn {
+  border-color: rgba(196, 92, 38, 0.26);
+  background: linear-gradient(180deg, #fffdf8 0%, #fff7ee 100%);
+}
+
+.vpn-card__body {
+  gap: 10px;
+}
+
+.vpn-card__link {
+  width: 100%;
+  justify-content: center;
+  text-align: center;
+  text-decoration: none;
+}
+
+.vpn-card__video-disclosure {
+  display: grid;
+  gap: 10px;
+}
+
+.vpn-card__video-disclosure summary {
+  list-style: none;
+  cursor: pointer;
+  width: 100%;
+}
+
+.vpn-card__video-disclosure summary::-webkit-details-marker {
+  display: none;
+}
+
+.vpn-card__video-panel {
+  display: grid;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid rgba(234, 223, 206, 0.9);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.86);
+}
+
+.vpn-card__video {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  background: #000;
+  aspect-ratio: 16 / 9;
+}
+
 .account-card__delete {
   flex: 0 0 auto;
   min-height: 32px;
