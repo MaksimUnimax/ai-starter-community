@@ -147,6 +147,48 @@ def test_materials_shows_locked_state_without_access(client, test_settings):
     assert "lesson-content" not in lesson_response.text
 
 
+def test_draft_learning_route_shows_paywall_for_unpaid_user_and_full_course_for_paid_user(client, test_settings):
+    _set_homepage_tariff(test_settings)
+    client.cookies.clear()
+    anonymous_response = client.get("/materials/drafts/dair-smoke-20260529/", follow_redirects=False)
+    assert anonymous_response.status_code == 303
+    assert anonymous_response.headers["location"] == "/login"
+
+    _prepare_and_login_verified_user(client, test_settings, "materials-draft-locked@example.com", "materialsdraftlocked")
+
+    locked_response = client.get("/materials/drafts/dair-smoke-20260529/")
+    assert locked_response.status_code == 200
+    assert "learning access required" not in locked_response.text
+    assert "Обучение" in locked_response.text
+    assert "Работа с ИИ" in locked_response.text
+    assert "Как разрабатывать с помощью ChatGPT и Codex" in locked_response.text
+    assert "Вступление к курсу" in locked_response.text
+    assert "Что изучаем" in locked_response.text
+    assert "Зачем это нужно" in locked_response.text
+    assert "Где это применяется" in locked_response.text
+    assert "Стартовый доступ — 6 990 ₽" in locked_response.text
+    assert "Полный доступ к урокам откроется после оплаты тарифа." in locked_response.text
+    assert "quiz-list" not in locked_response.text
+    assert "lesson-shell" not in locked_response.text
+
+    client.cookies.clear()
+    _prepare_and_login_verified_user(
+        client,
+        test_settings,
+        "materials-draft-paid@example.com",
+        "materialsdraftpaid",
+        grant_access=True,
+    )
+    paid_response = client.get("/materials/drafts/dair-smoke-20260529/")
+    assert paid_response.status_code == 200
+    assert "learning access required" not in paid_response.text
+    assert "quiz-list" in paid_response.text
+    assert "lesson-shell" in paid_response.text
+    assert "Полный доступ к урокам откроется после оплаты тарифа." not in paid_response.text
+    assert "Вступление к курсу" in paid_response.text
+    assert "Стартовый доступ — 6 990 ₽" not in paid_response.text
+
+
 def test_access_status_alone_does_not_unlock_materials_or_cabinet(client, test_settings):
     _set_homepage_tariff(test_settings)
     _prepare_and_login_verified_user(client, test_settings, "materials-status-only@example.com", "materialsstatus")

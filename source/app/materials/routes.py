@@ -63,6 +63,21 @@ def _template(request: Request, template_name: str, **context) -> HTMLResponse:
     return templates.TemplateResponse(request, template_name, payload)
 
 
+def _learning_paywall_response(request: Request, user) -> HTMLResponse:
+    settings = get_settings()
+    return _template(
+        request,
+        "learning_locked.html",
+        title="Работа с ИИ",
+        current_user=user,
+        primary_cta_href="/cabinet",
+        primary_cta_label="В личный кабинет",
+        secondary_cta_href="/",
+        secondary_cta_label="На главную",
+        **get_homepage_tariff_context(settings=settings),
+    )
+
+
 def _locked_response(
     request: Request,
     *,
@@ -96,17 +111,7 @@ def materials_page(request: Request):
     if user is None:
         return RedirectResponse(url="/login", status_code=303)
     if not user_has_materials_access(user):
-        return _template(
-            request,
-            "learning_locked.html",
-            title="Работа с ИИ",
-            current_user=user,
-            primary_cta_href="/cabinet",
-            primary_cta_label="В личный кабинет",
-            secondary_cta_href="/",
-            secondary_cta_label="На главную",
-            **get_homepage_tariff_context(settings=settings),
-        )
+        return _learning_paywall_response(request, user)
     course = load_course()
     return _template(
         request,
@@ -169,9 +174,12 @@ def lesson_head(request: Request, slug: str):
 
 @router.get(LESSON_TEST_URL, response_class=HTMLResponse)
 def lesson_test_page(request: Request):
-    _, redirect_response = _require_learning_access(request)
-    if redirect_response is not None:
-        return redirect_response
+    settings = get_settings()
+    user = get_current_user_from_cookies(request.cookies, settings=settings)
+    if user is None:
+        return RedirectResponse(url="/login", status_code=303)
+    if not user_has_materials_access(user):
+        return _learning_paywall_response(request, user)
     return HTMLResponse(_read_lesson_test_asset("index.html"))
 
 

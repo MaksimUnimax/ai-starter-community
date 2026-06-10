@@ -296,6 +296,12 @@ def test_route_flow_register_page_is_closed(client, test_settings):
     assert "Регистрация временно закрыта" in register_response.text
     assert "Перейти ко входу" in register_response.text
     assert "/login" in register_response.text
+    assert 'class="button button-secondary nav-pill" href="/#what-you-get"' in register_response.text
+    assert 'class="button button-secondary nav-pill" href="/#first-project"' in register_response.text
+    assert 'class="button button-secondary nav-pill" href="/#how-it-works"' in register_response.text
+    assert 'class="button button-secondary nav-pill" href="/#pricing"' in register_response.text
+    assert 'class="button button-secondary nav-pill" href="/login"' in register_response.text
+    assert 'class="button button-secondary nav-pill" href="/register"' in register_response.text
     assert "Создать аккаунт" not in register_response.text
 
     register_post_response = client.post(
@@ -626,6 +632,16 @@ def test_login_and_reset_pages_show_clear_rules(client):
     assert "Электронная почта или логин" in login_response.text
     assert "Зарегистрироваться" in login_response.text
     assert "Забыли пароль?" in login_response.text
+    assert 'class="button button-secondary nav-pill" href="/#what-you-get"' in login_response.text
+    assert 'class="button button-secondary nav-pill" href="/#first-project"' in login_response.text
+    assert 'class="button button-secondary nav-pill" href="/#how-it-works"' in login_response.text
+    assert 'class="button button-secondary nav-pill" href="/#pricing"' in login_response.text
+    assert 'class="button button-secondary nav-pill" href="/login"' in login_response.text
+    assert 'class="button button-secondary nav-pill" href="/register"' in login_response.text
+    assert 'href="#what-you-get"' not in login_response.text
+    assert 'href="#first-project"' not in login_response.text
+    assert 'href="#how-it-works"' not in login_response.text
+    assert 'href="#pricing"' not in login_response.text
     assert "Подтверждение почты" not in login_response.text
     assert "Не пришло письмо подтверждения?" not in login_response.text
     assert "/resend-verification" not in login_response.text
