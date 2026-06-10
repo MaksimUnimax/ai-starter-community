@@ -30,7 +30,7 @@ from app.shared.utils import utc_now, utc_now_iso
 EMAIL_TOKEN_TYPE = "email_verification"
 PASSWORD_RESET_TOKEN_TYPE = "password_reset"
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
-LOGIN_RE = re.compile(r"^[a-z0-9_-]{3,32}$")
+LOGIN_RE = re.compile(r"^[a-z0-9._-]{3,32}$")
 ROLE_USER = "user"
 ROLE_MODERATOR = "moderator"
 ROLE_ADMIN = "admin"
@@ -44,6 +44,14 @@ ROLE_LABELS_RU = {
     ROLE_ADMIN: "администратор",
 }
 EMAIL_DELIVERY_FAILURE_MESSAGE_RU = "Не удалось отправить письмо. Попробуйте позже."
+EMAIL_REQUIRED_MESSAGE_RU = "Электронная почта обязательна."
+EMAIL_INVALID_MESSAGE_RU = "Укажите корректный адрес электронной почты."
+LOGIN_REQUIRED_MESSAGE_RU = "Логин обязателен."
+LOGIN_INVALID_MESSAGE_RU = (
+    "Логин содержит недопустимые символы. Используйте латинские буквы, цифры и "
+    "безопасные символы вроде подчёркивания, дефиса и точки. Кириллица не поддерживается."
+)
+EMAIL_OR_LOGIN_REQUIRED_MESSAGE_RU = "Укажите электронную почту или логин."
 
 
 class AuthError(Exception):
@@ -105,25 +113,25 @@ def _public_user_from_row(row) -> UserPublic:
 def _normalize_email(value: str) -> str:
     normalized = (value or "").strip().lower()
     if not normalized:
-        raise ValidationError("email is required")
+        raise ValidationError(EMAIL_REQUIRED_MESSAGE_RU)
     if not EMAIL_RE.fullmatch(normalized):
-        raise ValidationError("invalid email")
+        raise ValidationError(EMAIL_INVALID_MESSAGE_RU)
     return normalized
 
 
 def _normalize_login(value: str) -> str:
     normalized = (value or "").strip().lower()
     if not normalized:
-        raise ValidationError("login is required")
+        raise ValidationError(LOGIN_REQUIRED_MESSAGE_RU)
     if not LOGIN_RE.fullmatch(normalized):
-        raise ValidationError("login must use lowercase letters, digits, underscore or hyphen")
+        raise ValidationError(LOGIN_INVALID_MESSAGE_RU)
     return normalized
 
 
 def _normalize_identifier(value: str) -> tuple[str, str]:
     raw_value = (value or "").strip()
     if not raw_value:
-        raise ValidationError("email or login is required")
+        raise ValidationError(EMAIL_OR_LOGIN_REQUIRED_MESSAGE_RU)
     if "@" in raw_value:
         return "email", _normalize_email(raw_value)
     return "login", _normalize_login(raw_value)

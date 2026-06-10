@@ -173,6 +173,73 @@ def test_register_rejects_duplicates_and_password_rules(test_settings):
         )
 
 
+@pytest.mark.parametrize(
+    ("login", "email"),
+    [
+        ("Maksim", "maksim"),
+        ("maksim_2026", "maksim_2026"),
+        ("Maksim-2026", "maksim-2026"),
+        ("maksim.2026", "maksim.2026"),
+    ],
+)
+def test_register_accepts_safe_latin_login_variants(test_settings, login, email):
+    user = register_user(
+        email=f"{email}@example.com",
+        login=login,
+        password="Secret123",
+        repeat_password="Secret123",
+        settings=test_settings,
+    )
+    assert user.login == email
+    verification_row = _fetch_one(
+        test_settings,
+        "SELECT * FROM email_outbox WHERE recipient_email = ? AND template_key = ? ORDER BY id DESC LIMIT 1",
+        (f"{email}@example.com", "email_verification"),
+    )
+    verify_email(_extract_token_from_link(verification_row["body_text"]), settings=test_settings)
+    assert authenticate_user(login, "Secret123", settings=test_settings).id == user.id
+
+
+def test_register_trims_login_input(test_settings):
+    user = register_user(
+        email="trimmed@example.com",
+        login="  Maksim  ",
+        password="Secret123",
+        repeat_password="Secret123",
+        settings=test_settings,
+    )
+    assert user.login == "maksim"
+    verification_row = _fetch_one(
+        test_settings,
+        "SELECT * FROM email_outbox WHERE recipient_email = ? AND template_key = ? ORDER BY id DESC LIMIT 1",
+        ("trimmed@example.com", "email_verification"),
+    )
+    verify_email(_extract_token_from_link(verification_row["body_text"]), settings=test_settings)
+    assert authenticate_user("  Maksim  ", "Secret123", settings=test_settings).id == user.id
+
+
+@pytest.mark.parametrize(
+    "login",
+    [
+        "Максим",
+        "тест123",
+        "<script>alert(1)</script>",
+        "bad/login",
+        "bad\\login",
+        'bad"quote',
+    ],
+)
+def test_register_rejects_unsafe_login_values(test_settings, login):
+    with pytest.raises(ValidationError, match="Логин содержит недопустимые символы"):
+        register_user(
+            email="unsafe@example.com",
+            login=login,
+            password="Secret123",
+            repeat_password="Secret123",
+            settings=test_settings,
+        )
+
+
 def test_password_policy_trims_and_rejects_spaces():
     assert validate_new_password("  Secret123  ") == "Secret123"
     with pytest.raises(ValueError, match="password must not contain spaces"):
