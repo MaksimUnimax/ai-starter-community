@@ -181,6 +181,10 @@ def user_can_access_materials(user: UserPublic | None) -> bool:
     )
 
 
+def can_manage_account_blocks(user: UserPublic | None) -> bool:
+    return bool(user and has_staff_materials_access(user.role))
+
+
 def _build_public_url(settings: Settings, path: str) -> str:
     base_url = settings.base_url.rstrip("/")
     if not path.startswith("/"):
@@ -223,6 +227,13 @@ def _issue_auth_token(
 def _fetch_user_by_id(user_id: int, settings: Settings | None = None) -> UserPublic | None:
     with _connection(settings) as connection:
         row = connection.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
+        return _public_user_from_row(row) if row else None
+
+
+def get_user_by_email(email: str, settings: Settings | None = None) -> UserPublic | None:
+    normalized_email = _normalize_email(email)
+    with _connection(settings) as connection:
+        row = connection.execute("SELECT * FROM users WHERE email = ?", (normalized_email,)).fetchone()
         return _public_user_from_row(row) if row else None
 
 
@@ -386,6 +397,29 @@ def update_user_role(
         return _public_user_from_row(updated)
 
 
+def set_user_materials_access(
+    *,
+    user_id: int,
+    granted: bool,
+    settings: Settings | None = None,
+) -> UserPublic:
+    resolved = _settings(settings)
+    now_iso = utc_now_iso()
+    granted_at = now_iso if granted else None
+    with _connection(resolved) as connection:
+        row = connection.execute("SELECT * FROM users WHERE id = ?", (int(user_id),)).fetchone()
+        if row is None:
+            raise NotFoundError("user not found")
+        connection.execute(
+            "UPDATE users SET materials_access_granted_at = ?, updated_at = ? WHERE id = ?",
+            (granted_at, now_iso, int(user_id)),
+        )
+        updated = connection.execute("SELECT * FROM users WHERE id = ?", (int(user_id),)).fetchone()
+        if updated is None:
+            raise AuthError("materials access update failed")
+        return _public_user_from_row(updated)
+
+
 def register_user(
     email: str,
     login: str,
@@ -522,6 +556,41 @@ def authenticate_user(email_or_login: str, password: str, settings: Settings | N
     except ValueError as exc:
         raise ValidationError(str(exc)) from exc
     return _public_user_from_row(user_row)
+
+
+def change_password(
+    *,
+    user_id: int,
+    current_password: str,
+    new_password: str,
+    repeat_password: str,
+    settings: Settings | None = None,
+) -> UserPublic:
+    resolved = _settings(settings)
+    normalized_password = _passwords_match(new_password, repeat_password)
+    with _connection(resolved) as connection:
+        row = connection.execute("SELECT * FROM users WHERE id = ?", (int(user_id),)).fetchone()
+        if row is None:
+            raise NotFoundError("user not found")
+        try:
+            if not verify_password(current_password, str(row["password_hash"])):
+                raise UnauthorizedError("invalid credentials")
+        except ValueError as exc:
+            raise ValidationError(str(exc)) from exc
+        now_iso = utc_now_iso()
+        new_password_hash = hash_password(normalized_password)
+        connection.execute(
+            "UPDATE users SET password_hash = ?, updated_at = ? WHERE id = ?",
+            (new_password_hash, now_iso, int(user_id)),
+        )
+        connection.execute(
+            "UPDATE sessions SET revoked_at = ? WHERE user_id = ? AND revoked_at IS NULL",
+            (now_iso, int(user_id)),
+        )
+        updated = connection.execute("SELECT * FROM users WHERE id = ?", (int(user_id),)).fetchone()
+        if updated is None:
+            raise AuthError("password change failed")
+        return _public_user_from_row(updated)
 
 
 def create_session(user_id: int, settings: Settings | None = None) -> str:
