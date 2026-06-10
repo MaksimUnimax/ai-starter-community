@@ -444,7 +444,7 @@ def test_route_flow_register_verify_login_cabinet_logout(client, test_settings):
     assert outbox_row["smtp_channel"] == "primary"
     assert outbox_row["from_address"] == "no-reply@example.com"
     assert outbox_row["provider_configured"] == 1
-    assert outbox_row["fallback_reason"] == "secondary_smtp_not_configured_falling_back_to_primary"
+    assert outbox_row["fallback_reason"] is None
     verify_token = _extract_token_from_link(outbox_row["body_text"])
     verify_response = client.get(f"/verify-email/{verify_token}")
     assert verify_response.status_code == 200
