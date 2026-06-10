@@ -3478,37 +3478,37 @@ function renderGitPracticeCarousel() {
     {
       stepLabel: "Шаг 1",
       title: "Откройте GitHub",
-      image: "assets/git-carousel/github-step-01.png",
+      image: "/static/course-assets/dair-smoke-20260529/git-carousel/github-step-01.png",
       alt: "Шаг 1. Откройте GitHub"
     },
     {
       stepLabel: "Шаг 2",
       title: "Нажмите Sign up",
-      image: "assets/git-carousel/github-step-02.png",
+      image: "/static/course-assets/dair-smoke-20260529/git-carousel/github-step-02.png",
       alt: "Шаг 2. Нажмите Sign up"
     },
     {
       stepLabel: "Шаг 3",
       title: "Введите email и пароль",
-      image: "assets/git-carousel/github-step-03.png",
+      image: "/static/course-assets/dair-smoke-20260529/git-carousel/github-step-03.png",
       alt: "Шаг 3. Введите email и пароль"
     },
     {
       stepLabel: "Шаг 4",
       title: "Выберите username",
-      image: "assets/git-carousel/github-step-04.png",
+      image: "/static/course-assets/dair-smoke-20260529/git-carousel/github-step-04.png",
       alt: "Шаг 4. Выберите username"
     },
     {
       stepLabel: "Шаг 5",
       title: "Пройдите проверку GitHub",
-      image: "assets/git-carousel/github-step-05.png",
+      image: "/static/course-assets/dair-smoke-20260529/git-carousel/github-step-05.png",
       alt: "Шаг 5. Пройдите проверку GitHub"
     },
     {
       stepLabel: "Шаг 6",
       title: "Подтвердите email и войдите",
-      image: "assets/git-carousel/github-step-06.png",
+      image: "/static/course-assets/dair-smoke-20260529/git-carousel/github-step-06.png",
       alt: "Шаг 6. Подтвердите email и войдите"
     }
   ];
