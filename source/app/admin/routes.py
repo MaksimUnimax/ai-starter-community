@@ -159,6 +159,7 @@ def _status_label(value: str) -> str:
 
 
 ACCOUNT_BLOCK_MANAGEMENT_QUERY_PARAM = "account_blocks_user_email"
+ACCOUNT_BLOCK_CREATE_DEFAULT_DURATION_DAYS = 30
 ACCOUNT_BLOCK_NOTICE_MESSAGES = {
     "created": "Блок создан.",
     "updated": "Блок сохранён.",
@@ -192,42 +193,6 @@ def _account_block_owner_email(settings, owner_user_id: int) -> str | None:
         if int(_user_attr(owner, "id")) == int(owner_user_id):
             return str(_user_attr(owner, "email"))
     return None
-
-
-def _paid_option_duration_days(option) -> int:
-    if option.default_duration_days is not None and int(option.default_duration_days) > 0:
-        return int(option.default_duration_days)
-    return DEFAULT_ACCOUNT_BLOCK_DURATION_DAYS
-
-
-def _active_paid_options_for_account_blocks(settings):
-    options = [
-        option
-        for option in list_paid_options(settings=settings)
-        if option.code != "ai_gpt_tool"
-    ]
-    options.sort(key=lambda option: (
-        option.price_amount_minor is None,
-        -(option.price_amount_minor or 0),
-        int(option.sort_order),
-        option.title.casefold(),
-        int(option.id),
-    ))
-    return [
-        {
-            "id": option.id,
-            "code": option.code,
-            "title": option.title,
-            "description": option.description,
-            "formatted_price": _format_minor_amount(option.price_amount_minor),
-            "currency": option.currency,
-            "default_duration_days": option.default_duration_days,
-            "resolved_duration_days": _paid_option_duration_days(option),
-            "is_renewable": option.is_renewable,
-            "status": option.status,
-        }
-        for option in options
-    ]
 
 
 def _account_block_owner_summary(user) -> dict[str, object]:
@@ -309,15 +274,11 @@ def _parse_optional_account_block_duration(value: str | None) -> int | None:
     return parsed
 
 
-def _resolve_create_duration_days(form, settings) -> int:
-    paid_option_code = (form.get("paid_option_code") or "").strip().lower()
-    default_duration = DEFAULT_ACCOUNT_BLOCK_DURATION_DAYS
-    if paid_option_code:
-        for option in _active_paid_options_for_account_blocks(settings):
-            if option["code"] == paid_option_code:
-                default_duration = int(option["resolved_duration_days"])
-                break
-    return _parse_account_block_duration(form.get("duration_days"), default=default_duration)
+def _resolve_create_duration_days(form) -> int:
+    return _parse_account_block_duration(
+        form.get("duration_days"),
+        default=ACCOUNT_BLOCK_CREATE_DEFAULT_DURATION_DAYS,
+    )
 
 
 def _admin_account_block_query_string(selected_email: str | None) -> str:
@@ -357,7 +318,7 @@ def _admin_account_block_page_context(user, settings, request: Request) -> dict[
         ],
         "account_block_blocks": blocks,
         "account_block_query_string": _admin_account_block_query_string(selected_email),
-        "account_block_paid_options": _active_paid_options_for_account_blocks(settings),
+        "account_block_create_default_duration_days": ACCOUNT_BLOCK_CREATE_DEFAULT_DURATION_DAYS,
         "account_block_type_options": [
             {"value": "chatgpt", "label": "ChatGPT"},
             {"value": "server", "label": "Сервер"},
@@ -992,7 +953,7 @@ def admin_account_blocks(request: Request):
 
 
 @router.post("/admin/account-blocks")
-async def admin_account_blocks_create(request: Request, type: str = Form(default=""), login: str = Form(default=""), password_secret: str = Form(default=""), duration_days: str = Form(default=""), paid_option_code: str = Form(default="")):
+async def admin_account_blocks_create(request: Request, type: str = Form(default=""), login: str = Form(default=""), password_secret: str = Form(default=""), duration_days: str = Form(default="")):
     settings = get_settings()
     user, response = _admin_user_or_redirect(request, settings=settings)
     if response is not None:
@@ -1009,7 +970,7 @@ async def admin_account_blocks_create(request: Request, type: str = Form(default
                 type=type,
                 login=login,
                 password_secret=password_secret,
-                duration_days=_resolve_create_duration_days(form, settings),
+                duration_days=_resolve_create_duration_days(form),
             ),
             settings=settings,
         )

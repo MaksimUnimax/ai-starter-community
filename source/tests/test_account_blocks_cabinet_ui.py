@@ -6,8 +6,6 @@ from datetime import datetime, timedelta, timezone
 from urllib.parse import urlencode
 from unittest.mock import patch
 
-from app.paid_options.schemas import PaidOptionCreateInput
-from app.paid_options.service import create_paid_option
 from app.account_blocks.schemas import AccountBlockCreateInput
 from app.account_blocks.service import activate_account_block, create_account_block
 from app.auth.service import authenticate_user, create_session, register_user, verify_email
@@ -156,25 +154,13 @@ def test_user_sees_compact_server_backed_account_blocks_and_copy_only_controls(c
     assert "из 60" not in accounts_section
     assert "После активации блок работает 60 дней" not in accounts_section
     assert 'data-account-block-form="create"' not in accounts_section
+    assert "Платная опция" not in accounts_section
+    assert "Без привязки" not in accounts_section
     assert "Продлить активацию" not in accounts_section
 
 
 def test_moderator_can_search_user_by_email_and_manage_selected_user_blocks(client, test_settings):
     admin = _create_verified_user(test_settings, "cab-ui-admin-2@example.com", "cabuiadmin2", role="admin")
-    paid_option = create_paid_option(
-        data=PaidOptionCreateInput(
-            code="cab_ui_monthly",
-            title="Cab UI Monthly",
-            description="Thirty day test option",
-            price_amount_minor=1000,
-            currency="RUB",
-            default_duration_days=30,
-            status="active",
-            is_renewable=True,
-            sort_order=1,
-        ),
-        settings=test_settings,
-    )
     moderator = _create_verified_user(test_settings, "cab-ui-moderator@example.com", "cabuimoderator", role="moderator")
     owner_a = _create_verified_user(test_settings, "cab-ui-owner-a@example.com", "cabuiownera")
     _login_as(client, test_settings, moderator.email)
@@ -187,11 +173,9 @@ def test_moderator_can_search_user_by_email_and_manage_selected_user_blocks(clie
     accounts_section = _extract_accounts_section(cabinet_response.text)
     builder_shell = _extract_builder_shell(accounts_section)
     assert "Добавить блок" in builder_shell
-    assert "Платная опция" in builder_shell
-    assert 'name="paid_option_code"' in builder_shell
-    assert 'data-account-block-paid-option-select' in builder_shell
     assert 'name="duration_days"' in builder_shell
     assert 'data-account-block-duration-input' in builder_shell
+    assert 'name="duration_days" type="number" min="1" value="30"' in builder_shell
     assert 'name="owner_user_id"' not in builder_shell
     assert 'name="title"' not in builder_shell
     assert f'action="/cabinet/account-blocks?{urlencode({"account_blocks_user_email": owner_a.email})}' in builder_shell
@@ -208,7 +192,6 @@ def test_moderator_can_search_user_by_email_and_manage_selected_user_blocks(clie
         f"/cabinet/account-blocks?{urlencode({'account_blocks_user_email': owner_a.email})}",
         data={
             "type": "server",
-            "paid_option_code": paid_option.code,
             "duration_days": "",
             "login": "mod-block-login",
             "password_secret": "mod-block-password",
@@ -312,7 +295,8 @@ def test_moderator_can_search_user_by_email_and_manage_selected_user_blocks(clie
     assert 'name="password_secret"' in edit_form
     assert "data-account-card-edit-form" in edit_form
     assert 'hidden' in edit_form
-    assert 'name="paid_option_code"' in builder_shell
+    assert "Платная опция" not in builder_shell
+    assert "Без привязки" not in builder_shell
 
     with patch("app.account_blocks.service.utc_now", return_value=renewal_now):
         renew_response = client.post(

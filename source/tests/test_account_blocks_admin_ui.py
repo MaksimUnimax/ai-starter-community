@@ -9,8 +9,6 @@ from unittest.mock import patch
 from app.account_blocks.schemas import AccountBlockCreateInput
 from app.account_blocks.service import create_account_block
 from app.auth.service import authenticate_user, create_session, register_user, verify_email
-from app.paid_options.schemas import PaidOptionCreateInput
-from app.paid_options.service import create_paid_option
 
 
 def _connect(settings):
@@ -56,20 +54,6 @@ def _login_as(client, test_settings, email: str):
 def test_admin_can_search_user_by_email_and_manage_selected_user_blocks(client, test_settings):
     admin = _create_verified_user(test_settings, "admin-ui-admin@example.com", "adminuiadmin", role="admin")
     owner = _create_verified_user(test_settings, "admin-ui-owner@example.com", "adminuiowner")
-    paid_option = create_paid_option(
-        data=PaidOptionCreateInput(
-            code="admin_ui_monthly",
-            title="Admin UI Monthly",
-            description="Thirty day test option",
-            price_amount_minor=1000,
-            currency="RUB",
-            default_duration_days=30,
-            status="active",
-            is_renewable=True,
-            sort_order=1,
-        ),
-        settings=test_settings,
-    )
     seed_block = create_account_block(
         actor=admin,
         data=AccountBlockCreateInput(
@@ -91,11 +75,11 @@ def test_admin_can_search_user_by_email_and_manage_selected_user_blocks(client, 
     assert "Email пользователя" in body
     assert owner.email in body
     assert "seed-login" in body
-    assert "Платная опция" in body
+    assert "Платная опция" not in body
+    assert "Без привязки" not in body
     assert 'name="account_blocks_user_email"' in body
-    assert 'name="paid_option_code"' in body
-    assert 'data-account-block-paid-option-select' in body
     assert 'data-account-block-duration-input' in body
+    assert 'name="duration_days" type="number" min="1" value="30"' in body
     assert f'action="/admin/account-blocks?{urlencode({"account_blocks_user_email": owner.email})}' in body
     assert "Добавить блок" in body
     assert "Неактивно" in body or "Не активирован" in body
@@ -105,7 +89,6 @@ def test_admin_can_search_user_by_email_and_manage_selected_user_blocks(client, 
         f"/admin/account-blocks?{urlencode({'account_blocks_user_email': owner.email})}",
         data={
             "type": "server",
-            "paid_option_code": paid_option.code,
             "duration_days": "",
             "login": "admin-ui-login",
             "password_secret": "admin-ui-password",
@@ -122,6 +105,22 @@ def test_admin_can_search_user_by_email_and_manage_selected_user_blocks(client, 
     assert row["title"] == "Сервер"
     assert int(row["owner_user_id"]) == owner.id
     assert int(row["duration_days"]) == 30
+
+    override_response = client.post(
+        f"/admin/account-blocks?{urlencode({'account_blocks_user_email': owner.email})}",
+        data={
+            "type": "mail",
+            "duration_days": "180",
+            "login": "admin-ui-login-180",
+            "password_secret": "admin-ui-password-180",
+        },
+        follow_redirects=False,
+    )
+    assert override_response.status_code == 303
+    with _connect(test_settings) as conn:
+        override_row = conn.execute("SELECT * FROM account_blocks WHERE login = ?", ("admin-ui-login-180",)).fetchone()
+    assert override_row is not None
+    assert int(override_row["duration_days"]) == 180
 
     activation_now = datetime(2026, 6, 8, 12, 0, 0, tzinfo=timezone.utc)
     with patch("app.account_blocks.service.utc_now", return_value=activation_now):

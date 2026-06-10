@@ -57,6 +57,7 @@ LEARNING_PROJECT_FILE_NAME = "02_СТАРТ_ПРОЕКТА_GIT_ДОКУМЕНТ�
 LEARNING_PROJECT_FILE_PATH = Path(__file__).resolve().parent / "private_files" / LEARNING_PROJECT_FILE_NAME
 BASE_CABINET_PAID_OPTION_CODE = "ai_gpt_tool"
 ACCOUNT_BLOCK_DURATION_DAYS = 60
+ACCOUNT_BLOCK_CREATE_DEFAULT_DURATION_DAYS = 30
 ACCOUNT_BLOCK_TYPE_LABELS = {
     "chatgpt": "ChatGPT",
     "server": "Сервер",
@@ -218,7 +219,7 @@ def _account_block_management_context(user, settings, request: Request) -> dict[
         "account_block_selected_user_summary": selected_owner_summary,
         "account_block_blocks": selected_blocks,
         "account_block_notice": notice,
-        "account_block_paid_options": _active_paid_options_for_cabinet(settings),
+        "account_block_create_default_duration_days": ACCOUNT_BLOCK_CREATE_DEFAULT_DURATION_DAYS,
     }
 
 
@@ -291,15 +292,11 @@ def _parse_optional_account_block_duration(value: str | None) -> int | None:
     return parsed
 
 
-def _resolve_create_duration_days(form, settings) -> int:
-    paid_option_code = (form.get("paid_option_code") or "").strip().lower()
-    default_duration = ACCOUNT_BLOCK_DURATION_DAYS
-    if paid_option_code:
-        for option in _active_paid_options_for_cabinet(settings):
-            if option["code"] == paid_option_code:
-                default_duration = int(option["resolved_duration_days"])
-                break
-    return _parse_account_block_duration(form.get("duration_days"), default=default_duration)
+def _resolve_create_duration_days(form) -> int:
+    return _parse_account_block_duration(
+        form.get("duration_days"),
+        default=ACCOUNT_BLOCK_CREATE_DEFAULT_DURATION_DAYS,
+    )
 
 
 def _format_price(amount_minor: int | None, currency: str | None) -> str:
@@ -531,7 +528,6 @@ def cabinet_create_account_block(
     login: str = Form(default=""),
     password_secret: str = Form(default=""),
     duration_days: str = Form(default=""),
-    paid_option_code: str = Form(default=""),
 ):
     settings, user, redirect_response = _require_authenticated_user(request)
     if redirect_response is not None:
@@ -549,13 +545,7 @@ def cabinet_create_account_block(
                 block_type=block_type,
                 login=login,
                 password_secret=password_secret,
-                duration_days=_resolve_create_duration_days(
-                    {
-                        "duration_days": duration_days,
-                        "paid_option_code": paid_option_code,
-                    },
-                    settings,
-                ),
+                duration_days=_resolve_create_duration_days({"duration_days": duration_days}),
             ),
             settings=settings,
         )

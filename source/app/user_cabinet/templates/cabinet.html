@@ -85,7 +85,6 @@
           method="post"
           action="/cabinet/account-blocks{{ account_block_query_string }}"
           data-account-block-form="create"
-          data-account-block-duration-form
         >
           <label class="form-row accounts-type-field">
             <span>Тип блока</span>
@@ -96,17 +95,8 @@
             </select>
           </label>
           <label class="form-row accounts-field">
-            <span>Платная опция</span>
-            <select class="select" name="paid_option_code" data-account-block-paid-option-select>
-              <option value="">Без привязки</option>
-              {% for option in account_block_paid_options %}
-                <option value="{{ option.code }}" data-duration-days="{{ option.resolved_duration_days }}">{{ option.title }} · {{ option.formatted_price }}</option>
-              {% endfor %}
-            </select>
-          </label>
-          <label class="form-row accounts-field">
             <span>Срок, дней</span>
-            <input class="input" name="duration_days" type="number" min="1" value="60" data-account-block-duration-input>
+            <input class="input" name="duration_days" type="number" min="1" value="{{ account_block_create_default_duration_days }}" data-account-block-duration-input>
           </label>
           <label class="form-row accounts-field">
             <span>Логин</span>
@@ -564,34 +554,6 @@
         true,
       );
 
-      const syncDurationField = (form) => {
-        if (!(form instanceof HTMLFormElement) || !form.matches("[data-account-block-duration-form]")) {
-          return;
-        }
-        const select = form.querySelector("[data-account-block-paid-option-select]");
-        const input = form.querySelector("[data-account-block-duration-input]");
-        if (!(select instanceof HTMLSelectElement) || !(input instanceof HTMLInputElement)) {
-          return;
-        }
-        const option = select.selectedOptions && select.selectedOptions[0];
-        const duration = option ? option.dataset.durationDays || "" : "";
-        if (duration) {
-          input.value = duration;
-        }
-      };
-
-      document.addEventListener("change", (event) => {
-        const target = event.target;
-        if (!(target instanceof HTMLSelectElement)) {
-          return;
-        }
-        const form = target.closest("form[data-account-block-duration-form]");
-        if (form instanceof HTMLFormElement) {
-          syncDurationField(form);
-        }
-      });
-
-      document.querySelectorAll("form[data-account-block-duration-form]").forEach((form) => syncDurationField(form));
     })();
   </script>
   <script src="/static/cabinet-local-accounts.js"></script>
