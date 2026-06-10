@@ -6,12 +6,22 @@
       <p class="muted">Письмо подтверждения</p>
       <h1 class="section-title">Проверьте почту</h1>
       <p>{{ message }}</p>
-      <p class="form-help">Не пришло письмо подтверждения? Отправьте его ещё раз.</p>
     </div>
+
+    {% if resend_error %}
+      <div class="alert alert-error">{{ resend_error }}</div>
+    {% endif %}
+
+    {% if resend_available %}
+      <p class="form-help">Не пришло письмо подтверждения? Отправьте его ещё раз без повторного ввода email.</p>
+      <form class="form" method="post" action="/resend-verification">
+        <button class="button button-secondary" type="submit">Отправить письмо ещё раз</button>
+      </form>
+    {% endif %}
 
     <div class="actions">
       <a class="button button-primary" href="/login">Войти</a>
-      <a class="button button-secondary" href="/resend-verification">Отправить письмо ещё раз</a>
+      <a class="button button-secondary" href="/register">Вернуться к регистрации</a>
     </div>
   </section>
 {% endblock %}

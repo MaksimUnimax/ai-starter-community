@@ -118,6 +118,14 @@ def test_resend_verification_request_creates_new_outbox_message(test_settings):
     )["c"]
     assert after_count == before_count + 1
 
+    assert resend_verification_request(user.email, settings=test_settings) is False
+    after_second_count = _fetch_one(
+        test_settings,
+        "SELECT COUNT(*) AS c FROM email_outbox WHERE recipient_email = ? AND template_key = ?",
+        (user.email, "email_verification"),
+    )["c"]
+    assert after_second_count == after_count
+
 
 def test_resend_verification_request_is_generic_for_missing_or_verified_user(test_settings):
     assert resend_verification_request("missing@example.com", settings=test_settings) is False
@@ -366,13 +374,50 @@ def test_route_flow_register_verify_login_cabinet_logout(client, test_settings):
     )
     assert register_response.status_code == 303
     assert register_response.headers["location"] == "/check-email?registered=1"
+    assert "pending_verification_email=" in register_response.headers.get("set-cookie", "")
 
     check_email_response = client.get("/check-email?registered=1")
     assert check_email_response.status_code == 200
     assert "Проверьте почту" in check_email_response.text
     assert "Мы отправили письмо подтверждения" in check_email_response.text
-    assert "Не пришло письмо подтверждения?" in check_email_response.text
-    assert "/resend-verification" in check_email_response.text
+    assert "Отправить письмо ещё раз" in check_email_response.text
+    assert '<form class="form" method="post" action="/resend-verification">' in check_email_response.text
+    assert 'name="email"' not in check_email_response.text
+    assert 'href="/resend-verification"' not in check_email_response.text
+
+    before_resend_count = _fetch_one(
+        test_settings,
+        "SELECT COUNT(*) AS c FROM email_outbox WHERE recipient_email = ? AND template_key = ?",
+        ("route@example.com", "email_verification"),
+    )["c"]
+
+    resend_response = client.post("/resend-verification", data={}, follow_redirects=False)
+    assert resend_response.status_code == 303
+    assert resend_response.headers["location"] == "/check-email?resent=1"
+
+    after_resend_count = _fetch_one(
+        test_settings,
+        "SELECT COUNT(*) AS c FROM email_outbox WHERE recipient_email = ? AND template_key = ?",
+        ("route@example.com", "email_verification"),
+    )["c"]
+    assert after_resend_count == before_resend_count + 1
+
+    resent_page = client.get("/check-email?resent=1")
+    assert "Письмо подтверждения отправлено повторно. Проверьте входящие и спам." in resent_page.text
+
+    limited_response = client.post("/resend-verification", data={}, follow_redirects=False)
+    assert limited_response.status_code == 303
+    assert limited_response.headers["location"] == "/check-email?resent=1&limited=1"
+
+    limited_after_count = _fetch_one(
+        test_settings,
+        "SELECT COUNT(*) AS c FROM email_outbox WHERE recipient_email = ? AND template_key = ?",
+        ("route@example.com", "email_verification"),
+    )["c"]
+    assert limited_after_count == after_resend_count
+
+    limited_page = client.get("/check-email?resent=1&limited=1")
+    assert "Письмо подтверждения уже отправлено недавно. Проверьте входящие и спам." in limited_page.text
 
     outbox_row = _fetch_one(
         test_settings,

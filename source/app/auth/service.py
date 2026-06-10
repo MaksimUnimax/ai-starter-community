@@ -475,6 +475,12 @@ def register_user(
 def resend_verification_request(email: str, settings: Settings | None = None) -> bool:
     resolved = _settings(settings)
     normalized_email = _normalize_email(email)
+    if is_verification_resend_rate_limited(
+        normalized_email,
+        settings=resolved,
+        cooldown_seconds=60,
+    ):
+        return False
     with _connection(resolved) as connection:
         user_row = connection.execute(
             "SELECT * FROM users WHERE email = ?",
@@ -505,6 +511,52 @@ def resend_verification_request(email: str, settings: Settings | None = None) ->
     except (EmailModeError, EmailConfigError, EmailDeliveryError) as exc:
         _raise_email_delivery_error(exc)
     return True
+
+
+def is_verification_resend_rate_limited(
+    email: str,
+    settings: Settings | None = None,
+    *,
+    cooldown_seconds: int = 60,
+) -> bool:
+    resolved = _settings(settings)
+    normalized_email = _normalize_email(email)
+    with _connection(resolved) as connection:
+        count_row = connection.execute(
+            """
+            SELECT COUNT(*) AS count
+            FROM email_outbox
+            WHERE recipient_email = ? AND template_key = ?
+            """,
+            (normalized_email, EMAIL_TOKEN_TYPE),
+        ).fetchone()
+        if count_row is None or int(count_row["count"]) < 2:
+            return False
+        row = connection.execute(
+            """
+            SELECT status, created_at, sent_at
+            FROM email_outbox
+            WHERE recipient_email = ? AND template_key = ?
+            ORDER BY id DESC
+            LIMIT 1
+            """,
+            (normalized_email, EMAIL_TOKEN_TYPE),
+        ).fetchone()
+    if row is None:
+        return False
+    if str(row["status"]) == "failed":
+        return False
+    timestamp_value = row["sent_at"] or row["created_at"]
+    if not timestamp_value:
+        return False
+    try:
+        last_sent = datetime.fromisoformat(str(timestamp_value))
+    except ValueError:
+        return False
+    now = utc_now()
+    if last_sent.tzinfo is None:
+        last_sent = last_sent.replace(tzinfo=timezone.utc)
+    return (now - last_sent).total_seconds() < float(cooldown_seconds)
 
 
 def verify_email(token: str, settings: Settings | None = None) -> UserPublic:
