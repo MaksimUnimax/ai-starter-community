@@ -38,6 +38,7 @@ from app.account_blocks.service import (
 )
 from app.core.config import get_settings
 from app.notifications.email_service import send_account_block_activation_email
+from app.shared.tariff_display import get_homepage_tariff_context
 from app.paid_options.service import list_paid_options
 from app.materials.service import user_has_materials_access
 from app.user_cabinet.prompts_library import load_cabinet_prompts
@@ -367,6 +368,8 @@ def _locked_response(
     locked_message: str,
     locked_action_label: str = "На главную",
     locked_action_url: str = "/",
+    locked_secondary_label: str | None = None,
+    locked_secondary_url: str | None = None,
     current_user=None,
 ):
     return _template(
@@ -377,7 +380,10 @@ def _locked_response(
         locked_message=locked_message,
         locked_action_label=locked_action_label,
         locked_action_url=locked_action_url,
+        locked_secondary_label=locked_secondary_label,
+        locked_secondary_url=locked_secondary_url,
         current_user=current_user,
+        **get_homepage_tariff_context(settings=get_settings()),
     )
 
 
@@ -415,10 +421,12 @@ def cabinet_page(request: Request):
         return _locked_response(
             request,
             title="Личный кабинет",
-            locked_title="Личный кабинет закрыт",
-            locked_message="Доступ к кабинету и обучению откроется после оплаты тарифа.",
+            locked_title="Личный кабинет будет доступен после оплаты",
+            locked_message="После оплаты тарифа откроются личный кабинет, обучение и материалы.",
             locked_action_label="На главную",
             locked_action_url="/",
+            locked_secondary_label="К обучению",
+            locked_secondary_url="/materials",
             current_user=user,
         )
     learning_access = user_has_materials_access(user)

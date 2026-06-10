@@ -8,6 +8,7 @@ from app.auth.service import authenticate_user, create_session, register_user, v
 from app.materials.routes import LESSON_TEST_SCRIPT_URL, LESSON_TEST_STYLES_URL, LESSON_TEST_URL
 from app.materials.service import user_has_materials_access
 from app.shared.db import get_database_path, initialize_database
+from app.tariffs.service import STARTER_TARIFF_CODE, seed_initial_catalog, update_tariff
 from app.user_cabinet.routes import (
     LEARNING_PROJECT_DOWNLOAD_URL,
     LEARNING_PROJECT_FILE_PATH,
@@ -33,6 +34,16 @@ def _extract_token_from_db(settings, email: str) -> str:
     match = re.search(r"/verify-email/([A-Za-z0-9_-]+)", row["body_text"])
     assert match
     return match.group(1)
+
+
+def _set_homepage_tariff(test_settings, *, price_amount_minor: int = 699000, title: str = "Стартовый доступ") -> None:
+    seed_initial_catalog(settings=test_settings)
+    update_tariff(
+        STARTER_TARIFF_CODE,
+        title=title,
+        price_amount_minor=price_amount_minor,
+        settings=test_settings,
+    )
 
 
 def _prepare_verified_user(
@@ -103,12 +114,22 @@ def test_shared_stylesheet_uses_main_page_theme(client):
 
 
 def test_materials_shows_locked_state_without_access(client, test_settings):
+    _set_homepage_tariff(test_settings)
     _prepare_and_login_verified_user(client, test_settings, "materials-locked@example.com", "materialslocked")
     response = client.get("/materials")
     assert response.status_code == 200
     assert "/static/styles.css" in response.text
-    assert "Раздел «Работа с ИИ» закрыт" in response.text
-    assert "Доступ к материалам и урокам откроется после оплаты тарифа." in response.text
+    assert "Обучение" in response.text
+    assert "Работа с ИИ" in response.text
+    assert "Как разрабатывать с помощью ChatGPT и Codex" in response.text
+    assert "Вступление к курсу" in response.text
+    assert "Что изучаем" in response.text
+    assert "Зачем это нужно" in response.text
+    assert "Где это применяется" in response.text
+    assert "Стартовый доступ — 6 990 ₽" in response.text
+    assert "4 990 ₽" not in response.text
+    assert "Полный доступ к урокам откроется после оплаты тарифа." in response.text
+    assert "Сейчас вы видите вводную часть и тариф для оплаты." in response.text
     assert "К разделу материалов" not in response.text
     assert "Уроки курса" not in response.text
     assert "Как мы работаем: ChatGPT проектирует, Codex выполняет, пользователь проверяет" not in response.text
@@ -127,6 +148,7 @@ def test_materials_shows_locked_state_without_access(client, test_settings):
 
 
 def test_access_status_alone_does_not_unlock_materials_or_cabinet(client, test_settings):
+    _set_homepage_tariff(test_settings)
     _prepare_and_login_verified_user(client, test_settings, "materials-status-only@example.com", "materialsstatus")
     with _connect(test_settings) as conn:
         conn.execute(
@@ -145,10 +167,12 @@ def test_access_status_alone_does_not_unlock_materials_or_cabinet(client, test_s
     cabinet_response = client.get("/cabinet")
     assert materials_response.status_code == 200
     assert cabinet_response.status_code == 200
-    assert "Раздел «Работа с ИИ» закрыт" in materials_response.text
-    assert "Личный кабинет закрыт" in cabinet_response.text
-    assert "Доступ к материалам и урокам откроется после оплаты тарифа." in materials_response.text
-    assert "Доступ к кабинету и обучению откроется после оплаты тарифа." in cabinet_response.text
+    assert "Обучение" in materials_response.text
+    assert "Вступление к курсу" in materials_response.text
+    assert "Личный кабинет будет доступен после оплаты" in cabinet_response.text
+    assert "После оплаты тарифа откроются личный кабинет, обучение и материалы." in cabinet_response.text
+    assert "Стартовый доступ — 6 990 ₽" in materials_response.text
+    assert "Стартовый доступ — 6 990 ₽" in cabinet_response.text
     lesson_response = client.get("/materials/lessons/kak-my-rabotaem-chatgpt-codex-user")
     assert lesson_response.status_code == 200
     assert "Урок и его материалы откроются после оплаты тарифа." in lesson_response.text
@@ -173,12 +197,14 @@ def test_materials_shows_placeholder_sections_when_access_granted(client, test_s
 
 
 def test_cabinet_contains_materials_link_and_locked_hint(client, test_settings):
+    _set_homepage_tariff(test_settings)
     _prepare_and_login_verified_user(client, test_settings, "materials-cabinet@example.com", "materialscabinet")
     response = client.get("/cabinet")
     assert response.status_code == 200
     assert "Главная" in response.text
-    assert "Личный кабинет закрыт" in response.text
-    assert "Доступ к кабинету и обучению откроется после оплаты тарифа." in response.text
+    assert "Личный кабинет будет доступен после оплаты" in response.text
+    assert "После оплаты тарифа откроются личный кабинет, обучение и материалы." in response.text
+    assert "Стартовый доступ — 6 990 ₽" in response.text
     assert "Аккаунты" not in response.text
     assert "/static/cabinet-local-accounts.js" not in response.text
     assert "Обучающий блок" not in response.text
@@ -236,6 +262,36 @@ def test_cabinet_access_labels_for_staff_and_paid_user(client, test_settings):
     assert "Скачать файл" in admin_response.text
     assert 'href="/materials/drafts/dair-smoke-20260529/"' in admin_response.text
     assert 'href="/cabinet/learning/project-file"' in admin_response.text
+
+
+def test_settings_page_is_compact_and_password_change_still_works(client, test_settings):
+    _prepare_and_login_verified_user(client, test_settings, "settings-user@example.com", "settingsuser")
+    response = client.get("/cabinet/settings")
+    assert response.status_code == 200
+    assert "settings-shell" in response.text
+    assert "settings-card" in response.text
+    assert "settings-meta" in response.text
+    assert "settings-form" in response.text
+    assert "Управляйте паролем и данными учётной записи без лишнего визуального шума." in response.text
+    assert "Аккаунт" in response.text
+    assert "Email" in response.text
+    assert "Смена пароля" in response.text
+    assert "Текущий пароль" in response.text
+    assert "Новый пароль" in response.text
+    assert "Повтор нового пароля" in response.text
+
+    post_response = client.post(
+        "/cabinet/settings/password",
+        data={
+            "current_password": "Secret123",
+            "password": "Secret456",
+            "repeat_password": "Secret456",
+        },
+        follow_redirects=False,
+    )
+    assert post_response.status_code == 303
+    assert post_response.headers["location"] == "/cabinet/settings?success=1"
+    assert authenticate_user("settings-user@example.com", "Secret456", settings=test_settings).email == "settings-user@example.com"
 
 
 def test_learning_access_helper_and_project_download_route(client, test_settings):

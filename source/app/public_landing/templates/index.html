@@ -1223,63 +1223,11 @@ a { color: inherit; }
   </div>
 </section>
 
-<section class="section" id="pricing">
-  <div class="container">
-    <div class="pricing-shell reveal">
-      <div class="price-head">
-        <span class="eyebrow">Цена</span>
-        {% if homepage_tariff %}
-          <h2 class="section-title">{{ homepage_tariff.title }} — {{ homepage_tariff_price_display }}</h2>
-          <p class="section-desc">{{ homepage_tariff.description or "Это активный тариф, отмеченный для показа на главной странице. Он подтягивается из каталога тарифов." }}</p>
-        {% else %}
-          <h2 class="section-title">Актуальный тариф на главной выбирается из каталога</h2>
-          <p class="section-desc">Когда активный тариф будет отмечен для главной страницы, здесь появятся его название и цена. Сейчас показывается нейтральная информация без числовой цены.</p>
-        {% endif %}
-      </div>
-      <div class="offer-grid">
-        <div class="offer-group">
-          <h3>Первый месяц</h3>
-          <p>Всё, что нужно, чтобы пройти стартовый проект и не застрять на первых шагах. Подписка ChatGPT Plus входит в стоимость и остаётся у вас.</p>
-          <ul>
-            <li>Подписка ChatGPT Plus на месяц;</li>
-            <li>Сервер и окружение для старта;</li>
-            <li>Первый проект с ИИ-наставником;</li>
-            <li>Дорожная карта разработки;</li>
-            <li>Помощь на первых шагах.</li>
-          </ul>
-        </div>
-        <div class="offer-group">
-          <h3>Навсегда</h3>
-          <p>Остаётся у вас после оплаты и помогает повторять подход уже на своих идеях.</p>
-          <ul>
-            <li>Доступ к материалам;</li>
-            <li>Пошаговые инструкции;</li>
-            <li>База команд и промптов;</li>
-            <li>Правила работы с техническим ИИ-исполнителем;</li>
-            <li>Дорожная карта первого проекта;</li>
-            <li>Понимание, как повторять подход на своих идеях.</li>
-          </ul>
-        </div>
-        <div class="offer-group">
-          <h3>Комьюнити</h3>
-          <p>Поддержка вокруг главного результата: первого проекта и навыка самостоятельной работы.</p>
-          <ul>
-            <li>Помощь, если застряли;</li>
-            <li>Обмен идеями;</li>
-            <li>Обсуждение проектов;</li>
-            <li>Поиск соратников;</li>
-            <li>Возможность объединяться для более крупных продуктов.</li>
-          </ul>
-        </div>
-      </div>
-      <div class="pricing-actions">
-        <a href="{{ primary_cta_href }}" class="btn btn-primary">{{ primary_cta_label }}</a>
-        <a href="{{ secondary_cta_href }}" class="btn btn-secondary">{{ secondary_cta_label }}</a>
-        <p class="pricing-note">После первого месяца вы сможете продолжать самостоятельно. Продление OpenScript не обязательно, но внешние инструменты, серверы и API при необходимости оплачиваются отдельно.</p>
-      </div>
-    </div>
-  </div>
-</section>
+{% set pricing_section_id = "pricing" %}
+{% set pricing_section_class = "" %}
+{% set pricing_shell_class = "pricing-shell reveal" %}
+{% set pricing_eyebrow = "Цена" %}
+{% include "tariff_pricing_section.html" %}
 
 <section class="section">
   <div class="container">

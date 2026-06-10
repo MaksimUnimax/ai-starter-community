@@ -346,8 +346,8 @@ def test_route_flow_login_cabinet_logout_still_works(client, test_settings):
     assert cabinet_response.status_code == 200
     assert "route@example.com" in cabinet_response.text
     assert "routeuser" in cabinet_response.text
-    assert "Личный кабинет закрыт" in cabinet_response.text
-    assert "Доступ к кабинету и обучению откроется после оплаты тарифа." in cabinet_response.text
+    assert "Личный кабинет будет доступен после оплаты" in cabinet_response.text
+    assert "После оплаты тарифа откроются личный кабинет, обучение и материалы." in cabinet_response.text
     assert "Аккаунты" not in cabinet_response.text
     assert "/static/cabinet-local-accounts.js" not in cabinet_response.text
     assert "Главная" in cabinet_response.text
@@ -546,6 +546,58 @@ def test_route_flow_login_by_login_and_password_reset(client, test_settings):
     assert "loginroute@example.com" in cabinet_response.text
 
 
+def test_settings_page_layout_and_password_change(client, test_settings):
+    register_user(
+        email="settingsflow@example.com",
+        login="settingsflow",
+        password="Secret123",
+        repeat_password="Secret123",
+        settings=test_settings,
+    )
+    verify_row = _fetch_one(
+        test_settings,
+        "SELECT * FROM email_outbox WHERE recipient_email = ? AND template_key = ? ORDER BY id DESC LIMIT 1",
+        ("settingsflow@example.com", "email_verification"),
+    )
+    verify_token = _extract_token_from_link(verify_row["body_text"])
+    verify_response = client.get(f"/verify-email/{verify_token}")
+    assert verify_response.status_code == 200
+
+    login_response = client.post(
+        "/login",
+        data={"email_or_login": "settingsflow@example.com", "password": "Secret123"},
+        follow_redirects=False,
+    )
+    assert login_response.status_code == 303
+
+    settings_response = client.get("/cabinet/settings")
+    assert settings_response.status_code == 200
+    assert "settings-shell" in settings_response.text
+    assert "settings-card" in settings_response.text
+    assert "settings-meta" in settings_response.text
+    assert "settings-form" in settings_response.text
+    assert "Управляйте паролем и данными учётной записи без лишнего визуального шума." in settings_response.text
+    assert "Аккаунт" in settings_response.text
+    assert "Email" in settings_response.text
+    assert "Смена пароля" in settings_response.text
+    assert "Текущий пароль" in settings_response.text
+    assert "Новый пароль" in settings_response.text
+    assert "Повтор нового пароля" in settings_response.text
+
+    password_response = client.post(
+        "/cabinet/settings/password",
+        data={
+            "current_password": "Secret123",
+            "password": "Secret456",
+            "repeat_password": "Secret456",
+        },
+        follow_redirects=False,
+    )
+    assert password_response.status_code == 303
+    assert password_response.headers["location"] == "/cabinet/settings?success=1"
+    assert authenticate_user("settingsflow@example.com", "Secret456", settings=test_settings).email == "settingsflow@example.com"
+
+
 def test_unverified_login_shows_resend_link(client, test_settings):
     register_user(
         email="needsverify@example.com",
@@ -614,8 +666,8 @@ def test_cabinet_shows_logout_button_and_access_text(client, test_settings):
     assert cabinet_response.status_code == 200
     assert "cabinetux@example.com" in cabinet_response.text
     assert "cabinetux" in cabinet_response.text
-    assert "Личный кабинет закрыт" in cabinet_response.text
-    assert "Доступ к кабинету и обучению откроется после оплаты тарифа." in cabinet_response.text
+    assert "Личный кабинет будет доступен после оплаты" in cabinet_response.text
+    assert "После оплаты тарифа откроются личный кабинет, обучение и материалы." in cabinet_response.text
     assert "Аккаунты" not in cabinet_response.text
     assert "Добавить блок" not in cabinet_response.text
     assert "Главная" in cabinet_response.text

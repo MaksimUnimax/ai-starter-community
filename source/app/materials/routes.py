@@ -19,6 +19,7 @@ from app.materials.course_loader import (
     LessonNotFoundError,
 )
 from app.materials.service import user_has_materials_access
+from app.shared.tariff_display import get_homepage_tariff_context
 
 router = APIRouter()
 templates = Jinja2Templates(directory=str(Path(__file__).resolve().parent / "templates"))
@@ -95,16 +96,16 @@ def materials_page(request: Request):
     if user is None:
         return RedirectResponse(url="/login", status_code=303)
     if not user_has_materials_access(user):
-        return _locked_response(
+        return _template(
             request,
+            "learning_locked.html",
             title="Работа с ИИ",
-            locked_title="Раздел «Работа с ИИ» закрыт",
-            locked_message="Доступ к материалам и урокам откроется после оплаты тарифа.",
-            locked_action_label="На главную",
-            locked_action_url="/",
-            locked_secondary_label="В личный кабинет",
-            locked_secondary_url="/cabinet",
             current_user=user,
+            primary_cta_href="/cabinet",
+            primary_cta_label="В личный кабинет",
+            secondary_cta_href="/",
+            secondary_cta_label="На главную",
+            **get_homepage_tariff_context(settings=settings),
         )
     course = load_course()
     return _template(

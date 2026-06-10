@@ -4,6 +4,7 @@ import re
 import sqlite3
 
 from app.auth.service import register_user, verify_email
+from app.tariffs.service import STARTER_TARIFF_CODE, seed_initial_catalog, update_tariff
 
 
 def _verify_registered_user(client, test_settings, email: str, login: str):
@@ -45,7 +46,18 @@ def _extract_accounts_section(body_text: str) -> str:
     return body_text[start:end]
 
 
+def _set_homepage_tariff(test_settings, *, price_amount_minor: int = 699000, title: str = "Стартовый доступ") -> None:
+    seed_initial_catalog(settings=test_settings)
+    update_tariff(
+        STARTER_TARIFF_CODE,
+        title=title,
+        price_amount_minor=price_amount_minor,
+        settings=test_settings,
+    )
+
+
 def test_cabinet_displays_course_shell_without_tariffs_or_payment_noise(client, test_settings):
+    _set_homepage_tariff(test_settings)
     _verify_registered_user(client, test_settings, "cabinet-catalog@example.com", "cabinetcatalog")
     token = _extract_token_from_db(test_settings, "cabinet-catalog@example.com")
     verify_email(token, settings=test_settings)
@@ -62,8 +74,9 @@ def test_cabinet_displays_course_shell_without_tariffs_or_payment_noise(client, 
     assert cabinet_response.text.count('rel="icon" href="/static/favicon.svg" type="image/svg+xml"') == 1
     assert cabinet_response.text.count('rel="shortcut icon" href="/static/favicon.svg" type="image/svg+xml"') == 1
     assert "/static/styles.css" in cabinet_response.text
-    assert "Личный кабинет закрыт" in cabinet_response.text
-    assert "Доступ к кабинету и обучению откроется после оплаты тарифа." in cabinet_response.text
+    assert "Личный кабинет будет доступен после оплаты" in cabinet_response.text
+    assert "После оплаты тарифа откроются личный кабинет, обучение и материалы." in cabinet_response.text
+    assert "Стартовый доступ — 6 990 ₽" in cabinet_response.text
     assert "Аккаунты" not in cabinet_response.text
     assert "Обучающий блок" not in cabinet_response.text
     assert "Обучающий проект" not in cabinet_response.text
@@ -72,9 +85,9 @@ def test_cabinet_displays_course_shell_without_tariffs_or_payment_noise(client, 
     assert "/static/cabinet-local-accounts.js" not in cabinet_response.text
     assert "raw.githubusercontent.com" not in cabinet_response.text
     assert "Активация опций" not in cabinet_response.text
-    assert "Доступные тарифы" not in cabinet_response.text
     assert "Что дальше" not in cabinet_response.text
-    assert "Стартовый доступ" not in cabinet_response.text
+    assert "Доступные тарифы" not in cabinet_response.text
+    assert cabinet_response.text.count("Стартовый доступ") >= 1
     assert "Последний платёж" not in cabinet_response.text
 
 

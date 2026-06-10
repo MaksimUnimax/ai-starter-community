@@ -5,6 +5,7 @@ import sqlite3
 
 from app.auth.service import authenticate_user, create_session, register_user, verify_email
 from app.shared.db import get_database_path
+from app.tariffs.service import STARTER_TARIFF_CODE, seed_initial_catalog, update_tariff
 
 
 def _connect(settings):
@@ -59,6 +60,16 @@ def _user_row(test_settings, email: str):
         ).fetchone()
 
 
+def _set_homepage_tariff(test_settings, *, price_amount_minor: int = 699000, title: str = "Стартовый доступ") -> None:
+    seed_initial_catalog(settings=test_settings)
+    update_tariff(
+        STARTER_TARIFF_CODE,
+        title=title,
+        price_amount_minor=price_amount_minor,
+        settings=test_settings,
+    )
+
+
 def test_admin_users_page_shows_paid_access_state_and_controls(client, test_settings):
     _create_verified_user(test_settings, email="admin-access-admin@example.com", login="adminaccessadmin", role="admin")
     _create_verified_user(test_settings, email="admin-access-open@example.com", login="adminaccessopen")
@@ -86,6 +97,7 @@ def test_admin_users_page_shows_paid_access_state_and_controls(client, test_sett
 
 
 def test_admin_can_grant_and_revoke_paid_access(client, test_settings):
+    _set_homepage_tariff(test_settings)
     _create_verified_user(test_settings, email="admin-grant-admin@example.com", login="admingrantadmin", role="admin")
     _create_verified_user(test_settings, email="admin-grant-user@example.com", login="admingrantuser")
 
@@ -110,7 +122,7 @@ def test_admin_can_grant_and_revoke_paid_access(client, test_settings):
     materials_response = client.get("/materials")
     assert materials_response.status_code == 200
     assert "Работа с ИИ" in materials_response.text
-    assert "Доступ к материалам и урокам откроется после оплаты тарифа." not in materials_response.text
+    assert "Полный доступ к урокам откроется после оплаты тарифа." not in materials_response.text
 
     client.cookies.clear()
     _login_as(client, test_settings, "admin-grant-admin@example.com")
@@ -126,13 +138,15 @@ def test_admin_can_grant_and_revoke_paid_access(client, test_settings):
     _login_as(client, test_settings, "admin-grant-user@example.com")
     locked_cabinet = client.get("/cabinet")
     assert locked_cabinet.status_code == 200
-    assert "Личный кабинет закрыт" in locked_cabinet.text
+    assert "Личный кабинет будет доступен после оплаты" in locked_cabinet.text
     assert "/static/cabinet-local-accounts.js" not in locked_cabinet.text
 
     locked_materials = client.get("/materials")
     assert locked_materials.status_code == 200
-    assert "Раздел «Работа с ИИ» закрыт" in locked_materials.text
-    assert "Доступ к материалам и урокам откроется после оплаты тарифа." in locked_materials.text
+    assert "Обучение" in locked_materials.text
+    assert "Вступление к курсу" in locked_materials.text
+    assert "Стартовый доступ" in locked_materials.text
+    assert "Полный доступ к урокам откроется после оплаты тарифа." in locked_materials.text
 
 
 def test_non_admins_cannot_grant_or_revoke_paid_access(client, test_settings):
@@ -161,6 +175,7 @@ def test_non_admins_cannot_grant_or_revoke_paid_access(client, test_settings):
 
 
 def test_access_status_alone_does_not_unlock_paid_access(client, test_settings):
+    _set_homepage_tariff(test_settings)
     _create_verified_user(test_settings, email="admin-grant-status-only@example.com", login="admingrantstatus")
     with _connect(test_settings) as conn:
         conn.execute(
@@ -178,5 +193,5 @@ def test_access_status_alone_does_not_unlock_paid_access(client, test_settings):
     materials_response = client.get("/materials")
     assert cabinet_response.status_code == 200
     assert materials_response.status_code == 200
-    assert "Личный кабинет закрыт" in cabinet_response.text
-    assert "Раздел «Работа с ИИ» закрыт" in materials_response.text
+    assert "Личный кабинет будет доступен после оплаты" in cabinet_response.text
+    assert "Обучение" in materials_response.text

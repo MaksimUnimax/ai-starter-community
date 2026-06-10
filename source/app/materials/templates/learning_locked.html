@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="stack">
+    <header class="card course-head">
+      <div class="hero-bg-visual hero-bg-desktop" aria-hidden="true">
+        <img src="/static/images/human_ai_hero_background_v2.png" alt="" decoding="async" draggable="false">
+      </div>
+      <div class="hero-bg-visual hero-bg-mobile" aria-hidden="true">
+        <img src="/static/images/mobile_vitruvian_NO_SQUARES_transparent.webp" alt="" decoding="async" draggable="false">
+      </div>
+      <div class="hero-wrap">
+        <div class="hero-copy">
+          <span class="eyebrow">Обучение</span>
+          <h1>Работа с ИИ</h1>
+          <p class="course-headline">Как разрабатывать с помощью ChatGPT и Codex</p>
+          <p class="course-note">Курс показывает, как вести проектную работу с ИИ без ручного написания кода: от простой идеи до проверенного результата.</p>
+          {% if current_user %}
+            <p class="form-help">Вы вошли как {{ current_user.email }}{% if current_user.login %} · {{ current_user.login }}{% endif %}. Полный доступ откроется после оплаты тарифа.</p>
+          {% endif %}
+        </div>
+      </div>
+    </header>
+
+    <section class="card stack course-intro">
+      <div class="section-heading">
+        <h2>Вступление к курсу</h2>
+      </div>
+      <div class="course-intro-body">
+        <section class="course-intro-part">
+          <h3>Что изучаем</h3>
+          <p>В этом курсе вы изучаете, как вести проектную работу с помощью ChatGPT и Codex без ручного написания кода.</p>
+          <p>Курс показывает, как простая идея пользователя превращается в понятную задачу, затем в план работы, затем в выполнение на сервере через Codex, а после этого - в проверенный результат.</p>
+        </section>
+        <section class="course-intro-part">
+          <h3>Зачем это нужно</h3>
+          <p>Без понятной схемы работа с ИИ быстро превращается в хаос: пользователь формулирует задачу без конкретики, ChatGPT может неправильно понять цель, а Codex может выполнить не тот шаг или изменить лишнее.</p>
+          <p>Курс нужен, чтобы научиться управлять процессом: описывать желание обычными словами, вместе с ChatGPT уточнять задачу, получать документацию и план работы, проверять отчёт и принимать результат по фактам.</p>
+        </section>
+        <section class="course-intro-part">
+          <h3>Где это применяется</h3>
+          <p>Эта схема применяется в реальных проектных задачах: при создании сайта, страницы, сервиса, бота, автоматизации, личного кабинета, учебного проекта или отдельной функции.</p>
+          <p>Пользователю не нужно заранее знать программирование, дизайн, вёрстку, архитектуру, документацию или техническое задание. Достаточно описать, что он хочет получить. Дальше ChatGPT помогает продумать задачу, подготовить документы, спланировать внешний вид, разбить работу на шаги и дать Codex точное задание.</p>
+        </section>
+      </div>
+    </section>
+
+    <section class="card stack course-paywall-note">
+      <p class="muted">Полный доступ к урокам откроется после оплаты тарифа.</p>
+      <p class="form-help">Сейчас вы видите вводную часть и тариф для оплаты. После оплаты откроются все уроки курса и навигация по ним.</p>
+    </section>
+
+    {% set pricing_section_id = "pricing" %}
+    {% set pricing_section_class = "course-pricing-block" %}
+    {% set pricing_shell_class = "pricing-shell" %}
+    {% set pricing_eyebrow = "Цена" %}
+    {% set pricing_fallback_description = "Это активный тариф, отмеченный для показа на главной странице. Он подтягивается из каталога тарифов." %}
+    {% set primary_cta_href = "/" %}
+    {% set primary_cta_label = "На главную" %}
+    {% set secondary_cta_href = "/cabinet" %}
+    {% set secondary_cta_label = "В личный кабинет" %}
+    {% include "tariff_pricing_section.html" %}
+  </section>
+{% endblock %}
