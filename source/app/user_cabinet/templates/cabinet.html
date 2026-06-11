@@ -28,27 +28,266 @@
     {% endif %}
   </section>
 
-  <section class="card stack accounts-card" data-local-accounts-root>
+  {% set vpn_account_blocks = account_block_blocks | selectattr('type', 'equalto', 'vpn') | list %}
+  {% set regular_account_blocks = account_block_blocks | rejectattr('type', 'equalto', 'vpn') | list %}
+
+  <section id="accounts" class="card stack accounts-card accounts-card--cabinet" data-local-accounts-root data-account-blocks-source="server">
     <div class="accounts-header">
       <div class="stack accounts-intro">
-        <h1 class="section-title">Аккаунты</h1>
-        <p class="form-help">Храните здесь часто используемые логины и пароли. Данные сохраняются только в этом браузере.</p>
+        <h2 class="section-title">Аккаунты</h2>
       </div>
-      <div class="accounts-builder">
-        <label class="form-row accounts-type-field">
-          <span>Тип нового блока</span>
-          <select class="select" data-local-accounts-type>
-            <option value="chatgpt">ChatGPT</option>
-            <option value="server">Сервер</option>
-          </select>
-        </label>
-        <button class="button button-primary" type="button" data-local-accounts-add>Добавить блок</button>
-      </div>
+
+      {% if account_blocks_manage_mode %}
+        <form class="accounts-search stack" method="get" action="/cabinet">
+          <label class="form-row accounts-field">
+            <span>Email пользователя</span>
+            <input
+              class="input"
+              name="account_blocks_user_email"
+              type="email"
+              list="account-block-user-email-list"
+              value="{{ account_block_selected_user_email }}"
+              placeholder="user@example.com"
+              autocomplete="email"
+              required
+            >
+          </label>
+          <datalist id="account-block-user-email-list">
+            {% for option in account_block_owner_options %}
+              <option value="{{ option.email }}">{{ option.display_label }}</option>
+            {% endfor %}
+          </datalist>
+          <div class="actions">
+            <button class="button button-primary" type="submit">Найти пользователя</button>
+          </div>
+        </form>
+      {% endif %}
     </div>
-    <div class="accounts-grid" data-local-accounts-list></div>
-    <p class="form-help accounts-empty" data-local-accounts-empty>Пока нет ни одного блока. Добавьте первый выше.</p>
-    <p class="accounts-notice" data-local-accounts-notice aria-live="polite" role="status"></p>
+
+    <p class="accounts-notice" data-account-blocks-notice aria-live="polite" role="status">{{ account_block_notice or "" }}</p>
+
+    {% if account_blocks_manage_mode and account_block_selected_user_summary %}
+      <section class="card stack accounts-selected-user">
+        <h3 class="section-title">Выбранный пользователь</h3>
+        <p class="form-help">Email: <strong>{{ account_block_selected_user_summary.email }}</strong></p>
+        <p class="form-help">Логин: <strong>{{ account_block_selected_user_summary.login }}</strong></p>
+        <p class="form-help">Роль: <strong>{{ account_block_selected_user_summary.role_label }}</strong></p>
+      </section>
+    {% endif %}
+
+    {% if account_blocks_manage_mode %}
+      <div class="accounts-builder-shell">
+        <form
+          class="accounts-builder accounts-builder--server"
+          method="post"
+          action="/cabinet/account-blocks{{ account_block_query_string }}"
+          data-account-block-form="create"
+        >
+          <label class="form-row accounts-type-field">
+            <span>Тип блока</span>
+            <select class="select" name="type" required>
+              {% for option in account_block_type_options %}
+                <option value="{{ option.value }}" {% if option.value == 'chatgpt' %}selected{% endif %}>{{ option.label }}</option>
+              {% endfor %}
+            </select>
+          </label>
+          <label class="form-row accounts-field">
+            <span>Срок, дней</span>
+            <input class="input" name="duration_days" type="number" min="1" value="{{ account_block_create_default_duration_days }}" data-account-block-duration-input>
+          </label>
+          <label class="form-row accounts-field">
+            <span>Логин</span>
+            <input class="input" name="login" type="text" placeholder="Логин" autocomplete="off">
+          </label>
+          <label class="form-row accounts-field">
+            <span>Пароль</span>
+            <input class="input" name="password_secret" type="text" placeholder="Пароль" autocomplete="off">
+          </label>
+          <button class="button button-primary" type="submit">Добавить блок</button>
+        </form>
+      </div>
+    {% endif %}
+
+    {% if regular_account_blocks %}
+      <div class="accounts-grid">
+        {% for block in regular_account_blocks %}
+          <article class="account-card">
+            <header class="account-card__header">
+              <div class="stack account-card__headline">
+                <div class="account-card__title-row">
+                  <h3 class="account-card__title">{{ block.display_title or block.title }}</h3>
+                  <div class="account-card__badges">
+                    <span class="account-card__type-badge">{{ block.display_type_label or block.type_label }}</span>
+                    {% if block.is_active %}
+                      <span class="account-card__status-badge account-card__status-badge--active">Активно</span>
+                    {% elif block.is_expired %}
+                      <span class="account-card__status-badge account-card__status-badge--expired">{{ block.status_label }}</span>
+                    {% else %}
+                      <span class="account-card__status-badge account-card__status-badge--inactive">{{ block.status_label }}</span>
+                    {% endif %}
+                  </div>
+                </div>
+                {% if account_blocks_manage_mode %}
+                  <p class="form-help account-card__owner-line">Пользователь: {{ account_block_selected_user_summary.email }} · {{ account_block_selected_user_summary.login }}</p>
+                {% endif %}
+              </div>
+            </header>
+
+            <div class="account-card__body">
+              <div class="account-card__readonly" data-account-card-view>
+                <label class="account-field">
+                  <span>Логин</span>
+                  <input class="input account-field__input" data-account-field="login" type="text" value="{{ block.login|e }}" readonly>
+                  <div class="account-field__actions">
+                    <button class="button button-secondary account-copy-button" type="button" data-account-copy>Скопировать</button>
+                  </div>
+                </label>
+                <label class="account-field">
+                  <span>Пароль</span>
+                  <input class="input account-field__input" data-account-field="password" type="password" value="{{ block.password_secret|e }}" readonly>
+                  <div class="account-field__actions account-field__actions--split">
+                    <button
+                      class="button button-secondary account-password-toggle"
+                      type="button"
+                      data-account-password-toggle
+                      aria-label="Показать пароль"
+                      aria-pressed="false"
+                    >
+                      Показать
+                    </button>
+                    <button class="button button-secondary account-copy-button" type="button" data-account-copy>Скопировать</button>
+                  </div>
+                </label>
+                <div class="account-card__details">
+                  <p class="account-card__detail">{{ block.activation_summary }}</p>
+                </div>
+                {% if account_blocks_manage_mode %}
+                  <div class="account-actions account-actions--view">
+                    <button class="button button-secondary account-card__edit-toggle" type="button" data-account-card-edit-toggle>Редактировать</button>
+                    <form class="account-action-form" method="post" action="/cabinet/account-blocks/{{ block.id }}/delete{{ account_block_query_string }}" data-account-block-form="delete">
+                      <button class="button button-secondary button-danger account-card__delete" type="submit">Удалить</button>
+                    </form>
+                    <form class="account-action-form" method="post" action="/cabinet/account-blocks/{{ block.id }}/activate{{ account_block_query_string }}" data-account-block-form="activate">
+                      <label class="account-field account-field--compact">
+                        <span>Срок, дней</span>
+                        <input class="input" name="duration_days" type="number" min="1" value="{{ block.duration_days }}" data-account-block-duration-input>
+                      </label>
+                      <button class="button button-primary account-card__activate" type="submit">Активировать</button>
+                    </form>
+                    {% if block.is_active %}
+                      <form class="account-action-form" method="post" action="/cabinet/account-blocks/{{ block.id }}/renew{{ account_block_query_string }}" data-account-block-form="renew">
+                        <label class="account-field account-field--compact">
+                          <span>Срок, дней</span>
+                          <input class="input" name="duration_days" type="number" min="1" value="{{ block.duration_days }}" data-account-block-duration-input>
+                        </label>
+                        <button class="button button-primary account-card__renew" type="submit">Продлить активацию</button>
+                      </form>
+                    {% endif %}
+                  </div>
+                {% endif %}
+              </div>
+
+              {% if account_blocks_manage_mode %}
+                <form class="account-card__edit-form" method="post" action="/cabinet/account-blocks/{{ block.id }}{{ account_block_query_string }}" hidden data-account-card-edit-form data-account-block-form="update">
+                  <label class="account-field">
+                    <span>Логин</span>
+                    <input class="input account-field__input" data-account-field="login" name="login" type="text" value="{{ block.login|e }}" autocomplete="off">
+                  </label>
+                  <label class="account-field">
+                    <span>Пароль</span>
+                    <input class="input account-field__input" data-account-field="password" name="password_secret" type="password" value="{{ block.password_secret|e }}" autocomplete="off">
+                    <div class="account-field__actions">
+                      <button
+                        class="button button-secondary account-password-toggle"
+                        type="button"
+                        data-account-password-toggle
+                        aria-label="Показать пароль"
+                        aria-pressed="false"
+                      >
+                        Показать
+                      </button>
+                    </div>
+                  </label>
+                  <div class="account-actions account-actions--edit">
+                    <button class="button button-primary account-card__save" type="submit">Сохранить</button>
+                    <button class="button button-secondary account-card__cancel" type="button" data-account-card-edit-cancel>Отмена</button>
+                  </div>
+                </form>
+              {% endif %}
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      {% if not account_blocks_manage_mode or account_block_selected_user_summary %}
+        <p class="form-help accounts-empty">Тут появятся блоки с данными для авторизации после того, как администратор активирует опции. Обычно это занимает не более суток после оплаты.</p>
+      {% endif %}
+    {% endif %}
   </section>
+
+  {% for block in vpn_account_blocks %}
+    <section class="card stack cabinet-vpn-section" data-cabinet-vpn-section>
+      <details class="cabinet-vpn-disclosure">
+        <summary class="cabinet-vpn-summary">
+          <h2 class="section-title cabinet-vpn-summary__title">ВПН</h2>
+          <p class="form-help cabinet-vpn-summary__hint">Видеоинструкция и ссылка Amnezia VPN</p>
+        </summary>
+        <div class="cabinet-vpn-content">
+          <div class="vpn-card__video-panel">
+            <video
+              class="vpn-card__video"
+              controls
+              preload="metadata"
+              src="/static/videos/amnezia-vpn-guide.mp4"
+            ></video>
+          </div>
+
+          <p class="account-card__detail">После просмотра откройте сайт Amnezia VPN и используйте IP из блока «Сервер».</p>
+          <p class="account-card__detail">
+            Видео взято с канала
+            <a href="https://www.youtube.com/@TechTalk_NotDead" target="_blank" rel="noreferrer">Tech Talk</a>.
+            Благодарим канал
+            <a href="https://www.youtube.com/@TechTalk_NotDead" target="_blank" rel="noreferrer">Tech Talk</a>
+            за видео. Лайк и подписка приветствуются.
+          </p>
+
+          <a
+            class="button button-primary vpn-card__link"
+            href="https://m-d0d72068b914-3w5hsuiikq-ez.a.run.app/ru"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Открыть сайт Amnezia VPN
+          </a>
+
+          {% if account_blocks_manage_mode %}
+            <div class="account-actions account-actions--view">
+              <form class="account-action-form" method="post" action="/cabinet/account-blocks/{{ block.id }}/delete{{ account_block_query_string }}" data-account-block-form="delete">
+                <button class="button button-secondary button-danger account-card__delete" type="submit">Удалить</button>
+              </form>
+              <form class="account-action-form" method="post" action="/cabinet/account-blocks/{{ block.id }}/activate{{ account_block_query_string }}" data-account-block-form="activate">
+                <label class="account-field account-field--compact">
+                  <span>Срок, дней</span>
+                  <input class="input" name="duration_days" type="number" min="1" value="{{ block.duration_days }}" data-account-block-duration-input>
+                </label>
+                <button class="button button-primary account-card__activate" type="submit">Активировать</button>
+              </form>
+              {% if block.is_active %}
+                <form class="account-action-form" method="post" action="/cabinet/account-blocks/{{ block.id }}/renew{{ account_block_query_string }}" data-account-block-form="renew">
+                  <label class="account-field account-field--compact">
+                    <span>Срок, дней</span>
+                    <input class="input" name="duration_days" type="number" min="1" value="{{ block.duration_days }}" data-account-block-duration-input>
+                  </label>
+                  <button class="button button-primary account-card__renew" type="submit">Продлить активацию</button>
+                </form>
+              {% endif %}
+            </div>
+          {% endif %}
+        </div>
+      </details>
+    </section>
+  {% endfor %}
+
   <section class="card stack prompts-library-card" data-prompts-library-root>
     <div class="prompts-library-header">
       <div class="stack prompts-library-intro">
@@ -160,6 +399,303 @@
 
     <p class="prompts-notice" data-prompts-notice aria-live="polite" role="status"></p>
   </section>
+
+  <section class="card stack paid-options-card" data-paid-options-root>
+    <div class="paid-options-header">
+      <div class="stack paid-options-intro">
+        <h2 class="section-title">Активация опций</h2>
+        <p class="form-help">Здесь показаны активные платные опции, которые можно будет подключать к аккаунту.</p>
+        {% if active_paid_options_count %}
+          <p class="paid-options-count">Доступно для подключения: {{ active_paid_options_count }}</p>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if active_paid_options %}
+      <div class="paid-options-grid" data-paid-options-list>
+        {% for option in active_paid_options %}
+          <article class="paid-option-card" data-paid-option-card data-paid-option-id="{{ option.id|e }}">
+            <div class="stack paid-option__intro">
+              <div class="paid-option__headline">
+                <h3 class="paid-option__title">{{ option.title }}</h3>
+                <span class="paid-option__badge">Активно</span>
+              </div>
+              {% if option.description %}
+                <p class="paid-option__description">{{ option.description }}</p>
+              {% endif %}
+            </div>
+
+            <div class="stack paid-option__meta">
+              <p class="paid-option__price">{{ option.formatted_price }}</p>
+              {% if option.default_duration_days %}
+                <p class="paid-option__duration">Срок: {{ option.default_duration_days }} дней</p>
+              {% endif %}
+              {% if option.is_renewable %}
+                <p class="paid-option__renewable">Можно продлевать</p>
+              {% endif %}
+            </div>
+
+            <div class="paid-option__actions">
+              <button class="button button-primary paid-option__buy" type="button" data-paid-option-buy>Купить</button>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="form-help paid-options-empty">Пока нет активных опций для подключения.</p>
+    {% endif %}
+
+    <p class="paid-options-notice" data-paid-options-notice aria-live="polite" role="status"></p>
+  </section>
+  <script>
+    (() => {
+      const getAccountsRoot = () => document.querySelector("[data-local-accounts-root][data-account-blocks-source='server']");
+      if (!getAccountsRoot()) {
+        return;
+      }
+
+      const setNotice = (message) => {
+        const root = getAccountsRoot();
+        const notice = root ? root.querySelector("[data-account-blocks-notice]") : null;
+        if (!notice) {
+          return;
+        }
+        notice.textContent = message;
+      };
+
+      const copyText = async (value) => {
+        if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+          await navigator.clipboard.writeText(value);
+          return true;
+        }
+
+        const textarea = document.createElement("textarea");
+        textarea.value = value;
+        textarea.setAttribute("readonly", "true");
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
+        textarea.style.left = "-9999px";
+        document.body.appendChild(textarea);
+        textarea.select();
+
+        let copied = false;
+        try {
+          copied = document.execCommand("copy");
+        } catch (_error) {
+          copied = false;
+        }
+
+        document.body.removeChild(textarea);
+        return copied;
+      };
+
+      const resetPasswordVisibility = (container) => {
+        if (!(container instanceof HTMLElement)) {
+          return;
+        }
+
+        container.querySelectorAll("[data-account-password-toggle]").forEach((button) => {
+          if (!(button instanceof HTMLButtonElement)) {
+            return;
+          }
+
+          const field = button.closest(".account-field");
+          const input = field ? field.querySelector('input[data-account-field="password"]') : null;
+          if (!(input instanceof HTMLInputElement)) {
+            return;
+          }
+
+          input.type = "password";
+          button.textContent = "Показать";
+          button.setAttribute("aria-label", "Показать пароль");
+          button.setAttribute("aria-pressed", "false");
+        });
+      };
+
+      document.addEventListener("click", async (event) => {
+        const editToggle = event.target.closest("[data-account-card-edit-toggle]");
+        if (editToggle) {
+          const root = editToggle.closest("[data-local-accounts-root][data-account-blocks-source='server']");
+          const card = editToggle.closest(".account-card");
+          const view = card ? card.querySelector("[data-account-card-view]") : null;
+          const form = card ? card.querySelector("[data-account-card-edit-form]") : null;
+          if (root instanceof HTMLElement && view instanceof HTMLElement && form instanceof HTMLFormElement) {
+            view.hidden = true;
+            form.hidden = false;
+            card.classList.add("account-card--editing");
+            resetPasswordVisibility(card);
+            const firstInput = form.querySelector("input[name='login']");
+            if (firstInput instanceof HTMLInputElement) {
+              firstInput.focus();
+              if (typeof firstInput.select === "function") {
+                firstInput.select();
+              }
+            }
+          }
+          return;
+        }
+
+        const editCancel = event.target.closest("[data-account-card-edit-cancel]");
+        if (editCancel) {
+          const root = editCancel.closest("[data-local-accounts-root][data-account-blocks-source='server']");
+          const card = editCancel.closest(".account-card");
+          const view = card ? card.querySelector("[data-account-card-view]") : null;
+          const form = card ? card.querySelector("[data-account-card-edit-form]") : null;
+          if (root instanceof HTMLElement && view instanceof HTMLElement && form instanceof HTMLFormElement) {
+            form.reset();
+            resetPasswordVisibility(card);
+            form.hidden = true;
+            view.hidden = false;
+            card.classList.remove("account-card--editing");
+          }
+          return;
+        }
+
+        const passwordToggle = event.target.closest("[data-account-password-toggle]");
+        if (passwordToggle) {
+          const root = passwordToggle.closest("[data-local-accounts-root][data-account-blocks-source='server']");
+          if (!root) {
+            return;
+          }
+
+          const field = passwordToggle.closest(".account-field");
+          const input = field ? field.querySelector('input[data-account-field="password"]') : null;
+          if (!(input instanceof HTMLInputElement)) {
+            return;
+          }
+
+          const isHidden = input.type === "password";
+          input.type = isHidden ? "text" : "password";
+          const isVisible = input.type === "text";
+          passwordToggle.textContent = isVisible ? "Скрыть" : "Показать";
+          passwordToggle.setAttribute("aria-label", isVisible ? "Скрыть пароль" : "Показать пароль");
+          passwordToggle.setAttribute("aria-pressed", String(isVisible));
+          return;
+        }
+
+        const button = event.target.closest("[data-account-copy]");
+        if (!button) {
+          return;
+        }
+
+        const root = button.closest("[data-local-accounts-root][data-account-blocks-source='server']");
+        if (!root) {
+          return;
+        }
+
+        const field = button.closest(".account-field");
+        const input = field ? field.querySelector("input") : null;
+        const value = input instanceof HTMLInputElement ? input.value : "";
+        if (!value) {
+          setNotice("Нечего копировать.");
+          return;
+        }
+
+        try {
+          const copied = await copyText(value);
+          setNotice(copied ? "Скопировано." : "Не удалось скопировать.");
+        } catch (_error) {
+          setNotice("Не удалось скопировать.");
+        }
+      });
+
+      document.addEventListener(
+        "submit",
+        async (event) => {
+          const form = event.target;
+          if (!(form instanceof HTMLFormElement)) {
+            return;
+          }
+          if (!form.matches("[data-account-block-form]")) {
+            return;
+          }
+
+          const root = form.closest("[data-local-accounts-root][data-account-blocks-source='server']");
+          if (!root) {
+            return;
+          }
+
+          event.preventDefault();
+
+          if (form.dataset.accountBlockSubmitting === "true") {
+            return;
+          }
+
+          const submitButton = form.querySelector('button[type="submit"]');
+          const scrollX = window.scrollX;
+          const scrollY = window.scrollY;
+          form.dataset.accountBlockSubmitting = "true";
+          if (submitButton instanceof HTMLButtonElement) {
+            submitButton.disabled = true;
+          }
+
+          try {
+            const response = await fetch(form.action, {
+              method: form.method || "POST",
+              body: new FormData(form),
+              credentials: "same-origin",
+              headers: {
+                "X-Requested-With": "XMLHttpRequest",
+              },
+            });
+
+            const bodyText = await response.text();
+            if (!response.ok) {
+              setNotice("Не удалось выполнить действие.");
+              return;
+            }
+
+            const parsed = new DOMParser().parseFromString(bodyText, "text/html");
+            const nextRoot = parsed.querySelector("[data-local-accounts-root][data-account-blocks-source='server']");
+            const currentRoot = getAccountsRoot();
+            if (!(nextRoot instanceof HTMLElement) || !(currentRoot instanceof HTMLElement)) {
+              if (response.url) {
+                window.history.replaceState({}, "", response.url);
+              }
+              return;
+            }
+
+            currentRoot.replaceWith(nextRoot);
+            if (response.url) {
+              window.history.replaceState({}, "", response.url);
+            }
+            requestAnimationFrame(() => {
+              window.scrollTo(scrollX, scrollY);
+            });
+          } catch (_error) {
+            setNotice("Не удалось выполнить действие.");
+          } finally {
+            if (submitButton instanceof HTMLButtonElement) {
+              submitButton.disabled = false;
+            }
+            form.dataset.accountBlockSubmitting = "false";
+          }
+        },
+        true,
+      );
+
+    })();
+  </script>
   <script src="/static/cabinet-local-accounts.js"></script>
   <script src="/static/cabinet-prompts-library.js"></script>
+  <script>
+    (() => {
+      const root = document.querySelector("[data-paid-options-root]");
+      if (!root) {
+        return;
+      }
+
+      const notice = root.querySelector("[data-paid-options-notice]");
+      root.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-paid-option-buy]");
+        if (!button) {
+          return;
+        }
+
+        if (notice) {
+          notice.textContent = "Оплата пока не подключена. Эта кнопка подготовлена для следующего этапа.";
+        }
+      });
+    })();
+  </script>
 {% endblock %}

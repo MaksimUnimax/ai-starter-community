@@ -9,6 +9,9 @@
   if (!root) {
     return;
   }
+  if (root.dataset.accountBlocksSource === "server") {
+    return;
+  }
 
   const listElement = root.querySelector("[data-local-accounts-list]");
   const emptyElement = root.querySelector("[data-local-accounts-empty]");
@@ -225,7 +228,7 @@
     const toggleButton = document.createElement("button");
     toggleButton.className = "button button-secondary account-password-toggle";
     toggleButton.type = "button";
-    toggleButton.textContent = account.passwordVisible ? "Скрыть пароль" : "Показать пароль";
+    toggleButton.textContent = account.passwordVisible ? "Скрыть" : "Показать";
     toggleButton.setAttribute("aria-label", account.passwordVisible ? "Скрыть пароль" : "Показать пароль");
     toggleButton.setAttribute("aria-pressed", String(account.passwordVisible));
 
@@ -254,7 +257,7 @@
         return;
       }
       passwordInput.type = updated.passwordVisible ? "text" : "password";
-      toggleButton.textContent = updated.passwordVisible ? "Скрыть пароль" : "Показать пароль";
+      toggleButton.textContent = updated.passwordVisible ? "Скрыть" : "Показать";
       toggleButton.setAttribute("aria-label", updated.passwordVisible ? "Скрыть пароль" : "Показать пароль");
       toggleButton.setAttribute("aria-pressed", String(updated.passwordVisible));
     });
