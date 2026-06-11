@@ -1340,6 +1340,62 @@ button:hover {
   aspect-ratio: 16 / 9;
 }
 
+.cabinet-vpn-section {
+  gap: 0;
+}
+
+.cabinet-vpn-disclosure {
+  display: grid;
+  gap: 14px;
+  padding: 16px 18px;
+  border: 1px solid rgba(234, 223, 206, 0.96);
+  border-radius: 20px;
+  background: linear-gradient(180deg, #fffdf8 0%, #fff7ee 100%);
+}
+
+.cabinet-vpn-disclosure > summary {
+  display: grid;
+  gap: 4px;
+  cursor: pointer;
+  list-style: none;
+  outline: none;
+}
+
+.cabinet-vpn-disclosure > summary::-webkit-details-marker {
+  display: none;
+}
+
+.cabinet-vpn-disclosure > summary:focus-visible {
+  border-radius: 12px;
+  box-shadow: 0 0 0 3px rgba(214, 127, 63, 0.2);
+}
+
+.cabinet-vpn-summary__title {
+  color: var(--text);
+  font-size: 1.02rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.cabinet-vpn-summary__hint {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+
+.cabinet-vpn-content {
+  display: grid;
+  gap: 14px;
+}
+
+.cabinet-vpn-content .account-card__detail {
+  margin: 0;
+}
+
+.cabinet-vpn-content .account-actions--view {
+  margin-top: 4px;
+}
+
 .accounts-card--cabinet .account-card--vpn .account-card__details {
   gap: 8px;
 }
@@ -1514,6 +1570,16 @@ button:hover {
 
   .accounts-card--cabinet .account-card__badges {
     justify-content: flex-start;
+  }
+
+  .cabinet-vpn-disclosure {
+    padding: 14px;
+  }
+
+  .cabinet-vpn-content .vpn-card__link {
+    width: 100%;
+    min-width: 0;
+    justify-self: stretch;
   }
 
   .accounts-card--cabinet .account-field__control {

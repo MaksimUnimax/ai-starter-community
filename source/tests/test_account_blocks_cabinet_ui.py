@@ -62,10 +62,13 @@ def _grant_materials_access(test_settings, email: str) -> None:
 
 def _extract_accounts_section(body_text: str) -> str:
     start_marker = '<section id="accounts" class="card stack accounts-card'
-    end_marker = '\n  <section class="card stack prompts-library-card" data-prompts-library-root>'
     start = body_text.find(start_marker)
-    end = body_text.find(end_marker, start)
     assert start != -1
+    vpn_marker = '<section class="card stack cabinet-vpn-section" data-cabinet-vpn-section>'
+    end = body_text.find(vpn_marker, start)
+    if end == -1:
+        end_marker = '<section class="card stack prompts-library-card" data-prompts-library-root>'
+        end = body_text.find(end_marker, start)
     assert end != -1
     return body_text[start:end]
 
@@ -91,10 +94,10 @@ def _extract_first_edit_form(accounts_section: str) -> str:
 
 
 def _extract_vpn_section(accounts_section: str) -> str:
-    start_marker = '<article class="account-card account-card--vpn">'
+    start_marker = '<section class="card stack cabinet-vpn-section" data-cabinet-vpn-section>'
     start = accounts_section.find(start_marker)
     assert start != -1
-    end = accounts_section.find("</article>", start)
+    end = accounts_section.find("</section>", start)
     assert end != -1
     return accounts_section[start:end]
 
@@ -163,7 +166,6 @@ def test_user_sees_compact_server_backed_account_blocks_and_copy_only_controls(c
     assert "data-account-card-edit-form" not in accounts_section
     assert "Скопировать" in accounts_section
     assert "ChatGPT" in accounts_section
-    assert "ВПН" in accounts_section
     assert "Почта" not in accounts_section
     assert "Осталось 60 дней" in accounts_section
     assert "Не активирован" not in accounts_section
@@ -182,20 +184,32 @@ def test_user_sees_compact_server_backed_account_blocks_and_copy_only_controls(c
     assert "Платная опция" not in accounts_section
     assert "Без привязки" not in accounts_section
     assert "Продлить активацию" not in accounts_section
-    assert "Открыть сайт Amnezia VPN" in accounts_section
-    assert "Просмотрите ролик. IP сервера возьмите из блока «Сервер»." in accounts_section
-    assert "Видео взято с канала" in accounts_section
-    assert "Tech Talk" in accounts_section
-    assert "https://www.youtube.com/@TechTalk_NotDead" in accounts_section
-    assert "Благодарим канал" in accounts_section
-    assert "Лайк и подписка приветствуются" in accounts_section
+    assert "ВПН" not in accounts_section
+    assert "account-card--vpn" not in accounts_section
+    assert "account-card__vpn" not in accounts_section
+    assert "account-vpn-panel" not in accounts_section
+    assert "cabinet-vpn-section" not in accounts_section
+    assert "amnezia-vpn-guide.mp4" not in accounts_section
+    assert "Открыть сайт Amnezia VPN" not in accounts_section
 
-    vpn_section = _extract_vpn_section(accounts_section)
+    assert "Просмотрите ролик. IP сервера возьмите из блока «Сервер»." not in response.text
+
+    vpn_section = _extract_vpn_section(response.text)
+    assert '<section class="card stack cabinet-vpn-section" data-cabinet-vpn-section>' in vpn_section
+    assert '<details class="cabinet-vpn-disclosure">' in vpn_section
+    assert '<summary class="cabinet-vpn-summary">' in vpn_section
+    assert "Видеоинструкция и ссылка Amnezia VPN" in vpn_section
+    assert "После просмотра откройте сайт Amnezia VPN и используйте IP из блока «Сервер»." in vpn_section
+    assert "Видео взято с канала" in vpn_section
+    assert vpn_section.count('href="https://www.youtube.com/@TechTalk_NotDead"') == 2
+    assert "Tech Talk" in vpn_section
+    assert "Благодарим канал" in vpn_section
+    assert "Лайк и подписка приветствуются" in vpn_section
+    assert "Открыть сайт Amnezia VPN" in vpn_section
     assert "account-card__type-badge" not in vpn_section
     assert "account-card__status-badge" not in vpn_section
     assert "Осталось" not in vpn_section
     assert "АКТИВНО" not in vpn_section
-    assert "Показать видеоинструкцию" not in vpn_section
     assert "amnezia-vpn-guide.mp4" in vpn_section
     assert "<video" in vpn_section
 
