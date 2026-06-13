@@ -857,9 +857,13 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Если ТЗ подходит, напишите: <strong>ТЗ утверждаю</strong>." in lesson6_section
     assert "Создайте в GitHub новый пустой repo: <strong>Public</strong>, без <strong>README</strong>, без <strong>.gitignore</strong>, без <strong>License</strong>." in lesson6_section
     assert "Получите отдельный prompt для Codex на проверку repo и подготовку deploy key flow." in lesson6_section
+    assert "Вставьте prompt в Codex и дождитесь его отчёта: Codex сам проверит repo, а вам не нужно вручную смотреть branch, remote или commits." in lesson6_section
+    assert "Скопируйте отчёт Codex и вставьте его в ChatGPT. ChatGPT сам проверит состояние repo и даст следующий безопасный шаг." in lesson6_section
     assert "В GitHub откройте <strong>Settings → Deploy keys</strong>, добавьте <strong>public deploy key</strong> и включите <strong>Allow write access</strong>." in lesson6_section
     assert "Не отправляйте в ChatGPT приватный key, токены, пароли, .env или auth-файлы." in lesson6_section
     assert "Codex не должен использовать GitHub integration для этого шага." in lesson6_section
+    assert "Когда deploy key добавлен, отправьте в Codex следующий prompt для создания рабочих Markdown-файлов." in lesson6_section
+    assert "Скопируйте итоговый отчёт Codex и вставьте его в ChatGPT. ChatGPT проверит commit, список файлов и отсутствие лишнего." in lesson6_section
     assert "В repo есть только техническая документация, без <code>next_steps.md</code> и без кода приложения." in lesson6_section
     assert "Что должно получиться" in lesson6_section
     assert "Codex создал и запушил шесть Markdown-документов:" in lesson6_section
@@ -887,9 +891,11 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Пошаговая визуальная инструкция к практическому занятию." in lesson6_section
     assert "practice-carousel" in lesson6_section
     assert 'data-practice-carousel="start-project-deploy-key"' in lesson6_section
-    assert lesson6_section.count('data-practice-carousel-slide=') == 15
+    assert lesson6_section.count('data-practice-carousel-slide=') == 17
     assert "lesson-6-step-01-copy-start-prompt.png" in lesson6_section
-    assert "lesson-6-step-15-final-documents-repo.png" in lesson6_section
+    assert "lesson-6-step-12-deploy-key-instructions.png" in lesson6_section
+    assert "lesson-6-step-16-final-codex-report-chatgpt.png" in lesson6_section
+    assert "lesson-6-step-17-final-documents-repo.png" in lesson6_section
     assert "lesson-screenshot-carousel" not in lesson6_section
     assert "Старый prompt" not in lesson6_section
 
@@ -977,8 +983,8 @@ def test_lesson6_start_project_deploy_key_flow_is_rendered(client, test_settings
     assert "start_prompt_for_next_chat.md" in lesson6_section
     assert "practice-carousel" in rendered_lesson6_html
     assert 'data-practice-carousel="start-project-deploy-key"' in rendered_lesson6_html
-    assert rendered_lesson6_html.count("data-practice-carousel-slide=") == 15
-    assert rendered_lesson6_html.count("data-practice-carousel-step=") == 15
+    assert rendered_lesson6_html.count("data-practice-carousel-slide=") == 17
+    assert rendered_lesson6_html.count("data-practice-carousel-step=") == 17
     for filename in [
         "lesson-6-step-01-copy-start-prompt.png",
         "lesson-6-step-02-paste-prompt-chatgpt.png",
@@ -991,10 +997,12 @@ def test_lesson6_start_project_deploy_key_flow_is_rendered(client, test_settings
         "lesson-6-step-09-chatgpt-codex-prompt.png",
         "lesson-6-step-10-paste-prompt-codex.png",
         "lesson-6-step-11-codex-repo-check.png",
-        "lesson-6-step-12-github-settings-deploy-keys.png",
-        "lesson-6-step-13-add-deploy-key.png",
-        "lesson-6-step-14-fill-deploy-key.png",
-        "lesson-6-step-15-final-documents-repo.png",
+        "lesson-6-step-12-deploy-key-instructions.png",
+        "lesson-6-step-13-github-settings-deploy-keys.png",
+        "lesson-6-step-14-add-deploy-key.png",
+        "lesson-6-step-15-fill-deploy-key.png",
+        "lesson-6-step-16-final-codex-report-chatgpt.png",
+        "lesson-6-step-17-final-documents-repo.png",
     ]:
         assert filename in rendered_lesson6_html
     assert "practice-carousel-placeholder-frame" not in rendered_lesson6_html

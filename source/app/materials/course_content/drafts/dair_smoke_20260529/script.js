@@ -1755,10 +1755,12 @@ const courseData = {
             <li>Создайте в GitHub новый пустой repo: <strong>Public</strong>, без <strong>README</strong>, без <strong>.gitignore</strong>, без <strong>License</strong>.</li>
             <li>Скопируйте URL repo из Quick setup и отправьте его обратно в ChatGPT.</li>
             <li>Получите отдельный prompt для Codex на проверку repo и подготовку deploy key flow.</li>
-            <li>В Codex проверьте repo: URL, branch, remote, root files, commits и пустой ли repo.</li>
+            <li>Вставьте prompt в Codex и дождитесь его отчёта: Codex сам проверит repo, а вам не нужно вручную смотреть branch, remote или commits.</li>
+            <li>Скопируйте отчёт Codex и вставьте его в ChatGPT. ChatGPT сам проверит состояние repo и даст следующий безопасный шаг.</li>
             <li>В GitHub откройте <strong>Settings → Deploy keys</strong>, добавьте <strong>public deploy key</strong> и включите <strong>Allow write access</strong>.</li>
-            <li>После этого отправьте в Codex следующий prompt для создания рабочих Markdown-файлов.</li>
-            <li>Проверьте, что в repo появились ровно шесть Markdown-документов и нет <code>next_steps.md</code>.</li>
+            <li>Когда deploy key добавлен, отправьте в Codex следующий prompt для создания рабочих Markdown-файлов.</li>
+            <li>Скопируйте итоговый отчёт Codex и вставьте его в ChatGPT. ChatGPT проверит commit, список файлов и отсутствие лишнего.</li>
+            <li>Проверьте GitHub только по видимому результату: в repo появились ровно шесть Markdown-документов и нет <code>next_steps.md</code>.</li>
           </ol>
           <p><strong>Важно</strong></p>
           <ul>
@@ -1773,9 +1775,11 @@ const courseData = {
             <li>ChatGPT получил идею проекта и подготовил ТЗ.</li>
             <li>Вы подтвердили ТЗ словами “ТЗ утверждаю”.</li>
             <li>Пустой GitHub repo создан и URL скопирован.</li>
-            <li>Codex проверил repo и подготовил deploy key flow.</li>
+            <li>Codex проверил repo и вы скопировали его отчёт в ChatGPT.</li>
+            <li>ChatGPT проверил состояние repo по отчёту Codex и дал следующий безопасный шаг.</li>
             <li>В GitHub добавлен public deploy key с <strong>Allow write access</strong>.</li>
             <li>Codex создал и запушил шесть Markdown-документов: <code>technical_spec.md</code>, <code>roadmap.md</code>, <code>rules.md</code>, <code>current_status.md</code>, <code>module_map.md</code>, <code>start_prompt_for_next_chat.md</code>.</li>
+            <li>Вы скопировали итоговый отчёт Codex в ChatGPT, и ChatGPT проверил commit, список файлов и отсутствие лишнего.</li>
             <li>В repo есть только техническая документация, без <code>next_steps.md</code> и без кода приложения.</li>
           </ul>
           ${renderProjectStartCarousel()}
@@ -4228,26 +4232,38 @@ function renderProjectStartCarousel() {
     },
     {
       stepLabel: "Шаг 12",
-      title: "Откройте Settings → Deploy keys",
-      image: "/static/course-assets/lesson-6/lesson-6-step-12-github-settings-deploy-keys.png",
-      alt: "Откройте Settings → Deploy keys",
+      title: "Получите инструкцию для Deploy key",
+      image: "/static/course-assets/lesson-6/lesson-6-step-12-deploy-key-instructions.png",
+      alt: "Получите инструкцию для Deploy key",
     },
     {
       stepLabel: "Шаг 13",
-      title: "Нажмите Add deploy key",
-      image: "/static/course-assets/lesson-6/lesson-6-step-13-add-deploy-key.png",
-      alt: "Нажмите Add deploy key",
+      title: "Откройте Settings → Deploy keys",
+      image: "/static/course-assets/lesson-6/lesson-6-step-13-github-settings-deploy-keys.png",
+      alt: "Откройте Settings → Deploy keys",
     },
     {
       stepLabel: "Шаг 14",
-      title: "Добавьте public deploy key",
-      image: "/static/course-assets/lesson-6/lesson-6-step-14-fill-deploy-key.png",
-      alt: "Добавьте public deploy key",
+      title: "Нажмите Add deploy key",
+      image: "/static/course-assets/lesson-6/lesson-6-step-14-add-deploy-key.png",
+      alt: "Нажмите Add deploy key",
     },
     {
       stepLabel: "Шаг 15",
+      title: "Добавьте public deploy key",
+      image: "/static/course-assets/lesson-6/lesson-6-step-15-fill-deploy-key.png",
+      alt: "Добавьте public deploy key",
+    },
+    {
+      stepLabel: "Шаг 16",
+      title: "Вставьте итоговый отчёт Codex в ChatGPT",
+      image: "/static/course-assets/lesson-6/lesson-6-step-16-final-codex-report-chatgpt.png",
+      alt: "Вставьте итоговый отчёт Codex в ChatGPT",
+    },
+    {
+      stepLabel: "Шаг 17",
       title: "Проверьте документы в GitHub",
-      image: "/static/course-assets/lesson-6/lesson-6-step-15-final-documents-repo.png",
+      image: "/static/course-assets/lesson-6/lesson-6-step-17-final-documents-repo.png",
       alt: "Проверьте документы в GitHub",
     },
   ];
