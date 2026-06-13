@@ -213,8 +213,9 @@ def test_user_sees_compact_server_backed_account_blocks_and_copy_only_controls(c
     assert '<p class="form-help cabinet-vpn-summary__hint">Видеоинструкция и ссылка Amnezia VPN</p>' in vpn_section
     assert '<span class="cabinet-vpn-summary__title">' not in vpn_section
     assert "Видеоинструкция и ссылка Amnezia VPN" in vpn_section
-    assert "После просмотра откройте сайт Amnezia VPN и используйте IP из блока «Сервер»." in vpn_section
+    assert 'После просмотра откройте сайт Amnezia VPN и используйте IP из блока «<a href="#accounts">Сервер</a>».' in vpn_section
     assert "cabinet-vpn-note" in vpn_section
+    assert 'href="#accounts">Сервер</a>' in vpn_section
     assert "Видео взято с канала" not in vpn_section
     assert 'href="https://www.youtube.com/@TechTalk_NotDead"' not in vpn_section
     assert "Tech Talk" not in vpn_section

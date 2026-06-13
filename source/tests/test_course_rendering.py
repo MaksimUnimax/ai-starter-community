@@ -209,7 +209,8 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Что изучаем" in page_response.text
     assert "Зачем это нужно" in page_response.text
     assert "Где это применяется" in page_response.text
-    assert page_response.text.count("course-intro-part") == 3
+    assert "Структура курса" in page_response.text
+    assert page_response.text.count("course-intro-part") == 4
     assert page_response.text.count('class="nav-button') == 9
     assert page_response.text.count("nav-title") == 9
     assert "data-section-nav=\"true\"" in script_response.text
@@ -251,6 +252,8 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert ".lesson-shell .section-body > .callout:not([data-starter-prompt-panel]) p" in styles_response.text
     assert ".lesson-shell .section-body > .callout:not([data-starter-prompt-panel]) li" in styles_response.text
     assert ".lesson-shell .section-body > .next-step-card p" in styles_response.text
+    assert ".next-step-actions .primary-button" in styles_response.text
+    assert "min-width: 220px;" in styles_response.text
     assert "font-size: 18px;" in styles_response.text
     assert "line-height: 1.65;" in styles_response.text
     assert ".course-note {" in styles_response.text
@@ -540,6 +543,7 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Как открыть Terminal на macOS" in lesson5_section
     assert "SSH-команду" in lesson5_section
     assert "личного кабинета" in lesson5_section
+    assert 'href="/cabinet#accounts" target="_blank" rel="noreferrer">личного кабинета</a>' in lesson5_section
     assert "окно связи с сервером" in lesson5_section
     assert "codex" in lesson5_section
     assert "привет ты кто?" in lesson5_section

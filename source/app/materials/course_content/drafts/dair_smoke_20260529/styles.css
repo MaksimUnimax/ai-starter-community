@@ -783,6 +783,7 @@ button:hover,
 
 .next-step-card .primary-button {
   align-self: flex-start;
+  min-width: 220px;
   white-space: normal;
 }
 
@@ -799,6 +800,12 @@ button:hover,
   align-items: center;
   justify-content: center;
   text-decoration: none;
+}
+
+.next-step-actions .primary-button {
+  align-self: flex-start;
+  min-width: 220px;
+  white-space: normal;
 }
 
 .info-grid ul,

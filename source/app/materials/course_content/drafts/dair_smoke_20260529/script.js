@@ -1377,7 +1377,7 @@ const courseData = {
         <ol>
           <li>Откройте <strong>Terminal</strong> на macOS или <strong>PowerShell</strong> на Windows.</li>
           <li>Войдите на сервер с помощью SSH-команды из личного кабинета.</li>
-          <li>Введите пароль из личного кабинета.</li>
+          <li>Введите пароль из <a href="/cabinet#accounts" target="_blank" rel="noreferrer">личного кабинета</a>.</li>
           <li>После подключения к серверу введите <strong>codex</strong>.</li>
           <li>Когда <strong>Codex</strong> откроется, напишите: <strong>привет ты кто?</strong></li>
           <li>Дождитесь ответа от <strong>Codex</strong>.</li>
