@@ -765,10 +765,10 @@ button:hover,
 }
 
 .next-step-card {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 16px;
-  justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   padding: 16px;
   border-radius: 24px;
   border: 1px solid rgba(196, 92, 38, 0.18);
@@ -777,11 +777,10 @@ button:hover,
 }
 
 .next-step-card--navigation-only {
-  align-items: center;
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .next-step-copy {
-  flex: 1 1 360px;
   min-width: 0;
 }
 
@@ -801,11 +800,11 @@ button:hover,
 
 .next-step-actions {
   display: flex;
-  flex-wrap: wrap;
-  flex: 0 0 auto;
+  flex-direction: column;
   gap: 10px;
-  justify-content: flex-end;
-  align-items: center;
+  align-items: stretch;
+  justify-content: center;
+  width: clamp(180px, 20vw, 240px);
 }
 
 .next-step-actions--single {
@@ -817,19 +816,19 @@ button:hover,
   align-items: center;
   justify-content: center;
   text-decoration: none;
-  width: auto;
+  width: 100%;
   min-width: 0;
-  max-width: 100%;
-  flex: 0 0 auto;
+  max-width: none;
+  flex: 1 1 auto;
 }
 
 .next-step-actions .primary-button {
-  align-self: flex-start;
+  align-self: stretch;
   white-space: normal;
-  width: auto;
+  width: 100%;
   min-width: 0;
-  max-width: 100%;
-  flex: 0 0 auto;
+  max-width: none;
+  flex: 1 1 auto;
 }
 
 .info-grid ul,
@@ -905,10 +904,34 @@ button:hover,
 
 .practice-carousel-nav {
   pointer-events: auto;
-  min-height: 44px;
-  padding: 10px 16px;
-  font-size: 0.88rem;
-  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(42px, 4.8vw, 56px);
+  height: clamp(42px, 4.8vw, 56px);
+  padding: 0;
+  border: 1px solid rgba(244, 247, 251, 0.32);
+  border-radius: 999px;
+  background: rgba(11, 17, 23, 0.38);
+  color: #f4f7fb;
+  box-shadow: 0 12px 24px rgba(10, 16, 23, 0.14);
+  backdrop-filter: blur(10px);
+  font-size: clamp(1.45rem, 2vw, 1.8rem);
+  line-height: 1;
+}
+
+.practice-carousel-nav:hover {
+  background: rgba(11, 17, 23, 0.52);
+}
+
+.practice-carousel-nav:focus-visible {
+  outline: 3px solid rgba(196, 92, 38, 0.5);
+  outline-offset: 2px;
+}
+
+.practice-carousel-nav span {
+  display: inline-block;
+  transform: translateY(-1px);
 }
 
 .practice-carousel-stepbar {
@@ -947,24 +970,43 @@ button:hover,
   width: 100%;
   max-width: 1100px;
   margin: 0 auto;
+  height: clamp(400px, 56vw, 680px);
 }
 
 .practice-carousel-stage-viewport {
+  position: relative;
   min-width: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 
 .practice-carousel-slide {
-  display: none;
+  position: absolute;
+  inset: 0;
+  display: block;
+  opacity: 0;
+  transform: translateY(8px) scale(0.995);
+  transition: opacity 240ms ease, transform 240ms ease;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .practice-carousel-slide.is-active {
-  display: block;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+  z-index: 1;
 }
 
 .practice-carousel-window {
   display: grid;
-  gap: 10px;
-  padding: 12px;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 12px;
+  height: 100%;
+  min-height: 0;
+  box-sizing: border-box;
+  padding: clamp(12px, 1.6vw, 16px);
   overflow: hidden;
   border: 1px solid var(--border);
   border-radius: 24px;
@@ -1000,6 +1042,11 @@ button:hover,
 }
 
 .practice-carousel-image-frame {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  height: 100%;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 18px;
@@ -1011,10 +1058,26 @@ button:hover,
 .practice-carousel-image-frame img {
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
   max-width: 100%;
+  max-height: 100%;
   object-fit: contain;
   object-position: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .practice-carousel-slide {
+    transition: none;
+    transform: none;
+  }
+
+  .practice-carousel-slide.is-active {
+    transform: none;
+  }
+
+  .practice-carousel-nav {
+    transition: none;
+  }
 }
 
 .practice-carousel-placeholder-frame {
@@ -1428,9 +1491,13 @@ button:hover,
   }
 
   .practice-carousel-nav {
-    min-height: 42px;
-    padding-inline: 12px;
-    font-size: 0.84rem;
+    width: clamp(40px, 11vw, 48px);
+    height: clamp(40px, 11vw, 48px);
+    font-size: 1.45rem;
+  }
+
+  .practice-carousel-stage {
+    height: clamp(320px, 84vw, 520px);
   }
 
   .practice-carousel-window {
@@ -1503,7 +1570,7 @@ button:hover,
   }
 
   .next-step-card {
-    flex-direction: column;
+    grid-template-columns: 1fr;
     align-items: flex-start;
   }
 
@@ -1513,14 +1580,14 @@ button:hover,
 
   .next-step-actions {
     width: 100%;
-    justify-content: flex-start;
+    max-width: none;
   }
 
   .next-step-actions .ghost-button,
   .next-step-actions .primary-button {
-    width: auto;
+    width: 100%;
     min-width: 0;
-    max-width: 100%;
-    flex: 0 0 auto;
+    max-width: none;
+    flex: 1 1 auto;
   }
 }

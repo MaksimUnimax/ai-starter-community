@@ -246,8 +246,16 @@ def test_rendered_course_export_and_lesson_5_html_include_the_updates():
     assert rendered_html.count("course-intro-part") == 4
     assert ".next-step-card .primary-button" in styles_css
     assert ".next-step-actions .primary-button" in styles_css
-    assert ".next-step-card .primary-button {\n  align-self: flex-start;\n  white-space: normal;\n  width: auto;\n  min-width: 0;\n  max-width: 100%;\n  flex: 0 0 auto;\n}" in styles_css
-    assert ".next-step-actions .primary-button {\n  align-self: flex-start;\n  white-space: normal;\n  width: auto;\n  min-width: 0;\n  max-width: 100%;\n  flex: 0 0 auto;\n}" in styles_css
+    assert ".next-step-card {\n  display: grid;\n  grid-template-columns: minmax(0, 1fr) auto;" in styles_css
+    assert ".next-step-actions {\n  display: flex;\n  flex-direction: column;" in styles_css
+    assert ".next-step-actions .ghost-button {\n  display: inline-flex;" in styles_css
+    assert ".next-step-actions .primary-button {\n  align-self: stretch;" in styles_css
+    assert ".practice-carousel-stage {\n  position: relative;\n  width: 100%;\n  max-width: 1100px;\n  margin: 0 auto;\n  height: clamp(400px, 56vw, 680px);" in styles_css
+    assert ".practice-carousel-stage-viewport {\n  position: relative;\n  min-width: 0;\n  width: 100%;\n  height: 100%;\n  overflow: hidden;" in styles_css
+    assert ".practice-carousel-slide {\n  position: absolute;\n  inset: 0;\n  display: block;\n  opacity: 0;\n  transform: translateY(8px) scale(0.995);\n  transition: opacity 240ms ease, transform 240ms ease;" in styles_css
+    assert ".practice-carousel-image-frame img {\n  display: block;\n  width: 100%;\n  height: 100%;\n  max-width: 100%;\n  max-height: 100%;\n  object-fit: contain;" in styles_css
+    assert ".practice-carousel-nav {\n  pointer-events: auto;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  width: clamp(42px, 4.8vw, 56px);" in styles_css
+    assert "@media (prefers-reduced-motion: reduce)" in styles_css
     assert len(exported_asset_names) == 10
     assert exported_asset_names == [f"assets/static/course-assets/lesson-5/{name}" for name in expected_asset_names]
     assert all((lesson5_asset_root / name).is_file() for name in expected_asset_names)
@@ -278,11 +286,19 @@ def test_rendered_course_export_and_lesson_5_html_include_the_updates():
     assert "Позже здесь будут реальные скриншоты" not in lesson5_html
     assert "practice-carousel-toolbar" not in lesson5_html
     assert "practice-carousel-controls" in lesson5_html
+    assert "Назад" not in lesson5_html
+    assert "Дальше" not in lesson5_html
+    assert "‹" in lesson5_html
+    assert "›" in lesson5_html
+    assert lesson5_html.count('data-practice-carousel-prev') == 1
+    assert lesson5_html.count('data-practice-carousel-next') == 1
     assert "/tmp/" not in lesson5_html
     assert 'data-section="lesson-4"' in lesson5_html
     assert 'data-section="lesson-6"' in lesson5_html
     assert "Вернуться к уроку 4" in lesson5_html
     assert "Перейти к уроку 6" in lesson5_html
+    assert "next-step-copy" in lesson5_html
+    assert "next-step-actions" in lesson5_html
     assert lesson5_html.index('data-practice-carousel-prev') > lesson5_html.index("practice-carousel-stage")
     assert lesson5_html.index('data-practice-carousel-next') > lesson5_html.index("practice-carousel-stage")
     assert '<section class="next-step-card">' in lesson2_html
@@ -298,6 +314,10 @@ def test_rendered_course_export_and_lesson_5_html_include_the_updates():
     assert '<button class="ghost-button" type="button" data-section="lesson-8" data-section-footer-nav="true">Вернуться к уроку 8</button>' in lesson9_html
     assert '<button class="primary-button" type="button" data-section="lesson-10" data-section-footer-nav="true">Перейти к финалу</button>' in lesson9_html
     assert '<button class="ghost-button" type="button" data-section="lesson-9" data-section-footer-nav="true">Вернуться к уроку 9</button>' in lesson10_html
+    assert lesson2_html.count("data-section-footer-nav=\"true\"") == 2
+    assert lesson5_html.count("data-section-footer-nav=\"true\"") == 2
+    assert lesson9_html.count("data-section-footer-nav=\"true\"") == 2
+    assert lesson10_html.count("data-section-footer-nav=\"true\"") == 1
     assert 'data-section="lesson-3"' in lesson2_html
     assert 'data-section="lesson-1"' in lesson2_html
     assert 'data-section="lesson-4"' in lesson5_html

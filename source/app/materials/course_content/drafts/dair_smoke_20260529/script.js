@@ -3670,8 +3670,12 @@ function renderPracticeCarousel({ carouselKey, note, slides }) {
             .join("")}
         </div>
         <div class="practice-carousel-controls">
-          <button class="ghost-button practice-carousel-nav practice-carousel-nav-prev" type="button" data-practice-carousel-prev aria-label="Предыдущий шаг">Назад</button>
-          <button class="primary-button practice-carousel-nav practice-carousel-nav-next" type="button" data-practice-carousel-next aria-label="Следующий шаг">Дальше</button>
+          <button class="practice-carousel-nav practice-carousel-nav-prev" type="button" data-practice-carousel-prev aria-label="Предыдущий шаг">
+            <span aria-hidden="true">‹</span>
+          </button>
+          <button class="practice-carousel-nav practice-carousel-nav-next" type="button" data-practice-carousel-next aria-label="Следующий шаг">
+            <span aria-hidden="true">›</span>
+          </button>
         </div>
       </div>
       <div class="practice-carousel-stepbar" role="tablist" aria-label="Шаги визуальной инструкции">
@@ -4653,7 +4657,6 @@ function updatePracticeCarouselUI(carousel, activeIndex) {
   slides.forEach((slide, index) => {
     const isActive = index === normalizedIndex;
     slide.classList.toggle("is-active", isActive);
-    slide.hidden = !isActive;
     slide.setAttribute("aria-hidden", String(!isActive));
   });
 
