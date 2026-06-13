@@ -336,6 +336,9 @@ def build_course_export(*, generated_at: datetime | None = None) -> CourseExport
         STATIC_ROOT / "images" / "human_ai_hero_background_v2.png",
         STATIC_ROOT / "images" / "mobile_vitruvian_NO_SQUARES_transparent.webp",
     ]
+    lesson5_asset_root = STATIC_ROOT / "course-assets" / "lesson-5"
+    if lesson5_asset_root.is_dir():
+        asset_source_paths.extend(sorted(path for path in lesson5_asset_root.iterdir() if path.is_file()))
     asset_files = []
     for path in asset_source_paths:
         if path.is_file():

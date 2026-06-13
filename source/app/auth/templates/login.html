@@ -15,9 +15,10 @@
       <div class="alert alert-error">{{ error }}</div>
     {% endif %}
     {% if unverified %}
-      <div class="alert alert-info stack">
-        <p>Email не подтверждён.</p>
-        <p>Не пришло письмо подтверждения? <a href="/resend-verification">Отправить письмо подтверждения ещё раз</a>.</p>
+      <div class="alert alert-info stack login-unverified">
+        <p class="login-unverified__title">Email не подтверждён.</p>
+        <p class="login-unverified__text">Не пришло письмо подтверждения?</p>
+        <a class="button button-secondary login-unverified__action" href="/resend-verification">Отправить письмо подтверждения ещё раз</a>
       </div>
     {% endif %}
 

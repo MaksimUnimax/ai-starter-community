@@ -491,6 +491,29 @@ button:hover {
   border-color: var(--error-border);
 }
 
+.login-unverified {
+  gap: 10px;
+}
+
+.login-unverified__title,
+.login-unverified__text {
+  margin: 0;
+}
+
+.login-unverified__title {
+  font-weight: 700;
+}
+
+.login-unverified__text {
+  color: var(--muted);
+}
+
+.login-unverified__action {
+  align-self: flex-start;
+  width: fit-content;
+  min-height: 40px;
+}
+
 .table {
   width: 100%;
   border-collapse: collapse;

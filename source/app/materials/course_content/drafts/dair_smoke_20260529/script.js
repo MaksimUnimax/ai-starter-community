@@ -1,3 +1,72 @@
+function renderLesson5ScreenshotCarousel() {
+  const slides = [
+    {
+      src: "/static/course-assets/lesson-5/lesson-5-step-01-powershell-search.png",
+      caption: "Откройте PowerShell",
+    },
+    {
+      src: "/static/course-assets/lesson-5/lesson-5-step-02-cabinet-server-command.png",
+      caption: "Скопируйте SSH-команду из блока «Сервер»",
+    },
+    {
+      src: "/static/course-assets/lesson-5/lesson-5-step-03-ssh-command.png",
+      caption: "Вставьте SSH-команду",
+    },
+    {
+      src: "/static/course-assets/lesson-5/lesson-5-step-04-password-prompt.png",
+      caption: "Введите пароль",
+    },
+    {
+      src: "/static/course-assets/lesson-5/lesson-5-step-05-run-codex.png",
+      caption: "Запустите Codex",
+    },
+    {
+      src: "/static/course-assets/lesson-5/lesson-5-step-06-codex-opened.png",
+      caption: "Проверьте, что Codex открылся",
+    },
+    {
+      src: "/static/course-assets/lesson-5/lesson-5-step-07-codex-reply.png",
+      caption: "Отправьте первое сообщение",
+    },
+    {
+      src: "/static/course-assets/lesson-5/lesson-5-step-08-slash-commands.png",
+      caption: "Откройте список slash-команд",
+    },
+    {
+      src: "/static/course-assets/lesson-5/lesson-5-step-09-status-command.png",
+      caption: "Откройте /status",
+    },
+    {
+      src: "/static/course-assets/lesson-5/lesson-5-step-10-status-output.png",
+      caption: "Проверьте модель, лимиты и права доступа",
+    }
+  ];
+
+  return `
+    <div class="lesson-screenshot-carousel" role="list" aria-label="Пошаговая визуальная инструкция по подключению к Codex">
+      ${slides
+        .map(
+          (slide, index) => `
+            <figure class="lesson-screenshot-slide" role="listitem">
+              <img
+                class="lesson-screenshot-image"
+                src="${slide.src}"
+                alt="${slide.caption}"
+                loading="lazy"
+                decoding="async"
+              >
+              <figcaption class="lesson-screenshot-caption">
+                <span class="lesson-screenshot-step">Шаг ${index + 1}</span>
+                <p>${slide.caption}</p>
+              </figcaption>
+            </figure>
+          `
+        )
+        .join("")}
+    </div>
+  `;
+}
+
 const courseData = {
   title: "Работа с ИИ",
   courseTitle: "Как вести разработку через ChatGPT и Codex",
@@ -1374,29 +1443,40 @@ const courseData = {
       title: "Первое подключение к Codex",
       html: `
         <p><strong>Практическое задание:</strong></p>
-        <p>Сначала настройте <strong>Codex</strong> простыми командами:</p>
         <ol>
           <li>Откройте <strong>Terminal</strong> на macOS или <strong>PowerShell</strong> на Windows.</li>
-          <li>Войдите на сервер с помощью SSH-команды из личного кабинета.</li>
-          <li>Введите пароль из <a href="/cabinet#accounts" target="_blank" rel="noreferrer">личного кабинета</a>.</li>
-          <li>После подключения к серверу введите <strong>codex</strong>.</li>
-          <li>Введите <strong>/st</strong>, чтобы посмотреть текущие лимиты и выбранную модель.</li>
-          <li>Введите <strong>/model</strong> и выберите модель курса — сейчас это <strong>5.4 mini</strong>.</li>
+          <li>Откройте раздел <strong>Аккаунты</strong> в личном кабинете.</li>
+          <li>Скопируйте SSH-команду из блока <strong>Сервер</strong>.</li>
+          <li>Вставьте SSH-команду в <strong>Terminal</strong> или <strong>PowerShell</strong> и нажмите <strong>Enter</strong>.</li>
+          <li>Когда появится запрос пароля, введите пароль из <a href="/cabinet#accounts" target="_blank" rel="noreferrer">личного кабинета</a>.</li>
+          <li>После входа на сервер запустите <strong>codex</strong>.</li>
+          <li>Когда <strong>Codex</strong> откроется, отправьте первое сообщение: <strong>Ты кто?</strong> или <strong>привет ты кто?</strong>.</li>
+          <li>Внутри <strong>Codex</strong> используйте slash-команды: введите <strong>/st</strong> и выберите <strong>/status</strong>, чтобы увидеть текущие лимиты, выбранную модель, папку проекта и права доступа.</li>
+          <li>Введите <strong>/model</strong> и выберите модель курса: <strong>5.4 mini</strong> / <strong>gpt-5.4-mini high</strong>.</li>
           <li>Если название модели позже изменится, это нормально: ИИ быстро развивается, а старые модели могут перестать поддерживаться.</li>
-          <li>Введите <strong>/permissions</strong> и включите <strong>полный доступ</strong>.</li>
-          <li>После этого напишите: <strong>привет ты кто?</strong></li>
-          <li>Дождитесь ответа от <strong>Codex</strong>.</li>
+          <li>Введите <strong>/permissions</strong> и включите <strong>Full Access</strong> / <strong>полный доступ</strong>.</li>
+          <li>После этого продолжайте работу, когда модель и права доступа настроены правильно.</li>
         </ol>
         <p><strong>Что должно получиться:</strong></p>
         <ul>
           <li><strong>Terminal</strong> или <strong>PowerShell</strong> открыт;</li>
-          <li>подключение к серверу выполнено;</li>
+          <li>SSH-команда из блока <strong>Сервер</strong> была скопирована и запущена;</li>
+          <li>пароль был введён;</li>
+          <li>вход на сервер успешно выполнен;</li>
           <li><strong>codex</strong> запущен;</li>
-          <li><strong>/st</strong> показал лимиты и выбранную модель;</li>
-          <li><strong>/model</strong> открыл выбор модели и была выбрана модель курса <strong>5.4 mini</strong>;</li>
-          <li><strong>/permissions</strong> открыл настройки и был включён <strong>полный доступ</strong>;</li>
-          <li><strong>Codex</strong> ответил на сообщение <strong>привет ты кто?</strong>.</li>
+          <li><strong>Codex</strong> ответил на первое сообщение;</li>
+          <li><strong>/status</strong> показал текущую модель, лимиты и права доступа;</li>
+          <li><strong>/model</strong> был открыт и текущая модель курса выбрана;</li>
+          <li><strong>/permissions</strong> был открыт и <strong>Full Access</strong> / <strong>полный доступ</strong> включён.</li>
         </ul>
+      `
+    },
+    {
+      label: "Визуальная инструкция",
+      title: "Пошаговая карусель",
+      html: `
+        <p>Эта карусель показывает весь путь от открытия PowerShell до проверки модели, лимитов и прав доступа в Codex.</p>
+        ${renderLesson5ScreenshotCarousel()}
       `
     },
     {

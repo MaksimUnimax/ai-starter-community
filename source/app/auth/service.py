@@ -173,6 +173,10 @@ def user_can_access_materials(user: UserPublic | None) -> bool:
     )
 
 
+def can_manage_account_blocks(user: UserPublic | None) -> bool:
+    return bool(user and has_staff_materials_access(user.role))
+
+
 def _build_public_url(settings: Settings, path: str) -> str:
     base_url = settings.base_url.rstrip("/")
     if not path.startswith("/"):
@@ -215,6 +219,13 @@ def _issue_auth_token(
 def _fetch_user_by_id(user_id: int, settings: Settings | None = None) -> UserPublic | None:
     with _connection(settings) as connection:
         row = connection.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
+        return _public_user_from_row(row) if row else None
+
+
+def get_user_by_email(email: str, settings: Settings | None = None) -> UserPublic | None:
+    normalized_email = _normalize_email(email)
+    with _connection(settings) as connection:
+        row = connection.execute("SELECT * FROM users WHERE email = ?", (normalized_email,)).fetchone()
         return _public_user_from_row(row) if row else None
 
 
@@ -463,6 +474,34 @@ def resend_verification_request(email: str, settings: Settings | None = None) ->
     except (EmailModeError, EmailConfigError, EmailDeliveryError) as exc:
         _raise_email_delivery_error(exc)
     return True
+
+
+def is_verification_resend_rate_limited(
+    email: str,
+    *,
+    settings: Settings | None = None,
+    cooldown_seconds: int = 60,
+) -> bool:
+    resolved = _settings(settings)
+    normalized_email = _normalize_email(email)
+    if cooldown_seconds <= 0:
+        return False
+
+    cooldown_started_at = utc_now() - timedelta(seconds=cooldown_seconds)
+    with _connection(resolved) as connection:
+        row = connection.execute(
+            """
+            SELECT created_at
+            FROM auth_tokens
+            WHERE token_type = ?
+              AND target_email = ?
+              AND created_at >= ?
+            ORDER BY created_at DESC
+            LIMIT 1
+            """,
+            (EMAIL_TOKEN_TYPE, normalized_email, cooldown_started_at.isoformat()),
+        ).fetchone()
+    return row is not None
 
 
 def verify_email(token: str, settings: Settings | None = None) -> UserPublic:

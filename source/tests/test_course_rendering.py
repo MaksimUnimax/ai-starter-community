@@ -222,9 +222,25 @@ answer_ref: ../answers/01-kak-my-rabotaem.md
 
 def test_rendered_course_export_and_lesson_5_html_include_the_updates():
     export_package = build_course_export()
+    lesson5_asset_root = Path(__file__).resolve().parents[1] / "app" / "static" / "course-assets" / "lesson-5"
+    expected_asset_names = [
+        "lesson-5-step-01-powershell-search.png",
+        "lesson-5-step-02-cabinet-server-command.png",
+        "lesson-5-step-03-ssh-command.png",
+        "lesson-5-step-04-password-prompt.png",
+        "lesson-5-step-05-run-codex.png",
+        "lesson-5-step-06-codex-opened.png",
+        "lesson-5-step-07-codex-reply.png",
+        "lesson-5-step-08-slash-commands.png",
+        "lesson-5-step-09-status-command.png",
+        "lesson-5-step-10-status-output.png",
+    ]
     with zipfile.ZipFile(io.BytesIO(export_package.content)) as archive:
         rendered_html = archive.read("rendered/course.html").decode("utf-8")
         styles_css = archive.read("source/styles.css").decode("utf-8")
+        exported_asset_names = sorted(
+            name for name in archive.namelist() if name.startswith("assets/static/course-assets/lesson-5/")
+        )
 
     assert "<h3>Структура курса</h3>" in rendered_html
     assert rendered_html.count("course-intro-part") == 4
@@ -232,17 +248,28 @@ def test_rendered_course_export_and_lesson_5_html_include_the_updates():
     assert ".next-step-actions .primary-button" in styles_css
     assert ".next-step-card .primary-button {\n  align-self: flex-start;\n  white-space: normal;\n}" in styles_css
     assert ".next-step-actions .primary-button {\n  align-self: flex-start;\n  white-space: normal;\n}" in styles_css
+    assert len(exported_asset_names) == 10
+    assert exported_asset_names == [f"assets/static/course-assets/lesson-5/{name}" for name in expected_asset_names]
+    assert all((lesson5_asset_root / name).is_file() for name in expected_asset_names)
 
     lesson5_html = _render_section_html_via_node("lesson-5")
     lesson2_html = _render_section_html_via_node("lesson-2")
 
+    assert "/status" in lesson5_html
     assert "/st" in lesson5_html
     assert "/model" in lesson5_html
     assert "5.4 mini" in lesson5_html
-    assert "модели могут перестать поддерживаться" in lesson5_html
+    assert "gpt-5.4-mini high" in lesson5_html
+    assert "старые модели могут перестать поддерживаться" in lesson5_html
     assert "/permissions" in lesson5_html
     assert "полный доступ" in lesson5_html
     assert 'href="/cabinet#accounts" target="_blank" rel="noreferrer">личного кабинета</a>' in lesson5_html
+    assert "lesson-screenshot-carousel" in lesson5_html
+    assert lesson5_html.count("lesson-screenshot-slide") == 10
+    assert "lesson-5-step-01-powershell-search.png" in lesson5_html
+    assert "lesson-5-step-10-status-output.png" in lesson5_html
+    assert "Позже здесь будут реальные скриншоты" not in lesson5_html
+    assert "/tmp/" not in lesson5_html
     assert 'data-section="lesson-6"' in lesson5_html
     assert "Перейти к уроку 6" in lesson5_html
     assert '<section class="next-step-card">' in lesson2_html
@@ -476,13 +503,18 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Перейти к уроку 5" in lesson4_section
     assert "В следующем уроке разберём старт проекта: сначала документация, потом разработка." in lesson5_section
     assert "Перейти к уроку 6" in lesson5_section
+    assert "/status" in lesson5_section
     assert "/st" in lesson5_section
     assert "/model" in lesson5_section
     assert "5.4 mini" in lesson5_section
-    assert "модели могут перестать поддерживаться" in lesson5_section
+    assert "gpt-5.4-mini high" in lesson5_section
+    assert "старые модели могут перестать поддерживаться" in lesson5_section
     assert "/permissions" in lesson5_section
     assert "полный доступ" in lesson5_section
     assert 'href="/cabinet#accounts" target="_blank" rel="noreferrer">личного кабинета</a>' in lesson5_section
+    assert "lesson-screenshot-carousel" in lesson5_section
+    assert "Пошаговая карусель" in lesson5_section
+    assert "lesson-5-step-01-powershell-search.png" in lesson5_section
     assert "В следующем уроке разберём процесс работы: какие бывают run’ы Codex, зачем нужна пошаговость и как удерживать важные инструкции в контексте ChatGPT." in lesson6_section
     assert "Перейти к уроку 7" in lesson6_section
     lesson8_start = script_response.text.index('id: "lesson-8"')
@@ -651,6 +683,9 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "SSH-команду" in lesson5_section
     assert "личного кабинета" in lesson5_section
     assert 'href="/cabinet#accounts" target="_blank" rel="noreferrer">личного кабинета</a>' in lesson5_section
+    assert "/status" in lesson5_section
+    assert "lesson-screenshot-carousel" in lesson5_section
+    assert "lesson-5-step-10-status-output.png" in lesson5_section
     assert "окно связи с сервером" in lesson5_section
     assert "codex" in lesson5_section
     assert "привет ты кто?" in lesson5_section

@@ -624,6 +624,7 @@ def test_unverified_login_shows_resend_link(client, test_settings):
     assert login_response.text.count("Email не подтверждён.") == 1
     assert "Не пришло письмо подтверждения?" in login_response.text
     assert "/resend-verification" in login_response.text
+    assert 'class="button button-secondary login-unverified__action"' in login_response.text
     assert "Подтверждение почты" not in client.get("/login").text
 
 
