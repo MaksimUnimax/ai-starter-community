@@ -2563,16 +2563,12 @@ const courseData = {
       <li>Откройте <strong>Prompt для обновления документов</strong> и вставьте его в текущий диалог с <strong>ChatGPT</strong>.</li>
       <li><strong>ChatGPT</strong> восстановит контекст проекта, проверит <strong>GitHub</strong> и подготовит два блока: project-specific prompt для сохранения и prompt для <strong>Codex</strong>.</li>
       <li>Скопируйте prompt для <strong>Codex</strong>.</li>
-      <li>Вставьте prompt в <strong>Codex</strong> и дождитесь отчёта.</li>
+      <li>Вставьте prompt в <strong>Codex</strong>.</li>
       <li>Скопируйте отчёт <strong>Codex</strong> и вставьте его в <strong>ChatGPT</strong>.</li>
-      <li><strong>ChatGPT</strong> проверит отчёт <strong>Codex</strong>, <strong>commit</strong> и состояние репозитория.</li>
-      <li>Сохраните project-specific prompt обновления документов в <strong>prefix-расширение</strong> или файлом на компьютер.</li>
-      <li>Откройте <strong>Prompt для нового диалога</strong> из урока и вставьте его в <strong>ChatGPT</strong> вместе с фразой: <strong>Сделай prompt под наш проект из этого шаблона</strong>.</li>
-      <li><strong>ChatGPT</strong> создаст заполненный prompt для нового диалога под текущий проект.</li>
-      <li>Сохраните prompt нового диалога в <strong>prefix-расширение</strong> или файлом на компьютер.</li>
-      <li>Закройте старый активный диалог только после того, как документы обновлены и оба project-specific prompt сохранены.</li>
-      <li>Откройте новый диалог и вставьте сохранённый prompt для нового диалога.</li>
-      <li>Убедитесь, что <strong>ChatGPT</strong> продолжает работу с того же места: читает документы проекта, называет актуальную <strong>stop-точку</strong> и не начинает по памяти.</li>
+      <li>Вставьте <strong>prompt для нового диалога</strong> из шаблона урока.</li>
+      <li>Сохраните prompt нового диалога в <strong>prefix</strong> или на компьютер.</li>
+      <li>Начните новый диалог с <strong>prompt’а</strong> для начала диалога.</li>
+      <li>Убедитесь, что <strong>ChatGPT</strong> продолжает работу с того места, где закрыли прошлый диалог.</li>
     </ol>
     <p>Практика завершена, когда:</p>
     <ul>
@@ -3581,9 +3577,9 @@ function renderLesson8PracticeCarousel() {
     },
     {
       stepLabel: "Шаг 2",
-      title: "Получите prompt обновления документов проекта",
+      title: "Получите prompt обновления документов проекта и промпт для кодекса",
       image: "/static/course-assets/lesson-8/lesson-8-step-02-get-project-docs-update-prompt.png",
-      alt: "Получите prompt обновления документов проекта",
+      alt: "Получите prompt обновления документов проекта и промпт для кодекса",
     },
     {
       stepLabel: "Шаг 3",
@@ -3593,33 +3589,33 @@ function renderLesson8PracticeCarousel() {
     },
     {
       stepLabel: "Шаг 4",
-      title: "Получите задачу для Codex",
+      title: "Скопируйте промпт для Codex",
       image: "/static/course-assets/lesson-8/lesson-8-step-04-get-codex-docs-task.png",
-      alt: "Получите задачу для Codex",
+      alt: "Скопируйте промпт для Codex",
     },
     {
       stepLabel: "Шаг 5",
-      title: "Верните отчёт Codex в ChatGPT",
+      title: "Вставьте промпт в Codex",
       image: "/static/course-assets/lesson-8/lesson-8-step-05-return-codex-report.png",
-      alt: "Верните отчёт Codex в ChatGPT",
+      alt: "Вставьте промпт в Codex",
     },
     {
       stepLabel: "Шаг 6",
-      title: "Проверьте результат docs-update",
+      title: "Скопируйте отчёт Codex и вставьте его в ChatGPT",
       image: "/static/course-assets/lesson-8/lesson-8-step-06-check-docs-update-result.png",
-      alt: "Проверьте результат docs-update",
+      alt: "Скопируйте отчёт Codex и вставьте его в ChatGPT",
     },
     {
       stepLabel: "Шаг 7",
-      title: "Получите prompt для нового диалога",
+      title: "Вставьте prompt для нового диалога из шаблона урока",
       image: "/static/course-assets/lesson-8/lesson-8-step-07-get-new-dialogue-prompt.png",
-      alt: "Получите prompt для нового диалога",
+      alt: "Вставьте prompt для нового диалога из шаблона урока",
     },
     {
       stepLabel: "Шаг 8",
-      title: "Сохраните prompt нового диалога в prefix",
+      title: "Сохраните prompt нового диалога в prefix или на компьютер",
       image: "/static/course-assets/lesson-8/lesson-8-step-08-save-new-dialogue-prefix.png",
-      alt: "Сохраните prompt нового диалога в prefix",
+      alt: "Сохраните prompt нового диалога в prefix или на компьютер",
     },
     {
       stepLabel: "Шаг 9",
@@ -3629,9 +3625,9 @@ function renderLesson8PracticeCarousel() {
     },
     {
       stepLabel: "Шаг 10",
-      title: "Начните новый диалог с актуального prompt",
+      title: "Начните новый диалог с prompt’а для начала диалога",
       image: "/static/course-assets/lesson-8/lesson-8-step-10-start-new-dialogue.png",
-      alt: "Начните новый диалог с актуального prompt",
+      alt: "Начните новый диалог с prompt’а для начала диалога",
     },
     {
       stepLabel: "Шаг 11",

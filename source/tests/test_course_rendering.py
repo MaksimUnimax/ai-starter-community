@@ -1095,7 +1095,14 @@ def test_lesson8_docs_workflow_prompt_and_carousel_are_rendered(client, test_set
     assert 'markdown: "# Prompt для обновления документов проекта' in lesson8_section
     assert "Project-specific docs-update prompt" in lesson8_section
     assert "Codex docs-only update prompt" in lesson8_section
-    assert "Prompt для нового диалога" in lesson8_section
+    assert "Получите prompt обновления документов проекта и промпт для кодекса" in rendered_lesson8_html
+    assert "Скопируйте промпт для Codex" in rendered_lesson8_html
+    assert "Вставьте промпт в Codex" in rendered_lesson8_html
+    assert "Скопируйте отчёт Codex и вставьте его в ChatGPT" in rendered_lesson8_html
+    assert "Вставьте prompt для нового диалога из шаблона урока" in rendered_lesson8_html
+    assert "Сохраните prompt нового диалога в prefix или на компьютер" in rendered_lesson8_html
+    assert "Начните новый диалог с prompt’а для начала диалога" in rendered_lesson8_html
+    assert "Убедитесь, что ChatGPT продолжает работу с того места, где закрыли прошлый диалог" in rendered_lesson8_html
     assert "docs-update-new-dialog" in rendered_lesson8_html
     assert rendered_lesson8_html.count("data-practice-carousel-slide=") == 11
     assert rendered_lesson8_html.count("data-practice-carousel-step=") == 11
@@ -1105,6 +1112,13 @@ def test_lesson8_docs_workflow_prompt_and_carousel_are_rendered(client, test_set
     assert "lesson-8-step-10-start-new-dialogue.png" in rendered_lesson8_html
     assert "lesson-8-step-11-continue-from-stop-point.png" in rendered_lesson8_html
     assert "Пошаговая визуальная инструкция к практическому занятию." in rendered_lesson8_html
+    for forbidden in [
+        "Получите задачу для Codex",
+        "Верните отчёт Codex в ChatGPT",
+        "Проверьте результат docs-update",
+        "Начните новый диалог с актуального prompt",
+    ]:
+        assert forbidden not in rendered_lesson8_html
 
 
 def test_quiz_answer_indices_are_shuffled_across_lessons():
