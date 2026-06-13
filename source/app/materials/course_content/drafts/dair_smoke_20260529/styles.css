@@ -925,9 +925,23 @@ button:hover,
 }
 
 .practice-carousel-stage {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
   width: 100%;
   max-width: 1100px;
   margin: 0 auto;
+}
+
+.practice-carousel-stage-viewport {
+  min-width: 0;
+}
+
+.practice-carousel-stage > .practice-carousel-nav {
+  justify-self: center;
+  align-self: center;
+  min-width: 96px;
 }
 
 .practice-carousel-slide {
@@ -1406,22 +1420,28 @@ button:hover,
     align-items: stretch;
   }
 
-  .practice-carousel-controls {
+  .practice-carousel-stage {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .practice-carousel-stage-viewport {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  .practice-carousel-stage > .practice-carousel-nav[data-practice-carousel-prev] {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .practice-carousel-stage > .practice-carousel-nav[data-practice-carousel-next] {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .practice-carousel-stage > .practice-carousel-nav {
     width: 100%;
-    justify-content: flex-start;
-  }
-
-  .practice-carousel-controls .practice-carousel-nav {
-    flex: 1 1 140px;
-  }
-
-  .practice-carousel-nav {
-    flex: 1 1 0;
     min-width: 0;
-  }
-
-  .practice-carousel-step {
-    flex: 1 1 120px;
   }
 
   .practice-carousel-window {

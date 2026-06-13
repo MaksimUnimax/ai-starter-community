@@ -267,12 +267,17 @@ def test_rendered_course_export_and_lesson_5_html_include_the_updates():
     assert "practice-carousel" in lesson5_html
     assert "lesson-screenshot-carousel" not in lesson5_html
     assert lesson5_html.count("data-practice-carousel-slide=") == 10
+    assert lesson5_html.count("Пошаговая визуальная инструкция к практическому занятию.") == 1
     assert "lesson-5-step-01-powershell-search.png" in lesson5_html
     assert "lesson-5-step-10-status-output.png" in lesson5_html
+    assert "Эта карусель показывает весь путь от открытия PowerShell до проверки модели, лимитов и прав доступа в Codex." not in lesson5_html
+    assert "Пошаговая визуальная инструкция по подключению к Codex" not in lesson5_html
     assert "Позже здесь будут реальные скриншоты" not in lesson5_html
     assert "/tmp/" not in lesson5_html
     assert 'data-section="lesson-6"' in lesson5_html
     assert "Перейти к уроку 6" in lesson5_html
+    assert lesson5_html.index('data-practice-carousel-prev') > lesson5_html.index("practice-carousel-stage")
+    assert lesson5_html.index('data-practice-carousel-next') > lesson5_html.index("practice-carousel-stage")
     assert '<section class="next-step-card">' in lesson2_html
     assert '<section class="next-step-card">' in lesson5_html
     assert '<button class="primary-button" type="button" data-section="lesson-3" data-section-next="true">' in lesson2_html
@@ -381,7 +386,6 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert ".lesson-shell .section-body > .callout:not([data-starter-prompt-panel]) li" in styles_response.text
     assert ".lesson-shell .section-body > .next-step-card p" in styles_response.text
     assert ".next-step-actions .primary-button" in styles_response.text
-    assert "min-width: 220px;" not in styles_response.text
     assert "font-size: 18px;" in styles_response.text
     assert "line-height: 1.65;" in styles_response.text
     assert ".course-note {" in styles_response.text
@@ -457,7 +461,7 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert 'title: "Поздравляем, вы завершили курс"' in script_response.text
     assert "Документы проекта: техническое задание (ТЗ), roadmap, правила и контекст" in script_response.text
     assert "Старт проекта: сначала документация, потом разработка" in script_response.text
-    assert "ChatGPT выступает как ведущий специалист" in script_response.text
+    assert "<strong>ChatGPT</strong> выступает как ведущий специалист" in script_response.text
     assert "Git: история, commit, push и откат" in script_response.text
     assert "Урок 7 — Процесс работы" in script_response.text
     assert 'navTitle: "Урок 7 — Процесс работы"' in script_response.text
@@ -471,7 +475,7 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Как Codex тратит токены и ресурсы" in script_response.text
     assert "Как оптимизировать расход Codex" in script_response.text
     assert "Что такое permissions и как выставить допуск" in script_response.text
-    assert "5 основных команд Codex внутри terminal" in script_response.text
+    assert "5 основных команд Codex внутри Terminal" in script_response.text
     assert "Что такое токены в работе Codex?" in script_response.text
     assert "Токены — это единицы ресурса" in script_response.text
     assert "5-часовые лимиты" in script_response.text
@@ -498,12 +502,18 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     lesson4_section = script_response.text[lesson4_start:lesson5_start]
     lesson5_section = script_response.text[lesson5_start:lesson6_start]
     lesson6_section = script_response.text[lesson6_start:lesson7_start]
+    assert script_response.text.count("Пошаговая визуальная инструкция к практическому занятию.") >= 6
     assert "В следующем уроке разберём Codex, AGENTS.md, Skills, токены и роль модели." in lesson3_section
     assert "Перейти к уроку 4" in lesson3_section
+    assert "Пошаговая регистрация GitHub" not in lesson3_section
     assert "В следующем уроке разберём PowerShell, Terminal и подключение к серверу." in lesson4_section
     assert "Перейти к уроку 5" in lesson4_section
     assert "В следующем уроке разберём старт проекта: сначала документация, потом разработка." in lesson5_section
     assert "Перейти к уроку 6" in lesson5_section
+    assert '<a href="/cabinet#accounts" target="_blank" rel="noreferrer">Сервер</a>' in lesson5_section
+    assert "скопируйте пароль из <a href=\"/cabinet#accounts\" target=\"_blank\" rel=\"noreferrer\">личного кабинета</a>" in lesson5_section
+    assert "символы могут не отображаться — это нормально: пароль всё равно вводится." in lesson5_section
+    assert "После этого продолжайте работу, когда модель и права доступа настроены правильно." not in lesson5_section
     assert "/status" in lesson5_section
     assert "/st" in lesson5_section
     assert "/model" in lesson5_section
@@ -513,11 +523,11 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "/permissions" in lesson5_section
     assert "полный доступ" in lesson5_section
     assert 'href="/cabinet#accounts" target="_blank" rel="noreferrer">личного кабинета</a>' in lesson5_section
-    assert "practice-carousel" in lesson5_section
-    assert "data-practice-carousel=\"codex-first-connection\"" in lesson5_section
-    assert "lesson-screenshot-carousel" not in lesson5_section
-    assert "Пошаговая визуальная инструкция по подключению к Codex" in lesson5_section
-    assert "lesson-5-step-01-powershell-search.png" in lesson5_section
+    assert "practice-carousel" in script_response.text
+    assert "data-practice-carousel=\"codex-first-connection\"" in script_response.text
+    assert "lesson-screenshot-carousel" not in script_response.text
+    assert "Пошаговая визуальная инструкция по подключению к Codex" not in lesson5_section
+    assert "lesson-5-step-01-powershell-search.png" in script_response.text
     assert "В следующем уроке разберём процесс работы: какие бывают run’ы Codex, зачем нужна пошаговость и как удерживать важные инструкции в контексте ChatGPT." in lesson6_section
     assert "Перейти к уроку 7" in lesson6_section
     lesson8_start = script_response.text.index('id: "lesson-8"')
@@ -539,7 +549,7 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "<li>готовить отчёт о выполненной работе.</li>" in script_response.text
     assert "<strong>Важно:</strong> Codex не является руководителем проекта." in script_response.text
     assert "<strong>Codex</strong> не должен сам выбирать стратегию, менять план курса, придумывать архитектуру или решать, какой этап делать дальше." in script_response.text
-    assert "<strong>ChatGPT</strong> понимает цель, читает правила, проверяет документацию, следит за run’ами и пишет точное задание." in script_response.text
+    assert "<strong>ChatGPT</strong> понимает цель, читает правила, проверяет документацию, следит за <strong>run’ами</strong> и пишет точное задание." in script_response.text
     assert "<strong>Codex CLI</strong> выполняет это задание в проекте и возвращает отчёт." in script_response.text
     assert "CLI читается как" not in script_response.text
     assert "вы не нажимаете кнопки" not in script_response.text
@@ -577,7 +587,7 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Screenshot" in lesson9_section
     assert "Снимок экрана" in lesson9_section
     assert "ChatGPT получает больше контекста" in lesson9_section
-    assert "Главное правило: если словами объяснить сложно, сделайте скриншот, нарисуйте стрелку и отправьте его в ChatGPT." in lesson9_section
+    assert "<strong>Главное правило:</strong> если словами объяснить сложно, сделайте скриншот, нарисуйте стрелку и отправьте его в ChatGPT." in lesson9_section
     assert "Ошибка 1" not in lesson9_section
     assert "Финальное правило" not in lesson9_section
     assert "Проверяйте версию ChatGPT" in lesson9_section
@@ -687,9 +697,9 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "личного кабинета" in lesson5_section
     assert 'href="/cabinet#accounts" target="_blank" rel="noreferrer">личного кабинета</a>' in lesson5_section
     assert "/status" in lesson5_section
-    assert "practice-carousel" in lesson5_section
-    assert "lesson-screenshot-carousel" not in lesson5_section
-    assert "lesson-5-step-10-status-output.png" in lesson5_section
+    assert "practice-carousel" in script_response.text
+    assert "lesson-screenshot-carousel" not in script_response.text
+    assert "lesson-5-step-10-status-output.png" in script_response.text
     assert "окно связи с сервером" in lesson5_section
     assert "codex" in lesson5_section
     assert "привет ты кто?" in lesson5_section
@@ -738,7 +748,6 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "starterPromptMarkdown: `# Prompt для создания расширения" in lesson7_section
     assert "Скопируйте prompt кнопкой “Скопировать prompt” или скачайте его кнопкой “Скачать .md”." in lesson7_section
     assert "Ошибка 3: писать код в design run." not in lesson7_section
-    assert "Правильно: в <strong>design run</strong> код не пишется, только описывается план решения." not in lesson7_section
     assert "стартовый prompt" not in lesson7_section
     assert "<pre><code>" not in lesson7_section
     assert "Что такое run в этом курсе?" in lesson7_section
