@@ -904,20 +904,20 @@ button:hover,
 
 .practice-carousel-nav {
   pointer-events: auto;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;
   width: clamp(42px, 4.8vw, 56px);
   height: clamp(42px, 4.8vw, 56px);
   padding: 0;
   border: 1px solid rgba(244, 247, 251, 0.34);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.08);
-  color: #f4f7fb;
+  color: var(--accent);
   box-shadow: 0 12px 24px rgba(10, 16, 23, 0.14);
   backdrop-filter: blur(10px);
-  font-size: clamp(1.45rem, 2vw, 1.8rem);
-  line-height: 1;
+  font-size: 0;
+  line-height: 0;
+  box-sizing: border-box;
 }
 
 .practice-carousel-nav:hover {
@@ -929,10 +929,16 @@ button:hover,
   outline-offset: 2px;
 }
 
-.practice-carousel-nav span {
-  display: inline-block;
-  transform: none;
-  line-height: 1;
+.practice-carousel-arrow-icon {
+  display: block;
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
 }
 
 .practice-carousel-stepbar {
@@ -1494,7 +1500,11 @@ button:hover,
   .practice-carousel-nav {
     width: clamp(40px, 11vw, 48px);
     height: clamp(40px, 11vw, 48px);
-    font-size: 1.45rem;
+  }
+
+  .practice-carousel-arrow-icon {
+    width: 20px;
+    height: 20px;
   }
 
   .practice-carousel-stage {

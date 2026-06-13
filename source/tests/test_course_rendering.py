@@ -254,7 +254,8 @@ def test_rendered_course_export_and_lesson_5_html_include_the_updates():
     assert ".practice-carousel-stage-viewport {\n  position: relative;\n  min-width: 0;\n  width: 100%;\n  height: 100%;\n  overflow: hidden;" in styles_css
     assert ".practice-carousel-slide {\n  position: absolute;\n  inset: 0;\n  display: block;\n  opacity: 0;\n  transform: translateY(8px) scale(0.995);\n  transition: opacity 240ms ease, transform 240ms ease;" in styles_css
     assert ".practice-carousel-image-frame img {\n  display: block;\n  width: 100%;\n  height: 100%;\n  max-width: 100%;\n  max-height: 100%;\n  object-fit: contain;" in styles_css
-    assert ".practice-carousel-nav {\n  pointer-events: auto;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  width: clamp(42px, 4.8vw, 56px);" in styles_css
+    assert ".practice-carousel-nav {\n  pointer-events: auto;\n  display: grid;\n  place-items: center;\n  width: clamp(42px, 4.8vw, 56px);" in styles_css
+    assert ".practice-carousel-arrow-icon {\n  display: block;\n  width: 22px;\n  height: 22px;\n  fill: none;\n  stroke: currentColor;\n  stroke-width: 2.6;" in styles_css
     assert "@media (prefers-reduced-motion: reduce)" in styles_css
     assert len(exported_asset_names) == 10
     assert exported_asset_names == [f"assets/static/course-assets/lesson-5/{name}" for name in expected_asset_names]
@@ -288,8 +289,11 @@ def test_rendered_course_export_and_lesson_5_html_include_the_updates():
     assert "practice-carousel-controls" in lesson5_html
     assert "Назад" not in lesson5_html
     assert "Дальше" not in lesson5_html
-    assert "‹" in lesson5_html
-    assert "›" in lesson5_html
+    assert "‹" not in lesson5_html
+    assert "›" not in lesson5_html
+    assert '<svg class="practice-carousel-arrow-icon"' in lesson5_html
+    assert '<path d="M15 6 9 12l6 6"></path>' in lesson5_html
+    assert '<path d="M9 6 15 12 9 18"></path>' in lesson5_html
     assert lesson5_html.count('data-practice-carousel-prev') == 1
     assert lesson5_html.count('data-practice-carousel-next') == 1
     assert "/tmp/" not in lesson5_html

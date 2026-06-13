@@ -3671,10 +3671,14 @@ function renderPracticeCarousel({ carouselKey, note, slides }) {
         </div>
         <div class="practice-carousel-controls">
           <button class="practice-carousel-nav practice-carousel-nav-prev" type="button" data-practice-carousel-prev aria-label="Предыдущий шаг">
-            <span aria-hidden="true">‹</span>
+            <svg class="practice-carousel-arrow-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M15 6 9 12l6 6"></path>
+            </svg>
           </button>
           <button class="practice-carousel-nav practice-carousel-nav-next" type="button" data-practice-carousel-next aria-label="Следующий шаг">
-            <span aria-hidden="true">›</span>
+            <svg class="practice-carousel-arrow-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M9 6 15 12 9 18"></path>
+            </svg>
           </button>
         </div>
       </div>
