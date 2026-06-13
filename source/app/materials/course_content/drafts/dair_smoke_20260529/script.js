@@ -1751,21 +1751,21 @@ const courseData = {
             <li>Скопируйте новый стартовый prompt в новый чат ChatGPT.</li>
             <li>Опишите идею проекта простыми словами.</li>
             <li>Дождитесь, пока ChatGPT сделает разведку идеи, подготовит ТЗ и объяснит следующий безопасный шаг.</li>
-            <li>Если ТЗ подходит, напишите: <strong>ТЗ утверждаю</strong>.</li>
-            <li>Создайте в GitHub новый пустой repo: <strong>Public</strong>, без <strong>README</strong>, без <strong>.gitignore</strong>, без <strong>License</strong>.</li>
-            <li>Скопируйте URL repo из Quick setup и отправьте его обратно в ChatGPT.</li>
-            <li>Получите отдельный prompt для Codex на проверку repo и подготовку deploy key flow.</li>
-            <li>Вставьте prompt в Codex и дождитесь его отчёта: Codex сам проверит repo, а вам не нужно вручную смотреть branch, remote или commits.</li>
-            <li>Скопируйте отчёт Codex и вставьте его в ChatGPT. ChatGPT сам проверит состояние repo и даст следующий безопасный шаг.</li>
+            <li>Если ТЗ подходит, напишите: <strong>ТЗ утверждаю</strong>. Если нет — напишите уточнения либо задайте вопросы ChatGPT.</li>
+            <li>Создайте в GitHub пустой репозиторий по инструкции ChatGPT.</li>
+            <li>Скопируйте ссылку на репозиторий из Quick setup и отправьте её обратно в ChatGPT.</li>
+            <li>Получите отдельный prompt для Codex на проверку репозитория и подготовку deploy key flow.</li>
+            <li>Вставьте prompt в Codex и дождитесь его отчёта: Codex сам проверит репозиторий, а ChatGPT по его отчёту даст следующий безопасный шаг.</li>
+            <li>Скопируйте отчёт Codex и вставьте его в ChatGPT. ChatGPT сам проверит состояние репозитория и даст следующий безопасный шаг.</li>
             <li>В GitHub откройте <strong>Settings → Deploy keys</strong>, добавьте <strong>public deploy key</strong> и включите <strong>Allow write access</strong>.</li>
-            <li>Когда deploy key добавлен, отправьте в Codex следующий prompt для создания рабочих Markdown-файлов.</li>
+            <li>Когда deploy key добавлен, ChatGPT даст prompt — отправьте его в Codex.</li>
             <li>Скопируйте итоговый отчёт Codex и вставьте его в ChatGPT. ChatGPT проверит commit, список файлов и отсутствие лишнего.</li>
-            <li>Проверьте GitHub только по видимому результату: в repo появились ровно шесть Markdown-документов и нет <code>next_steps.md</code>.</li>
+            <li>Проверьте GitHub только по видимому результату: в репозитории появились ровно шесть Markdown-документов и нет <code>next_steps.md</code>.</li>
           </ol>
           <p><strong>Важно</strong></p>
           <ul>
             <li>Не отправляйте в ChatGPT приватный key, токены, пароли, .env или auth-файлы.</li>
-            <li>Codex не должен использовать GitHub integration для этого шага.</li>
+            <li>Все эти инструкции ChatGPT также будет давать в чате пошагово, поэтому не обязательно брать их отсюда.</li>
             <li>В этом уроке создаются только Markdown-файлы, а не код приложения.</li>
             <li>Private key никогда не выводится в чат и не копируется в GitHub.</li>
           </ul>
@@ -1774,13 +1774,13 @@ const courseData = {
             <li>Вы открыли или скачали новый стартовый prompt.</li>
             <li>ChatGPT получил идею проекта и подготовил ТЗ.</li>
             <li>Вы подтвердили ТЗ словами “ТЗ утверждаю”.</li>
-            <li>Пустой GitHub repo создан и URL скопирован.</li>
-            <li>Codex проверил repo и вы скопировали его отчёт в ChatGPT.</li>
-            <li>ChatGPT проверил состояние repo по отчёту Codex и дал следующий безопасный шаг.</li>
+            <li>Пустой GitHub репозиторий создан и ссылка скопирована.</li>
+            <li>Codex проверил репозиторий, и вы скопировали его отчёт в ChatGPT.</li>
+            <li>ChatGPT проверил состояние репозитория по отчёту Codex и дал следующий безопасный шаг.</li>
             <li>В GitHub добавлен public deploy key с <strong>Allow write access</strong>.</li>
             <li>Codex создал и запушил шесть Markdown-документов: <code>technical_spec.md</code>, <code>roadmap.md</code>, <code>rules.md</code>, <code>current_status.md</code>, <code>module_map.md</code>, <code>start_prompt_for_next_chat.md</code>.</li>
             <li>Вы скопировали итоговый отчёт Codex в ChatGPT, и ChatGPT проверил commit, список файлов и отсутствие лишнего.</li>
-            <li>В repo есть только техническая документация, без <code>next_steps.md</code> и без кода приложения.</li>
+            <li>В репозитории есть только техническая документация, без <code>next_steps.md</code> и без кода приложения.</li>
           </ul>
           ${renderProjectStartCarousel()}
         </section>
@@ -4190,27 +4190,27 @@ function renderProjectStartCarousel() {
     },
     {
       stepLabel: "Шаг 5",
-      title: "Утвердите ТЗ и подготовьте документы",
+      title: "Утвердите ТЗ",
       image: "/static/course-assets/lesson-6/lesson-6-step-05-approve-tz-documents.png",
-      alt: "Утвердите ТЗ и подготовьте документы",
+      alt: "Утвердите ТЗ",
     },
     {
       stepLabel: "Шаг 6",
-      title: "Откройте создание нового repo",
+      title: "Откройте создание нового репозитория в GitHub",
       image: "/static/course-assets/lesson-6/lesson-6-step-06-github-new-repository-menu.png",
-      alt: "Откройте создание нового repo",
+      alt: "Откройте создание нового репозитория в GitHub",
     },
     {
       stepLabel: "Шаг 7",
-      title: "Создайте пустой GitHub repo",
+      title: "Создайте пустой репозиторий GitHub",
       image: "/static/course-assets/lesson-6/lesson-6-step-07-create-empty-repo.png",
-      alt: "Создайте пустой GitHub repo",
+      alt: "Создайте пустой репозиторий GitHub",
     },
     {
       stepLabel: "Шаг 8",
-      title: "Скопируйте ссылку repo",
+      title: "Скопируйте ссылку и вставьте в ChatGPT",
       image: "/static/course-assets/lesson-6/lesson-6-step-08-copy-repo-url.png",
-      alt: "Скопируйте ссылку repo",
+      alt: "Скопируйте ссылку и вставьте в ChatGPT",
     },
     {
       stepLabel: "Шаг 9",
@@ -4226,9 +4226,9 @@ function renderProjectStartCarousel() {
     },
     {
       stepLabel: "Шаг 11",
-      title: "Проверьте repo через Codex",
+      title: "Скопируйте отчёт Codex и вставьте его в ChatGPT",
       image: "/static/course-assets/lesson-6/lesson-6-step-11-codex-repo-check.png",
-      alt: "Проверьте repo через Codex",
+      alt: "Скопируйте отчёт Codex и вставьте его в ChatGPT",
     },
     {
       stepLabel: "Шаг 12",

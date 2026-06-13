@@ -850,21 +850,25 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "не используйте чужой аккаунт" not in lesson3_task_section
     lesson6_prompt_start = lesson6_section.index('label: "Готовый prompt"')
     lesson6_practice_start = lesson6_section.index("afterStarterPromptHtml")
+    lesson6_practice_end = lesson6_section.index("contentHtml: ``", lesson6_practice_start)
+    lesson6_practice_block = lesson6_section[lesson6_practice_start:lesson6_practice_end]
     assert lesson6_prompt_start < lesson6_practice_start
     assert 'starterPromptFilename: "updated_start_project_prompt_deploy_key.md"' in script_response.text
     assert "Запустить проект через ChatGPT, GitHub и Codex" in lesson6_section
     assert "Скопируйте новый стартовый prompt в новый чат ChatGPT." in lesson6_section
-    assert "Если ТЗ подходит, напишите: <strong>ТЗ утверждаю</strong>." in lesson6_section
-    assert "Создайте в GitHub новый пустой repo: <strong>Public</strong>, без <strong>README</strong>, без <strong>.gitignore</strong>, без <strong>License</strong>." in lesson6_section
-    assert "Получите отдельный prompt для Codex на проверку repo и подготовку deploy key flow." in lesson6_section
-    assert "Вставьте prompt в Codex и дождитесь его отчёта: Codex сам проверит repo, а вам не нужно вручную смотреть branch, remote или commits." in lesson6_section
-    assert "Скопируйте отчёт Codex и вставьте его в ChatGPT. ChatGPT сам проверит состояние repo и даст следующий безопасный шаг." in lesson6_section
+    assert "Если ТЗ подходит, напишите: <strong>ТЗ утверждаю</strong>. Если нет — напишите уточнения либо задайте вопросы ChatGPT." in lesson6_practice_block
+    assert "Создайте в GitHub пустой репозиторий по инструкции ChatGPT." in lesson6_practice_block
+    assert "Скопируйте ссылку на репозиторий из Quick setup и отправьте её обратно в ChatGPT." in lesson6_practice_block
+    assert "Получите отдельный prompt для Codex на проверку репозитория и подготовку deploy key flow." in lesson6_practice_block
+    assert "Вставьте prompt в Codex и дождитесь его отчёта: Codex сам проверит репозиторий, а ChatGPT по его отчёту даст следующий безопасный шаг." in lesson6_practice_block
+    assert "Скопируйте отчёт Codex и вставьте его в ChatGPT. ChatGPT сам проверит состояние репозитория и даст следующий безопасный шаг." in lesson6_practice_block
     assert "В GitHub откройте <strong>Settings → Deploy keys</strong>, добавьте <strong>public deploy key</strong> и включите <strong>Allow write access</strong>." in lesson6_section
     assert "Не отправляйте в ChatGPT приватный key, токены, пароли, .env или auth-файлы." in lesson6_section
-    assert "Codex не должен использовать GitHub integration для этого шага." in lesson6_section
-    assert "Когда deploy key добавлен, отправьте в Codex следующий prompt для создания рабочих Markdown-файлов." in lesson6_section
+    assert "Все эти инструкции ChatGPT также будет давать в чате пошагово, поэтому не обязательно брать их отсюда." in lesson6_practice_block
+    assert "GitHub integration" not in lesson6_practice_block
+    assert "Когда deploy key добавлен, ChatGPT даст prompt — отправьте его в Codex." in lesson6_practice_block
     assert "Скопируйте итоговый отчёт Codex и вставьте его в ChatGPT. ChatGPT проверит commit, список файлов и отсутствие лишнего." in lesson6_section
-    assert "В repo есть только техническая документация, без <code>next_steps.md</code> и без кода приложения." in lesson6_section
+    assert "В репозитории есть только техническая документация, без <code>next_steps.md</code> и без кода приложения." in lesson6_practice_block
     assert "Что должно получиться" in lesson6_section
     assert "Codex создал и запушил шесть Markdown-документов:" in lesson6_section
     assert "technical_spec.md" in lesson6_section
@@ -883,11 +887,10 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "ТЗ утверждаю" in lesson6_section
     assert "Allow write access" in lesson6_section
     assert "deploy key" in lesson6_section
-    assert "GitHub integration" in lesson6_section
     assert "next_steps.md" in lesson6_section
     assert "prompt просто вставлен в чат" not in lesson6_section
-    assert "Codex должен использовать GitHub integration для этого шага." in lesson6_section
-    assert "В repo появились ровно шесть Markdown-документов" in lesson6_section
+    assert "Codex не должен использовать GitHub integration для этого шага." not in lesson6_practice_block
+    assert "В репозитории появились ровно шесть Markdown-документов" in lesson6_practice_block
     assert "Пошаговая визуальная инструкция к практическому занятию." in lesson6_section
     assert "practice-carousel" in lesson6_section
     assert 'data-practice-carousel="start-project-deploy-key"' in lesson6_section
@@ -961,18 +964,20 @@ def test_lesson6_start_project_deploy_key_flow_is_rendered(client, test_settings
 
     lesson6_section = _lesson_section(script_response.text, "lesson-6", "lesson-7")
     rendered_lesson6_html = _render_section_html_via_node("lesson-6")
+    lesson6_practice_start = lesson6_section.index("afterStarterPromptHtml")
+    lesson6_practice_end = lesson6_section.index("contentHtml: ``", lesson6_practice_start)
+    lesson6_practice_block = lesson6_section[lesson6_practice_start:lesson6_practice_end]
 
     assert 'starterPromptFilename: "updated_start_project_prompt_deploy_key.md"' in script_response.text
     assert "Запустить проект через ChatGPT, GitHub и Codex" in lesson6_section
     assert "Смотреть prompt" in lesson6_section
     assert "Скопировать prompt" in lesson6_section
     assert "Скачать .md" in lesson6_section
-    assert "ТЗ утверждаю" in lesson6_section
+    assert "ТЗ утверждаю" in lesson6_practice_block
     assert "Settings → Deploy keys" in lesson6_section
     assert "public deploy key" in lesson6_section
     assert "Allow write access" in lesson6_section
     assert "private key" in lesson6_section
-    assert "GitHub integration" in lesson6_section
     assert "next_steps.md" in lesson6_section
     assert "Что должно получиться" in lesson6_section
     assert "technical_spec.md" in lesson6_section
@@ -981,6 +986,16 @@ def test_lesson6_start_project_deploy_key_flow_is_rendered(client, test_settings
     assert "current_status.md" in lesson6_section
     assert "module_map.md" in lesson6_section
     assert "start_prompt_for_next_chat.md" in lesson6_section
+    assert "Если ТЗ подходит, напишите: <strong>ТЗ утверждаю</strong>. Если нет — напишите уточнения либо задайте вопросы ChatGPT." in lesson6_practice_block
+    assert "Создайте в GitHub пустой репозиторий по инструкции ChatGPT." in lesson6_practice_block
+    assert "Скопируйте ссылку на репозиторий из Quick setup и отправьте её обратно в ChatGPT." in lesson6_practice_block
+    assert "Получите отдельный prompt для Codex на проверку репозитория и подготовку deploy key flow." in lesson6_practice_block
+    assert "Вставьте prompt в Codex и дождитесь его отчёта: Codex сам проверит репозиторий, а ChatGPT по его отчёту даст следующий безопасный шаг." in lesson6_practice_block
+    assert "Скопируйте отчёт Codex и вставьте его в ChatGPT. ChatGPT сам проверит состояние репозитория и даст следующий безопасный шаг." in lesson6_practice_block
+    assert "Все эти инструкции ChatGPT также будет давать в чате пошагово, поэтому не обязательно брать их отсюда." in lesson6_practice_block
+    assert "Когда deploy key добавлен, ChatGPT даст prompt — отправьте его в Codex." in lesson6_practice_block
+    assert "В репозитории есть только техническая документация, без <code>next_steps.md</code> и без кода приложения." in lesson6_practice_block
+    assert "Скопируйте итоговый отчёт Codex и вставьте его в ChatGPT. ChatGPT проверит commit, список файлов и отсутствие лишнего." in lesson6_practice_block
     assert "practice-carousel" in rendered_lesson6_html
     assert 'data-practice-carousel="start-project-deploy-key"' in rendered_lesson6_html
     assert rendered_lesson6_html.count("data-practice-carousel-slide=") == 17
@@ -1005,6 +1020,10 @@ def test_lesson6_start_project_deploy_key_flow_is_rendered(client, test_settings
         "lesson-6-step-17-final-documents-repo.png",
     ]:
         assert filename in rendered_lesson6_html
+    assert "Утвердите ТЗ" in rendered_lesson6_html
+    assert "Откройте создание нового репозитория в GitHub" in rendered_lesson6_html
+    assert "Скопируйте ссылку и вставьте в ChatGPT" in rendered_lesson6_html
+    assert "Скопируйте отчёт Codex и вставьте его в ChatGPT" in rendered_lesson6_html
     assert "practice-carousel-placeholder-frame" not in rendered_lesson6_html
     assert "lesson-screenshot-carousel" not in rendered_lesson6_html
 
