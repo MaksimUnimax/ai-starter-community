@@ -687,7 +687,10 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "<strong>Prompt для нового диалога</strong>" in lesson8_section
     assert 'project_docs_update_prompt.md' in lesson8_section
     assert 'new_project_dialogue_prompt.md' in lesson8_section
-    assert 'markdown: "# Project-specific prompt' in lesson8_section
+    assert 'markdown: "# Prompt для обновления документов проекта' in lesson8_section
+    assert "Потом подготовь **два отдельных prompt-блока для копирования кликом**" in lesson8_section
+    assert "Project-specific docs-update prompt" in lesson8_section
+    assert "Codex docs-only update prompt" in lesson8_section
     assert "Prompt для нового диалога" in lesson8_section
     assert lesson8_section.count("promptForm: {") == 2
     assert "Что я передам ниже" not in lesson8_section
@@ -695,16 +698,17 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Материалы текущего этапа" not in lesson8_section
     assert "ВСТАВЬТЕ СЮДА ОТЧЁТ" not in lesson8_section
     assert "СКРИНШОТ, РЕШЕНИЕ ИЛИ ОПИСАНИЕ" not in lesson8_section
-    assert "AstroDaily Bot" in lesson8_section
+    assert "Prompt для обновления документов проекта" in lesson8_section
     assert "DOC_READ_PROOF" in lesson8_section
     assert "CORPUS_MATCH_CHECK" in lesson8_section
     assert "CHRONOLOGY_CHECK" in lesson8_section
-    assert "prompts ниже — это шаблоны" in lesson8_section
-    assert "В реальной работе <strong>ChatGPT</strong> должен заполнить проектные данные сам" in lesson8_section
-    assert "готовые <strong>prefix-блоки</strong>" in lesson8_section
+    assert "показанные ниже <strong>prompts</strong> — это универсальные шаблоны" in lesson8_section
+    assert "проектный <strong>prompt</strong>" in lesson8_section
+    assert "либо файлом, либо в <strong>prefix-расширение</strong>" in lesson8_section
     assert "ChatGPT</strong> сверяет <strong>current_status.md</strong>" in lesson8_section
     assert "в документы не попали <strong>.env</strong>, <strong>токены</strong>, <strong>пароли</strong>, <strong>private key</strong> и <strong>auth-файлы</strong>" in lesson8_section
-    assert "не создан <strong>next_steps.md</strong>" in lesson8_section
+    assert "Сделай prompt под наш проект из этого шаблона" in lesson8_section
+    assert "prefix-расширение</strong> или файлом на компьютер" in lesson8_section
     assert "Обновить документы и начать новый диалог" in lesson8_section
     assert "Главное" in lesson8_section
     for forbidden in [
@@ -1082,21 +1086,24 @@ def test_lesson8_docs_workflow_prompt_and_carousel_are_rendered(client, test_set
     lesson8_section = _lesson_section(script_response.text, "lesson-8", "lesson-9")
     rendered_lesson8_html = _render_section_html_via_node("lesson-8")
 
-    assert "AstroDaily Bot" in lesson8_section
+    assert "Prompt для обновления документов проекта" in lesson8_section
     assert "DOC_READ_PROOF" in lesson8_section
     assert "CORPUS_MATCH_CHECK" in lesson8_section
     assert "CHRONOLOGY_CHECK" in lesson8_section
     assert 'filename: "project_docs_update_prompt.md"' in lesson8_section
     assert 'filename: "new_project_dialogue_prompt.md"' in lesson8_section
-    assert 'markdown: "# Project-specific prompt' in lesson8_section
+    assert 'markdown: "# Prompt для обновления документов проекта' in lesson8_section
+    assert "Project-specific docs-update prompt" in lesson8_section
+    assert "Codex docs-only update prompt" in lesson8_section
     assert "Prompt для нового диалога" in lesson8_section
     assert "docs-update-new-dialog" in rendered_lesson8_html
-    assert rendered_lesson8_html.count("data-practice-carousel-slide=") == 10
-    assert rendered_lesson8_html.count("data-practice-carousel-step=") == 10
+    assert rendered_lesson8_html.count("data-practice-carousel-slide=") == 11
+    assert rendered_lesson8_html.count("data-practice-carousel-step=") == 11
     assert "practice-carousel-placeholder-frame" not in rendered_lesson8_html
     assert "lesson-screenshot-carousel" not in rendered_lesson8_html
     assert "lesson-8-step-01-run-docs-update-prompt.png" in rendered_lesson8_html
     assert "lesson-8-step-10-start-new-dialogue.png" in rendered_lesson8_html
+    assert "lesson-8-step-11-continue-from-stop-point.png" in rendered_lesson8_html
     assert "Пошаговая визуальная инструкция к практическому занятию." in rendered_lesson8_html
 
 
