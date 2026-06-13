@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from app.core.config import Settings, get_settings
 from app.shared.db import get_connection, get_database_path, initialize_database
 from app.shared.utils import utc_now_iso
@@ -12,6 +14,9 @@ from app.notifications.smtp_adapter import (
     send_smtp_email,
     validate_smtp_settings,
 )
+
+if TYPE_CHECKING:
+    from app.account_blocks.schemas import AccountBlockActivationNotification
 
 
 class EmailModeError(RuntimeError):
@@ -203,3 +208,16 @@ def send_password_reset(
         "Если вы не запрашивали сброс, просто игнорируйте это письмо."
     )
     return _queue_email(recipient_email, subject, body_text, "password_reset", settings=settings)
+
+
+def send_account_block_activation_email(
+    notification: "AccountBlockActivationNotification",
+    settings: Settings | None = None,
+) -> int:
+    return _queue_email(
+        notification.recipient_email,
+        notification.subject,
+        notification.body_text,
+        notification.template_key,
+        settings=settings,
+    )

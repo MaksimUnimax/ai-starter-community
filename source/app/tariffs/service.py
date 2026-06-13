@@ -515,6 +515,22 @@ def update_tariff(
         return _tariff_from_row(updated)
 
 
+def get_homepage_tariff(settings: Settings | None = None) -> TariffPublic | None:
+    # The current schema no longer stores a homepage flag; keep startup working
+    # by exposing the first active tariff in the existing sort order.
+    with _connection(settings) as connection:
+        row = connection.execute(
+            """
+            SELECT *
+            FROM tariffs
+            WHERE status = 'active'
+            ORDER BY sort_order ASC, id ASC, code ASC
+            LIMIT 1
+            """
+        ).fetchone()
+        return _tariff_from_row(row) if row is not None else None
+
+
 def archive_tariff(code: str, settings: Settings | None = None) -> bool:
     normalized_code = _normalize_code(code)
     now_iso = utc_now_iso()
