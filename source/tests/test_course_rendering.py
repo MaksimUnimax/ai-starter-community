@@ -987,15 +987,16 @@ def test_lesson6_start_project_deploy_key_flow_is_rendered(client, test_settings
     assert "module_map.md" in lesson6_section
     assert "start_prompt_for_next_chat.md" in lesson6_section
     assert "Если ТЗ подходит, напишите: <strong>ТЗ утверждаю</strong>. Если нет — напишите уточнения либо задайте вопросы ChatGPT." in lesson6_practice_block
-    assert "Создайте в GitHub пустой репозиторий по инструкции ChatGPT." in lesson6_practice_block
-    assert "Скопируйте ссылку на репозиторий из Quick setup и отправьте её обратно в ChatGPT." in lesson6_practice_block
-    assert "Получите отдельный prompt для Codex на проверку репозитория и подготовку deploy key flow." in lesson6_practice_block
-    assert "Вставьте prompt в Codex и дождитесь его отчёта: Codex сам проверит репозиторий, а ChatGPT по его отчёту даст следующий безопасный шаг." in lesson6_practice_block
-    assert "Скопируйте отчёт Codex и вставьте его в ChatGPT. ChatGPT сам проверит состояние репозитория и даст следующий безопасный шаг." in lesson6_practice_block
-    assert "Все эти инструкции ChatGPT также будет давать в чате пошагово, поэтому не обязательно брать их отсюда." in lesson6_practice_block
-    assert "Когда deploy key добавлен, ChatGPT даст prompt — отправьте его в Codex." in lesson6_practice_block
-    assert "В репозитории есть только техническая документация, без <code>next_steps.md</code> и без кода приложения." in lesson6_practice_block
-    assert "Скопируйте итоговый отчёт Codex и вставьте его в ChatGPT. ChatGPT проверит commit, список файлов и отсутствие лишнего." in lesson6_practice_block
+    assert "<li><strong>В интерактивном режиме</strong> с <strong>ChatGPT</strong> этот процесс проходит проще:" in lesson6_section
+    assert "Создайте в <strong>GitHub</strong> пустой <strong>репозиторий</strong> по инструкции <strong>ChatGPT</strong>." in lesson6_practice_block
+    assert "Скопируйте ссылку на <strong>репозиторий</strong> из <strong>Quick setup</strong> и отправьте её обратно в <strong>ChatGPT</strong>." in lesson6_practice_block
+    assert "Получите отдельный <strong>prompt</strong> для <strong>Codex</strong> на проверку <strong>репозитория</strong> и подготовку <strong>deploy key</strong> flow." in lesson6_practice_block
+    assert "Вставьте <strong>prompt</strong> в <strong>Codex</strong> и дождитесь его отчёта: <strong>Codex</strong> сам проверит <strong>репозиторий</strong>, а <strong>ChatGPT</strong> по его отчёту даст следующий безопасный шаг." in lesson6_practice_block
+    assert "Скопируйте отчёт <strong>Codex</strong> и вставьте его в <strong>ChatGPT</strong>. <strong>ChatGPT</strong> сам проверит состояние <strong>репозитория</strong> и даст следующий безопасный шаг." in lesson6_practice_block
+    assert "Все эти инструкции <strong>ChatGPT</strong> также будет давать в чате пошагово, поэтому не обязательно брать их отсюда." in lesson6_practice_block
+    assert "Когда <strong>deploy key</strong> добавлен, <strong>ChatGPT</strong> даст <strong>prompt</strong> — отправьте его в <strong>Codex</strong>." in lesson6_practice_block
+    assert "В <strong>репозитории</strong> есть только техническая документация, без <strong>next_steps.md</strong> и без кода приложения." in lesson6_practice_block
+    assert "Скопируйте итоговый отчёт <strong>Codex</strong> и вставьте его в <strong>ChatGPT</strong>. <strong>ChatGPT</strong> проверит <strong>commit</strong>, список файлов и отсутствие лишнего." in lesson6_practice_block
     assert "practice-carousel" in rendered_lesson6_html
     assert 'data-practice-carousel="start-project-deploy-key"' in rendered_lesson6_html
     assert rendered_lesson6_html.count("data-practice-carousel-slide=") == 17
@@ -1026,6 +1027,44 @@ def test_lesson6_start_project_deploy_key_flow_is_rendered(client, test_settings
     assert "Скопируйте отчёт Codex и вставьте его в ChatGPT" in rendered_lesson6_html
     assert "practice-carousel-placeholder-frame" not in rendered_lesson6_html
     assert "lesson-screenshot-carousel" not in rendered_lesson6_html
+
+
+def test_lesson7_prefix_helper_extension_flow_is_rendered(client, test_settings):
+    _prepare_verified_user(client, test_settings, "lesson7-flow@example.com", "lesson7flowproof", grant_access=True)
+
+    page_response = client.get("/materials/drafts/dair-smoke-20260529/")
+    script_response = client.get("/materials/drafts/dair-smoke-20260529/script.js")
+
+    assert page_response.status_code == 200
+    assert script_response.status_code == 200
+
+    lesson7_section = _lesson_section(script_response.text, "lesson-7", "lesson-8")
+    rendered_lesson7_html = _render_section_html_via_node("lesson-7")
+
+    assert 'starterPromptFilename: "side_prompt_create_chatgpt_prefix_extension.md"' in script_response.text
+    assert "Prompt для создания ChatGPT Prefix Helper" in lesson7_section
+    assert "prefix-блоками" in lesson7_section
+    assert "Создать ChatGPT Prefix Helper" in lesson7_section
+    assert "В этой практике вы делаете не основной проект, а отдельный помощник-расширение" in lesson7_section
+    assert "Откройте страницу расширений в Chrome или Edge" in lesson7_section
+    assert "Добавлять prefix перед отправкой" in lesson7_section
+    assert "Не храните в prefix-блоках пароли, токены, приватные ключи" in lesson7_section
+    assert "У вас установлен и включён <strong>ChatGPT Prefix Helper</strong>." in lesson7_section
+    assert rendered_lesson7_html.count("data-practice-carousel-slide=") == 7
+    assert rendered_lesson7_html.count("data-practice-carousel-step=") == 7
+    assert 'data-practice-carousel="chatgpt-prefix-extension"' in rendered_lesson7_html
+    for filename in [
+        "lesson-7-step-01-download-extension.png",
+        "lesson-7-step-02-load-unpacked.png",
+        "lesson-7-step-03-enable-extension.png",
+        "lesson-7-step-04-open-extensions-menu.png",
+        "lesson-7-step-05-pin-extension.png",
+        "lesson-7-step-06-configure-prefix.png",
+        "lesson-7-step-07-test-prefix.png",
+    ]:
+        assert filename in rendered_lesson7_html
+    assert "practice-carousel-placeholder-frame" not in rendered_lesson7_html
+    assert "lesson-screenshot-carousel" not in rendered_lesson7_html
 
 
 def test_quiz_answer_indices_are_shuffled_across_lessons():
