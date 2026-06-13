@@ -954,6 +954,7 @@ def test_lesson6_start_project_deploy_key_flow_is_rendered(client, test_settings
     assert script_response.status_code == 200
 
     lesson6_section = _lesson_section(script_response.text, "lesson-6", "lesson-7")
+    rendered_lesson6_html = _render_section_html_via_node("lesson-6")
 
     assert 'starterPromptFilename: "updated_start_project_prompt_deploy_key.md"' in script_response.text
     assert "Запустить проект через ChatGPT, GitHub и Codex" in lesson6_section
@@ -974,9 +975,10 @@ def test_lesson6_start_project_deploy_key_flow_is_rendered(client, test_settings
     assert "current_status.md" in lesson6_section
     assert "module_map.md" in lesson6_section
     assert "start_prompt_for_next_chat.md" in lesson6_section
-    assert "practice-carousel" in script_response.text
-    assert 'data-practice-carousel="start-project-deploy-key"' in script_response.text
-    assert script_response.text.count("lesson-6-step-") == 15
+    assert "practice-carousel" in rendered_lesson6_html
+    assert 'data-practice-carousel="start-project-deploy-key"' in rendered_lesson6_html
+    assert rendered_lesson6_html.count("data-practice-carousel-slide=") == 15
+    assert rendered_lesson6_html.count("data-practice-carousel-step=") == 15
     for filename in [
         "lesson-6-step-01-copy-start-prompt.png",
         "lesson-6-step-02-paste-prompt-chatgpt.png",
@@ -994,8 +996,9 @@ def test_lesson6_start_project_deploy_key_flow_is_rendered(client, test_settings
         "lesson-6-step-14-fill-deploy-key.png",
         "lesson-6-step-15-final-documents-repo.png",
     ]:
-        assert filename in script_response.text
-    assert "lesson-screenshot-carousel" not in script_response.text
+        assert filename in rendered_lesson6_html
+    assert "practice-carousel-placeholder-frame" not in rendered_lesson6_html
+    assert "lesson-screenshot-carousel" not in rendered_lesson6_html
 
 
 def test_quiz_answer_indices_are_shuffled_across_lessons():
