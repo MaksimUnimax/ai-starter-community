@@ -910,9 +910,9 @@ button:hover,
   width: clamp(42px, 4.8vw, 56px);
   height: clamp(42px, 4.8vw, 56px);
   padding: 0;
-  border: 1px solid rgba(244, 247, 251, 0.32);
+  border: 1px solid rgba(244, 247, 251, 0.34);
   border-radius: 999px;
-  background: rgba(11, 17, 23, 0.38);
+  background: rgba(255, 255, 255, 0.08);
   color: #f4f7fb;
   box-shadow: 0 12px 24px rgba(10, 16, 23, 0.14);
   backdrop-filter: blur(10px);
@@ -921,7 +921,7 @@ button:hover,
 }
 
 .practice-carousel-nav:hover {
-  background: rgba(11, 17, 23, 0.52);
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .practice-carousel-nav:focus-visible {
@@ -931,7 +931,8 @@ button:hover,
 
 .practice-carousel-nav span {
   display: inline-block;
-  transform: translateY(-1px);
+  transform: none;
+  line-height: 1;
 }
 
 .practice-carousel-stepbar {
