@@ -246,8 +246,8 @@ def test_rendered_course_export_and_lesson_5_html_include_the_updates():
     assert rendered_html.count("course-intro-part") == 4
     assert ".next-step-card .primary-button" in styles_css
     assert ".next-step-actions .primary-button" in styles_css
-    assert ".next-step-card .primary-button {\n  align-self: flex-start;\n  white-space: normal;\n}" in styles_css
-    assert ".next-step-actions .primary-button {\n  align-self: flex-start;\n  white-space: normal;\n}" in styles_css
+    assert ".next-step-card .primary-button {\n  align-self: flex-start;\n  white-space: normal;\n  width: auto;\n  min-width: 0;\n  max-width: 100%;\n  flex: 0 0 auto;\n}" in styles_css
+    assert ".next-step-actions .primary-button {\n  align-self: flex-start;\n  white-space: normal;\n  width: auto;\n  min-width: 0;\n  max-width: 100%;\n  flex: 0 0 auto;\n}" in styles_css
     assert len(exported_asset_names) == 10
     assert exported_asset_names == [f"assets/static/course-assets/lesson-5/{name}" for name in expected_asset_names]
     assert all((lesson5_asset_root / name).is_file() for name in expected_asset_names)
@@ -264,8 +264,9 @@ def test_rendered_course_export_and_lesson_5_html_include_the_updates():
     assert "/permissions" in lesson5_html
     assert "полный доступ" in lesson5_html
     assert 'href="/cabinet#accounts" target="_blank" rel="noreferrer">личного кабинета</a>' in lesson5_html
-    assert "lesson-screenshot-carousel" in lesson5_html
-    assert lesson5_html.count("lesson-screenshot-slide") == 10
+    assert "practice-carousel" in lesson5_html
+    assert "lesson-screenshot-carousel" not in lesson5_html
+    assert lesson5_html.count("data-practice-carousel-slide=") == 10
     assert "lesson-5-step-01-powershell-search.png" in lesson5_html
     assert "lesson-5-step-10-status-output.png" in lesson5_html
     assert "Позже здесь будут реальные скриншоты" not in lesson5_html
@@ -512,8 +513,10 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "/permissions" in lesson5_section
     assert "полный доступ" in lesson5_section
     assert 'href="/cabinet#accounts" target="_blank" rel="noreferrer">личного кабинета</a>' in lesson5_section
-    assert "lesson-screenshot-carousel" in lesson5_section
-    assert "Пошаговая карусель" in lesson5_section
+    assert "practice-carousel" in lesson5_section
+    assert "data-practice-carousel=\"codex-first-connection\"" in lesson5_section
+    assert "lesson-screenshot-carousel" not in lesson5_section
+    assert "Пошаговая визуальная инструкция по подключению к Codex" in lesson5_section
     assert "lesson-5-step-01-powershell-search.png" in lesson5_section
     assert "В следующем уроке разберём процесс работы: какие бывают run’ы Codex, зачем нужна пошаговость и как удерживать важные инструкции в контексте ChatGPT." in lesson6_section
     assert "Перейти к уроку 7" in lesson6_section
@@ -684,7 +687,8 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "личного кабинета" in lesson5_section
     assert 'href="/cabinet#accounts" target="_blank" rel="noreferrer">личного кабинета</a>' in lesson5_section
     assert "/status" in lesson5_section
-    assert "lesson-screenshot-carousel" in lesson5_section
+    assert "practice-carousel" in lesson5_section
+    assert "lesson-screenshot-carousel" not in lesson5_section
     assert "lesson-5-step-10-status-output.png" in lesson5_section
     assert "окно связи с сервером" in lesson5_section
     assert "codex" in lesson5_section

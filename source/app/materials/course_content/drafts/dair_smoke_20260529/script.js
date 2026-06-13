@@ -1,70 +1,72 @@
 function renderLesson5ScreenshotCarousel() {
   const slides = [
     {
-      src: "/static/course-assets/lesson-5/lesson-5-step-01-powershell-search.png",
-      caption: "Откройте PowerShell",
+      stepLabel: "Шаг 1",
+      title: "Откройте PowerShell",
+      image: "/static/course-assets/lesson-5/lesson-5-step-01-powershell-search.png",
+      alt: "Откройте PowerShell",
     },
     {
-      src: "/static/course-assets/lesson-5/lesson-5-step-02-cabinet-server-command.png",
-      caption: "Скопируйте SSH-команду из блока «Сервер»",
+      stepLabel: "Шаг 2",
+      title: "Скопируйте SSH-команду из блока «Сервер»",
+      image: "/static/course-assets/lesson-5/lesson-5-step-02-cabinet-server-command.png",
+      alt: "Скопируйте SSH-команду из блока «Сервер»",
     },
     {
-      src: "/static/course-assets/lesson-5/lesson-5-step-03-ssh-command.png",
-      caption: "Вставьте SSH-команду",
+      stepLabel: "Шаг 3",
+      title: "Вставьте SSH-команду",
+      image: "/static/course-assets/lesson-5/lesson-5-step-03-ssh-command.png",
+      alt: "Вставьте SSH-команду",
     },
     {
-      src: "/static/course-assets/lesson-5/lesson-5-step-04-password-prompt.png",
-      caption: "Введите пароль",
+      stepLabel: "Шаг 4",
+      title: "Введите пароль",
+      image: "/static/course-assets/lesson-5/lesson-5-step-04-password-prompt.png",
+      alt: "Введите пароль",
     },
     {
-      src: "/static/course-assets/lesson-5/lesson-5-step-05-run-codex.png",
-      caption: "Запустите Codex",
+      stepLabel: "Шаг 5",
+      title: "Запустите Codex",
+      image: "/static/course-assets/lesson-5/lesson-5-step-05-run-codex.png",
+      alt: "Запустите Codex",
     },
     {
-      src: "/static/course-assets/lesson-5/lesson-5-step-06-codex-opened.png",
-      caption: "Проверьте, что Codex открылся",
+      stepLabel: "Шаг 6",
+      title: "Проверьте, что Codex открылся",
+      image: "/static/course-assets/lesson-5/lesson-5-step-06-codex-opened.png",
+      alt: "Проверьте, что Codex открылся",
     },
     {
-      src: "/static/course-assets/lesson-5/lesson-5-step-07-codex-reply.png",
-      caption: "Отправьте первое сообщение",
+      stepLabel: "Шаг 7",
+      title: "Отправьте первое сообщение",
+      image: "/static/course-assets/lesson-5/lesson-5-step-07-codex-reply.png",
+      alt: "Отправьте первое сообщение",
     },
     {
-      src: "/static/course-assets/lesson-5/lesson-5-step-08-slash-commands.png",
-      caption: "Откройте список slash-команд",
+      stepLabel: "Шаг 8",
+      title: "Откройте список slash-команд",
+      image: "/static/course-assets/lesson-5/lesson-5-step-08-slash-commands.png",
+      alt: "Откройте список slash-команд",
     },
     {
-      src: "/static/course-assets/lesson-5/lesson-5-step-09-status-command.png",
-      caption: "Откройте /status",
+      stepLabel: "Шаг 9",
+      title: "Откройте /status",
+      image: "/static/course-assets/lesson-5/lesson-5-step-09-status-command.png",
+      alt: "Откройте /status",
     },
     {
-      src: "/static/course-assets/lesson-5/lesson-5-step-10-status-output.png",
-      caption: "Проверьте модель, лимиты и права доступа",
+      stepLabel: "Шаг 10",
+      title: "Проверьте модель, лимиты и права доступа",
+      image: "/static/course-assets/lesson-5/lesson-5-step-10-status-output.png",
+      alt: "Проверьте модель, лимиты и права доступа",
     }
   ];
 
-  return `
-    <div class="lesson-screenshot-carousel" role="list" aria-label="Пошаговая визуальная инструкция по подключению к Codex">
-      ${slides
-        .map(
-          (slide, index) => `
-            <figure class="lesson-screenshot-slide" role="listitem">
-              <img
-                class="lesson-screenshot-image"
-                src="${slide.src}"
-                alt="${slide.caption}"
-                loading="lazy"
-                decoding="async"
-              >
-              <figcaption class="lesson-screenshot-caption">
-                <span class="lesson-screenshot-step">Шаг ${index + 1}</span>
-                <p>${slide.caption}</p>
-              </figcaption>
-            </figure>
-          `
-        )
-        .join("")}
-    </div>
-  `;
+  return renderPracticeCarousel({
+    carouselKey: "codex-first-connection",
+    note: "Пошаговая визуальная инструкция по подключению к Codex",
+    slides,
+  });
 }
 
 const courseData = {
@@ -658,6 +660,14 @@ const courseData = {
               <li>открывается ваш профиль;</li>
               <li>email подтверждён.</li>
             </ul>
+          `
+        },
+        {
+          label: "Визуальный блок",
+          title: "Визуальная инструкция",
+          html: `
+            <p class="practice-carousel-subtitle">Пошаговая регистрация GitHub</p>
+            ${renderGitPracticeCarousel()}
           `
         },
         {
@@ -2038,6 +2048,12 @@ ChatGPT вставляет тексты документов в prompt для Co
           <p>Вы готовы перейти к следующему уроку, когда <strong>ChatGPT</strong> объяснил вам:</p>
           <p><strong>проектная основа создана, приложение и документация находятся в GitHub, Codex готов как исполнитель, следующий безопасный run определён.</strong></p>
         </section>
+        <section class="callout">
+          <span class="block-label">Визуальный блок</span>
+          <h4>Визуальная инструкция</h4>
+          <p class="practice-carousel-subtitle">Пробный формат карусели для практического задания</p>
+          ${renderProjectStartCarousel()}
+        </section>
       `,
       contentHtml: ``,
       quizzes: [
@@ -2372,6 +2388,14 @@ ChatGPT вставляет тексты документов в prompt для Co
             </ol>
           `,
           includeStarterPromptForm: true
+        },
+        {
+          label: "Визуальный блок",
+          title: "Визуальная инструкция",
+          html: `
+            <p class="practice-carousel-subtitle">Пробный формат карусели для практического задания</p>
+            ${renderPrefixPracticeCarousel()}
+          `
         },
         {
           label: "Частые ошибки",
@@ -3108,6 +3132,14 @@ Codex не должен сам выбирать архитектуру, стра
           `
         },
         {
+          label: "Визуальный блок",
+          title: "Визуальная инструкция",
+          html: `
+            <p class="practice-carousel-subtitle">Пробный формат карусели для практического задания</p>
+            ${renderDocsPracticeCarousel()}
+          `
+        },
+        {
           label: "Главный вывод урока",
           title: "Главное",
           html: `
@@ -3493,7 +3525,8 @@ const state = {
   flippedCards: new Set(),
   solvedQuestions: new Set(),
   answeredQuestions: {},
-  openStarterPromptIds: new Set()
+  openStarterPromptIds: new Set(),
+  practiceCarouselState: Object.create(null)
 };
 
 const legacySectionAliases = {
@@ -3540,6 +3573,984 @@ function escapeHTML(value) {
     .replaceAll("\"", "&quot;");
 }
 
+function practicePlaceholderLine(width, className = "") {
+  const classes = ["practice-carousel-placeholder-line", className].filter(Boolean).join(" ");
+  return `<span class="${classes}" style="width: ${width};"></span>`;
+}
+
+function practicePlaceholderChip(text, isActive = false) {
+  return `<span class="practice-carousel-placeholder-chip${isActive ? " is-active" : ""}">${escapeHTML(text)}</span>`;
+}
+
+function practicePlaceholderCard(kicker, bodyHtml, className = "") {
+  const classes = ["practice-carousel-placeholder-card", className].filter(Boolean).join(" ");
+  return `
+    <div class="${classes}">
+      <span class="practice-carousel-placeholder-card-kicker">${escapeHTML(kicker)}</span>
+      ${bodyHtml}
+    </div>
+  `;
+}
+
+function renderPracticePlaceholderFrame({ title, badge, leftHtml, rightHtml, footerHtml }) {
+  return `
+    <div class="practice-carousel-placeholder-frame">
+      <div class="practice-carousel-placeholder-windowbar">
+        <div class="practice-carousel-placeholder-window-dots" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <div class="practice-carousel-placeholder-window-title">${escapeHTML(title)}</div>
+        <div class="practice-carousel-placeholder-window-badge">${escapeHTML(badge)}</div>
+      </div>
+      <div class="practice-carousel-placeholder-body">
+        ${leftHtml ? `<div class="practice-carousel-placeholder-column">${leftHtml}</div>` : ""}
+        ${rightHtml ? `<div class="practice-carousel-placeholder-column">${rightHtml}</div>` : ""}
+      </div>
+      ${footerHtml ? `<div class="practice-carousel-placeholder-footer">${footerHtml}</div>` : ""}
+    </div>
+  `;
+}
+
+function renderPracticeCarouselAttribute(carouselKey) {
+  switch (carouselKey) {
+    case "github-registration":
+      return 'data-practice-carousel="github-registration"';
+    case "codex-first-connection":
+      return 'data-practice-carousel="codex-first-connection"';
+    case "project-start":
+      return 'data-practice-carousel="project-start"';
+    case "prefix-extension":
+      return 'data-practice-carousel="prefix-extension"';
+    case "docs-update-new-dialog":
+      return 'data-practice-carousel="docs-update-new-dialog"';
+    default:
+      return `data-practice-carousel="${escapeHTML(carouselKey || "default")}"`;
+  }
+}
+
+function renderPracticeCarousel({ carouselKey, note, slides }) {
+  const safeKey = carouselKey || "default";
+  const idPrefix = `practice-carousel-${safeKey}`;
+  const carouselAttribute = renderPracticeCarouselAttribute(safeKey);
+
+  return `
+    <div class="practice-carousel" ${carouselAttribute}>
+      <div class="practice-carousel-toolbar">
+        <div class="practice-carousel-note-wrap">
+          <p class="practice-carousel-note">${escapeHTML(note)}</p>
+        </div>
+        <div class="practice-carousel-controls" role="group" aria-label="Навигация по карусели">
+          <button class="ghost-button practice-carousel-nav" type="button" data-practice-carousel-prev>Назад</button>
+          <button class="primary-button practice-carousel-nav" type="button" data-practice-carousel-next>Дальше</button>
+        </div>
+      </div>
+      <div class="practice-carousel-stepbar" role="tablist" aria-label="Шаги визуальной инструкции">
+        ${slides
+          .map(
+            (slide, index) => `
+              <button
+                class="practice-carousel-step ${index === 0 ? "is-active" : ""}"
+                type="button"
+                data-practice-carousel-step="${index}"
+                id="${idPrefix}-step-${index}"
+                role="tab"
+                aria-selected="${index === 0 ? "true" : "false"}"
+                aria-controls="${idPrefix}-slide-${index}"
+              >
+                ${escapeHTML(slide.stepLabel)}
+              </button>
+            `
+          )
+          .join("")}
+      </div>
+      <div class="practice-carousel-stage">
+        ${slides
+          .map(
+            (slide, index) => `
+              <section
+                class="practice-carousel-slide ${index === 0 ? "is-active" : ""}"
+                data-practice-carousel-slide="${index}"
+                id="${idPrefix}-slide-${index}"
+                role="tabpanel"
+                aria-labelledby="${idPrefix}-step-${index}"
+                aria-hidden="${index === 0 ? "false" : "true"}"
+              >
+                <div class="practice-carousel-window">
+                  <div class="practice-carousel-slide-caption">
+                    <span class="practice-carousel-step-label">${escapeHTML(slide.stepLabel)}</span>
+                    <h5>${escapeHTML(slide.title)}</h5>
+                  </div>
+                  ${slide.image
+                    ? `
+                      <div class="practice-carousel-image-frame">
+                        <img
+                          src="${escapeHTML(slide.image)}"
+                          alt="${escapeHTML(slide.alt || slide.title)}"
+                          loading="${index === 0 ? "eager" : "lazy"}"
+                          decoding="async"
+                          draggable="false"
+                        >
+                      </div>
+                    `
+                    : slide.mockHtml || ""}
+                </div>
+              </section>
+            `
+          )
+          .join("")}
+      </div>
+    </div>
+  `;
+}
+
+function renderGitPracticeCarousel() {
+  const slides = [
+    {
+      stepLabel: "Шаг 1",
+      title: "Откройте GitHub и нажмите Sign in",
+      image: "/static/course-assets/dair-smoke-20260529/git-carousel/github-step-01.png",
+      alt: "Откройте GitHub и нажмите Sign in",
+    },
+    {
+      stepLabel: "Шаг 2",
+      title: "Перейдите к созданию аккаунта",
+      image: "/static/course-assets/dair-smoke-20260529/git-carousel/github-step-02.png",
+      alt: "Перейдите к созданию аккаунта",
+    },
+    {
+      stepLabel: "Шаг 3",
+      title: "Введите email, пароль и username",
+      image: "/static/course-assets/dair-smoke-20260529/git-carousel/github-step-03.png",
+      alt: "Введите email, пароль и username",
+    },
+    {
+      stepLabel: "Шаг 4",
+      title: "Пройдите проверку GitHub",
+      image: "/static/course-assets/dair-smoke-20260529/git-carousel/github-step-04.png",
+      alt: "Пройдите проверку GitHub",
+    },
+    {
+      stepLabel: "Шаг 5",
+      title: "Войдите в аккаунт",
+      image: "/static/course-assets/dair-smoke-20260529/git-carousel/github-step-05.png",
+      alt: "Войдите в аккаунт",
+    },
+    {
+      stepLabel: "Шаг 6",
+      title: "Проверьте, что аккаунт открыт",
+      image: "/static/course-assets/dair-smoke-20260529/git-carousel/github-step-06.png",
+      alt: "Проверьте, что аккаунт открыт",
+    }
+  ];
+
+  return renderPracticeCarousel({
+    carouselKey: "github-registration",
+    note: "Пошаговая регистрация GitHub",
+    slides,
+  });
+}
+
+function renderCodexPracticeCarousel() {
+  const slides = [
+    {
+      stepLabel: "Шаг 1",
+      title: "Откройте Terminal или PowerShell",
+      mockHtml: renderPracticePlaceholderFrame({
+        title: "Terminal",
+        badge: "Открытие приложения",
+        leftHtml: [
+          practicePlaceholderCard(
+            "Поиск",
+            `
+              ${practicePlaceholderLine("74%", "is-strong")}
+              ${practicePlaceholderLine("58%")}
+              <div class="practice-carousel-placeholder-chip-row">
+                ${practicePlaceholderChip("Terminal", true)}
+                ${practicePlaceholderChip("PowerShell")}
+              </div>
+            `
+          ),
+          practicePlaceholderCard(
+            "Подсказка",
+            `
+              ${practicePlaceholderLine("86%", "is-strong")}
+              ${practicePlaceholderLine("62%")}
+            `
+          )
+        ].join(""),
+        rightHtml: `
+          <div class="practice-carousel-placeholder-terminal">
+            <div class="practice-carousel-placeholder-terminal-head">
+              <span>Desktop launcher</span>
+              <span class="practice-carousel-placeholder-terminal-prompt">⌘ + Space</span>
+            </div>
+            ${practicePlaceholderLine("88%", "is-strong")}
+            ${practicePlaceholderLine("72%")}
+            ${practicePlaceholderLine("44%")}
+            <div class="practice-carousel-placeholder-chip-row">
+              ${practicePlaceholderChip("Откройте нужное приложение", true)}
+            </div>
+          </div>
+        `,
+        footerHtml: "Откройте Terminal или PowerShell, чтобы начать подключение."
+      })
+    },
+    {
+      stepLabel: "Шаг 2",
+      title: "Найдите SSH-команду",
+      mockHtml: renderPracticePlaceholderFrame({
+        title: "Личный кабинет",
+        badge: "SSH-команда",
+        leftHtml: [
+          practicePlaceholderCard(
+            "Команда",
+            `
+              <div class="practice-carousel-placeholder-terminal">
+                <div class="practice-carousel-placeholder-terminal-head">
+                  <span>Сервер</span>
+                  <span class="practice-carousel-placeholder-terminal-prompt">copy</span>
+                </div>
+                ${practicePlaceholderLine("92%", "is-strong")}
+                ${practicePlaceholderLine("74%")}
+                ${practicePlaceholderLine("48%")}
+              </div>
+            `
+          )
+        ].join(""),
+        rightHtml: `
+          <div class="practice-carousel-placeholder-panel">
+            <span class="practice-carousel-placeholder-card-kicker">Что ищем</span>
+            <div class="practice-carousel-placeholder-chip-row">
+              ${practicePlaceholderChip("SSH")}
+              ${practicePlaceholderChip("копировать")}
+              ${practicePlaceholderChip("личный кабинет", true)}
+            </div>
+            ${practicePlaceholderLine("80%", "is-strong")}
+            ${practicePlaceholderLine("64%")}
+            ${practicePlaceholderLine("52%")}
+          </div>
+        `,
+        footerHtml: "Найдите команду подключения и скопируйте её без изменений."
+      })
+    },
+    {
+      stepLabel: "Шаг 3",
+      title: "Введите пароль",
+      mockHtml: renderPracticePlaceholderFrame({
+        title: "Terminal",
+        badge: "Запрос пароля",
+        leftHtml: [
+          practicePlaceholderCard(
+            "Ввод",
+            `
+              <div class="practice-carousel-placeholder-terminal">
+                <div class="practice-carousel-placeholder-terminal-head">
+                  <span>ssh user@server</span>
+                  <span class="practice-carousel-placeholder-terminal-prompt">password</span>
+                </div>
+                ${practicePlaceholderLine("88%", "is-strong")}
+                ${practicePlaceholderLine("66%")}
+                ${practicePlaceholderLine("42%")}
+              </div>
+            `
+          )
+        ].join(""),
+        rightHtml: `
+          <div class="practice-carousel-placeholder-panel">
+            <span class="practice-carousel-placeholder-card-kicker">Важно</span>
+            <div class="practice-carousel-placeholder-chip-row">
+              ${practicePlaceholderChip("Пароль скрыт", true)}
+              ${practicePlaceholderChip("Это нормально")}
+            </div>
+            ${practicePlaceholderLine("82%", "is-strong")}
+            ${practicePlaceholderLine("58%")}
+            ${practicePlaceholderLine("46%")}
+          </div>
+        `,
+        footerHtml: "Введите пароль из личного кабинета и нажмите Enter."
+      })
+    },
+    {
+      stepLabel: "Шаг 4",
+      title: "Запустите Codex",
+      mockHtml: renderPracticePlaceholderFrame({
+        title: "Terminal",
+        badge: "Команда codex",
+        leftHtml: `
+          <div class="practice-carousel-placeholder-terminal">
+            <div class="practice-carousel-placeholder-terminal-head">
+              <span>Подключение завершено</span>
+              <span class="practice-carousel-placeholder-terminal-prompt">codex</span>
+            </div>
+            ${practicePlaceholderLine("90%", "is-strong")}
+            ${practicePlaceholderLine("76%")}
+            ${practicePlaceholderLine("54%")}
+          </div>
+        `,
+        rightHtml: `
+          <div class="practice-carousel-placeholder-panel">
+            <span class="practice-carousel-placeholder-card-kicker">Ожидаемый результат</span>
+            <div class="practice-carousel-placeholder-chip-row">
+              ${practicePlaceholderChip("Codex открыт", true)}
+              ${practicePlaceholderChip("Terminal активен")}
+            </div>
+            ${practicePlaceholderLine("78%", "is-strong")}
+            ${practicePlaceholderLine("62%")}
+          </div>
+        `,
+        footerHtml: "После подключения введите codex и дождитесь запуска чата."
+      })
+    },
+    {
+      stepLabel: "Шаг 5",
+      title: "Напишите первое сообщение",
+      mockHtml: renderPracticePlaceholderFrame({
+        title: "Codex chat",
+        badge: "Первый вопрос",
+        leftHtml: `
+          <div class="practice-carousel-placeholder-panel">
+            <span class="practice-carousel-placeholder-card-kicker">Сообщение</span>
+            <div class="practice-carousel-placeholder-chat-bubble">
+              привет ты кто?
+            </div>
+            ${practicePlaceholderLine("68%", "is-strong")}
+            ${practicePlaceholderLine("54%")}
+          </div>
+        `,
+        rightHtml: `
+          <div class="practice-carousel-placeholder-terminal">
+            <div class="practice-carousel-placeholder-terminal-head">
+              <span>Ответ Codex</span>
+              <span class="practice-carousel-placeholder-terminal-prompt">chat</span>
+            </div>
+            ${practicePlaceholderLine("86%", "is-strong")}
+            ${practicePlaceholderLine("70%")}
+            ${practicePlaceholderLine("42%")}
+            <div class="practice-carousel-placeholder-chip-row">
+              ${practicePlaceholderChip("ждём ответ", true)}
+            </div>
+          </div>
+        `,
+        footerHtml: "Напишите короткое приветствие и дождитесь первого ответа."
+      })
+    },
+    {
+      stepLabel: "Шаг 6",
+      title: "Дождитесь ответа Codex",
+      mockHtml: renderPracticePlaceholderFrame({
+        title: "Сервер",
+        badge: "Готово",
+        leftHtml: `
+          <div class="practice-carousel-placeholder-panel">
+            <span class="practice-carousel-placeholder-card-kicker">Проверка</span>
+            <div class="practice-carousel-placeholder-checklist">
+              <div class="practice-carousel-placeholder-checkitem">Terminal или PowerShell открыт</div>
+              <div class="practice-carousel-placeholder-checkitem">Подключение по SSH выполнено</div>
+              <div class="practice-carousel-placeholder-checkitem">Codex ответил на сообщение</div>
+            </div>
+          </div>
+        `,
+        rightHtml: `
+          <div class="practice-carousel-placeholder-terminal">
+            <div class="practice-carousel-placeholder-terminal-head">
+              <span>Следующий шаг</span>
+              <span class="practice-carousel-placeholder-terminal-prompt">done</span>
+            </div>
+            ${practicePlaceholderLine("84%", "is-strong")}
+            ${practicePlaceholderLine("64%")}
+            ${practicePlaceholderLine("50%")}
+            <div class="practice-carousel-placeholder-chip-row">
+              ${practicePlaceholderChip("можно двигаться дальше", true)}
+            </div>
+          </div>
+        `,
+        footerHtml: "Проверьте, что вы попали в рабочую среду и получили ответ от Codex."
+      })
+    }
+  ];
+
+  return renderPracticeCarousel({
+    carouselKey: "codex-first-connection",
+    note: "Позже здесь будут реальные скриншоты.",
+    slides,
+  });
+}
+
+function renderPrefixPracticeCarousel() {
+  const slides = [
+    {
+      stepLabel: "Шаг 1",
+      title: "Откройте prompt для расширения",
+      mockHtml: renderPracticePlaceholderFrame({
+        title: "Prefix extension",
+        badge: "Prompt",
+        leftHtml: [
+          practicePlaceholderCard(
+            "Что ищем",
+            `
+              ${practicePlaceholderLine("78%", "is-strong")}
+              ${practicePlaceholderLine("60%")}
+              <div class="practice-carousel-placeholder-chip-row">
+                ${practicePlaceholderChip("prompt", true)}
+                ${practicePlaceholderChip("prefix")}
+              </div>
+            `
+          )
+        ].join(""),
+        rightHtml: `
+          <div class="practice-carousel-placeholder-panel">
+            <span class="practice-carousel-placeholder-card-kicker">Задача</span>
+            ${practicePlaceholderLine("88%", "is-strong")}
+            ${practicePlaceholderLine("70%")}
+            ${practicePlaceholderLine("52%")}
+          </div>
+        `,
+        footerHtml: "Откройте prompt и посмотрите, как расширение помогает работать с ChatGPT."
+      })
+    },
+    {
+      stepLabel: "Шаг 2",
+      title: "Скопируйте prompt или скачайте .md",
+      mockHtml: renderPracticePlaceholderFrame({
+        title: "Сохранение файла",
+        badge: "Copy / Download",
+        leftHtml: `
+          <div class="practice-carousel-placeholder-terminal">
+            <div class="practice-carousel-placeholder-terminal-head">
+              <span>Actions</span>
+              <span class="practice-carousel-placeholder-terminal-prompt">copy</span>
+            </div>
+            <div class="practice-carousel-placeholder-chip-row">
+              ${practicePlaceholderChip("Скопировать prompt", true)}
+              ${practicePlaceholderChip("Скачать .md")}
+            </div>
+            ${practicePlaceholderLine("86%", "is-strong")}
+            ${practicePlaceholderLine("64%")}
+          </div>
+        `,
+        rightHtml: `
+          <div class="practice-carousel-placeholder-panel">
+            <span class="practice-carousel-placeholder-card-kicker">Файл</span>
+            ${practicePlaceholderLine("80%", "is-strong")}
+            ${practicePlaceholderLine("66%")}
+            ${practicePlaceholderLine("44%")}
+          </div>
+        `,
+        footerHtml: "Скопируйте prompt или сохраните его как .md."
+      })
+    },
+    {
+      stepLabel: "Шаг 3",
+      title: "Откройте новый чат с ChatGPT",
+      mockHtml: renderPracticePlaceholderFrame({
+        title: "ChatGPT",
+        badge: "Новый диалог",
+        leftHtml: `
+          <div class="practice-carousel-placeholder-panel">
+            <span class="practice-carousel-placeholder-card-kicker">Панель</span>
+            <div class="practice-carousel-placeholder-chip-row">
+              ${practicePlaceholderChip("Новый чат", true)}
+              ${practicePlaceholderChip("История")}
+            </div>
+            ${practicePlaceholderLine("82%", "is-strong")}
+            ${practicePlaceholderLine("58%")}
+          </div>
+        `,
+        rightHtml: `
+          <div class="practice-carousel-placeholder-terminal">
+            <div class="practice-carousel-placeholder-terminal-head">
+              <span>ChatGPT</span>
+              <span class="practice-carousel-placeholder-terminal-prompt">+</span>
+            </div>
+            ${practicePlaceholderLine("88%", "is-strong")}
+            ${practicePlaceholderLine("72%")}
+            ${practicePlaceholderLine("50%")}
+          </div>
+        `,
+        footerHtml: "Начните новый диалог, чтобы вставить prompt без лишнего контекста."
+      })
+    },
+    {
+      stepLabel: "Шаг 4",
+      title: "Вставьте prompt в ChatGPT",
+      mockHtml: renderPracticePlaceholderFrame({
+        title: "Prompt input",
+        badge: "Paste",
+        leftHtml: `
+          <div class="practice-carousel-placeholder-terminal">
+            <div class="practice-carousel-placeholder-terminal-head">
+              <span>Вставка</span>
+              <span class="practice-carousel-placeholder-terminal-prompt">paste</span>
+            </div>
+            ${practicePlaceholderLine("84%", "is-strong")}
+            ${practicePlaceholderLine("66%")}
+            ${practicePlaceholderLine("52%")}
+          </div>
+        `,
+        rightHtml: `
+          <div class="practice-carousel-placeholder-panel">
+            <span class="practice-carousel-placeholder-card-kicker">Текст</span>
+            ${practicePlaceholderLine("92%", "is-strong")}
+            ${practicePlaceholderLine("76%")}
+            ${practicePlaceholderLine("58%")}
+          </div>
+        `,
+        footerHtml: "Вставьте prompt в сообщение и отправьте его в ChatGPT."
+      })
+    },
+    {
+      stepLabel: "Шаг 5",
+      title: "Дождитесь создания расширения",
+      mockHtml: renderPracticePlaceholderFrame({
+        title: "Создание",
+        badge: "Генерация",
+        leftHtml: `
+          <div class="practice-carousel-placeholder-panel">
+            <span class="practice-carousel-placeholder-card-kicker">Статус</span>
+            <div class="practice-carousel-placeholder-chip-row">
+              ${practicePlaceholderChip("Генерируется", true)}
+              ${practicePlaceholderChip("Файлы")}
+            </div>
+            ${practicePlaceholderLine("76%", "is-strong")}
+            ${practicePlaceholderLine("60%")}
+          </div>
+        `,
+        rightHtml: `
+          <div class="practice-carousel-placeholder-terminal">
+            <div class="practice-carousel-placeholder-terminal-head">
+              <span>ChatGPT</span>
+              <span class="practice-carousel-placeholder-terminal-prompt">run</span>
+            </div>
+            ${practicePlaceholderLine("86%", "is-strong")}
+            ${practicePlaceholderLine("70%")}
+            ${practicePlaceholderLine("48%")}
+          </div>
+        `,
+        footerHtml: "Дождитесь, пока ChatGPT создаст файлы расширения и даст инструкцию установки."
+      })
+    },
+    {
+      stepLabel: "Шаг 6",
+      title: "Проверьте prefix в сообщении",
+      mockHtml: renderPracticePlaceholderFrame({
+        title: "Проверка",
+        badge: "Тест",
+        leftHtml: `
+          <div class="practice-carousel-placeholder-panel">
+            <span class="practice-carousel-placeholder-card-kicker">Сообщение</span>
+            <div class="practice-carousel-placeholder-chat-bubble">
+              prefix добавился перед текстом
+            </div>
+          </div>
+        `,
+        rightHtml: `
+          <div class="practice-carousel-placeholder-terminal">
+            <div class="practice-carousel-placeholder-terminal-head">
+              <span>Результат</span>
+              <span class="practice-carousel-placeholder-terminal-prompt">ok</span>
+            </div>
+            <div class="practice-carousel-placeholder-chip-row">
+              ${practicePlaceholderChip("prefix применён", true)}
+            </div>
+            ${practicePlaceholderLine("84%", "is-strong")}
+            ${practicePlaceholderLine("64%")}
+          </div>
+        `,
+        footerHtml: "Отправьте тестовое сообщение и проверьте, что prefix добавляется автоматически."
+      })
+    }
+  ];
+
+  return renderPracticeCarousel({
+    carouselKey: "prefix-extension",
+    note: "Позже здесь будут реальные скриншоты.",
+    slides,
+  });
+}
+
+function renderDocsPracticeCarousel() {
+  const slides = [
+    {
+      stepLabel: "Шаг 1",
+      title: "Откройте prompt для обновления документов",
+      mockHtml: renderPracticePlaceholderFrame({
+        title: "Документы проекта",
+        badge: "Prompt",
+        leftHtml: `
+          <div class="practice-carousel-placeholder-panel">
+            <span class="practice-carousel-placeholder-card-kicker">Prompt</span>
+            ${practicePlaceholderLine("84%", "is-strong")}
+            ${practicePlaceholderLine("62%")}
+            ${practicePlaceholderLine("44%")}
+          </div>
+        `,
+        rightHtml: `
+          <div class="practice-carousel-placeholder-terminal">
+            <div class="practice-carousel-placeholder-terminal-head">
+              <span>Что нужно сделать</span>
+              <span class="practice-carousel-placeholder-terminal-prompt">docs</span>
+            </div>
+            <div class="practice-carousel-placeholder-chip-row">
+              ${practicePlaceholderChip("обновить", true)}
+              ${practicePlaceholderChip("проверить")}
+            </div>
+            ${practicePlaceholderLine("88%", "is-strong")}
+            ${practicePlaceholderLine("66%")}
+          </div>
+        `,
+        footerHtml: "Откройте prompt и посмотрите, какие документы нужно обновить."
+      })
+    },
+    {
+      stepLabel: "Шаг 2",
+      title: "Скопируйте prompt или скачайте .md",
+      mockHtml: renderPracticePlaceholderFrame({
+        title: "Сохранение файла",
+        badge: "Copy / Download",
+        leftHtml: `
+          <div class="practice-carousel-placeholder-terminal">
+            <div class="practice-carousel-placeholder-terminal-head">
+              <span>Actions</span>
+              <span class="practice-carousel-placeholder-terminal-prompt">copy</span>
+            </div>
+            <div class="practice-carousel-placeholder-chip-row">
+              ${practicePlaceholderChip("Скопировать prompt", true)}
+              ${practicePlaceholderChip("Скачать .md")}
+            </div>
+            ${practicePlaceholderLine("86%", "is-strong")}
+            ${practicePlaceholderLine("60%")}
+          </div>
+        `,
+        rightHtml: `
+          <div class="practice-carousel-placeholder-panel">
+            <span class="practice-carousel-placeholder-card-kicker">Файл</span>
+            ${practicePlaceholderLine("80%", "is-strong")}
+            ${practicePlaceholderLine("66%")}
+            ${practicePlaceholderLine("48%")}
+          </div>
+        `,
+        footerHtml: "Скопируйте prompt или сохраните его как .md."
+      })
+    },
+    {
+      stepLabel: "Шаг 3",
+      title: "Вставьте prompt в текущий ChatGPT",
+      mockHtml: renderPracticePlaceholderFrame({
+        title: "ChatGPT",
+        badge: "Текущий диалог",
+        leftHtml: `
+          <div class="practice-carousel-placeholder-panel">
+            <span class="practice-carousel-placeholder-card-kicker">Контекст</span>
+            <div class="practice-carousel-placeholder-chip-row">
+              ${practicePlaceholderChip("текущий чат", true)}
+              ${practicePlaceholderChip("актуальные документы")}
+            </div>
+            ${practicePlaceholderLine("82%", "is-strong")}
+            ${practicePlaceholderLine("58%")}
+          </div>
+        `,
+        rightHtml: `
+          <div class="practice-carousel-placeholder-chat-bubble">
+            Вставьте prompt в текущий диалог
+          </div>
+        `,
+        footerHtml: "Проверьте, что в диалоге уже есть актуальный контекст проекта."
+      })
+    },
+    {
+      stepLabel: "Шаг 4",
+      title: "Дождитесь проверки и задачи для Codex",
+      mockHtml: renderPracticePlaceholderFrame({
+        title: "Проверка",
+        badge: "ChatGPT → Codex",
+        leftHtml: `
+          <div class="practice-carousel-placeholder-terminal">
+            <div class="practice-carousel-placeholder-terminal-head">
+              <span>ChatGPT</span>
+              <span class="practice-carousel-placeholder-terminal-prompt">check</span>
+            </div>
+            ${practicePlaceholderLine("88%", "is-strong")}
+            ${practicePlaceholderLine("70%")}
+            ${practicePlaceholderLine("50%")}
+          </div>
+        `,
+        rightHtml: `
+          <div class="practice-carousel-placeholder-panel">
+            <span class="practice-carousel-placeholder-card-kicker">Задача</span>
+            <div class="practice-carousel-placeholder-chip-row">
+              ${practicePlaceholderChip("готовит prompt", true)}
+              ${practicePlaceholderChip("передаёт Codex")}
+            </div>
+            ${practicePlaceholderLine("84%", "is-strong")}
+            ${practicePlaceholderLine("60%")}
+          </div>
+        `,
+        footerHtml: "Дождитесь, пока ChatGPT проверит контекст и подготовит задание для Codex."
+      })
+    },
+    {
+      stepLabel: "Шаг 5",
+      title: "Сохраните новые prompts в prefix",
+      mockHtml: renderPracticePlaceholderFrame({
+        title: "Prefix extension",
+        badge: "Сохранение",
+        leftHtml: `
+          <div class="practice-carousel-placeholder-panel">
+            <span class="practice-carousel-placeholder-card-kicker">Новый prompt</span>
+            <div class="practice-carousel-placeholder-chip-row">
+              ${practicePlaceholderChip("обновить документы", true)}
+              ${practicePlaceholderChip("новый диалог")}
+            </div>
+            ${practicePlaceholderLine("80%", "is-strong")}
+            ${practicePlaceholderLine("56%")}
+          </div>
+        `,
+        rightHtml: `
+          <div class="practice-carousel-placeholder-terminal">
+            <div class="practice-carousel-placeholder-terminal-head">
+              <span>Saved</span>
+              <span class="practice-carousel-placeholder-terminal-prompt">prefix</span>
+            </div>
+            ${practicePlaceholderLine("86%", "is-strong")}
+            ${practicePlaceholderLine("66%")}
+          </div>
+        `,
+        footerHtml: "Сохраните новые готовые prompts в prefix-расширение для будущих запусков."
+      })
+    },
+    {
+      stepLabel: "Шаг 6",
+      title: "Откройте новый диалог и начните с актуального контекста",
+      mockHtml: renderPracticePlaceholderFrame({
+        title: "Новый диалог",
+        badge: "Готово",
+        leftHtml: `
+          <div class="practice-carousel-placeholder-panel">
+            <span class="practice-carousel-placeholder-card-kicker">Результат</span>
+            <div class="practice-carousel-placeholder-checklist">
+              <div class="practice-carousel-placeholder-checkitem">документы обновлены</div>
+              <div class="practice-carousel-placeholder-checkitem">новый диалог открыт</div>
+              <div class="practice-carousel-placeholder-checkitem">контекст уже актуален</div>
+            </div>
+          </div>
+        `,
+        rightHtml: `
+          <div class="practice-carousel-placeholder-chat-bubble">
+            Новый prompt готов для следующего диалога
+          </div>
+        `,
+        footerHtml: "Откройте новый диалог и используйте уже сгенерированный prompt."
+      })
+    }
+  ];
+
+  return renderPracticeCarousel({
+    carouselKey: "docs-update-new-dialog",
+    note: "Позже здесь будут реальные скриншоты.",
+    slides,
+  });
+}
+
+function renderProjectStartCarousel() {
+  const slides = [
+    {
+      stepLabel: "Шаг 1",
+      title: "Откройте стартовый prompt",
+      mockHtml: renderPracticePlaceholderFrame({
+        title: "Start prompt",
+        badge: "Documentation",
+        leftHtml: `
+          <div class="practice-carousel-placeholder-panel">
+            <span class="practice-carousel-placeholder-card-kicker">Prompt</span>
+            <div class="practice-carousel-placeholder-chip-row">
+              ${practicePlaceholderChip("start prompt", true)}
+              ${practicePlaceholderChip("идея проекта")}
+            </div>
+            ${practicePlaceholderLine("84%", "is-strong")}
+            ${practicePlaceholderLine("62%")}
+          </div>
+        `,
+        rightHtml: `
+          <div class="practice-carousel-placeholder-terminal">
+            <div class="practice-carousel-placeholder-terminal-head">
+              <span>Чтение</span>
+              <span class="practice-carousel-placeholder-terminal-prompt">docs</span>
+            </div>
+            ${practicePlaceholderLine("88%", "is-strong")}
+            ${practicePlaceholderLine("70%")}
+            ${practicePlaceholderLine("50%")}
+          </div>
+        `,
+        footerHtml: "Откройте стартовый prompt и начните с описания идеи проекта."
+      })
+    },
+    {
+      stepLabel: "Шаг 2",
+      title: "Вставьте prompt в ChatGPT",
+      mockHtml: renderPracticePlaceholderFrame({
+        title: "ChatGPT",
+        badge: "Paste",
+        leftHtml: `
+          <div class="practice-carousel-placeholder-terminal">
+            <div class="practice-carousel-placeholder-terminal-head">
+              <span>Новый чат</span>
+              <span class="practice-carousel-placeholder-terminal-prompt">paste</span>
+            </div>
+            ${practicePlaceholderLine("90%", "is-strong")}
+            ${practicePlaceholderLine("74%")}
+            ${practicePlaceholderLine("52%")}
+          </div>
+        `,
+        rightHtml: `
+          <div class="practice-carousel-placeholder-panel">
+            <span class="practice-carousel-placeholder-card-kicker">Action</span>
+            <div class="practice-carousel-placeholder-chat-bubble">
+              Вставьте prompt и опишите идею простыми словами
+            </div>
+          </div>
+        `,
+        footerHtml: "Вставьте prompt в ChatGPT и начните диалог."
+      })
+    },
+    {
+      stepLabel: "Шаг 3",
+      title: "Ответьте на уточняющие вопросы",
+      mockHtml: renderPracticePlaceholderFrame({
+        title: "Уточнение",
+        badge: "Questions",
+        leftHtml: `
+          <div class="practice-carousel-placeholder-panel">
+            <span class="practice-carousel-placeholder-card-kicker">Вопросы</span>
+            <div class="practice-carousel-placeholder-chip-row">
+              ${practicePlaceholderChip("для кого", true)}
+              ${practicePlaceholderChip("цель")}
+              ${practicePlaceholderChip("ограничения")}
+            </div>
+            ${practicePlaceholderLine("82%", "is-strong")}
+            ${practicePlaceholderLine("58%")}
+          </div>
+        `,
+        rightHtml: `
+          <div class="practice-carousel-placeholder-chat-bubble">
+            Не знаю, объясни простыми словами и предложи лучший вариант
+          </div>
+        `,
+        footerHtml: "Ответьте на вопросы по смыслу проекта, не по техстеку."
+      })
+    },
+    {
+      stepLabel: "Шаг 4",
+      title: "Проверьте документы проекта",
+      mockHtml: renderPracticePlaceholderFrame({
+        title: "Project docs",
+        badge: "Markdown",
+        leftHtml: `
+          <div class="practice-carousel-placeholder-panel">
+            <span class="practice-carousel-placeholder-card-kicker">Файлы</span>
+            <div class="practice-carousel-placeholder-checklist">
+              <div class="practice-carousel-placeholder-checkitem">technical_spec.md</div>
+              <div class="practice-carousel-placeholder-checkitem">roadmap.md</div>
+              <div class="practice-carousel-placeholder-checkitem">rules.md</div>
+              <div class="practice-carousel-placeholder-checkitem">current_status.md</div>
+              <div class="practice-carousel-placeholder-checkitem">module_map.md</div>
+              <div class="practice-carousel-placeholder-checkitem">start_prompt_for_next_chat.md</div>
+            </div>
+          </div>
+        `,
+        rightHtml: `
+          <div class="practice-carousel-placeholder-terminal">
+            <div class="practice-carousel-placeholder-terminal-head">
+              <span>Проверка</span>
+              <span class="practice-carousel-placeholder-terminal-prompt">docs</span>
+            </div>
+            ${practicePlaceholderLine("86%", "is-strong")}
+            ${practicePlaceholderLine("64%")}
+            ${practicePlaceholderLine("48%")}
+          </div>
+        `,
+        footerHtml: "Проверьте, что документы проекта созданы и понятны."
+      })
+    },
+    {
+      stepLabel: "Шаг 5",
+      title: "Настройте связь с GitHub и Codex",
+      mockHtml: renderPracticePlaceholderFrame({
+        title: "GitHub + Codex",
+        badge: "Connection",
+        leftHtml: `
+          <div class="practice-carousel-placeholder-terminal">
+            <div class="practice-carousel-placeholder-terminal-head">
+              <span>GitHub repo</span>
+              <span class="practice-carousel-placeholder-terminal-prompt">ssh</span>
+            </div>
+            <div class="practice-carousel-placeholder-chip-row">
+              ${practicePlaceholderChip("GitHub", true)}
+              ${practicePlaceholderChip("Codex")}
+              ${practicePlaceholderChip("SSH key")}
+            </div>
+            ${practicePlaceholderLine("88%", "is-strong")}
+            ${practicePlaceholderLine("70%")}
+          </div>
+        `,
+        rightHtml: `
+          <div class="practice-carousel-placeholder-panel">
+            <span class="practice-carousel-placeholder-card-kicker">Связь</span>
+            <div class="practice-carousel-placeholder-chip-row">
+              ${practicePlaceholderChip("ChatGPT", true)}
+              ${practicePlaceholderChip("GitHub")}
+              ${practicePlaceholderChip("Codex")}
+            </div>
+            ${practicePlaceholderLine("82%", "is-strong")}
+            ${practicePlaceholderLine("56%")}
+          </div>
+        `,
+        footerHtml: "Настройте связь между ChatGPT, GitHub и Codex, если это требуется."
+      })
+    },
+    {
+      stepLabel: "Шаг 6",
+      title: "Проверьте итог в GitHub",
+      mockHtml: renderPracticePlaceholderFrame({
+        title: "GitHub",
+        badge: "Result",
+        leftHtml: `
+          <div class="practice-carousel-placeholder-panel">
+            <span class="practice-carousel-placeholder-card-kicker">Проверка</span>
+            <div class="practice-carousel-placeholder-checklist">
+              <div class="practice-carousel-placeholder-checkitem">документы лежат в GitHub</div>
+              <div class="practice-carousel-placeholder-checkitem">commit/push сделаны</div>
+              <div class="practice-carousel-placeholder-checkitem">ChatGPT может читать и проверять repo</div>
+            </div>
+          </div>
+        `,
+        rightHtml: `
+          <div class="practice-carousel-placeholder-terminal">
+            <div class="practice-carousel-placeholder-terminal-head">
+              <span>Итог</span>
+              <span class="practice-carousel-placeholder-terminal-prompt">ok</span>
+            </div>
+            <div class="practice-carousel-placeholder-chip-row">
+              ${practicePlaceholderChip("готово", true)}
+              ${practicePlaceholderChip("проверено")}
+            </div>
+            ${practicePlaceholderLine("86%", "is-strong")}
+            ${practicePlaceholderLine("64%")}
+          </div>
+        `,
+        footerHtml: "Проверьте результат в GitHub и убедитесь, что основа проекта готова."
+      })
+    }
+  ];
+
+  return renderPracticeCarousel({
+    carouselKey: "project-start",
+    note: "Позже здесь будут реальные скриншоты.",
+    slides,
+  });
+}
+
 function renderNavigation() {
   navRoot.innerHTML = courseData.sections
     .map((section) => {
@@ -3553,6 +4564,65 @@ function renderNavigation() {
       `;
     })
     .join("");
+}
+
+function getPracticeCarouselKey(carousel) {
+  return carousel?.dataset?.practiceCarousel || "default";
+}
+
+function updatePracticeCarouselUI(carousel, activeIndex) {
+  if (!carousel) {
+    return;
+  }
+
+  const slides = Array.from(carousel.querySelectorAll("[data-practice-carousel-slide]"));
+  const stepButtons = Array.from(carousel.querySelectorAll("[data-practice-carousel-step]"));
+  if (slides.length === 0 || stepButtons.length === 0) {
+    return;
+  }
+
+  const normalizedIndex = Math.max(0, Math.min(activeIndex, slides.length - 1));
+
+  slides.forEach((slide, index) => {
+    const isActive = index === normalizedIndex;
+    slide.classList.toggle("is-active", isActive);
+    slide.hidden = !isActive;
+    slide.setAttribute("aria-hidden", String(!isActive));
+  });
+
+  stepButtons.forEach((button, index) => {
+    const isActive = index === normalizedIndex;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-selected", String(isActive));
+  });
+
+  const prevButton = carousel.querySelector("[data-practice-carousel-prev]");
+  const nextButton = carousel.querySelector("[data-practice-carousel-next]");
+  if (prevButton) {
+    prevButton.disabled = normalizedIndex === 0;
+  }
+  if (nextButton) {
+    nextButton.disabled = normalizedIndex === slides.length - 1;
+  }
+}
+
+function syncPracticeCarousels(root = activeSectionRoot) {
+  const carousels = root.querySelectorAll("[data-practice-carousel]");
+  carousels.forEach((carousel) => {
+    const key = getPracticeCarouselKey(carousel);
+    const activeIndex = state.practiceCarouselState[key] ?? 0;
+    updatePracticeCarouselUI(carousel, activeIndex);
+  });
+}
+
+function setPracticeCarouselIndex(carousel, activeIndex) {
+  if (!carousel) {
+    return;
+  }
+
+  const key = getPracticeCarouselKey(carousel);
+  state.practiceCarouselState[key] = activeIndex;
+  updatePracticeCarouselUI(carousel, activeIndex);
 }
 
 function flashcardKey(sectionId, index) {
@@ -4002,6 +5072,7 @@ function renderActiveSection() {
   activeSectionRoot.innerHTML = renderSectionContent(section);
   renderNavigation();
   updateProgress();
+  syncPracticeCarousels(activeSectionRoot);
 }
 
 function scrollToActiveLesson() {
@@ -4072,6 +5143,45 @@ document.addEventListener("click", (event) => {
   const nextButton = event.target.closest("[data-section-next]");
   if (nextButton) {
     setActiveSection(nextButton.dataset.section, { scroll: true });
+    return;
+  }
+
+  const practiceCarouselStep = event.target.closest("[data-practice-carousel-step]");
+  if (practiceCarouselStep) {
+    const carousel = practiceCarouselStep.closest("[data-practice-carousel]");
+    if (!carousel) {
+      return;
+    }
+    const activeIndex = Number(practiceCarouselStep.dataset.practiceCarouselStep);
+    if (Number.isNaN(activeIndex)) {
+      return;
+    }
+    setPracticeCarouselIndex(carousel, activeIndex);
+    return;
+  }
+
+  const practiceCarouselPrev = event.target.closest("[data-practice-carousel-prev]");
+  if (practiceCarouselPrev) {
+    const carousel = practiceCarouselPrev.closest("[data-practice-carousel]");
+    if (!carousel) {
+      return;
+    }
+    const key = getPracticeCarouselKey(carousel);
+    const currentIndex = state.practiceCarouselState[key] ?? 0;
+    setPracticeCarouselIndex(carousel, Math.max(0, currentIndex - 1));
+    return;
+  }
+
+  const practiceCarouselNext = event.target.closest("[data-practice-carousel-next]");
+  if (practiceCarouselNext) {
+    const carousel = practiceCarouselNext.closest("[data-practice-carousel]");
+    if (!carousel) {
+      return;
+    }
+    const slides = carousel.querySelectorAll("[data-practice-carousel-slide]");
+    const key = getPracticeCarouselKey(carousel);
+    const currentIndex = state.practiceCarouselState[key] ?? 0;
+    setPracticeCarouselIndex(carousel, Math.min(slides.length - 1, currentIndex + 1));
     return;
   }
 
