@@ -1,6 +1,7 @@
 """Authentication routes for registration, verification, login, logout, and reset."""
 
 from pathlib import Path
+from urllib.parse import urlencode
 
 from fastapi import APIRouter, Form, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -9,6 +10,7 @@ from jinja2 import ChoiceLoader, FileSystemLoader
 
 from app.auth.service import (
     AuthError,
+    ConflictError,
     NotFoundError,
     NotVerifiedError,
     UnauthorizedError,
@@ -16,6 +18,8 @@ from app.auth.service import (
     authenticate_user,
     create_password_reset_request,
     create_session,
+    is_verification_resend_rate_limited,
+    register_user,
     reset_password,
     revoke_session,
     resend_verification_request,
@@ -31,22 +35,19 @@ templates.env.loader = ChoiceLoader(
         FileSystemLoader(str(Path(__file__).resolve().parents[1] / "shared" / "templates")),
     ]
 )
-
-REGISTRATION_CLOSED_MESSAGE = (
-    "Регистрация временно закрыта. Мы готовим курсы и материалы раздела «Работа с ИИ». "
-    "Если у вас уже есть аккаунт, войдите через страницу входа."
-)
+PENDING_VERIFICATION_EMAIL_COOKIE = "pending_verification_email"
+PENDING_VERIFICATION_EMAIL_COOKIE_MAX_AGE_SECONDS = 24 * 3600
+VERIFICATION_RESEND_COOLDOWN_SECONDS = 60
 
 
 def _template(request: Request, template_name: str, **context) -> HTMLResponse:
-    status_code = context.pop("status_code", 200)
     payload = {
         "request": request,
         "title": context.pop("title", "Страница"),
         "current_user": get_current_user_from_cookies(request.cookies),
     }
     payload.update(context)
-    return templates.TemplateResponse(request, template_name, payload, status_code=status_code)
+    return templates.TemplateResponse(request, template_name, payload)
 
 
 def _login_notice(request: Request) -> str | None:
@@ -60,14 +61,21 @@ def _login_notice(request: Request) -> str | None:
     return None
 
 
+def _pending_verification_email(request: Request) -> str | None:
+    email = (request.cookies.get(PENDING_VERIFICATION_EMAIL_COOKIE) or "").strip().lower()
+    return email or None
+
+
 @router.get("/register", response_class=HTMLResponse)
 def register_page(request: Request) -> HTMLResponse:
     return _template(
         request,
         "register.html",
         title="Регистрация",
-        notice=REGISTRATION_CLOSED_MESSAGE,
-        registration_closed=True,
+        notice=request.query_params.get("notice"),
+        error=request.query_params.get("error"),
+        email="",
+        login="",
     )
 
 
@@ -84,35 +92,72 @@ def register_submit(
     password: str = Form(default=""),
     repeat_password: str = Form(default=""),
 ) -> HTMLResponse:
-    return _template(
-        request,
-        "register.html",
-        title="Регистрация",
-        notice=REGISTRATION_CLOSED_MESSAGE,
-        registration_closed=True,
-        status_code=403,
+    try:
+        user = register_user(email=email, login=login, password=password, repeat_password=repeat_password)
+    except (ValidationError, ConflictError) as exc:
+        return _template(
+            request,
+            "register.html",
+            title="Регистрация",
+            error=str(exc),
+            email=email,
+            login=login,
+        )
+    except AuthError as exc:
+        return _template(
+            request,
+            "register.html",
+            title="Регистрация",
+            error=str(exc),
+            email=email,
+            login=login,
+        )
+    response = RedirectResponse(url="/check-email?registered=1", status_code=303)
+    settings = get_settings()
+    response.set_cookie(
+        key=PENDING_VERIFICATION_EMAIL_COOKIE,
+        value=user.email,
+        max_age=min(PENDING_VERIFICATION_EMAIL_COOKIE_MAX_AGE_SECONDS, settings.email_verification_token_expiry_hours * 3600),
+        httponly=True,
+        secure=settings.session_cookie_secure,
+        samesite="lax",
+        path="/",
     )
+    return response
 
 
 @router.get("/check-email", response_class=HTMLResponse)
 def check_email_page(request: Request) -> HTMLResponse:
+    pending_email = _pending_verification_email(request)
+    resend_available = bool(pending_email)
     if request.query_params.get("registered"):
         message = (
             "Мы отправили письмо подтверждения. Подтвердите почту перед входом."
         )
+    elif request.query_params.get("resent") and request.query_params.get("limited"):
+        message = (
+            "Письмо подтверждения уже отправлено недавно. Проверьте входящие и спам."
+        )
     elif request.query_params.get("resent"):
         message = (
-            "Новое письмо подтверждения отправлено. Проверьте почту и подтвердите её перед входом."
+            "Письмо подтверждения отправлено повторно. Проверьте входящие и спам."
         )
     else:
         message = (
             "Проверьте почту и подтвердите её по ссылке."
+        )
+    resend_error = request.query_params.get("resend_error")
+    if not resend_available and not resend_error:
+        resend_error = (
+            "Не удалось определить email для повторной отправки. Вернитесь к регистрации или войдите заново."
         )
     return _template(
         request,
         "check_email.html",
         title="Проверка почты",
         message=message,
+        resend_error=resend_error,
+        resend_available=resend_available,
     )
 
 
@@ -143,23 +188,77 @@ def resend_verification_submit(
     request: Request,
     email: str = Form(default=""),
 ) -> HTMLResponse:
+    settings = get_settings()
+    requested_email = (email or "").strip()
+    pending_email = _pending_verification_email(request)
+    target_email = requested_email or pending_email
+
+    if not target_email:
+        error = urlencode(
+            {
+                "resend_error": "Не удалось определить email для повторной отправки. Вернитесь к регистрации или войдите заново.",
+            }
+        )
+        return RedirectResponse(url=f"/check-email?{error}", status_code=303)
+
+    if is_verification_resend_rate_limited(
+        target_email,
+        settings=settings,
+        cooldown_seconds=VERIFICATION_RESEND_COOLDOWN_SECONDS,
+    ):
+        if requested_email:
+            return _template(
+                request,
+                "resend_verification.html",
+                title="Повторная отправка письма подтверждения",
+                notice="Письмо подтверждения уже отправлено недавно. Проверьте входящие и спам.",
+                email=requested_email,
+            )
+        limited = urlencode({"resent": "1", "limited": "1"})
+        return RedirectResponse(url=f"/check-email?{limited}", status_code=303)
+
     try:
-        resend_verification_request(email=email)
+        resend_verification_request(email=target_email, settings=settings)
     except ValidationError as exc:
+        if requested_email:
+            return _template(
+                request,
+                "resend_verification.html",
+                title="Повторная отправка письма подтверждения",
+                error=str(exc),
+                email=requested_email,
+            )
+        error = urlencode(
+            {
+                "resend_error": "Не удалось определить email для повторной отправки. Вернитесь к регистрации или войдите заново.",
+            }
+        )
+        return RedirectResponse(url=f"/check-email?{error}", status_code=303)
+    except AuthError:
+        if requested_email:
+            return _template(
+                request,
+                "resend_verification.html",
+                title="Повторная отправка письма подтверждения",
+                error="Не удалось отправить письмо подтверждения.",
+                email=requested_email,
+            )
+        error = urlencode(
+            {
+                "resend_error": "Не удалось отправить письмо подтверждения. Вернитесь к регистрации или войдите заново.",
+            }
+        )
+        return RedirectResponse(url=f"/check-email?{error}", status_code=303)
+
+    if requested_email:
         return _template(
             request,
             "resend_verification.html",
             title="Повторная отправка письма подтверждения",
-            error=str(exc),
-            email=email,
+            notice="Письмо подтверждения отправлено повторно. Проверьте входящие и спам.",
+            email="",
         )
-    return _template(
-        request,
-        "resend_verification.html",
-        title="Повторная отправка письма подтверждения",
-        notice="Если аккаунт существует и почта ещё не подтверждена, мы отправили новое письмо.",
-        email="",
-    )
+    return RedirectResponse(url="/check-email?resent=1", status_code=303)
 
 
 @router.get("/verify-email/{token}", response_class=HTMLResponse)
@@ -182,13 +281,15 @@ def verify_email_page(request: Request, token: str) -> HTMLResponse:
             success=False,
             message=str(exc),
         )
-    return _template(
+    response = _template(
         request,
         "verify_email.html",
         title="Подтверждение почты",
         success=True,
         message=f"Почта подтверждена для {user.email}. Теперь можно войти.",
     )
+    response.delete_cookie(key=PENDING_VERIFICATION_EMAIL_COOKIE, path="/")
+    return response
 
 
 @router.head("/verify-email/{token}")
@@ -228,7 +329,6 @@ def login_submit(
             request,
             "login.html",
             title="Вход в аккаунт",
-            error="Email не подтверждён.",
             unverified=True,
             email_or_login=email_or_login,
         )

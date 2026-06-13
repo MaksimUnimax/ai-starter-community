@@ -114,18 +114,15 @@
           <article class="account-card">
             <header class="account-card__header">
               <div class="stack account-card__headline">
-                <div class="account-card__title-row">
-                  <h3 class="account-card__title">{{ block.display_title or block.title }}</h3>
-                  <div class="account-card__badges">
-                    <span class="account-card__type-badge">{{ block.display_type_label or block.type_label }}</span>
-                    {% if block.is_active %}
-                      <span class="account-card__status-badge account-card__status-badge--active">Активно</span>
-                    {% elif block.is_expired %}
-                      <span class="account-card__status-badge account-card__status-badge--expired">{{ block.status_label }}</span>
-                    {% else %}
-                      <span class="account-card__status-badge account-card__status-badge--inactive">{{ block.status_label }}</span>
-                    {% endif %}
-                  </div>
+                <div class="account-card__badges">
+                  <span class="account-card__type-badge">{{ block.display_type_label or block.type_label }}</span>
+                  {% if block.is_active %}
+                    <span class="account-card__status-badge account-card__status-badge--active">Активно</span>
+                  {% elif block.is_expired %}
+                    <span class="account-card__status-badge account-card__status-badge--expired">{{ block.status_label }}</span>
+                  {% else %}
+                    <span class="account-card__status-badge account-card__status-badge--inactive">{{ block.status_label }}</span>
+                  {% endif %}
                 </div>
                 {% if account_blocks_manage_mode %}
                   <p class="form-help account-card__owner-line">Пользователь: {{ account_block_selected_user_summary.email }} · {{ account_block_selected_user_summary.login }}</p>
@@ -242,14 +239,7 @@
             ></video>
           </div>
 
-          <p class="account-card__detail">После просмотра откройте сайт Amnezia VPN и используйте IP из блока «Сервер».</p>
-          <p class="account-card__detail">
-            Видео взято с канала
-            <a href="https://www.youtube.com/@TechTalk_NotDead" target="_blank" rel="noreferrer">Tech Talk</a>.
-            Благодарим канал
-            <a href="https://www.youtube.com/@TechTalk_NotDead" target="_blank" rel="noreferrer">Tech Talk</a>
-            за видео. Лайк и подписка приветствуются.
-          </p>
+          <p class="cabinet-vpn-note">После просмотра откройте сайт Amnezia VPN и используйте IP из блока «Сервер».</p>
 
           <a
             class="button button-primary vpn-card__link"

@@ -165,8 +165,9 @@ def test_user_sees_compact_server_backed_account_blocks_and_copy_only_controls(c
     assert 'name="email"' not in accounts_section
     assert "data-account-card-edit-form" not in accounts_section
     assert "Скопировать" in accounts_section
-    assert '<h3 class="account-card__title">Chat</h3>' in accounts_section
     assert '<span class="account-card__type-badge">GPT</span>' in accounts_section
+    assert '<span class="account-card__status-badge account-card__status-badge--active">Активно</span>' in accounts_section
+    assert "account-card__title" not in accounts_section
     assert "ChatGPT" not in accounts_section
     assert "Почта" not in accounts_section
     assert "Осталось 60 дней" in accounts_section
@@ -213,11 +214,12 @@ def test_user_sees_compact_server_backed_account_blocks_and_copy_only_controls(c
     assert '<span class="cabinet-vpn-summary__title">' not in vpn_section
     assert "Видеоинструкция и ссылка Amnezia VPN" in vpn_section
     assert "После просмотра откройте сайт Amnezia VPN и используйте IP из блока «Сервер»." in vpn_section
-    assert "Видео взято с канала" in vpn_section
-    assert vpn_section.count('href="https://www.youtube.com/@TechTalk_NotDead"') == 2
-    assert "Tech Talk" in vpn_section
-    assert "Благодарим канал" in vpn_section
-    assert "Лайк и подписка приветствуются" in vpn_section
+    assert "cabinet-vpn-note" in vpn_section
+    assert "Видео взято с канала" not in vpn_section
+    assert 'href="https://www.youtube.com/@TechTalk_NotDead"' not in vpn_section
+    assert "Tech Talk" not in vpn_section
+    assert "Благодарим канал" not in vpn_section
+    assert "Лайк и подписка приветствуются" not in vpn_section
     assert "Открыть сайт Amnezia VPN" in vpn_section
     assert "account-card__type-badge" not in vpn_section
     assert "account-card__status-badge" not in vpn_section
@@ -258,15 +260,12 @@ def test_user_sees_three_active_account_cards_with_consistent_header_labels(clie
     assert response.status_code == 200
     accounts_section = _extract_accounts_section(response.text)
     assert accounts_section.count('<article class="account-card">') == 3
-    assert accounts_section.count('account-card__title-row') == 3
     assert accounts_section.count('account-card__status-badge--active">Активно</span>') == 3
-    assert '<h3 class="account-card__title">Chat</h3>' in accounts_section
     assert '<span class="account-card__type-badge">GPT</span>' in accounts_section
-    assert '<h3 class="account-card__title">Сервер</h3>' in accounts_section
     assert '<span class="account-card__type-badge">Сервер</span>' in accounts_section
-    assert '<h3 class="account-card__title">Почта</h3>' in accounts_section
     assert '<span class="account-card__type-badge">Почта</span>' in accounts_section
     assert "ChatGPT" not in accounts_section
+    assert "account-card__title" not in accounts_section
     assert accounts_section.count('input class="input account-field__input" data-account-field="login"') == 3
     assert accounts_section.count('input class="input account-field__input" data-account-field="password" type="password"') == 3
     assert accounts_section.count("data-account-copy") == 6
