@@ -3413,7 +3413,7 @@ Codex не должен сам выбирать архитектуру, стра
       resultText: "Безопасная работа держится на одной понятной задаче, сильной версии ChatGPT, доказательствах, актуальных документах, защите секретов и отдельном разрешении на опасные изменения.",
       nextStepTitle: "Финал курса",
       nextStepText: "После девятого урока откройте итоговый раздел курса, где собраны ключевые выводы и советы для дальнейшего роста.",
-      nextStepButtonLabel: "Завершить курс",
+      nextStepButtonLabel: "Перейти к финалу",
       nextStepTargetId: "lesson-10"
     },
     {
@@ -3631,9 +3631,47 @@ function renderPracticeCarousel({ carouselKey, note, slides }) {
 
   return `
     <div class="practice-carousel" ${carouselAttribute}>
-      <div class="practice-carousel-toolbar">
-        <div class="practice-carousel-note-wrap">
-          <p class="practice-carousel-note">${escapeHTML(note)}</p>
+      <p class="practice-carousel-note">${escapeHTML(note)}</p>
+      <div class="practice-carousel-stage" role="region" aria-roledescription="carousel" aria-label="${escapeHTML(note)}" tabindex="0">
+        <div class="practice-carousel-stage-viewport">
+          ${slides
+            .map(
+              (slide, index) => `
+                <section
+                  class="practice-carousel-slide ${index === 0 ? "is-active" : ""}"
+                  data-practice-carousel-slide="${index}"
+                  id="${idPrefix}-slide-${index}"
+                  role="tabpanel"
+                  aria-labelledby="${idPrefix}-step-${index}"
+                  aria-hidden="${index === 0 ? "false" : "true"}"
+                >
+                  <div class="practice-carousel-window">
+                    <div class="practice-carousel-slide-caption">
+                      <span class="practice-carousel-step-label">${escapeHTML(slide.stepLabel)}</span>
+                      <h5>${escapeHTML(slide.title)}</h5>
+                    </div>
+                    ${slide.image
+                      ? `
+                        <div class="practice-carousel-image-frame">
+                          <img
+                            src="${escapeHTML(slide.image)}"
+                            alt="${escapeHTML(slide.alt || slide.title)}"
+                            loading="${index === 0 ? "eager" : "lazy"}"
+                            decoding="async"
+                            draggable="false"
+                          >
+                        </div>
+                      `
+                      : slide.mockHtml || ""}
+                  </div>
+                </section>
+              `
+            )
+            .join("")}
+        </div>
+        <div class="practice-carousel-controls">
+          <button class="ghost-button practice-carousel-nav practice-carousel-nav-prev" type="button" data-practice-carousel-prev aria-label="Предыдущий шаг">Назад</button>
+          <button class="primary-button practice-carousel-nav practice-carousel-nav-next" type="button" data-practice-carousel-next aria-label="Следующий шаг">Дальше</button>
         </div>
       </div>
       <div class="practice-carousel-stepbar" role="tablist" aria-label="Шаги визуальной инструкции">
@@ -3655,47 +3693,82 @@ function renderPracticeCarousel({ carouselKey, note, slides }) {
           )
           .join("")}
       </div>
-      <div class="practice-carousel-stage">
-        <button class="ghost-button practice-carousel-nav" type="button" data-practice-carousel-prev>Назад</button>
-        <div class="practice-carousel-stage-viewport">
-        ${slides
-          .map(
-            (slide, index) => `
-              <section
-                class="practice-carousel-slide ${index === 0 ? "is-active" : ""}"
-                data-practice-carousel-slide="${index}"
-                id="${idPrefix}-slide-${index}"
-                role="tabpanel"
-                aria-labelledby="${idPrefix}-step-${index}"
-                aria-hidden="${index === 0 ? "false" : "true"}"
-              >
-                <div class="practice-carousel-window">
-                  <div class="practice-carousel-slide-caption">
-                    <span class="practice-carousel-step-label">${escapeHTML(slide.stepLabel)}</span>
-                    <h5>${escapeHTML(slide.title)}</h5>
-                  </div>
-                  ${slide.image
-                    ? `
-                      <div class="practice-carousel-image-frame">
-                        <img
-                          src="${escapeHTML(slide.image)}"
-                          alt="${escapeHTML(slide.alt || slide.title)}"
-                          loading="${index === 0 ? "eager" : "lazy"}"
-                          decoding="async"
-                          draggable="false"
-                        >
-                      </div>
-                    `
-                    : slide.mockHtml || ""}
-                </div>
-              </section>
-            `
-          )
-          .join("")}
-        </div>
-        <button class="primary-button practice-carousel-nav" type="button" data-practice-carousel-next>Дальше</button>
-      </div>
     </div>
+  `;
+}
+
+function getCourseSectionIndex(sectionId) {
+  return courseData.sections.findIndex((section) => section.id === sectionId);
+}
+
+function getAdjacentCourseSection(sectionId, offset) {
+  const index = getCourseSectionIndex(sectionId);
+  if (index < 0) {
+    return null;
+  }
+  return courseData.sections[index + offset] || null;
+}
+
+function formatLessonNavigationLabel(targetSection, direction) {
+  if (!targetSection) {
+    return "";
+  }
+
+  if (targetSection.id === "lesson-10") {
+    return direction === "next" ? "Перейти к финалу" : "Вернуться к финалу";
+  }
+
+  const match = targetSection.id.match(/^lesson-(\d+)$/);
+  if (match) {
+    return direction === "next"
+      ? `Перейти к уроку ${match[1]}`
+      : `Вернуться к уроку ${match[1]}`;
+  }
+
+  const title = targetSection.navTitle || targetSection.title || "следующему уроку";
+  return direction === "next" ? `Перейти к ${title}` : `Вернуться к ${title}`;
+}
+
+function renderLessonFooterNavigation(section) {
+  const previousSection = getAdjacentCourseSection(section.id, -1);
+  const nextSection = section.nextStepTargetId
+    ? courseData.sections.find((item) => item.id === section.nextStepTargetId)
+    : getAdjacentCourseSection(section.id, 1);
+  const previousButtonLabel = previousSection ? formatLessonNavigationLabel(previousSection, "previous") : "";
+  const nextButtonLabel = nextSection ? (section.nextStepButtonLabel || formatLessonNavigationLabel(nextSection, "next")) : "";
+  const hasButtons = Boolean(previousButtonLabel || nextButtonLabel);
+
+  if (!hasButtons) {
+    return "";
+  }
+
+  const hasText = Boolean(section.nextStepText);
+  const cardClass = [
+    "next-step-card",
+    !hasText ? "next-step-card--navigation-only" : ""
+  ].filter(Boolean).join(" ");
+  const actionsClass = [
+    "next-step-actions",
+    !previousButtonLabel || !nextButtonLabel ? "next-step-actions--single" : ""
+  ].filter(Boolean).join(" ");
+
+  return `
+    <section class="${cardClass}">
+      ${
+        hasText
+          ? `
+            <div class="next-step-copy">
+              <span class="block-label">${escapeHTML(section.nextStepTitle || "Следующий урок")}</span>
+              <p>${escapeHTML(section.nextStepText)}</p>
+            </div>
+          `
+          : ""
+      }
+      <div class="${actionsClass}">
+        ${previousButtonLabel ? `<button class="ghost-button" type="button" data-section="${escapeHTML(previousSection.id)}" data-section-footer-nav="true">${escapeHTML(previousButtonLabel)}</button>` : ""}
+        ${nextButtonLabel ? `<button class="primary-button" type="button" data-section="${escapeHTML(nextSection.id)}" data-section-footer-nav="true">${escapeHTML(nextButtonLabel)}</button>` : ""}
+      </div>
+    </section>
   `;
 }
 
@@ -4954,9 +5027,6 @@ function renderStructuredLesson(section) {
   const afterStarterPrompt = section.afterStarterPromptHtml || "";
   const resultTitle = section.finalResultTitle || section.resultTitle || "Главный вывод урока";
   const resultText = section.finalResultText || section.resultText;
-  const nextTitle = section.nextStepTitle || "Следующий урок";
-  const nextText = section.nextStepText;
-  const nextButton = section.nextStepButtonLabel;
   const finalResult = section.finalResultText
     ? `
         <section class="callout">
@@ -4973,17 +5043,7 @@ function renderStructuredLesson(section) {
         </section>
       `
     : "";
-  const nextStep = nextText
-    ? `
-        <section class="next-step-card">
-          <div>
-            <span class="block-label">${escapeHTML(nextTitle)}</span>
-            <p>${escapeHTML(nextText)}</p>
-          </div>
-          ${nextButton ? `<button class="primary-button" type="button" data-section="${escapeHTML(section.nextStepTargetId || "lesson-2")}" data-section-next="true">${escapeHTML(nextButton)}</button>` : ""}
-        </section>
-      `
-    : "";
+  const nextStep = renderLessonFooterNavigation(section);
 
   return `
     <article class="section-card">
@@ -5134,12 +5194,6 @@ document.addEventListener("click", (event) => {
     return;
   }
 
-  const nextButton = event.target.closest("[data-section-next]");
-  if (nextButton) {
-    setActiveSection(nextButton.dataset.section, { scroll: true });
-    return;
-  }
-
   const practiceCarouselStep = event.target.closest("[data-practice-carousel-step]");
   if (practiceCarouselStep) {
     const carousel = practiceCarouselStep.closest("[data-practice-carousel]");
@@ -5181,7 +5235,8 @@ document.addEventListener("click", (event) => {
 
   const sectionButton = event.target.closest("[data-section]");
   if (sectionButton) {
-    setActiveSection(sectionButton.dataset.section, { scroll: false });
+    const shouldScroll = sectionButton.dataset.sectionFooterNav === "true";
+    setActiveSection(sectionButton.dataset.section, { scroll: shouldScroll });
     return;
   }
 
@@ -5246,6 +5301,33 @@ document.addEventListener("click", (event) => {
   if (reviewButton) {
     setActiveSection("review");
     return;
+  }
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") {
+    return;
+  }
+
+  const carousel = event.target.closest?.("[data-practice-carousel]");
+  if (!carousel) {
+    return;
+  }
+
+  const slides = carousel.querySelectorAll("[data-practice-carousel-slide]");
+  if (slides.length === 0) {
+    return;
+  }
+
+  const key = getPracticeCarouselKey(carousel);
+  const currentIndex = state.practiceCarouselState[key] ?? 0;
+  const nextIndex = event.key === "ArrowLeft"
+    ? Math.max(0, currentIndex - 1)
+    : Math.min(slides.length - 1, currentIndex + 1);
+
+  if (nextIndex !== currentIndex) {
+    event.preventDefault();
+    setPracticeCarouselIndex(carousel, nextIndex);
   }
 });
 

@@ -254,6 +254,9 @@ def test_rendered_course_export_and_lesson_5_html_include_the_updates():
 
     lesson5_html = _render_section_html_via_node("lesson-5")
     lesson2_html = _render_section_html_via_node("lesson-2")
+    lesson1_html = _render_section_html_via_node("lesson-1")
+    lesson9_html = _render_section_html_via_node("lesson-9")
+    lesson10_html = _render_section_html_via_node("lesson-10")
 
     assert "/status" in lesson5_html
     assert "/st" in lesson5_html
@@ -267,24 +270,37 @@ def test_rendered_course_export_and_lesson_5_html_include_the_updates():
     assert "practice-carousel" in lesson5_html
     assert "lesson-screenshot-carousel" not in lesson5_html
     assert lesson5_html.count("data-practice-carousel-slide=") == 10
-    assert lesson5_html.count("Пошаговая визуальная инструкция к практическому занятию.") == 1
+    assert lesson5_html.count('<p class="practice-carousel-note">Пошаговая визуальная инструкция к практическому занятию.</p>') == 1
     assert "lesson-5-step-01-powershell-search.png" in lesson5_html
     assert "lesson-5-step-10-status-output.png" in lesson5_html
     assert "Эта карусель показывает весь путь от открытия PowerShell до проверки модели, лимитов и прав доступа в Codex." not in lesson5_html
     assert "Пошаговая визуальная инструкция по подключению к Codex" not in lesson5_html
     assert "Позже здесь будут реальные скриншоты" not in lesson5_html
+    assert "practice-carousel-toolbar" not in lesson5_html
+    assert "practice-carousel-controls" in lesson5_html
     assert "/tmp/" not in lesson5_html
+    assert 'data-section="lesson-4"' in lesson5_html
     assert 'data-section="lesson-6"' in lesson5_html
+    assert "Вернуться к уроку 4" in lesson5_html
     assert "Перейти к уроку 6" in lesson5_html
     assert lesson5_html.index('data-practice-carousel-prev') > lesson5_html.index("practice-carousel-stage")
     assert lesson5_html.index('data-practice-carousel-next') > lesson5_html.index("practice-carousel-stage")
     assert '<section class="next-step-card">' in lesson2_html
     assert '<section class="next-step-card">' in lesson5_html
-    assert '<button class="primary-button" type="button" data-section="lesson-3" data-section-next="true">' in lesson2_html
-    assert '<button class="primary-button" type="button" data-section="lesson-6" data-section-next="true">' in lesson5_html
+    assert '<section class="next-step-card">' in lesson9_html
+    assert '<section class="next-step-card next-step-card--navigation-only">' in lesson10_html
+    assert '<button class="primary-button" type="button" data-section="lesson-2" data-section-footer-nav="true">Перейти к уроку 2</button>' in lesson1_html
+    assert "Вернуться к уроку 1" not in lesson1_html
+    assert '<button class="ghost-button" type="button" data-section="lesson-1" data-section-footer-nav="true">Вернуться к уроку 1</button>' in lesson2_html
+    assert '<button class="primary-button" type="button" data-section="lesson-3" data-section-footer-nav="true">Перейти к уроку 3</button>' in lesson2_html
+    assert '<button class="ghost-button" type="button" data-section="lesson-4" data-section-footer-nav="true">Вернуться к уроку 4</button>' in lesson5_html
+    assert '<button class="primary-button" type="button" data-section="lesson-6" data-section-footer-nav="true">Перейти к уроку 6</button>' in lesson5_html
+    assert '<button class="ghost-button" type="button" data-section="lesson-8" data-section-footer-nav="true">Вернуться к уроку 8</button>' in lesson9_html
+    assert '<button class="primary-button" type="button" data-section="lesson-10" data-section-footer-nav="true">Перейти к финалу</button>' in lesson9_html
+    assert '<button class="ghost-button" type="button" data-section="lesson-9" data-section-footer-nav="true">Вернуться к уроку 9</button>' in lesson10_html
     assert 'data-section="lesson-3"' in lesson2_html
-    assert 'data-section-next="true"' in lesson2_html
-    assert 'data-section-next="true"' in lesson5_html
+    assert 'data-section="lesson-1"' in lesson2_html
+    assert 'data-section="lesson-4"' in lesson5_html
 
 
 def test_materials_and_lesson_pages_render_course_content(client, test_settings):
@@ -347,7 +363,7 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert page_response.text.count('class="nav-button') == 9
     assert page_response.text.count("nav-title") == 9
     assert "data-section-nav=\"true\"" in script_response.text
-    assert "data-section-next=\"true\"" in script_response.text
+    assert "renderLessonFooterNavigation" in script_response.text
     assert "Codex, AGENTS.md, Skills, токены и роль модели" in page_response.text
     assert "PowerShell, Terminal и подключение к серверу" in page_response.text
     assert "Процесс работы" in page_response.text
@@ -446,13 +462,12 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "getSectionQuiz(section, quizIndex)" in script_response.text
     assert 'state.answeredQuestions[quizKey(section.id, index)] !== undefined' in script_response.text
     assert "renderStructuredLesson" in script_response.text
-    assert 'section.nextStepTargetId || "lesson-2"' in script_response.text
+    assert 'function formatLessonNavigationLabel(targetSection, direction)' in script_response.text
     assert 'const navButton = event.target.closest("[data-section-nav]");' in script_response.text
     assert 'setActiveSection(navButton.dataset.section, { scroll: false });' in script_response.text
-    assert 'const nextButton = event.target.closest("[data-section-next]");' in script_response.text
-    assert 'setActiveSection(nextButton.dataset.section, { scroll: true });' in script_response.text
     assert 'const sectionButton = event.target.closest("[data-section]");' in script_response.text
-    assert 'setActiveSection(sectionButton.dataset.section, { scroll: false });' in script_response.text
+    assert 'sectionButton.dataset.sectionFooterNav === "true"' in script_response.text
+    assert 'setActiveSection(sectionButton.dataset.section, { scroll: shouldScroll });' in script_response.text
     assert 'id: "lesson-9"' in script_response.text
     assert 'id: "lesson-10"' in script_response.text
     assert 'review: "lesson-9"' in script_response.text
@@ -595,7 +610,7 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Instant" in lesson9_section
     assert "Не используйте <strong>Instant</strong> для серьёзной проектной работы." in lesson9_section
     assert "nextStepTargetId: \"lesson-10\"" in lesson9_section
-    assert "Завершить курс" in lesson9_section
+    assert "Перейти к финалу" in lesson9_section
     assert "Поздравляем, вы завершили курс" in lesson10_section
     assert "вводный курс" not in lesson10_section
     assert "Вы прошли курс по работе с ChatGPT и Codex." in lesson10_section
