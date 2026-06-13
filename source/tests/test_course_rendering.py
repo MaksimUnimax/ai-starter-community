@@ -1103,6 +1103,9 @@ def test_lesson8_docs_workflow_prompt_and_carousel_are_rendered(client, test_set
     assert "Сохраните prompt нового диалога в prefix или на компьютер" in rendered_lesson8_html
     assert "Начните новый диалог с prompt’а для начала диалога" in rendered_lesson8_html
     assert "Убедитесь, что ChatGPT продолжает работу с того места, где закрыли прошлый диалог" in rendered_lesson8_html
+    assert "проектный prompt" in rendered_lesson8_html
+    assert "проектный prompt обновления документов" in rendered_lesson8_html
+    assert "проектный prompt нового диалога" in rendered_lesson8_html
     assert "docs-update-new-dialog" in rendered_lesson8_html
     assert rendered_lesson8_html.count("data-practice-carousel-slide=") == 11
     assert rendered_lesson8_html.count("data-practice-carousel-step=") == 11
@@ -1116,6 +1119,7 @@ def test_lesson8_docs_workflow_prompt_and_carousel_are_rendered(client, test_set
         "Получите задачу для Codex",
         "Верните отчёт Codex в ChatGPT",
         "Проверьте результат docs-update",
+        "Получите prompt для нового диалога",
         "Начните новый диалог с актуального prompt",
     ]:
         assert forbidden not in rendered_lesson8_html
