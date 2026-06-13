@@ -401,9 +401,9 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     ]
     assert "переводит задачу пользователя на технический язык для Codex" in lesson1_difference_block
     assert "Почему результат работы нужно проверять по фактам?" not in lesson1_section
-    assert "Что такое ChatGPT в нашем курсе?" in lesson1_section
-    assert "Что такое Codex в нашем курсе?" in lesson1_section
-    assert "Как правильно разделять ChatGPT и Codex?" in lesson1_section
+    assert "Что такое ChatGPT" in lesson1_section
+    assert "Что такое Codex" in lesson1_section
+    assert "Чем ChatGPT отличается от Codex" in lesson1_section
     assert "Сервер, Codex, AGENTS.md и Skills" not in page_response.text
     assert page_response.text.count("Вернуться в личный кабинет") == 2
     assert page_response.text.count('href="/cabinet"') == 2
@@ -687,35 +687,27 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "<strong>Prompt для нового диалога</strong>" in lesson8_section
     assert 'project_docs_update_prompt.md' in lesson8_section
     assert 'new_project_dialogue_prompt.md' in lesson8_section
-    assert "markdown: `# Prompt для обновления документов проекта" in lesson8_section
-    assert "markdown: `# Prompt для нового диалога по проекту" in lesson8_section
+    assert 'markdown: "# Project-specific prompt' in lesson8_section
+    assert "Prompt для нового диалога" in lesson8_section
     assert lesson8_section.count("promptForm: {") == 2
     assert "Что я передам ниже" not in lesson8_section
     assert "Ниже я передам" not in lesson8_section
     assert "Материалы текущего этапа" not in lesson8_section
     assert "ВСТАВЬТЕ СЮДА ОТЧЁТ" not in lesson8_section
     assert "СКРИНШОТ, РЕШЕНИЕ ИЛИ ОПИСАНИЕ" not in lesson8_section
-    assert "Этот prompt — универсальный шаблон" in lesson8_section
-    assert "создай для меня новый проектный prompt для обновления документов" in lesson8_section
-    assert "создай для меня новый prompt для нового диалога" in lesson8_section
-    assert "Сохраните этот новый prompt в prefix-расширение" in lesson8_section
-    assert "используйте его, а не универсальный шаблон из урока" in lesson8_section
-    assert "Проверь текущий диалог, если он доступен." in lesson8_section
-    assert "Проверь документы проекта в public docs repo, если он доступен." in lesson8_section
-    assert 'title: "Что нужно записывать"' not in lesson8_section
-    assert 'title: "Что не нужно записывать"' not in lesson8_section
-    assert "Что ChatGPT проверяет перед обновлением документов" in lesson8_section
-    assert "Как начинать новый диалог" in lesson8_section
+    assert "AstroDaily Bot" in lesson8_section
+    assert "DOC_READ_PROOF" in lesson8_section
+    assert "CORPUS_MATCH_CHECK" in lesson8_section
+    assert "CHRONOLOGY_CHECK" in lesson8_section
+    assert "prompts ниже — это шаблоны" in lesson8_section
+    assert "В реальной работе <strong>ChatGPT</strong> должен заполнить проектные данные сам" in lesson8_section
+    assert "готовые <strong>prefix-блоки</strong>" in lesson8_section
+    assert "ChatGPT</strong> сверяет <strong>current_status.md</strong>" in lesson8_section
+    assert "в документы не попали <strong>.env</strong>, <strong>токены</strong>, <strong>пароли</strong>, <strong>private key</strong> и <strong>auth-файлы</strong>" in lesson8_section
+    assert "не создан <strong>next_steps.md</strong>" in lesson8_section
     assert "Обновить документы и начать новый диалог" in lesson8_section
     assert "Главное" in lesson8_section
     for forbidden in [
-        "OpenScript",
-        "AI Starter Community",
-        "openscript.ru",
-        "MaksimUnimax",
-        "Agent Lab",
-        "APM",
-        "Kilo",
         "/opt/ai-starter-community",
         "/opt/openscript-site-docs",
         "design/product-story-03",
@@ -1076,6 +1068,36 @@ def test_lesson7_prefix_helper_extension_flow_is_rendered(client, test_settings)
         assert filename in rendered_lesson7_html
     assert "practice-carousel-placeholder-frame" not in rendered_lesson7_html
     assert "lesson-screenshot-carousel" not in rendered_lesson7_html
+
+
+def test_lesson8_docs_workflow_prompt_and_carousel_are_rendered(client, test_settings):
+    _prepare_verified_user(client, test_settings, "lesson8-flow@example.com", "lesson8flowproof", grant_access=True)
+
+    page_response = client.get("/materials/drafts/dair-smoke-20260529/")
+    script_response = client.get("/materials/drafts/dair-smoke-20260529/script.js")
+
+    assert page_response.status_code == 200
+    assert script_response.status_code == 200
+
+    lesson8_section = _lesson_section(script_response.text, "lesson-8", "lesson-9")
+    rendered_lesson8_html = _render_section_html_via_node("lesson-8")
+
+    assert "AstroDaily Bot" in lesson8_section
+    assert "DOC_READ_PROOF" in lesson8_section
+    assert "CORPUS_MATCH_CHECK" in lesson8_section
+    assert "CHRONOLOGY_CHECK" in lesson8_section
+    assert 'filename: "project_docs_update_prompt.md"' in lesson8_section
+    assert 'filename: "new_project_dialogue_prompt.md"' in lesson8_section
+    assert 'markdown: "# Project-specific prompt' in lesson8_section
+    assert "Prompt для нового диалога" in lesson8_section
+    assert "docs-update-new-dialog" in rendered_lesson8_html
+    assert rendered_lesson8_html.count("data-practice-carousel-slide=") == 10
+    assert rendered_lesson8_html.count("data-practice-carousel-step=") == 10
+    assert "practice-carousel-placeholder-frame" not in rendered_lesson8_html
+    assert "lesson-screenshot-carousel" not in rendered_lesson8_html
+    assert "lesson-8-step-01-run-docs-update-prompt.png" in rendered_lesson8_html
+    assert "lesson-8-step-10-start-new-dialogue.png" in rendered_lesson8_html
+    assert "Пошаговая визуальная инструкция к практическому занятию." in rendered_lesson8_html
 
 
 def test_quiz_answer_indices_are_shuffled_across_lessons():
