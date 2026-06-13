@@ -776,15 +776,15 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Developer mode" in lesson7_section
     assert "Load unpacked" in lesson7_section
     assert "Я не программист" in lesson7_section
-    assert "Prompt для создания расширения" in lesson7_section
-    assert "Откройте prompt для создания расширения ниже." in lesson7_section
+    assert "Prompt для создания ChatGPT Prefix Helper" in lesson7_section
+    assert "Скачайте или скопируйте промпт и вставьте в ChatGPT." in lesson7_section
     assert "includeStarterPromptForm: true" in lesson7_section
     assert "starterPromptPlacement: \"block\"" in lesson7_section
-    assert "starterPromptLabel: \"Prompt для создания расширения\"" in lesson7_section
-    assert "starterPromptDescription: \"Ниже есть prompt для практики. Его можно скопировать или скачать как Markdown-файл.\"" in lesson7_section
+    assert "starterPromptLabel: \"Prompt для создания ChatGPT Prefix Helper\"" in lesson7_section
+    assert "starterPromptDescription: \"Скачайте или скопируйте промпт и вставьте в ChatGPT.\"" in lesson7_section
     assert "starterPromptActionsLabel: \"Действия с prompt для практики\"" in lesson7_section
-    assert "starterPromptFilename: \"prefix_extension_for_chatgpt_prompt.md\"" in lesson7_section
-    assert "starterPromptMarkdown: `# Prompt для создания расширения" in lesson7_section
+    assert "starterPromptFilename: \"side_prompt_create_chatgpt_prefix_extension.md\"" in lesson7_section
+    assert "starterPromptMarkdown: `# Вставной prompt: создать browser-расширение для ChatGPT и вернуться к основному ТЗ" in lesson7_section
     assert "Скопируйте prompt кнопкой “Скопировать prompt” или скачайте его кнопкой “Скачать .md”." in lesson7_section
     assert "Ошибка 3: писать код в design run." not in lesson7_section
     assert "стартовый prompt" not in lesson7_section
@@ -1045,11 +1045,22 @@ def test_lesson7_prefix_helper_extension_flow_is_rendered(client, test_settings)
     assert "Prompt для создания ChatGPT Prefix Helper" in lesson7_section
     assert "prefix-блоками" in lesson7_section
     assert "Создать ChatGPT Prefix Helper" in lesson7_section
-    assert "В этой практике вы делаете не основной проект, а отдельный помощник-расширение" in lesson7_section
-    assert "Откройте страницу расширений в Chrome или Edge" in lesson7_section
+    assert "Продолжите уже начатую работу с <strong>ChatGPT</strong> и вставьте <strong>prompt</strong> туда." in lesson7_section
+    assert 'href="chrome://extensions/" target="_blank" rel="noreferrer">chrome://extensions/</a>' in lesson7_section
+    assert 'href="edge://extensions/" target="_blank" rel="noreferrer">edge://extensions/</a>' in lesson7_section
     assert "Добавлять prefix перед отправкой" in lesson7_section
-    assert "Не храните в prefix-блоках пароли, токены, приватные ключи" in lesson7_section
+    assert "Не храните в <strong>prefix-блоках</strong> пароли, токены, приватные ключи" in lesson7_section
     assert "У вас установлен и включён <strong>ChatGPT Prefix Helper</strong>." in lesson7_section
+    assert "новый чат" not in lesson7_section
+    assert "line-through" not in lesson7_section
+    assert "<s>" not in lesson7_section
+    assert "<del>" not in lesson7_section
+    assert 'starterPromptDescription: "Скачайте или скопируйте промпт и вставьте в ChatGPT."' in lesson7_section
+    assert "Вставьте промпт в ChatGPT, следуйте инструкциям ChatGPT" in rendered_lesson7_html
+    assert "Откройте chrome://extensions/ и загрузите скачанное и распакованное расширение" in rendered_lesson7_html
+    assert "Скачайте или скопируйте промпт и вставьте в ChatGPT." in rendered_lesson7_html
+    assert 'href="chrome://extensions/" target="_blank" rel="noreferrer">chrome://extensions/</a>' in rendered_lesson7_html
+    assert 'href="edge://extensions/" target="_blank" rel="noreferrer">edge://extensions/</a>' in rendered_lesson7_html
     assert rendered_lesson7_html.count("data-practice-carousel-slide=") == 7
     assert rendered_lesson7_html.count("data-practice-carousel-step=") == 7
     assert 'data-practice-carousel="chatgpt-prefix-extension"' in rendered_lesson7_html
