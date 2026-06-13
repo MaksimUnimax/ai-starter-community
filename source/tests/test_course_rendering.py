@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+import io
+import json
 import re
 import sqlite3
+import subprocess
+import zipfile
 from collections import Counter
 from pathlib import Path
 
+from app.admin.course_export import build_course_export
 from app.auth.service import authenticate_user, create_session, register_user, verify_email
 from app.materials.course_loader import get_lesson, list_lessons, load_course, render_markdown
 
@@ -29,6 +34,67 @@ def _lesson_section(script_text: str, lesson_id: str, next_lesson_id: str | None
     else:
         end = script_text.index("function renderNavigation()", start)
     return script_text[start:end]
+
+
+def _render_section_html_via_node(lesson_id: str) -> str:
+    node_script = f"""
+const fs = require("fs");
+const vm = require("vm");
+const source = fs.readFileSync({json.dumps(str(SCRIPT_PATH))}, "utf8");
+const cutoff = source.indexOf('document.addEventListener("click"');
+const snippet = source.slice(0, cutoff);
+const makeStub = () => ({{
+  innerHTML: "",
+  querySelector: () => null,
+  scrollIntoView: () => {{}},
+}});
+const progressStub = {{ textContent: "", style: {{}} }};
+const sandbox = {{
+  console,
+  URLSearchParams,
+  document: {{
+    getElementById(id) {{
+      if (id === "lesson-nav" || id === "active-section") {{
+        return makeStub();
+      }}
+      if (id === "progress-fill" || id === "progress-value" || id === "progress-label") {{
+        return progressStub;
+      }}
+      return makeStub();
+    }},
+    querySelector: () => null,
+    addEventListener: () => {{}},
+  }},
+  window: {{
+    location: {{ search: "", href: "https://example.test/materials/drafts/dair-smoke-20260529/" }},
+    history: {{ replaceState: () => {{}} }},
+    requestAnimationFrame: () => {{}},
+  }},
+  navigator: {{}},
+  Blob: class Blob {{}},
+  URL: {{
+    createObjectURL: () => "",
+    revokeObjectURL: () => {{}},
+  }},
+  setTimeout,
+  clearTimeout,
+}};
+vm.createContext(sandbox);
+vm.runInContext(
+  `${{snippet}}
+globalThis.__lesson = courseData.sections.find((section) => section.id === {json.dumps(lesson_id)});
+globalThis.__rendered = renderSectionContent(globalThis.__lesson);`,
+  sandbox
+);
+process.stdout.write(sandbox.__rendered);
+"""
+    completed = subprocess.run(
+        ["node", "-e", node_script],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return completed.stdout
 
 
 def _extract_token_from_db(test_settings, email: str) -> str:
@@ -154,6 +220,40 @@ answer_ref: ../answers/01-kak-my-rabotaem.md
     assert "&lt;script&gt;alert(1)&lt;/script&gt;" in safe_html
 
 
+def test_rendered_course_export_and_lesson_5_html_include_the_updates():
+    export_package = build_course_export()
+    with zipfile.ZipFile(io.BytesIO(export_package.content)) as archive:
+        rendered_html = archive.read("rendered/course.html").decode("utf-8")
+        styles_css = archive.read("source/styles.css").decode("utf-8")
+
+    assert "<h3>Структура курса</h3>" in rendered_html
+    assert rendered_html.count("course-intro-part") == 4
+    assert ".next-step-card .primary-button" in styles_css
+    assert ".next-step-actions .primary-button" in styles_css
+    assert ".next-step-card .primary-button {\n  align-self: flex-start;\n  white-space: normal;\n}" in styles_css
+    assert ".next-step-actions .primary-button {\n  align-self: flex-start;\n  white-space: normal;\n}" in styles_css
+
+    lesson5_html = _render_section_html_via_node("lesson-5")
+    lesson2_html = _render_section_html_via_node("lesson-2")
+
+    assert "/st" in lesson5_html
+    assert "/model" in lesson5_html
+    assert "5.4 mini" in lesson5_html
+    assert "модели могут перестать поддерживаться" in lesson5_html
+    assert "/permissions" in lesson5_html
+    assert "полный доступ" in lesson5_html
+    assert 'href="/cabinet#accounts" target="_blank" rel="noreferrer">личного кабинета</a>' in lesson5_html
+    assert 'data-section="lesson-6"' in lesson5_html
+    assert "Перейти к уроку 6" in lesson5_html
+    assert '<section class="next-step-card">' in lesson2_html
+    assert '<section class="next-step-card">' in lesson5_html
+    assert '<button class="primary-button" type="button" data-section="lesson-3" data-section-next="true">' in lesson2_html
+    assert '<button class="primary-button" type="button" data-section="lesson-6" data-section-next="true">' in lesson5_html
+    assert 'data-section="lesson-3"' in lesson2_html
+    assert 'data-section-next="true"' in lesson2_html
+    assert 'data-section-next="true"' in lesson5_html
+
+
 def test_materials_and_lesson_pages_render_course_content(client, test_settings):
     _prepare_verified_user(client, test_settings, "course-render@example.com", "courserender", grant_access=True)
 
@@ -253,7 +353,7 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert ".lesson-shell .section-body > .callout:not([data-starter-prompt-panel]) li" in styles_response.text
     assert ".lesson-shell .section-body > .next-step-card p" in styles_response.text
     assert ".next-step-actions .primary-button" in styles_response.text
-    assert "min-width: 220px;" in styles_response.text
+    assert "min-width: 220px;" not in styles_response.text
     assert "font-size: 18px;" in styles_response.text
     assert "line-height: 1.65;" in styles_response.text
     assert ".course-note {" in styles_response.text
@@ -376,6 +476,13 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Перейти к уроку 5" in lesson4_section
     assert "В следующем уроке разберём старт проекта: сначала документация, потом разработка." in lesson5_section
     assert "Перейти к уроку 6" in lesson5_section
+    assert "/st" in lesson5_section
+    assert "/model" in lesson5_section
+    assert "5.4 mini" in lesson5_section
+    assert "модели могут перестать поддерживаться" in lesson5_section
+    assert "/permissions" in lesson5_section
+    assert "полный доступ" in lesson5_section
+    assert 'href="/cabinet#accounts" target="_blank" rel="noreferrer">личного кабинета</a>' in lesson5_section
     assert "В следующем уроке разберём процесс работы: какие бывают run’ы Codex, зачем нужна пошаговость и как удерживать важные инструкции в контексте ChatGPT." in lesson6_section
     assert "Перейти к уроку 7" in lesson6_section
     lesson8_start = script_response.text.index('id: "lesson-8"')

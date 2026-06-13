@@ -1374,12 +1374,17 @@ const courseData = {
       title: "Первое подключение к Codex",
       html: `
         <p><strong>Практическое задание:</strong></p>
+        <p>Сначала настройте <strong>Codex</strong> простыми командами:</p>
         <ol>
           <li>Откройте <strong>Terminal</strong> на macOS или <strong>PowerShell</strong> на Windows.</li>
           <li>Войдите на сервер с помощью SSH-команды из личного кабинета.</li>
           <li>Введите пароль из <a href="/cabinet#accounts" target="_blank" rel="noreferrer">личного кабинета</a>.</li>
           <li>После подключения к серверу введите <strong>codex</strong>.</li>
-          <li>Когда <strong>Codex</strong> откроется, напишите: <strong>привет ты кто?</strong></li>
+          <li>Введите <strong>/st</strong>, чтобы посмотреть текущие лимиты и выбранную модель.</li>
+          <li>Введите <strong>/model</strong> и выберите модель курса — сейчас это <strong>5.4 mini</strong>.</li>
+          <li>Если название модели позже изменится, это нормально: ИИ быстро развивается, а старые модели могут перестать поддерживаться.</li>
+          <li>Введите <strong>/permissions</strong> и включите <strong>полный доступ</strong>.</li>
+          <li>После этого напишите: <strong>привет ты кто?</strong></li>
           <li>Дождитесь ответа от <strong>Codex</strong>.</li>
         </ol>
         <p><strong>Что должно получиться:</strong></p>
@@ -1387,6 +1392,9 @@ const courseData = {
           <li><strong>Terminal</strong> или <strong>PowerShell</strong> открыт;</li>
           <li>подключение к серверу выполнено;</li>
           <li><strong>codex</strong> запущен;</li>
+          <li><strong>/st</strong> показал лимиты и выбранную модель;</li>
+          <li><strong>/model</strong> открыл выбор модели и была выбрана модель курса <strong>5.4 mini</strong>;</li>
+          <li><strong>/permissions</strong> открыл настройки и был включён <strong>полный доступ</strong>;</li>
           <li><strong>Codex</strong> ответил на сообщение <strong>привет ты кто?</strong>.</li>
         </ul>
       `
