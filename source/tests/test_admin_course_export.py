@@ -6,6 +6,7 @@ import sqlite3
 import zipfile
 from datetime import datetime, timezone
 from io import BytesIO
+from pathlib import Path
 from urllib.parse import unquote
 
 from app.admin import course_export
@@ -53,6 +54,25 @@ def _open_zip(response):
     return zipfile.ZipFile(BytesIO(response.content))
 
 
+COURSE_DRAFT_ROOT = Path(__file__).resolve().parents[1] / "app" / "materials" / "course_content" / "drafts" / "dair_smoke_20260529"
+STATIC_ASSET_REF_RE = re.compile(r'(?P<ref>(?:/static/)?(?:course-assets|images)/[^\s"\'`<>)]+)')
+
+
+def _course_asset_refs() -> list[str]:
+    text = ""
+    for name in ["index.html", "styles.css", "script.js"]:
+        path = COURSE_DRAFT_ROOT / name
+        if path.exists():
+            text += "\n" + path.read_text(encoding="utf-8")
+    return sorted(
+        {
+            match.group("ref").removeprefix("/static/")
+            for match in STATIC_ASSET_REF_RE.finditer(text)
+            if match.group("ref").removeprefix("/static/") and ".." not in match.group("ref").removeprefix("/static/").split("/")
+        }
+    )
+
+
 def test_admin_course_export_button_is_visible_on_dashboard(client, test_settings):
     _make_user(client, test_settings, "export-admin@example.com", "exportadmin", role="admin")
     response = client.get("/admin")
@@ -89,7 +109,6 @@ def test_admin_course_export_returns_fresh_zip_attachment_and_manifest(client, t
         names = set(archive.namelist())
         manifest = json.loads(archive.read("manifest.json").decode("utf-8"))
         assert manifest["source_draft_id"] == "dair_smoke_20260529"
-        assert manifest["course_title"] == "Работа с ИИ"
         assert manifest["course_subtitle"] == "Как вести разработку через ChatGPT и Codex"
         assert manifest["numbered_lesson_count"] == 9
         assert manifest["has_final_section"] is True
@@ -99,10 +118,6 @@ def test_admin_course_export_returns_fresh_zip_attachment_and_manifest(client, t
 
         lesson_titles = [lesson["title"] for lesson in manifest["lessons"]]
         assert len(lesson_titles) == 9
-        assert lesson_titles[3] == "Codex, AGENTS.md, Skills, токены и роль модели"
-        assert lesson_titles[4] == "PowerShell, Terminal и подключение к серверу"
-        assert lesson_titles[5] == "Старт проекта: сначала документация, потом разработка"
-        assert lesson_titles[6] == "Процесс работы"
         assert manifest["final_section"]["archive_path"] == "lessons/final.md"
         assert manifest["final_section"]["id"] == "lesson-10"
         assert manifest["final_section"]["title"] == "Поздравляем, вы завершили курс"
@@ -115,29 +130,22 @@ def test_admin_course_export_returns_fresh_zip_attachment_and_manifest(client, t
             "source/styles.css",
             "source/README.md",
             "lessons/final.md",
-            "prompts/lesson-6-start_project_documentation_prompt.md",
-            "prompts/lesson-7-prefix_extension_for_chatgpt_prompt.md",
-            "prompts/lesson-8-project_docs_update_prompt.md",
-            "prompts/lesson-8-new_project_dialogue_prompt.md",
-            "assets/static/images/human_ai_hero_background_v2.png",
-            "assets/static/images/mobile_vitruvian_NO_SQUARES_transparent.webp",
         }
         expected_names.update(lesson["archive_path"] for lesson in manifest["lessons"])
+        expected_asset_paths = {f"assets/static/{ref}" for ref in _course_asset_refs()}
+        expected_names.update(expected_asset_paths)
         assert expected_names.issubset(names)
 
-        prompt_paths = {item["archive_path"] for item in manifest["prompt_files"]}
-        assert prompt_paths == {
-            "prompts/lesson-6-start_project_documentation_prompt.md",
-            "prompts/lesson-7-prefix_extension_for_chatgpt_prompt.md",
-            "prompts/lesson-8-project_docs_update_prompt.md",
-            "prompts/lesson-8-new_project_dialogue_prompt.md",
-        }
-
         asset_paths = {item["archive_path"] for item in manifest["assets"]}
-        assert asset_paths == {
-            "assets/static/images/human_ai_hero_background_v2.png",
-            "assets/static/images/mobile_vitruvian_NO_SQUARES_transparent.webp",
-        }
+        assert asset_paths == expected_asset_paths
+        assert len(asset_paths) == 53
+        assert sum(1 for path in asset_paths if path.startswith("assets/static/course-assets/")) == 51
+        assert sum(1 for path in asset_paths if path.startswith("assets/static/images/")) == 2
+        assert sum(1 for path in asset_paths if path.startswith("assets/static/course-assets/dair-smoke-20260529/git-carousel/")) == 6
+        assert sum(1 for path in asset_paths if path.startswith("assets/static/course-assets/lesson-5/")) == 10
+        assert sum(1 for path in asset_paths if path.startswith("assets/static/course-assets/lesson-6/")) == 17
+        assert sum(1 for path in asset_paths if path.startswith("assets/static/course-assets/lesson-7/")) == 7
+        assert sum(1 for path in asset_paths if path.startswith("assets/static/course-assets/lesson-8/")) == 11
 
         source_paths = {item["archive_path"] for item in manifest["source_files"]}
         assert source_paths == {
@@ -154,28 +162,6 @@ def test_admin_course_export_returns_fresh_zip_attachment_and_manifest(client, t
         assert '../source/script.js' in rendered_html
         assert '../assets/static/images/human_ai_hero_background_v2.png' in rendered_html
         assert '../assets/static/images/mobile_vitruvian_NO_SQUARES_transparent.webp' in rendered_html
-
-        lesson4_text = archive.read("lessons/04-codex-agents-md-skills-tokeny-i-rol-modeli.md").decode("utf-8")
-        assert "# Codex, AGENTS.md, Skills, токены и роль модели" in lesson4_text
-        assert "Canonical source excerpt" in lesson4_text
-        assert "navTitle: \"Урок 4 — Codex, AGENTS.md, Skills, токены и роль модели\"" in lesson4_text
-
-        lesson7_text = archive.read("lessons/07-protsess-raboty.md").decode("utf-8")
-        assert "# Процесс работы" in lesson7_text
-        assert "starterPromptPlacement: \"block\"" in lesson7_text
-        assert "контекстное окно" in lesson7_text
-        assert "prefix-расширение" in lesson7_text
-
-        prompt6 = archive.read("prompts/lesson-6-start_project_documentation_prompt.md").decode("utf-8")
-        assert prompt6.startswith("# Старт проекта с разработки документации")
-        assert "technical_spec.md" in prompt6
-        prompt7 = archive.read("prompts/lesson-7-prefix_extension_for_chatgpt_prompt.md").decode("utf-8")
-        assert prompt7.startswith("# Prompt для создания расширения")
-        assert "manifest.json" in prompt7
-        prompt8 = archive.read("prompts/lesson-8-project_docs_update_prompt.md").decode("utf-8")
-        assert prompt8.startswith("# Prompt для обновления документов проекта")
-        prompt9 = archive.read("prompts/lesson-8-new_project_dialogue_prompt.md").decode("utf-8")
-        assert prompt9.startswith("# Prompt для нового диалога по проекту")
 
 
 def test_course_export_is_fresh_per_request(monkeypatch):

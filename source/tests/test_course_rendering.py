@@ -21,10 +21,27 @@ def _connect(test_settings):
 
 
 SCRIPT_PATH = Path(__file__).resolve().parents[1] / "app/materials/course_content/drafts/dair_smoke_20260529/script.js"
+COURSE_DRAFT_ROOT = SCRIPT_PATH.parent
+STATIC_ASSET_REF_RE = re.compile(r'(?P<ref>(?:/static/)?(?:course-assets|images)/[^\s"\'`<>)]+)')
 
 
 def _script_source() -> str:
     return SCRIPT_PATH.read_text()
+
+
+def _course_asset_refs() -> list[str]:
+    text = ""
+    for name in ["index.html", "styles.css", "script.js"]:
+        path = COURSE_DRAFT_ROOT / name
+        if path.exists():
+            text += "\n" + path.read_text(encoding="utf-8")
+    return sorted(
+        {
+            match.group("ref").removeprefix("/static/")
+            for match in STATIC_ASSET_REF_RE.finditer(text)
+            if match.group("ref").removeprefix("/static/") and ".." not in match.group("ref").removeprefix("/static/").split("/")
+        }
+    )
 
 
 def _lesson_section(script_text: str, lesson_id: str, next_lesson_id: str | None = None) -> str:
@@ -223,7 +240,7 @@ answer_ref: ../answers/01-kak-my-rabotaem.md
 def test_rendered_course_export_and_lesson_5_html_include_the_updates():
     export_package = build_course_export()
     lesson5_asset_root = Path(__file__).resolve().parents[1] / "app" / "static" / "course-assets" / "lesson-5"
-    expected_asset_names = [
+    lesson5_expected_asset_names = [
         "lesson-5-step-01-powershell-search.png",
         "lesson-5-step-02-cabinet-server-command.png",
         "lesson-5-step-03-ssh-command.png",
@@ -238,9 +255,13 @@ def test_rendered_course_export_and_lesson_5_html_include_the_updates():
     with zipfile.ZipFile(io.BytesIO(export_package.content)) as archive:
         rendered_html = archive.read("rendered/course.html").decode("utf-8")
         styles_css = archive.read("source/styles.css").decode("utf-8")
-        exported_asset_names = sorted(
-            name for name in archive.namelist() if name.startswith("assets/static/course-assets/lesson-5/")
-        )
+        exported_asset_names = sorted(name for name in archive.namelist() if name.startswith("assets/static/course-assets/"))
+        hero_asset_names = sorted(name for name in archive.namelist() if name.startswith("assets/static/images/"))
+        expected_asset_names = [f"assets/static/{ref}" for ref in _course_asset_refs() if ref.startswith("course-assets/")]
+        expected_hero_asset_names = [
+            "assets/static/images/human_ai_hero_background_v2.png",
+            "assets/static/images/mobile_vitruvian_NO_SQUARES_transparent.webp",
+        ]
 
     assert "<h3>Структура курса</h3>" in rendered_html
     assert rendered_html.count("course-intro-part") == 4
@@ -257,9 +278,15 @@ def test_rendered_course_export_and_lesson_5_html_include_the_updates():
     assert ".practice-carousel-nav {\n  pointer-events: auto;\n  display: grid;\n  place-items: center;\n  width: clamp(42px, 4.8vw, 56px);" in styles_css
     assert ".practice-carousel-arrow-icon {\n  display: block;\n  width: 22px;\n  height: 22px;\n  fill: none;\n  stroke: currentColor;\n  stroke-width: 2.6;" in styles_css
     assert "@media (prefers-reduced-motion: reduce)" in styles_css
-    assert len(exported_asset_names) == 10
-    assert exported_asset_names == [f"assets/static/course-assets/lesson-5/{name}" for name in expected_asset_names]
-    assert all((lesson5_asset_root / name).is_file() for name in expected_asset_names)
+    assert exported_asset_names == expected_asset_names
+    assert len(exported_asset_names) == 51
+    assert sum(1 for name in exported_asset_names if name.startswith("assets/static/course-assets/dair-smoke-20260529/git-carousel/")) == 6
+    assert sum(1 for name in exported_asset_names if name.startswith("assets/static/course-assets/lesson-5/")) == 10
+    assert sum(1 for name in exported_asset_names if name.startswith("assets/static/course-assets/lesson-6/")) == 17
+    assert sum(1 for name in exported_asset_names if name.startswith("assets/static/course-assets/lesson-7/")) == 7
+    assert sum(1 for name in exported_asset_names if name.startswith("assets/static/course-assets/lesson-8/")) == 11
+    assert hero_asset_names == expected_hero_asset_names
+    assert all((lesson5_asset_root / name).is_file() for name in lesson5_expected_asset_names)
 
     lesson4_html = _render_section_html_via_node("lesson-4")
     lesson5_html = _render_section_html_via_node("lesson-5")

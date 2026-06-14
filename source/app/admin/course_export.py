@@ -27,6 +27,7 @@ COURSE_TITLE_RE = re.compile(r'^\s*title:\s*"(?P<value>.*?)"', re.M | re.S)
 COURSE_SUBTITLE_RE = re.compile(r'^\s*courseTitle:\s*"(?P<value>.*?)"', re.M | re.S)
 STRING_FIELD_RE_TEMPLATE = r'^\s*{field}:\s*"(?P<value>.*?)"'
 TEMPLATE_FIELD_RE_TEMPLATE = r'^\s*{field}:\s*`(?P<value>.*?)`'
+STATIC_ASSET_REF_RE = re.compile(r'(?P<ref>(?:/static/)?(?:course-assets|images)/[^\s"\'`<>)]+)')
 PROMPT_FORM_RE = re.compile(
     r'promptForm:\s*{\s*'
     r'id:\s*"(?P<id>[^"]+)"\s*,\s*'
@@ -227,6 +228,49 @@ def _build_rendered_course_html(index_html: str) -> str:
     return rendered
 
 
+def _extract_static_asset_refs(*texts: str) -> list[str]:
+    asset_refs: list[str] = []
+    seen: set[str] = set()
+
+    for text in texts:
+        for match in STATIC_ASSET_REF_RE.finditer(text):
+            ref = match.group("ref").removeprefix("/static/")
+            if not ref or ref.startswith("/"):
+                continue
+            if any(part == ".." for part in ref.split("/")):
+                continue
+            if ref in seen:
+                continue
+            seen.add(ref)
+            asset_refs.append(ref)
+
+    return asset_refs
+
+
+def _collect_asset_files(*, index_html: str, script_text: str, styles_text: str) -> list[dict[str, str]]:
+    asset_refs = _extract_static_asset_refs(
+        index_html,
+        script_text,
+        styles_text,
+        "/static/images/human_ai_hero_background_v2.png",
+        "/static/images/mobile_vitruvian_NO_SQUARES_transparent.webp",
+    )
+    asset_files: list[dict[str, str]] = []
+
+    for ref in asset_refs:
+        source_path = STATIC_ROOT / ref
+        if not source_path.is_file():
+            continue
+        asset_files.append(
+            {
+                "source_path": str(source_path),
+                "archive_path": f"assets/{source_path.relative_to(STATIC_ROOT.parent)}",
+            }
+        )
+
+    return asset_files
+
+
 def _build_manifest(
     *,
     generated_at: datetime,
@@ -332,22 +376,7 @@ def build_course_export(*, generated_at: datetime | None = None) -> CourseExport
         }
     ]
 
-    asset_source_paths = [
-        STATIC_ROOT / "images" / "human_ai_hero_background_v2.png",
-        STATIC_ROOT / "images" / "mobile_vitruvian_NO_SQUARES_transparent.webp",
-    ]
-    lesson5_asset_root = STATIC_ROOT / "course-assets" / "lesson-5"
-    if lesson5_asset_root.is_dir():
-        asset_source_paths.extend(sorted(path for path in lesson5_asset_root.iterdir() if path.is_file()))
-    asset_files = []
-    for path in asset_source_paths:
-        if path.is_file():
-            asset_files.append(
-                {
-                    "source_path": str(path),
-                    "archive_path": f"assets/{path.relative_to(STATIC_ROOT.parent)}",
-                }
-            )
+    asset_files = _collect_asset_files(index_html=index_html, script_text=script_text, styles_text=styles_text)
 
     manifest = _build_manifest(
         generated_at=generated_at,
