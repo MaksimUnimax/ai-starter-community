@@ -574,6 +574,7 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     lesson10_start = script_response.text.index('id: "lesson-10"')
     lesson7_section = script_response.text[lesson7_start:lesson8_start]
     lesson8_section = script_response.text[lesson8_start:lesson9_start]
+    project_specific_marker = "-".join(["project", "specific"])
     lesson9_section = script_response.text[lesson9_start:lesson10_start]
     lesson10_section = script_response.text[lesson10_start:script_response.text.index("const state", lesson10_start)]
     lesson4_agents_index = lesson4_section.index('label: "AGENTS.md"')
@@ -689,8 +690,9 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert 'new_project_dialogue_prompt.md' in lesson8_section
     assert 'markdown: "# Prompt для обновления документов проекта' in lesson8_section
     assert "Потом подготовь **два отдельных prompt-блока для копирования кликом**" in lesson8_section
-    assert "Project-specific docs-update prompt" in lesson8_section
+    assert "Проектный docs-update prompt" in lesson8_section
     assert "Codex docs-only update prompt" in lesson8_section
+    assert project_specific_marker not in lesson8_section
     assert "Prompt для нового диалога" in lesson8_section
     assert lesson8_section.count("promptForm: {") == 2
     assert "Что я передам ниже" not in lesson8_section
@@ -703,7 +705,7 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "CORPUS_MATCH_CHECK" in lesson8_section
     assert "CHRONOLOGY_CHECK" in lesson8_section
     assert "показанные ниже <strong>prompts</strong> — это универсальные шаблоны" in lesson8_section
-    assert "проектный <strong>prompt</strong>" in lesson8_section
+    assert "готовый <strong>проектный prompt</strong>" in lesson8_section
     assert "либо файлом, либо в <strong>prefix-расширение</strong>" in lesson8_section
     assert "ChatGPT</strong> сверяет <strong>current_status.md</strong>" in lesson8_section
     assert "в документы не попали <strong>.env</strong>, <strong>токены</strong>, <strong>пароли</strong>, <strong>private key</strong> и <strong>auth-файлы</strong>" in lesson8_section
@@ -759,7 +761,7 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert '<strong>Prefix</strong> помогает напомнить <strong>ChatGPT</strong> об этом правиле без ручного написания большого текста.' in lesson7_section
     assert "ручного копирования" not in lesson7_section
     assert "Project Prefixer" not in lesson7_section
-    assert "https://github.com/MaksimUnimax/openscript-agent-lab-student-kit" not in lesson7_section
+    assert "https://github.com/MaksimUnimax/openscript-agent-lab-student-kit" in lesson7_section
     assert "Отправьте тестовое сообщение в <strong>ChatGPT</strong> и убедитесь, что prefix добавился перед текстом." in lesson7_section
     assert "manifest.json" in lesson7_section
     assert "content.js" in lesson7_section
@@ -1085,6 +1087,7 @@ def test_lesson8_docs_workflow_prompt_and_carousel_are_rendered(client, test_set
 
     lesson8_section = _lesson_section(script_response.text, "lesson-8", "lesson-9")
     rendered_lesson8_html = _render_section_html_via_node("lesson-8")
+    project_specific_marker = "-".join(["project", "specific"])
 
     assert "Prompt для обновления документов проекта" in lesson8_section
     assert "DOC_READ_PROOF" in lesson8_section
@@ -1093,7 +1096,7 @@ def test_lesson8_docs_workflow_prompt_and_carousel_are_rendered(client, test_set
     assert 'filename: "project_docs_update_prompt.md"' in lesson8_section
     assert 'filename: "new_project_dialogue_prompt.md"' in lesson8_section
     assert 'markdown: "# Prompt для обновления документов проекта' in lesson8_section
-    assert "Project-specific docs-update prompt" in lesson8_section
+    assert "Проектный docs-update prompt" in lesson8_section
     assert "Codex docs-only update prompt" in lesson8_section
     assert "Получите prompt обновления документов проекта и промпт для кодекса" in rendered_lesson8_html
     assert "Скопируйте промпт для Codex" in rendered_lesson8_html
@@ -1107,6 +1110,7 @@ def test_lesson8_docs_workflow_prompt_and_carousel_are_rendered(client, test_set
     assert "проектный prompt обновления документов" in rendered_lesson8_html
     assert "проектный prompt нового диалога" in rendered_lesson8_html
     assert "docs-update-new-dialog" in rendered_lesson8_html
+    assert rendered_lesson8_html.count(project_specific_marker) == 0
     assert rendered_lesson8_html.count("data-practice-carousel-slide=") == 11
     assert rendered_lesson8_html.count("data-practice-carousel-step=") == 11
     assert "practice-carousel-placeholder-frame" not in rendered_lesson8_html
@@ -1116,6 +1120,7 @@ def test_lesson8_docs_workflow_prompt_and_carousel_are_rendered(client, test_set
     assert "lesson-8-step-11-continue-from-stop-point.png" in rendered_lesson8_html
     assert "Пошаговая визуальная инструкция к практическому занятию." in rendered_lesson8_html
     for forbidden in [
+        project_specific_marker,
         "Получите задачу для Codex",
         "Верните отчёт Codex в ChatGPT",
         "Проверьте результат docs-update",
