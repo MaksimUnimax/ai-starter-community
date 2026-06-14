@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="{{ lesson_test_styles_url }}">
+{% endblock %}
+
+{% block content %}
+  {{ course_body_html | safe }}
+{% endblock %}

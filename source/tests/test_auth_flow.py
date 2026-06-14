@@ -710,7 +710,11 @@ def test_cabinet_shows_logout_button_and_access_text(client, test_settings):
     assert "nav-account-compact" in cabinet_response.text
     assert "nav-account-name" in cabinet_response.text
     assert "nav-account-email" in cabinet_response.text
-    assert "nav-settings" in cabinet_response.text
+    assert "nav-account-link" in cabinet_response.text
+    assert "nav-settings" not in cabinet_response.text
+    assert 'href="/cabinet/settings"' in cabinet_response.text
+    assert "hero-bg-desktop" in cabinet_response.text
+    assert "hero-bg-mobile" in cabinet_response.text
     assert "Аккаунты" not in cabinet_response.text
     assert "Добавить блок" not in cabinet_response.text
     assert "Главная" in cabinet_response.text

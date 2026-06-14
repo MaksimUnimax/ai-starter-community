@@ -3,11 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>OpenScript — первый ИИ-бот без опыта в программировании</title>
+  <title>{{ title|default("OpenScript — первый ИИ-бот без опыта в программировании", true) }}</title>
   <meta name="description" content="OpenScript помогает пройти первый проект с ИИ-наставником, создать своего первого ИИ-бота и понять, как дальше делать боты, автоматизации и MVP самостоятельно.">
   <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
   <link rel="shortcut icon" href="/static/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/static/styles.css">
+  {% block extra_head %}{% endblock %}
 </head>
   <body class="page{% if request.url.path == '/' %} page--landing{% endif %}">
     <div class="page-shell">
@@ -15,25 +16,16 @@
         <div class="nav-inner">
           <div class="nav-brand-row">
             <a class="nav-logo" href="/">OpenScript</a>
-            {% if current_user %}
-              <div class="nav-account-compact" aria-label="Текущий аккаунт">
-                <span class="nav-account-name">{{ current_user.login }}</span>
-                <span class="nav-account-email">{{ current_user.email }}</span>
-              </div>
-            {% endif %}
           </div>
           <div class="nav-menu-row">
             <nav class="nav-links" aria-label="Навигация">
               <a class="button button-secondary nav-pill" href="/">Главная</a>
               {% if current_user %}
-                <a class="button button-secondary nav-pill" href="/materials">Обучение</a>
+                <a class="button button-secondary nav-pill" href="{{ learning_course_url|default('/materials/drafts/dair-smoke-20260529/', true) }}">Обучение</a>
                 <a class="button button-secondary nav-pill" href="/cabinet">Личный кабинет</a>
                 {% if current_user.role == "admin" %}
                   <a class="button button-secondary nav-pill" href="/admin">Админ-панель</a>
                 {% endif %}
-                <a class="button button-secondary nav-pill nav-settings" href="/cabinet/settings">
-                  <span class="nav-settings-label">Настройки</span>
-                </a>
                 <form class="nav-form logout-form" method="post" action="/logout">
                   <button class="button button-secondary nav-pill" type="submit">Выйти</button>
                 </form>
@@ -41,6 +33,12 @@
                 <a class="button button-secondary nav-pill" href="/login">Вход / регистрация</a>
               {% endif %}
             </nav>
+            {% if current_user %}
+              <a class="nav-account-compact nav-account-link" href="/cabinet/settings" aria-label="Открыть настройки аккаунта">
+                <span class="nav-account-name">{{ current_user.login }}</span>
+                <span class="nav-account-email">{{ current_user.email }}</span>
+              </a>
+            {% endif %}
           </div>
         </div>
       </header>

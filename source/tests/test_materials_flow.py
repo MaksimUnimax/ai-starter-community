@@ -104,26 +104,31 @@ def test_shared_stylesheet_uses_main_page_theme(client):
 
 def test_materials_shows_locked_state_without_access(client, test_settings):
     _prepare_and_login_verified_user(client, test_settings, "materials-locked@example.com", "materialslocked")
-    response = client.get("/materials")
-    assert response.status_code == 200
-    assert "/static/styles.css" in response.text
-    assert "Обучение" in response.text
-    assert "Доступ ограничен" in response.text
-    assert "nav-account-compact" in response.text
-    assert "nav-account-name" in response.text
-    assert "nav-account-email" in response.text
-    assert "nav-settings" in response.text
-    assert "Работа с ИИ" in response.text
-    assert "Полный доступ откроется после оплаты тарифа." in response.text
-    assert "В личный кабинет" in response.text
-    assert "Курс для новичков без опыта программирования." not in response.text
-    assert "Уроки курса" not in response.text
-    assert "Как мы работаем: ChatGPT проектирует, Codex выполняет, пользователь проверяет" not in response.text
-    assert "/materials/lessons/kak-my-rabotaem-chatgpt-codex-user" not in response.text
-    assert "/cabinet" in response.text
-    assert "/admin" not in response.text
-    assert "Payment" not in response.text
-    assert "Locked" not in response.text
+    response = client.get("/materials", follow_redirects=False)
+    assert response.status_code == 303
+    assert response.headers["location"] == "/materials/drafts/dair-smoke-20260529/"
+
+    locked_response = client.get("/materials/drafts/dair-smoke-20260529/", follow_redirects=False)
+    assert locked_response.status_code == 403
+    assert "Доступ ограничен" in locked_response.text
+    assert "Полный доступ откроется после оплаты тарифа." in locked_response.text
+    assert "hero-bg-desktop" in locked_response.text
+    assert "hero-bg-mobile" in locked_response.text
+    assert "nav-account-compact" in locked_response.text
+    assert "nav-account-name" in locked_response.text
+    assert "nav-account-email" in locked_response.text
+    assert "nav-settings" not in locked_response.text
+    assert "nav-account-link" in locked_response.text
+    assert 'href="/cabinet/settings"' in locked_response.text
+    assert "Работа с ИИ" in locked_response.text
+    assert "Курс для новичков без опыта программирования." not in locked_response.text
+    assert "Уроки курса" not in locked_response.text
+    assert "Как мы работаем: ChatGPT проектирует, Codex выполняет, пользователь проверяет" not in locked_response.text
+    assert "/materials/lessons/kak-my-rabotaem-chatgpt-codex-user" not in locked_response.text
+    assert "/cabinet" in locked_response.text
+    assert "/admin" not in locked_response.text
+    assert "Payment" not in locked_response.text
+    assert "Locked" not in locked_response.text
 
     lesson_response = client.get("/materials/lessons/kak-my-rabotaem-chatgpt-codex-user")
     assert lesson_response.status_code == 200
@@ -133,22 +138,29 @@ def test_materials_shows_locked_state_without_access(client, test_settings):
 
 def test_materials_shows_placeholder_sections_when_access_granted(client, test_settings):
     _prepare_and_login_verified_user(client, test_settings, "materials-open@example.com", "materialsopen", grant_access=True)
-    response = client.get("/materials")
-    assert response.status_code == 200
-    assert "Работа с ИИ" in response.text
-    assert "nav-account-compact" in response.text
-    assert "nav-settings" in response.text
-    assert "Курс для новичков без опыта программирования." in response.text
-    assert "Уроки курса" in response.text
-    assert "Как мы работаем: ChatGPT проектирует, Codex выполняет, пользователь проверяет" in response.text
-    assert "/materials/lessons/kak-my-rabotaem-chatgpt-codex-user" in response.text
-    assert "/static/styles.css" in response.text
-    assert "Личный кабинет" in response.text
-    assert "Вернуться в личный кабинет" in response.text
-    assert "/cabinet" in response.text
-    assert "/admin" not in response.text
-    assert "Payment" not in response.text
-    assert "Content" not in response.text
+    response = client.get("/materials", follow_redirects=False)
+    assert response.status_code == 303
+    assert response.headers["location"] == "/materials/drafts/dair-smoke-20260529/"
+
+    course_response = client.get("/materials/drafts/dair-smoke-20260529/")
+    assert course_response.status_code == 200
+    assert "nav-account-compact" in course_response.text
+    assert "nav-account-name" in course_response.text
+    assert "nav-account-email" in course_response.text
+    assert "nav-settings" not in course_response.text
+    assert "nav-account-link" in course_response.text
+    assert 'href="/cabinet/settings"' in course_response.text
+    assert "hero-bg-desktop" in course_response.text
+    assert "hero-bg-mobile" in course_response.text
+    assert "Вступление к курсу" in course_response.text
+    assert "Структура курса" in course_response.text
+    assert "/static/styles.css" in course_response.text
+    assert "Личный кабинет" in course_response.text
+    assert "Вернуться в личный кабинет" in course_response.text
+    assert "/cabinet" in course_response.text
+    assert "/admin" not in course_response.text
+    assert "Payment" not in course_response.text
+    assert "Content" not in course_response.text
 
 
 def test_cabinet_contains_materials_link_and_locked_hint(client, test_settings):
@@ -159,6 +171,8 @@ def test_cabinet_contains_materials_link_and_locked_hint(client, test_settings):
     assert "Личный кабинет будет доступен после оплаты" in response.text
     assert "После оплаты тарифа откроются личный кабинет, обучение и материалы." in response.text
     assert "Доступ ограничен" in response.text
+    assert "hero-bg-desktop" in response.text
+    assert "hero-bg-mobile" in response.text
     assert "Обучающий блок" not in response.text
     assert "Перейти к обучению" not in response.text
     assert "Обучающий проект" not in response.text
@@ -169,7 +183,9 @@ def test_cabinet_contains_materials_link_and_locked_hint(client, test_settings):
     assert "nav-account-compact" in response.text
     assert "nav-account-name" in response.text
     assert "nav-account-email" in response.text
-    assert "nav-settings" in response.text
+    assert "nav-settings" not in response.text
+    assert "nav-account-link" in response.text
+    assert 'href="/cabinet/settings"' in response.text
     assert 'href="/materials/drafts/dair-smoke-20260529/"' in response.text
     assert 'href="/cabinet/learning/project-file"' not in response.text
     assert "Аккаунты" not in response.text
@@ -185,13 +201,19 @@ def test_staff_roles_can_open_materials_without_payment_marker(client, test_sett
     ]:
         client.cookies.clear()
         _prepare_and_login_verified_user(client, test_settings, email, login, role=role)
-        response = client.get("/materials")
-        assert response.status_code == 200
-        assert "Работа с ИИ" in response.text
-        assert "Уроки курса" in response.text
-        assert "Как мы работаем: ChatGPT проектирует, Codex выполняет, пользователь проверяет" in response.text
-        assert "/materials/lessons/kak-my-rabotaem-chatgpt-codex-user" in response.text
-        assert "Раздел «Работа с ИИ» будет доступен после оплаты." not in response.text
+        response = client.get("/materials", follow_redirects=False)
+        assert response.status_code == 303
+        assert response.headers["location"] == "/materials/drafts/dair-smoke-20260529/"
+
+    course_response = client.get("/materials/drafts/dair-smoke-20260529/")
+    assert course_response.status_code == 200
+    assert "Работа с ИИ" in course_response.text
+    assert "Вступление к курсу" in course_response.text
+    assert "Структура курса" in course_response.text
+    assert "hero-bg-desktop" in course_response.text
+    assert "hero-bg-mobile" in course_response.text
+    assert "course-head hero" in course_response.text
+    assert "Раздел «Работа с ИИ» будет доступен после оплаты." not in course_response.text
 
 
 def test_cabinet_access_labels_for_staff_and_paid_user(client, test_settings):
@@ -200,6 +222,10 @@ def test_cabinet_access_labels_for_staff_and_paid_user(client, test_settings):
     assert paid_response.status_code == 200
     assert "Аккаунты" in paid_response.text
     assert "/static/cabinet-local-accounts.js" in paid_response.text
+    assert "nav-account-compact" in paid_response.text
+    assert "nav-account-link" in paid_response.text
+    assert "nav-settings" not in paid_response.text
+    assert 'href="/cabinet/settings"' in paid_response.text
     assert "Перейти к обучению" in paid_response.text
     assert "Скачать файл" in paid_response.text
     assert 'href="/materials/drafts/dair-smoke-20260529/"' in paid_response.text
@@ -210,6 +236,10 @@ def test_cabinet_access_labels_for_staff_and_paid_user(client, test_settings):
     moderator_response = client.get("/cabinet")
     assert moderator_response.status_code == 200
     assert "Аккаунты" in moderator_response.text
+    assert "nav-account-compact" in moderator_response.text
+    assert "nav-account-link" in moderator_response.text
+    assert "nav-settings" not in moderator_response.text
+    assert 'href="/cabinet/settings"' in moderator_response.text
     assert "Перейти к обучению" in moderator_response.text
     assert "Скачать файл" in moderator_response.text
     assert 'href="/materials/drafts/dair-smoke-20260529/"' in moderator_response.text
@@ -220,6 +250,10 @@ def test_cabinet_access_labels_for_staff_and_paid_user(client, test_settings):
     admin_response = client.get("/cabinet")
     assert admin_response.status_code == 200
     assert "Аккаунты" in admin_response.text
+    assert "nav-account-compact" in admin_response.text
+    assert "nav-account-link" in admin_response.text
+    assert "nav-settings" not in admin_response.text
+    assert 'href="/cabinet/settings"' in admin_response.text
     assert "Перейти к обучению" in admin_response.text
     assert "Скачать файл" in admin_response.text
     assert 'href="/materials/drafts/dair-smoke-20260529/"' in admin_response.text

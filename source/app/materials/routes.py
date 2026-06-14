@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 from fastapi import APIRouter, HTTPException, Request
@@ -51,6 +52,24 @@ def _read_lesson_test_asset(filename: str) -> str:
     if not path.is_file():
         raise HTTPException(status_code=404, detail=f"Missing lesson test file: {filename}")
     return path.read_text(encoding="utf-8")
+
+
+def _read_lesson_test_document() -> str:
+    return _read_lesson_test_asset("index.html")
+
+
+def _extract_lesson_test_title(document: str) -> str:
+    match = re.search(r"<title>(.*?)</title>", document, flags=re.IGNORECASE | re.DOTALL)
+    if match is None:
+        return "Как разрабатывать с помощью ChatGPT и Codex — Работа с ИИ"
+    return match.group(1).strip()
+
+
+def _extract_lesson_test_body(document: str) -> str:
+    match = re.search(r"<body[^>]*>(.*)</body>", document, flags=re.IGNORECASE | re.DOTALL)
+    if match is None:
+        return document
+    return match.group(1).strip()
 
 
 def _template(request: Request, template_name: str, **context) -> HTMLResponse:
@@ -108,33 +127,18 @@ def _learning_paywall_response(request: Request, user, *, status_code: int = 200
 
 @router.get("/materials", response_class=HTMLResponse)
 def materials_page(request: Request):
-    settings = get_settings()
-    user = get_current_user_from_cookies(request.cookies, settings=settings)
+    user = get_current_user_from_cookies(request.cookies, settings=get_settings())
     if user is None:
         return RedirectResponse(url="/login", status_code=303)
-    if not user_has_materials_access(user):
-        return _learning_paywall_response(request, user)
-    course = load_course()
-    return _template(
-        request,
-        "materials.html",
-        title="Работа с ИИ",
-        course_title=course["title"],
-        course_audience=course["audience"],
-        lessons=list_lessons(),
-        user_email=user.email,
-        user_login=user.login,
-        lesson_test_url=LESSON_TEST_URL,
-    )
+    return RedirectResponse(url=LESSON_TEST_URL, status_code=303)
 
 
 @router.head("/materials")
 def materials_head(request: Request):
-    settings = get_settings()
-    user = get_current_user_from_cookies(request.cookies, settings=settings)
+    user = get_current_user_from_cookies(request.cookies, settings=get_settings())
     if user is None:
         return RedirectResponse(url="/login", status_code=303)
-    return materials_page(request)
+    return RedirectResponse(url=LESSON_TEST_URL, status_code=303)
 
 
 @router.get("/materials/lessons/{slug}", response_class=HTMLResponse)
@@ -182,7 +186,14 @@ def lesson_test_page(request: Request):
         return RedirectResponse(url="/login", status_code=303)
     if not user_has_materials_access(user):
         return _learning_paywall_response(request, user, status_code=403)
-    return HTMLResponse(_read_lesson_test_asset("index.html"))
+    document = _read_lesson_test_document()
+    return _template(
+        request,
+        "course_map.html",
+        title=_extract_lesson_test_title(document),
+        lesson_test_styles_url=LESSON_TEST_STYLES_URL,
+        course_body_html=_extract_lesson_test_body(document),
+    )
 
 
 @router.get(LESSON_TEST_STYLES_URL)

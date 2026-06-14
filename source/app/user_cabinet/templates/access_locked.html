@@ -2,22 +2,26 @@
 
 {% block content %}
   <section class="stack">
-    <div class="card stack">
-      <div class="course-access-badge" role="status" aria-live="polite">
-        <p>Доступ ограничен</p>
-        {% if current_user %}
-          <p>Вы вошли как {{ current_user.email }}{% if current_user.login %} · {{ current_user.login }}{% endif %}.</p>
-        {% endif %}
+    <section class="card course-head access-locked-card">
+      <div class="hero-bg-visual hero-bg-desktop" aria-hidden="true">
+        <img src="/static/images/human_ai_hero_background_v2.png" alt="" decoding="async" draggable="false">
       </div>
-      <h1 class="section-title">{{ locked_title }}</h1>
-      <p class="form-help">{{ locked_message }}</p>
-      <div class="actions">
-        <a class="button button-primary" href="{{ locked_action_url }}">{{ locked_action_label }}</a>
-        {% if locked_secondary_label and locked_secondary_url %}
-          <a class="button button-secondary" href="{{ locked_secondary_url }}">{{ locked_secondary_label }}</a>
-        {% endif %}
+      <div class="hero-bg-visual hero-bg-mobile" aria-hidden="true">
+        <img src="/static/images/mobile_vitruvian_NO_SQUARES_transparent.webp" alt="" decoding="async" draggable="false">
       </div>
-    </div>
+      <div class="hero-wrap">
+        <div class="hero-copy access-locked-copy">
+          <div class="course-access-badge" role="status" aria-live="polite">
+            <p>Доступ ограничен</p>
+            {% if current_user %}
+              <p>Вы вошли как {{ current_user.email }}{% if current_user.login %} · {{ current_user.login }}{% endif %}.</p>
+            {% endif %}
+          </div>
+          <h2 class="section-title">{{ locked_title }}</h2>
+          <p class="form-help">{{ locked_message }}</p>
+        </div>
+      </div>
+    </section>
 
     {% set pricing_section_id = "pricing" %}
     {% set pricing_section_class = "account-paywall-pricing" %}

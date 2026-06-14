@@ -106,11 +106,14 @@ def test_admin_can_grant_and_revoke_paid_access(client, test_settings):
     assert cabinet_response.status_code == 200
     assert "Аккаунты" in cabinet_response.text
     assert "/static/cabinet-local-accounts.js" in cabinet_response.text
+    assert "nav-account-compact" in cabinet_response.text
+    assert "nav-account-link" in cabinet_response.text
+    assert "nav-settings" not in cabinet_response.text
+    assert 'href="/cabinet/settings"' in cabinet_response.text
 
-    materials_response = client.get("/materials")
-    assert materials_response.status_code == 200
-    assert "Работа с ИИ" in materials_response.text
-    assert "Доступ к материалам и урокам откроется после оплаты тарифа." not in materials_response.text
+    materials_response = client.get("/materials", follow_redirects=False)
+    assert materials_response.status_code == 303
+    assert materials_response.headers["location"] == "/materials/drafts/dair-smoke-20260529/"
 
     client.cookies.clear()
     _login_as(client, test_settings, "admin-grant-admin@example.com")
@@ -130,14 +133,23 @@ def test_admin_can_grant_and_revoke_paid_access(client, test_settings):
     assert "После оплаты тарифа откроются личный кабинет, обучение и материалы." in locked_cabinet.text
     assert "Доступ ограничен" in locked_cabinet.text
     assert "Обучение" in locked_cabinet.text
+    assert "nav-account-compact" in locked_cabinet.text
+    assert "nav-account-link" in locked_cabinet.text
+    assert "nav-settings" not in locked_cabinet.text
+    assert 'href="/cabinet/settings"' in locked_cabinet.text
+    assert "hero-bg-desktop" in locked_cabinet.text
+    assert "hero-bg-mobile" in locked_cabinet.text
     assert "/static/cabinet-local-accounts.js" not in locked_cabinet.text
 
-    locked_materials = client.get("/materials")
-    assert locked_materials.status_code == 200
-    assert "Полный доступ откроется после оплаты тарифа." in locked_materials.text
-    assert "Доступ ограничен" in locked_materials.text
-    assert "В личный кабинет" in locked_materials.text
-    assert "На главную" in locked_materials.text
+    locked_materials = client.get("/materials", follow_redirects=False)
+    assert locked_materials.status_code == 303
+    assert locked_materials.headers["location"] == "/materials/drafts/dair-smoke-20260529/"
+    locked_course = client.get("/materials/drafts/dair-smoke-20260529/", follow_redirects=False)
+    assert locked_course.status_code == 403
+    assert "Полный доступ откроется после оплаты тарифа." in locked_course.text
+    assert "Доступ ограничен" in locked_course.text
+    assert "В личный кабинет" in locked_course.text
+    assert "На главную" in locked_course.text
 
 
 def test_non_admins_cannot_grant_or_revoke_paid_access(client, test_settings):
@@ -180,10 +192,13 @@ def test_access_status_alone_does_not_unlock_paid_access(client, test_settings):
 
     _login_as(client, test_settings, "admin-grant-status-only@example.com")
     cabinet_response = client.get("/cabinet")
-    materials_response = client.get("/materials")
+    materials_response = client.get("/materials", follow_redirects=False)
     assert cabinet_response.status_code == 200
-    assert materials_response.status_code == 200
+    assert materials_response.status_code == 303
+    assert materials_response.headers["location"] == "/materials/drafts/dair-smoke-20260529/"
     assert "Личный кабинет будет доступен после оплаты" in cabinet_response.text
     assert "После оплаты тарифа откроются личный кабинет, обучение и материалы." in cabinet_response.text
     assert "Доступ ограничен" in cabinet_response.text
-    assert "Полный доступ откроется после оплаты тарифа." in materials_response.text
+    locked_course = client.get("/materials/drafts/dair-smoke-20260529/", follow_redirects=False)
+    assert locked_course.status_code == 403
+    assert "Полный доступ откроется после оплаты тарифа." in locked_course.text

@@ -83,8 +83,8 @@ def test_shared_header_css_adds_compact_mobile_nav_layout(client):
     assert ".top-nav .nav-brand-row {" in response.text
     assert ".top-nav .nav-menu-row {" in response.text
     assert ".top-nav .nav-account-compact {" in response.text
+    assert ".top-nav .nav-account-link {" in response.text
     assert ".top-nav .nav-account-email {" in response.text
-    assert ".top-nav .nav-settings {" in response.text
     assert ".top-nav .nav-inner {" in response.text
     assert "flex-direction: row;" in response.text
     assert "justify-content: space-between;" in response.text
@@ -96,8 +96,9 @@ def test_shared_header_css_adds_compact_mobile_nav_layout(client):
     assert ".top-nav .nav-links .nav-form {" in response.text
     assert "@media (max-width: 720px)" in response.text
     assert "flex-direction: column;" in response.text
-    assert ".top-nav .nav-settings-label {" in response.text
-    assert ".top-nav .nav-settings-label {\n    display: none;" not in response.text
+    assert "border-radius: 16px;" in response.text
+    assert "background: var(--secondary);" in response.text
+    assert ".top-nav .nav-account-link:hover {" in response.text
 
 
 def test_login_and_register_pages(client):

@@ -382,15 +382,24 @@ def test_rendered_course_export_and_lesson_5_html_include_the_updates():
 def test_materials_and_lesson_pages_render_course_content(client, test_settings):
     _prepare_verified_user(client, test_settings, "course-render@example.com", "courserender", grant_access=True)
 
-    materials_response = client.get("/materials")
-    assert materials_response.status_code == 200
-    assert "Работа с ИИ" in materials_response.text
-    assert "Уроки курса" in materials_response.text
-    assert "Как мы работаем: ChatGPT проектирует, Codex выполняет, пользователь проверяет" in materials_response.text
-    assert "/materials/lessons/kak-my-rabotaem-chatgpt-codex-user" in materials_response.text
-    assert "Доступные тарифы" not in materials_response.text
-    assert "Оплата" not in materials_response.text
-    assert "Последний платёж" not in materials_response.text
+    materials_response = client.get("/materials", follow_redirects=False)
+    assert materials_response.status_code == 303
+    assert materials_response.headers["location"] == "/materials/drafts/dair-smoke-20260529/"
+
+    course_response = client.get("/materials/drafts/dair-smoke-20260529/")
+    assert course_response.status_code == 200
+    assert "nav-account-compact" in course_response.text
+    assert "nav-account-link" in course_response.text
+    assert "nav-settings" not in course_response.text
+    assert "Работа с ИИ" in course_response.text
+    assert "Вступление к курсу" in course_response.text
+    assert "Структура курса" in course_response.text
+    assert "hero-bg-desktop" in course_response.text
+    assert "hero-bg-mobile" in course_response.text
+    assert "course-head hero" in course_response.text
+    assert "Доступные тарифы" not in course_response.text
+    assert "Оплата" not in course_response.text
+    assert "Последний платёж" not in course_response.text
 
     lesson_response = client.get("/materials/lessons/kak-my-rabotaem-chatgpt-codex-user")
     assert lesson_response.status_code == 200
@@ -407,16 +416,24 @@ def test_materials_and_lesson_pages_render_course_content(client, test_settings)
 def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     _prepare_verified_user(client, test_settings, "course-map@example.com", "coursemapproof", grant_access=True)
 
-    materials_response = client.get("/materials")
-    assert materials_response.status_code == 200
-    assert "/materials/drafts/dair-smoke-20260529/" in materials_response.text
-    assert "Открыть карту курса" in materials_response.text
+    materials_response = client.get("/materials", follow_redirects=False)
+    assert materials_response.status_code == 303
+    assert materials_response.headers["location"] == "/materials/drafts/dair-smoke-20260529/"
 
     page_response = client.get("/materials/drafts/dair-smoke-20260529/")
     styles_response = client.get("/materials/drafts/dair-smoke-20260529/styles.css")
     script_response = client.get("/materials/drafts/dair-smoke-20260529/script.js")
 
     assert page_response.status_code == 200
+    assert "nav-account-compact" in page_response.text
+    assert "nav-account-name" in page_response.text
+    assert "nav-account-email" in page_response.text
+    assert "nav-account-link" in page_response.text
+    assert "nav-settings" not in page_response.text
+    assert "Обучение" in page_response.text
+    assert "Личный кабинет" in page_response.text
+    assert 'href="/cabinet/settings"' in page_response.text
+    assert 'href="/materials/drafts/dair-smoke-20260529/"' in page_response.text
     assert "Работа с ИИ" in page_response.text
     assert "Как разрабатывать с помощью ChatGPT и Codex" in page_response.text
     assert page_response.text.count('class="course-head hero"') == 1
@@ -459,7 +476,7 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Чем ChatGPT отличается от Codex" in lesson1_section
     assert "Сервер, Codex, AGENTS.md и Skills" not in page_response.text
     assert page_response.text.count("Вернуться в личный кабинет") == 2
-    assert page_response.text.count('href="/cabinet"') == 2
+    assert page_response.text.count('href="/cabinet"') >= 3
     assert "Прогресс зависит от прохождения проверки знаний." in page_response.text
     assert "Пока ничего не проверено." in page_response.text
     assert styles_response.status_code == 200
@@ -955,6 +972,7 @@ def test_git_backed_course_map_page_requires_learning_access(client, test_settin
     anon_page = client.get("/materials/drafts/dair-smoke-20260529/", follow_redirects=False)
     anon_styles = client.get("/materials/drafts/dair-smoke-20260529/styles.css", follow_redirects=False)
     anon_script = client.get("/materials/drafts/dair-smoke-20260529/script.js", follow_redirects=False)
+    anon_materials = client.get("/materials", follow_redirects=False)
 
     assert anon_page.status_code == 303
     assert anon_page.headers["location"] == "/login"
@@ -962,16 +980,24 @@ def test_git_backed_course_map_page_requires_learning_access(client, test_settin
     assert anon_styles.headers["location"] == "/login"
     assert anon_script.status_code == 303
     assert anon_script.headers["location"] == "/login"
+    assert anon_materials.status_code == 303
+    assert anon_materials.headers["location"] == "/login"
 
     _prepare_verified_user(client, test_settings, "course-lock@example.com", "courselock")
 
+    locked_materials = client.get("/materials", follow_redirects=False)
     locked_page = client.get("/materials/drafts/dair-smoke-20260529/", follow_redirects=False)
     locked_styles = client.get("/materials/drafts/dair-smoke-20260529/styles.css", follow_redirects=False)
     locked_script = client.get("/materials/drafts/dair-smoke-20260529/script.js", follow_redirects=False)
 
+    assert locked_materials.status_code == 303
+    assert locked_materials.headers["location"] == "/materials/drafts/dair-smoke-20260529/"
     assert locked_page.status_code == 403
     assert locked_styles.status_code == 403
     assert locked_script.status_code == 403
+    assert "Доступ ограничен" in locked_page.text
+    assert "hero-bg-desktop" in locked_page.text
+    assert "hero-bg-mobile" in locked_page.text
 
     with _connect(test_settings) as conn:
         conn.execute(
@@ -987,6 +1013,12 @@ def test_git_backed_course_map_page_requires_learning_access(client, test_settin
     assert authorized_page.status_code == 200
     assert authorized_styles.status_code == 200
     assert authorized_script.status_code == 200
+    assert "nav-account-compact" in authorized_page.text
+    assert "nav-account-link" in authorized_page.text
+    assert "nav-settings" not in authorized_page.text
+    assert 'href="/cabinet/settings"' in authorized_page.text
+    assert "Обучение" in authorized_page.text
+    assert "Личный кабинет" in authorized_page.text
     assert "Работа с ИИ" in authorized_page.text
     assert "application/javascript" in authorized_script.headers["content-type"]
 
@@ -999,6 +1031,12 @@ def test_git_backed_course_map_page_requires_learning_access(client, test_settin
     assert admin_page.status_code == 200
     assert admin_styles.status_code == 200
     assert admin_script.status_code == 200
+    assert "nav-account-compact" in admin_page.text
+    assert "nav-account-link" in admin_page.text
+    assert "nav-settings" not in admin_page.text
+    assert 'href="/cabinet/settings"' in admin_page.text
+    assert "Обучение" in admin_page.text
+    assert "Личный кабинет" in admin_page.text
 
 
 def test_lesson6_start_project_deploy_key_flow_is_rendered(client, test_settings):
