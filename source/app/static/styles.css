@@ -246,9 +246,9 @@ a:hover {
   margin: 18px auto 0;
   padding: 12px 14px;
   border-radius: 16px;
-  border: 1px solid rgba(196, 92, 38, 0.2);
-  background: rgba(255, 255, 255, 0.82);
-  box-shadow: 0 10px 24px rgba(42, 33, 24, 0.05);
+  border: 1px solid rgba(196, 92, 38, 0.16);
+  background: linear-gradient(180deg, #fffefc 0%, #fff9f2 100%);
+  box-shadow: 0 10px 24px rgba(42, 33, 24, 0.04);
   text-align: center;
 }
 
@@ -268,9 +268,9 @@ a:hover {
   gap: 14px;
   padding: 24px 22px 22px;
   border-radius: 24px;
-  border: 1px solid rgba(196, 92, 38, 0.18);
-  background: rgba(255, 255, 255, 0.78);
-  box-shadow: 0 18px 36px rgba(42, 33, 24, 0.08);
+  border: 1px solid rgba(196, 92, 38, 0.14);
+  background: linear-gradient(180deg, #fffefc 0%, #fff8f1 100%);
+  box-shadow: 0 18px 36px rgba(42, 33, 24, 0.06);
   backdrop-filter: blur(8px);
 }
 
@@ -279,9 +279,9 @@ a:hover {
 }
 
 .access-locked-pricing .pricing-shell {
-  border-color: rgba(196, 92, 38, 0.16);
-  background: linear-gradient(180deg, #fffdf8 0%, #fff7ee 100%);
-  box-shadow: 0 18px 36px rgba(42, 33, 24, 0.05);
+  border-color: rgba(196, 92, 38, 0.14);
+  background: linear-gradient(180deg, #fffdf9 0%, #fff8f1 100%);
+  box-shadow: 0 18px 36px rgba(42, 33, 24, 0.06);
 }
 
 .access-locked-panel::before {
@@ -313,8 +313,8 @@ a:hover {
   justify-content: center;
   padding: 7px 11px;
   border-radius: 999px;
-  border: 1px solid rgba(196, 92, 38, 0.16);
-  background: var(--accent-soft);
+  border: 1px solid rgba(196, 92, 38, 0.14);
+  background: rgba(196, 92, 38, 0.08);
   color: var(--accent-strong);
   font-size: 0.82rem;
   font-weight: 600;
@@ -960,6 +960,71 @@ button:hover {
   padding: 38px;
 }
 
+.pricing-tariff-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 22px;
+}
+
+.pricing-tariff-card {
+  display: grid;
+  gap: 10px;
+  padding: 22px;
+  border-radius: 22px;
+  border: 1px solid var(--border);
+  background: linear-gradient(180deg, #fffefc 0%, #fff9f2 100%);
+  box-shadow: 0 10px 24px rgba(42, 33, 24, 0.04);
+}
+
+.pricing-tariff-card--featured {
+  border-color: rgba(196, 92, 38, 0.18);
+  background: linear-gradient(180deg, #fffdf8 0%, #fff7ee 100%);
+}
+
+.pricing-tariff-card-head {
+  display: grid;
+  gap: 8px;
+}
+
+.pricing-tariff-badge {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(196, 92, 38, 0.14);
+  background: rgba(196, 92, 38, 0.08);
+  color: var(--accent-strong);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.pricing-tariff-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.24rem;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.pricing-tariff-price {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: var(--text);
+}
+
+.pricing-tariff-description {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
 .price-head,
 .public-landing-page .price-head {
   max-width: 720px;
@@ -1079,7 +1144,9 @@ button:hover {
   gap: 18px;
   min-height: 100%;
   align-content: start;
-  background: linear-gradient(180deg, #fffefc 0%, #fffaf4 100%);
+  background: linear-gradient(180deg, #fffefc 0%, #fff8f1 100%);
+  border-color: rgba(196, 92, 38, 0.14);
+  box-shadow: 0 18px 36px rgba(42, 33, 24, 0.06);
 }
 
 .auth-chip-row {
@@ -1093,7 +1160,7 @@ button:hover {
   align-items: center;
   padding: 7px 11px;
   border-radius: 999px;
-  background: var(--accent-soft);
+  background: rgba(196, 92, 38, 0.08);
   color: var(--accent-strong);
   border: 1px solid rgba(196, 92, 38, 0.14);
   font-size: 0.82rem;
@@ -1112,8 +1179,8 @@ button:hover {
 .auth-layout--login .auth-benefits li {
   padding: 12px 14px;
   border-radius: 16px;
-  border: 1px solid rgba(234, 223, 206, 0.95);
-  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(234, 223, 206, 0.9);
+  background: linear-gradient(180deg, #fffefc 0%, #fff9f2 100%);
   box-shadow: 0 10px 24px rgba(42, 33, 24, 0.04);
   color: var(--fg);
 }

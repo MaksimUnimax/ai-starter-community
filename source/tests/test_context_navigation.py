@@ -83,7 +83,7 @@ def test_login_and_register_pages_link_to_each_other(client):
     assert login_response.status_code == 200
     assert register_response.status_code == 200
     assert "Зарегистрироваться" in login_response.text
-    assert "Забыл пароль?" in login_response.text
+    assert "Не помню пароль?" in login_response.text
     assert "Нет аккаунта?" not in login_response.text
     assert "/register" in login_response.text
     assert "Уже есть аккаунт?" in register_response.text

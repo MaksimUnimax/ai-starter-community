@@ -38,7 +38,7 @@ from app.account_blocks.service import (
 )
 from app.core.config import get_settings
 from app.notifications.email_service import send_account_block_activation_email
-from app.shared.tariff_display import get_homepage_tariff_context
+from app.shared.tariff_display import get_homepage_tariffs_context
 from app.paid_options.service import list_paid_options
 from app.materials.service import user_has_materials_access
 from app.user_cabinet.prompts_library import load_cabinet_prompts
@@ -395,7 +395,7 @@ def _locked_response(
         locked_secondary_label=locked_secondary_label,
         locked_secondary_url=locked_secondary_url,
         current_user=current_user,
-        **get_homepage_tariff_context(settings=get_settings()),
+        **get_homepage_tariffs_context(settings=get_settings(), limit=2),
     )
 
 

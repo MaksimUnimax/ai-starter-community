@@ -5,6 +5,7 @@ import sqlite3
 
 from app.auth.service import register_user, verify_email
 from app.shared.tariff_display import get_homepage_tariff_context
+from app.tariffs.service import STARTER_TARIFF_CODE, create_tariff, seed_initial_catalog, update_tariff
 
 
 def _verify_registered_user(client, test_settings, email: str, login: str):
@@ -176,3 +177,55 @@ def test_cabinet_shows_active_learning_links_when_access_granted(client, test_se
     assert 'href="/cabinet/settings"' in admin_response.text
     assert 'href="/materials/drafts/dair-smoke-20260529/"' in admin_response.text
     assert 'href="/cabinet/learning/project-file"' in admin_response.text
+
+
+def test_locked_cabinet_pricing_renders_two_selected_tariffs(client, test_settings):
+    seed_initial_catalog(settings=test_settings)
+    update_tariff(
+        STARTER_TARIFF_CODE,
+        show_on_homepage=False,
+        settings=test_settings,
+    )
+    create_tariff(
+        code="cabinet_selected_alpha",
+        title="Cabinet selected alpha",
+        description="Первая выбранная тарифная карточка.",
+        price_amount_minor=200000,
+        currency="RUB",
+        status="active",
+        show_on_homepage=True,
+        sort_order=1,
+        settings=test_settings,
+    )
+    create_tariff(
+        code="cabinet_selected_beta",
+        title="Cabinet selected beta",
+        description="Вторая выбранная тарифная карточка.",
+        price_amount_minor=300000,
+        currency="RUB",
+        status="active",
+        show_on_homepage=True,
+        sort_order=2,
+        settings=test_settings,
+    )
+    _verify_registered_user(client, test_settings, "cabinet-selected@example.com", "cabinetselected")
+    token = _extract_token_from_db(test_settings, "cabinet-selected@example.com")
+    verify_email(token, settings=test_settings)
+
+    login_response = client.post(
+        "/login",
+        data={"email_or_login": "cabinet-selected@example.com", "password": "Secret123"},
+        follow_redirects=False,
+    )
+    assert login_response.status_code == 303
+
+    cabinet_response = client.get("/cabinet")
+    assert cabinet_response.status_code == 200
+    body = cabinet_response.text
+    assert "Cabinet selected alpha" in body
+    assert "Cabinet selected beta" in body
+    assert "2 000 ₽" in body
+    assert "3 000 ₽" in body
+    assert body.index("Cabinet selected alpha") < body.index("Cabinet selected beta")
+    assert body.count("pricing-tariff-card") >= 2
+    assert "access-locked-pricing" in body

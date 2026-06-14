@@ -5,7 +5,7 @@ from __future__ import annotations
 from decimal import Decimal
 
 from app.core.config import Settings, get_settings
-from app.tariffs.service import get_homepage_tariff
+from app.tariffs.service import get_homepage_tariff, list_homepage_tariffs
 
 
 def format_tariff_price(amount_minor: int | None, currency: str | None) -> str:
@@ -33,4 +33,36 @@ def get_homepage_tariff_context(settings: Settings | None = None) -> dict[str, o
             if homepage_tariff is not None
             else None
         ),
+    }
+
+
+def get_homepage_tariffs_context(
+    settings: Settings | None = None,
+    *,
+    limit: int | None = None,
+) -> dict[str, object]:
+    resolved = settings or get_settings()
+    homepage_tariffs = list_homepage_tariffs(settings=resolved, limit=limit)
+    homepage_tariff_cards = [
+        {
+            "id": tariff.id,
+            "code": tariff.code,
+            "title": tariff.title,
+            "description": tariff.description,
+            "price_display": format_tariff_price(tariff.price_amount_minor, tariff.currency),
+            "sort_order": tariff.sort_order,
+            "is_primary": index == 0,
+        }
+        for index, tariff in enumerate(homepage_tariffs)
+    ]
+    homepage_tariff = homepage_tariffs[0] if homepage_tariffs else None
+    return {
+        "homepage_tariff": homepage_tariff,
+        "homepage_tariff_price_display": (
+            format_tariff_price(homepage_tariff.price_amount_minor, homepage_tariff.currency)
+            if homepage_tariff is not None
+            else None
+        ),
+        "homepage_tariffs": homepage_tariffs,
+        "homepage_tariff_cards": homepage_tariff_cards,
     }

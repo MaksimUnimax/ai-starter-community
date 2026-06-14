@@ -529,28 +529,44 @@ def update_tariff(
 
 
 def get_homepage_tariff(settings: Settings | None = None) -> TariffPublic | None:
+    homepage_tariffs = list_homepage_tariffs(settings=settings, limit=1)
+    return homepage_tariffs[0] if homepage_tariffs else None
+
+
+def list_homepage_tariffs(
+    settings: Settings | None = None,
+    limit: int | None = None,
+) -> list[TariffPublic]:
+    resolved_limit = None if limit is None else max(0, int(limit))
     with _connection(settings) as connection:
-        row = connection.execute(
+        selected_query = [
             """
             SELECT *
             FROM tariffs
             WHERE status = 'active' AND show_on_homepage = 1
             ORDER BY sort_order ASC, id ASC, code ASC
-            LIMIT 1
             """
-        ).fetchone()
-        if row is not None:
-            return _tariff_from_row(row)
-        fallback = connection.execute(
+        ]
+        selected_params: tuple[int, ...] = ()
+        if resolved_limit is not None:
+            selected_query.append("LIMIT ?")
+            selected_params = (resolved_limit,)
+        selected_rows = connection.execute("\n".join(selected_query), selected_params).fetchall()
+        if selected_rows:
+            return [_tariff_from_row(row) for row in selected_rows]
+        if resolved_limit == 0:
+            return []
+        fallback_rows = connection.execute(
             """
             SELECT *
             FROM tariffs
             WHERE status = 'active'
             ORDER BY sort_order ASC, id ASC, code ASC
-            LIMIT 1
             """
-        ).fetchone()
-        return _tariff_from_row(fallback) if fallback is not None else None
+        ).fetchall()
+        if resolved_limit is not None:
+            fallback_rows = fallback_rows[:resolved_limit]
+        return [_tariff_from_row(row) for row in fallback_rows]
 
 
 def archive_tariff(code: str, settings: Settings | None = None) -> bool:

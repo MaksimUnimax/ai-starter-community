@@ -121,7 +121,7 @@ def test_login_and_register_pages(client):
     assert "/login" in register_response.text
     assert "Регистрация временно закрыта" not in register_response.text
     assert "Зарегистрироваться" in login_response.text
-    assert "Забыл пароль?" in login_response.text
+    assert "Не помню пароль?" in login_response.text
     assert "Нет аккаунта?" not in login_response.text
     assert "Уже есть аккаунт?" in register_response.text
     assert "Войти" in register_response.text

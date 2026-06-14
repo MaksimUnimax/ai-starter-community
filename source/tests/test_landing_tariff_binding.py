@@ -7,6 +7,7 @@ from app.tariffs.service import (
     seed_initial_catalog,
     update_tariff,
 )
+from app.shared.tariff_display import get_homepage_tariff_context, get_homepage_tariffs_context
 
 
 def test_homepage_tariff_selection_prefers_selected_tariff_over_first_active(test_settings):
@@ -99,3 +100,56 @@ def test_landing_page_uses_homepage_tariff_price(client, test_settings):
     assert "Homepage tariff selected — 6 990 ₽" in response.text
     assert "Что входит в 6 990 ₽?" in response.text
     assert "4 990 ₽" not in response.text
+
+
+def test_homepage_tariffs_context_returns_two_selected_tariffs_in_stable_order(test_settings):
+    seed_initial_catalog(settings=test_settings)
+    update_tariff(
+        STARTER_TARIFF_CODE,
+        show_on_homepage=False,
+        settings=test_settings,
+    )
+    create_tariff(
+        code="homepage_selected_alpha",
+        title="Homepage selected alpha",
+        price_amount_minor=200000,
+        currency="RUB",
+        status="active",
+        show_on_homepage=True,
+        sort_order=1,
+        settings=test_settings,
+    )
+    create_tariff(
+        code="homepage_selected_beta",
+        title="Homepage selected beta",
+        price_amount_minor=300000,
+        currency="RUB",
+        status="active",
+        show_on_homepage=True,
+        sort_order=1,
+        settings=test_settings,
+    )
+    create_tariff(
+        code="homepage_selected_gamma",
+        title="Homepage selected gamma",
+        price_amount_minor=400000,
+        currency="RUB",
+        status="active",
+        show_on_homepage=True,
+        sort_order=2,
+        settings=test_settings,
+    )
+
+    context = get_homepage_tariffs_context(settings=test_settings, limit=2)
+
+    assert [tariff.code for tariff in context["homepage_tariffs"]] == [
+        "homepage_selected_alpha",
+        "homepage_selected_beta",
+    ]
+    assert [card["title"] for card in context["homepage_tariff_cards"]] == [
+        "Homepage selected alpha",
+        "Homepage selected beta",
+    ]
+    assert context["homepage_tariff"].code == "homepage_selected_alpha"
+    assert context["homepage_tariff_price_display"] == "2 000 ₽"
+    assert get_homepage_tariff_context(settings=test_settings)["homepage_tariff"] is not None

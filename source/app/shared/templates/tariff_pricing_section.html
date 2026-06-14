@@ -3,7 +3,16 @@
     <div class="{{ pricing_shell_class or 'pricing-shell' }}">
       <div class="price-head">
         <span class="eyebrow">{{ pricing_eyebrow or "Цена" }}</span>
-        {% if homepage_tariff %}
+        {% set tariff_cards = pricing_tariff_cards or homepage_tariff_cards or [] %}
+        {% if tariff_cards %}
+          {% if tariff_cards|length == 1 %}
+            <h2 class="section-title">{{ tariff_cards[0].title }} — {{ tariff_cards[0].price_display }}</h2>
+            <p class="section-desc">{{ tariff_cards[0].description or pricing_fallback_description or "Это активный тариф, отмеченный для показа на главной странице. Он подтягивается из каталога тарифов." }}</p>
+          {% else %}
+            <h2 class="section-title">{{ pricing_cards_title or "Выбранные тарифы" }}</h2>
+            <p class="section-desc">{{ pricing_cards_description or "Показаны активные тарифы, отмеченные для показа на главной странице." }}</p>
+          {% endif %}
+        {% elif homepage_tariff %}
           <h2 class="section-title">{{ homepage_tariff.title }} — {{ homepage_tariff_price_display }}</h2>
           <p class="section-desc">{{ homepage_tariff.description or pricing_fallback_description or "Это активный тариф, отмеченный для показа на главной странице. Он подтягивается из каталога тарифов." }}</p>
         {% else %}
@@ -11,6 +20,35 @@
           <p class="section-desc">{{ pricing_empty_description or "Когда активный тариф будет отмечен для главной страницы, здесь появятся его название и цена. Сейчас показывается нейтральная информация без числовой цены." }}</p>
         {% endif %}
       </div>
+      {% if tariff_cards %}
+        <div class="pricing-tariff-grid" aria-label="{{ pricing_cards_aria_label or 'Выбранные тарифы' }}">
+          {% for tariff_card in tariff_cards %}
+            <article class="pricing-tariff-card{% if tariff_card.is_primary %} pricing-tariff-card--featured{% endif %}">
+              <div class="pricing-tariff-card-head">
+                <span class="pricing-tariff-badge">{{ pricing_card_badge_label or "Тариф" }} {{ loop.index }}</span>
+                <h3 class="pricing-tariff-title">{{ tariff_card.title }}</h3>
+              </div>
+              <p class="pricing-tariff-price">{{ tariff_card.price_display }}</p>
+              {% if tariff_card.description %}
+                <p class="pricing-tariff-description">{{ tariff_card.description }}</p>
+              {% endif %}
+            </article>
+          {% endfor %}
+        </div>
+      {% elif homepage_tariff %}
+        <div class="pricing-tariff-grid" aria-label="{{ pricing_cards_aria_label or 'Тариф' }}">
+          <article class="pricing-tariff-card pricing-tariff-card--featured">
+            <div class="pricing-tariff-card-head">
+              <span class="pricing-tariff-badge">{{ pricing_card_badge_label or "Тариф" }} 1</span>
+              <h3 class="pricing-tariff-title">{{ homepage_tariff.title }}</h3>
+            </div>
+            <p class="pricing-tariff-price">{{ homepage_tariff_price_display }}</p>
+            {% if homepage_tariff.description %}
+              <p class="pricing-tariff-description">{{ homepage_tariff.description }}</p>
+            {% endif %}
+          </article>
+        </div>
+      {% endif %}
       <div class="offer-grid">
         <div class="offer-group">
           <h3>Первый месяц</h3>

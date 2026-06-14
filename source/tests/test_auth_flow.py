@@ -642,7 +642,7 @@ def test_login_and_reset_pages_show_clear_rules(client):
 
     assert "Электронная почта или логин" in login_response.text
     assert "Зарегистрироваться" in login_response.text
-    assert "Забыл пароль?" in login_response.text
+    assert "Не помню пароль?" in login_response.text
     assert "Нет аккаунта?" not in login_response.text
     assert "auth-layout--login" in login_response.text
     assert "auth-login-panel" in login_response.text
