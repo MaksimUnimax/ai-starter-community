@@ -58,106 +58,46 @@ def test_cabinet_prompt_library_renders_course_prompts_and_custom_prompt_templat
 
     cabinet_response = client.get("/cabinet")
     assert cabinet_response.status_code == 200
-    assert cabinet_response.text.index('data-local-accounts-root') < cabinet_response.text.index('data-prompts-library-root')
-    assert "Промпты" in cabinet_response.text
-    assert "Промпты из курса" in cabinet_response.text
-    assert cabinet_response.text.count('class="prompt-card prompt-card--built-in prompt-card--collapsed"') == 4
-    assert "Мои промпты" in cabinet_response.text
-    assert "Добавить промпт" in cabinet_response.text
-    assert "Редактировать" in cabinet_response.text
-    assert "Сохранить" in cabinet_response.text
-    assert "Скопировать" in cabinet_response.text
-    assert "Скачать .md" in cabinet_response.text
-    assert "Сбросить к версии курса" in cabinet_response.text
-    assert "Удалить" in cabinet_response.text
-    assert "data-prompts-custom-template" in cabinet_response.text
-    assert 'class="prompt-card prompt-card--custom prompt-card--collapsed"' in cabinet_response.text
-    assert 'data-prompt-custom data-prompt-expanded="false"' in cabinet_response.text
-    assert 'aria-controls="prompt-body-custom"' in cabinet_response.text
-    assert "Файл: custom-prompt.md" in cabinet_response.text
-    assert "openscript:cabinet:prompts-library:v1" in client.get("/static/cabinet-prompts-library.js").text
-    assert cabinet_response.text.count('aria-expanded="false"') >= 4
-    assert cabinet_response.text.count("data-prompt-body") >= 5
-    assert cabinet_response.text.count("Развернуть") >= 5
-
-    collapsed_cards = re.findall(
-        r'<article\s+class="prompt-card prompt-card--built-in prompt-card--collapsed"[^>]*>.*?</article>',
-        cabinet_response.text,
-        re.S,
-    )
-    assert len(collapsed_cards) == 4
-    for card_html in collapsed_cards:
-        assert 'data-prompt-expanded="false"' in card_html
-        assert "prompt-card__filename" in card_html
-        assert "data-prompt-body" in card_html
-        assert "hidden" in card_html
-        assert 'data-prompt-toggle' in card_html
-        assert 'aria-expanded="false"' in card_html
-        assert "Развернуть" in card_html
-
-    prompts = load_cabinet_prompts()
-    assert len(prompts) == 4
-    assert [prompt["lesson_number"] for prompt in prompts] == [6, 7, 8, 8]
-    assert [prompt["owner_label"] for prompt in prompts] == ["Урок 6", "Урок 7", "Урок 8", "Урок 8"]
-    assert [prompt["filename"] for prompt in prompts] == [
-        "start_project_documentation_prompt.md",
-        "prefix_extension_for_chatgpt_prompt.md",
-        "project_docs_update_prompt.md",
-        "new_project_dialogue_prompt.md",
-    ]
-    assert [prompt["id"] for prompt in prompts] == [
-        "lesson-6-start-project-documentation-prompt",
-        "lesson-7-prefix-extension-for-chatgpt-prompt",
-        "lesson-8-project-docs-update-prompt",
-        "lesson-8-new-project-dialogue-prompt",
-    ]
-
-    expected_source = {
-        prompt["id"]: prompt
-        for prompt in prompts
-    }
-    rendered_markdowns = _extract_built_in_prompt_markdowns(cabinet_response.text)
-    assert set(rendered_markdowns) == set(expected_source)
-    assert "Старт проекта с разработки документации" in cabinet_response.text
-    assert "Prompt для создания расширения" in cabinet_response.text
-    assert "Prompt для обновления документов проекта" in cabinet_response.text
-    assert "Prompt для нового диалога по проекту" in cabinet_response.text
-    assert "start_project_documentation_prompt.md" in cabinet_response.text
-    assert "prefix_extension_for_chatgpt_prompt.md" in cabinet_response.text
-    assert "project_docs_update_prompt.md" in cabinet_response.text
-    assert "new_project_dialogue_prompt.md" in cabinet_response.text
-
-    for prompt in prompts:
-        rendered = rendered_markdowns[prompt["id"]]
-        assert rendered == prompt["markdown"]
-        assert prompt["title"] in cabinet_response.text
-        assert prompt["owner_label"] in cabinet_response.text
-        assert prompt["filename"] in cabinet_response.text
-
-    assert "Ты — ChatGPT, ведущий технический специалист проекта." in cabinet_response.text
-    assert "Сначала ответь только одной фразой:" in cabinet_response.text
-    assert "Опишите свою идею проекта простыми словами" in cabinet_response.text
-    assert "Мне нужно сделать простое browser-расширение для ChatGPT." in cabinet_response.text
-    assert "Сделай расширение для Chrome и Edge." in cabinet_response.text
-    assert "https://chatgpt.com/*" in cabinet_response.text
-    assert "Мне нужно обновить документы проекта после текущего этапа работы." in cabinet_response.text
-    assert "Public docs repo: [ССЫЛКА НА ПУБЛИЧНЫЙ РЕПОЗИТОРИЙ ДОКУМЕНТОВ]" in cabinet_response.text
-    assert "Prompt для обновления документов проекта" in cabinet_response.text
-    assert "Начни работу по проекту строго по документам проекта." in cabinet_response.text
-    assert "Не продолжай по памяти." in cabinet_response.text
-    assert "Prompt для нового диалога по проекту" in cabinet_response.text
-
-    course_script = Path(
-        "/opt/ai-starter-community/source/app/materials/course_content/drafts/dair_smoke_20260529/script.js"
-    ).read_text(encoding="utf-8")
-    assert "starterPromptMarkdown:" in course_script
-    assert 'starterPromptFilename: "start_project_documentation_prompt.md"' in course_script
-    assert 'starterPromptLabel: "Prompt для создания расширения"' in course_script
-    assert 'label: "Prompt для обновления документов"' in course_script
-    assert 'label: "Prompt для нового диалога"' in course_script
-    assert 'id: "lesson-8-project-docs-update-prompt"' in course_script
-    assert 'id: "lesson-8-new-project-dialogue-prompt"' in course_script
-    routes_text = Path("/opt/ai-starter-community/source/app/user_cabinet/routes.py").read_text(encoding="utf-8")
-    assert '"/cabinet/prompts"' not in routes_text
-    assert "openscript:cabinet:local-accounts:v1" in client.get("/static/cabinet-local-accounts.js").text
+    assert "Личный кабинет будет доступен после оплаты" in cabinet_response.text
+    assert "После оплаты тарифа откроются личный кабинет, обучение и материалы." in cabinet_response.text
+    assert "data-local-accounts-root" not in cabinet_response.text
+    assert "data-prompts-library-root" not in cabinet_response.text
+    assert "Промпты" not in cabinet_response.text
+    assert "Промпты из курса" not in cabinet_response.text
+    assert "Мои промпты" not in cabinet_response.text
+    assert "Добавить промпт" not in cabinet_response.text
+    assert "Редактировать" not in cabinet_response.text
+    assert "Сохранить" not in cabinet_response.text
+    assert "Скопировать" not in cabinet_response.text
+    assert "Скачать .md" not in cabinet_response.text
+    assert "Сбросить к версии курса" not in cabinet_response.text
+    assert "Удалить" not in cabinet_response.text
+    assert "data-prompts-custom-template" not in cabinet_response.text
+    assert 'class="prompt-card prompt-card--custom prompt-card--collapsed"' not in cabinet_response.text
+    assert 'data-prompt-custom data-prompt-expanded="false"' not in cabinet_response.text
+    assert 'aria-controls="prompt-body-custom"' not in cabinet_response.text
+    assert "Файл: custom-prompt.md" not in cabinet_response.text
+    assert "openscript:cabinet:prompts-library:v1" not in cabinet_response.text
+    assert cabinet_response.text.count('aria-expanded="false"') == 0
+    assert cabinet_response.text.count("data-prompt-body") == 0
+    assert cabinet_response.text.count("Развернуть") == 0
+    assert "Старт проекта с разработки документации" not in cabinet_response.text
+    assert "Prompt для создания расширения" not in cabinet_response.text
+    assert "Prompt для обновления документов проекта" not in cabinet_response.text
+    assert "Prompt для нового диалога по проекту" not in cabinet_response.text
+    assert "start_project_documentation_prompt.md" not in cabinet_response.text
+    assert "prefix_extension_for_chatgpt_prompt.md" not in cabinet_response.text
+    assert "project_docs_update_prompt.md" not in cabinet_response.text
+    assert "new_project_dialogue_prompt.md" not in cabinet_response.text
+    assert "Ты — ChatGPT, ведущий технический специалист проекта." not in cabinet_response.text
+    assert "Сначала ответь только одной фразой:" not in cabinet_response.text
+    assert "Опишите свою идею проекта простыми словами" not in cabinet_response.text
+    assert "Мне нужно сделать простое browser-расширение для ChatGPT." not in cabinet_response.text
+    assert "Сделай расширение для Chrome и Edge." not in cabinet_response.text
+    assert "https://chatgpt.com/*" not in cabinet_response.text
+    assert "Мне нужно обновить документы проекта после текущего этапа работы." not in cabinet_response.text
+    assert "Public docs repo: [ССЫЛКА НА ПУБЛИЧНЫЙ РЕПОЗИТОРИЙ ДОКУМЕНТОВ]" not in cabinet_response.text
+    assert "Начни работу по проекту строго по документам проекта." not in cabinet_response.text
+    assert "Не продолжай по памяти." not in cabinet_response.text
+    assert "Prompt для нового диалога по проекту" not in cabinet_response.text
     assert "Личный кабинет" in cabinet_response.text

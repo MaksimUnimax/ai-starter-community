@@ -60,36 +60,26 @@ def test_cabinet_displays_course_shell_without_tariffs_or_payment_noise(client, 
     cabinet_response = client.get("/cabinet")
     assert cabinet_response.status_code == 200
     assert "/static/styles.css" in cabinet_response.text
-    assert "Настройки" in cabinet_response.text
-    assert "⚙" not in cabinet_response.text
-    assert 'href="/cabinet/settings"' in cabinet_response.text
-    assert "/static/cabinet-local-accounts.js" in cabinet_response.text
     assert "Главная" in cabinet_response.text
-    assert "Обучающий блок" in cabinet_response.text
-    assert "Обучение" in cabinet_response.text
-    assert "Работа с ИИ" not in cabinet_response.text
-    assert "Обучающий проект" in cabinet_response.text
-    assert "Перейти к обучению" in cabinet_response.text
-    assert "Скачать файл" in cabinet_response.text
-    assert "Пройдите обучение, затем скачайте файл, вставьте в чат ChatGPT и следуйте его инструкциям." in cabinet_response.text
-    assert cabinet_response.text.count('class="button button-primary learning-button"') == 2
-    assert "Доступ откроется после оплаты." in cabinet_response.text
-    assert 'href="/materials/drafts/dair-smoke-20260529/"' not in cabinet_response.text
+    assert "Личный кабинет будет доступен после оплаты" in cabinet_response.text
+    assert "После оплаты тарифа откроются личный кабинет, обучение и материалы." in cabinet_response.text
+    assert "Обучающий блок" not in cabinet_response.text
+    assert "Обучение" not in cabinet_response.text
+    assert "Обучающий проект" not in cabinet_response.text
+    assert "Перейти к обучению" not in cabinet_response.text
+    assert "Скачать файл" not in cabinet_response.text
+    assert "Пройдите обучение, затем скачайте файл, вставьте в чат ChatGPT и следуйте его инструкциям." not in cabinet_response.text
+    assert cabinet_response.text.count('class="button button-primary learning-button"') == 0
+    assert "Доступ откроется после оплаты." not in cabinet_response.text
+    assert "Аккаунты" not in cabinet_response.text
+    assert "Промпты" not in cabinet_response.text
+    assert "data-local-accounts-root" not in cabinet_response.text
+    assert "data-prompts-library-root" not in cabinet_response.text
+    assert "/static/cabinet-local-accounts.js" not in cabinet_response.text
+    assert "/static/cabinet-prompts-library.js" not in cabinet_response.text
+    assert 'href="/materials/drafts/dair-smoke-20260529/"' in cabinet_response.text
     assert 'href="/cabinet/learning/project-file"' not in cabinet_response.text
     assert "raw.githubusercontent.com" not in cabinet_response.text
-    accounts_section = _extract_accounts_section(cabinet_response.text)
-    assert cabinet_response.text.index("Обучающий блок") < cabinet_response.text.index("Аккаунты")
-    assert cabinet_response.text.index('data-local-accounts-root') < cabinet_response.text.index('data-prompts-library-root')
-    assert "Аккаунты" in accounts_section
-    assert "Храните здесь часто используемые логины и пароли. Данные сохраняются только в этом браузере." in accounts_section
-    assert "Добавить блок" in accounts_section
-    assert "ChatGPT" in accounts_section
-    assert "Сервер" in accounts_section
-    assert "Тип нового блока" in accounts_section
-    assert "Личный кабинет" not in accounts_section
-    assert '<h2 class="section-title">Аккаунт</h2>' not in accounts_section
-    assert "Логин:" not in accounts_section
-    assert "Email:" not in accounts_section
     assert "Доступные тарифы" not in cabinet_response.text
     assert "Оплата" not in cabinet_response.text
     assert "Что дальше" not in cabinet_response.text
