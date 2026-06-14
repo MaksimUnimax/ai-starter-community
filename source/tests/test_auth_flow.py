@@ -632,9 +632,11 @@ def test_login_and_reset_pages_show_clear_rules(client):
 
     assert "Электронная почта или логин" in login_response.text
     assert "Зарегистрироваться" in login_response.text
-    assert "Забыли пароль?" in login_response.text
-    assert 'class="nav-link" href="/"' in login_response.text
-    assert 'class="nav-link" href="/login"' in login_response.text
+    assert "Забыл пароль?" in login_response.text
+    assert "Нет аккаунта?" not in login_response.text
+    assert 'class="button button-secondary nav-pill"' in login_response.text
+    assert 'href="/"' in login_response.text
+    assert 'href="/login"' in login_response.text
     assert "Вход / регистрация" in login_response.text
     assert "Что вы получите" not in login_response.text
     assert "Первый проект" not in login_response.text
@@ -704,6 +706,11 @@ def test_cabinet_shows_logout_button_and_access_text(client, test_settings):
     assert "cabinetux" in cabinet_response.text
     assert "Личный кабинет будет доступен после оплаты" in cabinet_response.text
     assert "После оплаты тарифа откроются личный кабинет, обучение и материалы." in cabinet_response.text
+    assert "Доступ ограничен" in cabinet_response.text
+    assert "nav-account-compact" in cabinet_response.text
+    assert "nav-account-name" in cabinet_response.text
+    assert "nav-account-email" in cabinet_response.text
+    assert "nav-settings" in cabinet_response.text
     assert "Аккаунты" not in cabinet_response.text
     assert "Добавить блок" not in cabinet_response.text
     assert "Главная" in cabinet_response.text
@@ -715,7 +722,8 @@ def test_cabinet_shows_logout_button_and_access_text(client, test_settings):
     assert 'href="/cabinet/learning/project-file"' not in cabinet_response.text
     assert "Выйти" in cabinet_response.text
     assert "/static/styles.css" in cabinet_response.text
-    assert "Работа с ИИ" in cabinet_response.text
+    assert "Обучение" in cabinet_response.text
+    assert "Работа с ИИ" not in cabinet_response.text
 
 
 def test_password_hash_is_not_plaintext_and_session_revocation(test_settings):

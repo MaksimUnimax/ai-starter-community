@@ -54,11 +54,11 @@ def test_anonymous_navigation_shows_public_links_and_login(client):
     response = client.get("/login")
     assert response.status_code == 200
     nav = _nav_block(response.text)
-    assert 'class="nav-link"' in nav
+    assert 'class="button button-secondary nav-pill"' in nav
     assert "Главная" in nav
     assert "Вход / регистрация" in nav
-    assert 'class="nav-link" href="/"' in nav
-    assert 'class="nav-link" href="/login"' in nav
+    assert 'href="/"' in nav
+    assert 'href="/login"' in nav
     assert "Что вы получите" not in nav
     assert "Первый проект" not in nav
     assert "Как проходит работа" not in nav
@@ -66,6 +66,7 @@ def test_anonymous_navigation_shows_public_links_and_login(client):
     assert "Личный кабинет" not in nav
     assert "Работа с ИИ" not in nav
     assert "Админ-панель" not in nav
+    assert "nav-account-compact" not in nav
 
 
 def test_login_and_register_pages_link_to_each_other(client):
@@ -74,8 +75,9 @@ def test_login_and_register_pages_link_to_each_other(client):
 
     assert login_response.status_code == 200
     assert register_response.status_code == 200
-    assert "Нет аккаунта?" in login_response.text
     assert "Зарегистрироваться" in login_response.text
+    assert "Забыл пароль?" in login_response.text
+    assert "Нет аккаунта?" not in login_response.text
     assert "/register" in login_response.text
     assert "Уже есть аккаунт?" in register_response.text
     assert "Войти" in register_response.text
@@ -95,20 +97,25 @@ def test_authenticated_user_navigation_order_and_labels(client, test_settings):
         nav = _nav_block(body)
         assert "Войти" not in nav
         assert "Главная" in nav
-        assert "Работа с ИИ" in nav
+        assert "Обучение" in nav
         assert "Личный кабинет" in nav
+        assert "Настройки" in nav
+        assert "nav-account-compact" in nav
+        assert "nav-account-name" in nav
+        assert "nav-account-email" in nav
+        assert "nav-settings" in nav
+        assert "nav-pill" in nav
         assert 'method="post"' in nav
         assert 'action="/logout"' in nav
         assert "Выйти" in nav
-        assert "Настройки" not in nav
-        assert "nav-brand-row" not in nav
-        assert "nav-menu-row" not in nav
-        assert "nav-account-compact" not in nav
         assert "Регистрация" not in nav
         assert "Начать первый проект" not in nav
+        assert "Работа с ИИ" not in nav
 
+    assert "navuser" in landing.text
+    assert "nav-user@example.com" in landing.text
     cabinet_nav = _nav_block(cabinet.text)
-    assert cabinet_nav.index("Главная") < cabinet_nav.index("Работа с ИИ") < cabinet_nav.index("Личный кабинет") < cabinet_nav.index("Выйти")
+    assert cabinet_nav.index("Главная") < cabinet_nav.index("Обучение") < cabinet_nav.index("Личный кабинет") < cabinet_nav.index("Настройки") < cabinet_nav.index("Выйти")
 
 
 def test_authenticated_moderator_navigation_has_no_admin_panel(client, test_settings):
@@ -125,15 +132,13 @@ def test_authenticated_moderator_navigation_has_no_admin_panel(client, test_sett
         assert "Войти" not in nav
         assert "Админ-панель" not in nav
         assert "Главная" in nav
-        assert "Работа с ИИ" in nav
+        assert "Обучение" in nav
         assert "Личный кабинет" in nav
+        assert "Настройки" in nav
+        assert "nav-account-compact" in nav
         assert 'method="post"' in nav
         assert 'action="/logout"' in nav
         assert "Выйти" in nav
-        assert "Настройки" not in nav
-        assert "nav-brand-row" not in nav
-        assert "nav-menu-row" not in nav
-        assert "nav-account-compact" not in nav
 
 
 def test_authenticated_admin_navigation_includes_admin_panel(client, test_settings):
@@ -149,16 +154,16 @@ def test_authenticated_admin_navigation_includes_admin_panel(client, test_settin
         nav = _nav_block(body)
         assert "Войти" not in nav
         assert "Главная" in nav
-        assert "Работа с ИИ" in nav
+        assert "Обучение" in nav
         assert "Личный кабинет" in nav
         assert "Админ-панель" in nav
+        assert "Настройки" in nav
+        assert "nav-account-compact" in nav
         assert 'method="post"' in nav
         assert 'action="/logout"' in nav
         assert "Выйти" in nav
-        assert "Настройки" not in nav
-        assert "nav-brand-row" not in nav
-        assert "nav-menu-row" not in nav
-        assert "nav-account-compact" not in nav
 
+    assert "navadmin" in landing.text
+    assert "nav-admin@example.com" in landing.text
     cabinet_nav = _nav_block(cabinet.text)
-    assert cabinet_nav.index("Главная") < cabinet_nav.index("Работа с ИИ") < cabinet_nav.index("Личный кабинет") < cabinet_nav.index("Админ-панель") < cabinet_nav.index("Выйти")
+    assert cabinet_nav.index("Главная") < cabinet_nav.index("Обучение") < cabinet_nav.index("Личный кабинет") < cabinet_nav.index("Админ-панель") < cabinet_nav.index("Настройки") < cabinet_nav.index("Выйти")

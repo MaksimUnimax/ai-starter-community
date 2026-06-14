@@ -108,6 +108,11 @@ def test_materials_shows_locked_state_without_access(client, test_settings):
     assert response.status_code == 200
     assert "/static/styles.css" in response.text
     assert "Обучение" in response.text
+    assert "Доступ ограничен" in response.text
+    assert "nav-account-compact" in response.text
+    assert "nav-account-name" in response.text
+    assert "nav-account-email" in response.text
+    assert "nav-settings" in response.text
     assert "Работа с ИИ" in response.text
     assert "Полный доступ откроется после оплаты тарифа." in response.text
     assert "В личный кабинет" in response.text
@@ -131,6 +136,8 @@ def test_materials_shows_placeholder_sections_when_access_granted(client, test_s
     response = client.get("/materials")
     assert response.status_code == 200
     assert "Работа с ИИ" in response.text
+    assert "nav-account-compact" in response.text
+    assert "nav-settings" in response.text
     assert "Курс для новичков без опыта программирования." in response.text
     assert "Уроки курса" in response.text
     assert "Как мы работаем: ChatGPT проектирует, Codex выполняет, пользователь проверяет" in response.text
@@ -151,13 +158,18 @@ def test_cabinet_contains_materials_link_and_locked_hint(client, test_settings):
     assert "Главная" in response.text
     assert "Личный кабинет будет доступен после оплаты" in response.text
     assert "После оплаты тарифа откроются личный кабинет, обучение и материалы." in response.text
+    assert "Доступ ограничен" in response.text
     assert "Обучающий блок" not in response.text
     assert "Перейти к обучению" not in response.text
     assert "Обучающий проект" not in response.text
     assert "Скачать файл" not in response.text
     assert "Доступ откроется после оплаты." not in response.text
     assert response.text.count('class="button button-primary learning-button"') == 0
-    assert "К обучению" in response.text
+    assert "Обучение" in response.text
+    assert "nav-account-compact" in response.text
+    assert "nav-account-name" in response.text
+    assert "nav-account-email" in response.text
+    assert "nav-settings" in response.text
     assert 'href="/materials/drafts/dair-smoke-20260529/"' in response.text
     assert 'href="/cabinet/learning/project-file"' not in response.text
     assert "Аккаунты" not in response.text

@@ -80,23 +80,22 @@ def test_authenticated_landing_page_switches_to_account_and_learning_links(clien
 def test_shared_header_css_adds_compact_mobile_nav_layout(client):
     response = client.get("/static/styles.css")
     assert response.status_code == 200
-    assert ".top-nav .logout-form {" in response.text
     assert ".top-nav .nav-brand-row {" in response.text
     assert ".top-nav .nav-menu-row {" in response.text
     assert ".top-nav .nav-account-compact {" in response.text
     assert ".top-nav .nav-account-email {" in response.text
     assert ".top-nav .nav-settings {" in response.text
-    assert "@media (max-width: 720px)" in response.text
     assert ".top-nav .nav-inner {" in response.text
-    assert "flex-direction: column;" in response.text
-    assert ".top-nav .nav-brand-row {" in response.text
+    assert "flex-direction: row;" in response.text
+    assert "justify-content: space-between;" in response.text
     assert ".top-nav .nav-links {" in response.text
-    assert "grid-template-columns: repeat(2, minmax(0, 1fr));" in response.text
-    assert ".top-nav .nav-links .nav-pill," in response.text
-    assert "min-height: 38px;" in response.text
-    assert ".top-nav .nav-form > .button {" in response.text
-    assert "@media (max-width: 520px)" in response.text
-    assert "grid-template-columns: 1fr;" in response.text
+    assert "display: flex;" in response.text
+    assert "flex-wrap: wrap;" in response.text
+    assert "justify-content: flex-end;" in response.text
+    assert ".top-nav .nav-links .nav-pill {" in response.text
+    assert ".top-nav .nav-links .nav-form {" in response.text
+    assert "@media (max-width: 720px)" in response.text
+    assert "flex-direction: column;" in response.text
     assert ".top-nav .nav-settings-label {" in response.text
     assert ".top-nav .nav-settings-label {\n    display: none;" not in response.text
 
@@ -120,9 +119,9 @@ def test_login_and_register_pages(client):
     assert "Создать аккаунт" in register_response.text
     assert "/login" in register_response.text
     assert "Регистрация временно закрыта" not in register_response.text
-    assert "Нет аккаунта?" in login_response.text
     assert "Зарегистрироваться" in login_response.text
-    assert "Забыли пароль?" in login_response.text
+    assert "Забыл пароль?" in login_response.text
+    assert "Нет аккаунта?" not in login_response.text
     assert "Уже есть аккаунт?" in register_response.text
     assert "Войти" in register_response.text
     assert "Проверьте почту" in check_email_response.text

@@ -63,8 +63,12 @@ def test_cabinet_displays_course_shell_without_tariffs_or_payment_noise(client, 
     assert "Главная" in cabinet_response.text
     assert "Личный кабинет будет доступен после оплаты" in cabinet_response.text
     assert "После оплаты тарифа откроются личный кабинет, обучение и материалы." in cabinet_response.text
-    assert "Обучающий блок" not in cabinet_response.text
-    assert "Обучение" not in cabinet_response.text
+    assert "Доступ ограничен" in cabinet_response.text
+    assert "nav-account-compact" in cabinet_response.text
+    assert "nav-account-name" in cabinet_response.text
+    assert "nav-account-email" in cabinet_response.text
+    assert "nav-settings" in cabinet_response.text
+    assert "Обучение" in cabinet_response.text
     assert "Обучающий проект" not in cabinet_response.text
     assert "Перейти к обучению" not in cabinet_response.text
     assert "Скачать файл" not in cabinet_response.text
