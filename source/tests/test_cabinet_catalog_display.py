@@ -66,8 +66,10 @@ def test_cabinet_displays_course_shell_without_tariffs_or_payment_noise(client, 
     assert "Доступ ограничен" in cabinet_response.text
     assert "nav-account-compact" in cabinet_response.text
     assert "nav-account-name" in cabinet_response.text
-    assert "nav-account-email" in cabinet_response.text
-    assert "nav-account-link" in cabinet_response.text
+    assert "nav-account-email" not in cabinet_response.text
+    assert "nav-account-dropdown" in cabinet_response.text
+    assert "nav-account-menu" in cabinet_response.text
+    assert "nav-account-link" not in cabinet_response.text
     assert "nav-settings" not in cabinet_response.text
     assert 'href="/cabinet/settings"' in cabinet_response.text
     assert "Обучение" in cabinet_response.text
@@ -124,7 +126,9 @@ def test_cabinet_shows_active_learning_links_when_access_granted(client, test_se
     assert "Обучение" in cabinet_response.text
     assert "Обучающий проект" in cabinet_response.text
     assert "nav-account-compact" in cabinet_response.text
-    assert "nav-account-link" in cabinet_response.text
+    assert "nav-account-dropdown" in cabinet_response.text
+    assert "nav-account-menu" in cabinet_response.text
+    assert "nav-account-link" not in cabinet_response.text
     assert "nav-settings" not in cabinet_response.text
     assert 'href="/cabinet/settings"' in cabinet_response.text
     assert 'href="/materials/drafts/dair-smoke-20260529/"' in cabinet_response.text
@@ -157,7 +161,9 @@ def test_cabinet_shows_active_learning_links_when_access_granted(client, test_se
     assert "Обучающий блок" in admin_response.text
     assert "Доступ откроется после оплаты." not in admin_response.text
     assert "nav-account-compact" in admin_response.text
-    assert "nav-account-link" in admin_response.text
+    assert "nav-account-dropdown" in admin_response.text
+    assert "nav-account-menu" in admin_response.text
+    assert "nav-account-link" not in admin_response.text
     assert "nav-settings" not in admin_response.text
     assert 'href="/cabinet/settings"' in admin_response.text
     assert 'href="/materials/drafts/dair-smoke-20260529/"' in admin_response.text

@@ -1,45 +1,63 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <section class="card stack">
-    <div class="stack">
-      <p class="muted">Вход в аккаунт</p>
-      <h1 class="section-title">Вход в аккаунт</h1>
-      <p>Войдите по электронной почте или логину.</p>
-    </div>
-
-    {% if notice %}
-      <div class="alert alert-info">{{ notice }}</div>
-    {% endif %}
-    {% if error %}
-      <div class="alert alert-error">{{ error }}</div>
-    {% endif %}
-    {% if unverified %}
-      <div class="alert alert-info stack">
-        <p>Email не подтверждён.</p>
-        <p>Не пришло письмо подтверждения? <a href="/resend-verification">Отправить письмо подтверждения ещё раз</a>.</p>
+  <section class="auth-layout auth-layout--login">
+    <aside class="card stack auth-spotlight auth-login-panel">
+      <p class="muted">Доступ к обучению</p>
+      <h2 class="section-title">Личный кабинет OpenScript</h2>
+      <p>Войдите, чтобы открыть обучение, материалы и настройки аккаунта.</p>
+      <div class="auth-chip-row" aria-label="Что открывается после входа">
+        <span class="auth-chip">Обучение</span>
+        <span class="auth-chip">Материалы</span>
+        <span class="auth-chip">Настройки</span>
       </div>
-    {% endif %}
+      <ul class="auth-benefits">
+        <li>Единый вход по email или логину.</li>
+        <li>Промпты и учебные материалы в одном месте.</li>
+        <li>Переход к курсу без лишних экранов.</li>
+      </ul>
+    </aside>
 
-    <form class="form" method="post" action="/login">
-      <label class="form-row">
-        <span>Электронная почта или логин</span>
-        <input class="input" type="text" name="email_or_login" value="{{ email_or_login or '' }}" autocomplete="username">
-      </label>
-      <label class="form-row">
-        <span>Пароль</span>
-        <div class="password-field" data-password-field>
-          <input class="input" type="password" name="password" autocomplete="current-password" data-password-input>
-          <button class="button button-secondary password-toggle" type="button" data-password-toggle aria-pressed="false" aria-label="Показать пароль">Показать пароль</button>
+    <section class="card stack auth-form-card auth-login-card">
+      <div class="stack">
+        <p class="muted">Вход в аккаунт</p>
+        <h1 class="section-title">Вход в аккаунт</h1>
+        <p>Войдите по электронной почте или логину.</p>
+      </div>
+
+      {% if notice %}
+        <div class="alert alert-info">{{ notice }}</div>
+      {% endif %}
+      {% if error %}
+        <div class="alert alert-error">{{ error }}</div>
+      {% endif %}
+      {% if unverified %}
+        <div class="alert alert-info stack">
+          <p>Email не подтверждён.</p>
+          <p>Не пришло письмо подтверждения? <a href="/resend-verification">Отправить письмо подтверждения ещё раз</a>.</p>
         </div>
-      </label>
-      <button class="button button-primary" type="submit">Войти</button>
-    </form>
+      {% endif %}
 
-    <div class="actions">
-      <a class="button button-secondary" href="/register">Зарегистрироваться</a>
-      <a class="button button-secondary" href="/forgot-password">Забыл пароль?</a>
-    </div>
+      <form class="form" method="post" action="/login">
+        <label class="form-row">
+          <span>Электронная почта или логин</span>
+          <input class="input" type="text" name="email_or_login" value="{{ email_or_login or '' }}" autocomplete="username">
+        </label>
+        <label class="form-row">
+          <span>Пароль</span>
+          <div class="password-field" data-password-field>
+            <input class="input" type="password" name="password" autocomplete="current-password" data-password-input>
+            <button class="button button-secondary password-toggle" type="button" data-password-toggle aria-pressed="false" aria-label="Показать пароль">Показать пароль</button>
+          </div>
+        </label>
+        <button class="button button-primary" type="submit">Войти</button>
+      </form>
+
+      <div class="actions">
+        <a class="button button-secondary" href="/register">Зарегистрироваться</a>
+        <a class="button button-secondary" href="/forgot-password">Забыл пароль?</a>
+      </div>
+    </section>
   </section>
 
   <script src="/static/auth-password-toggle.js" defer></script>

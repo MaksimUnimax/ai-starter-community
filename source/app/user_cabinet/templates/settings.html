@@ -1,13 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <section class="card stack">
-    <div class="stack">
+  <section class="settings-layout stack">
+    <header class="card stack settings-hero">
       <p class="muted">Личный кабинет</p>
       <h1 class="section-title">Настройки</h1>
-      <p>Аккаунт: <strong>{{ user_login or user_email or "Аккаунт" }}</strong></p>
-      <p>Email: {{ user_email or user_login or "Аккаунт" }}</p>
-    </div>
+      <p>Управляйте аккаунтом, паролем и выходом из системы в одном месте.</p>
+    </header>
 
     {% if success %}
       <div class="alert alert-info">{{ notice or "Пароль изменён." }}</div>
@@ -16,28 +15,54 @@
       <div class="alert alert-error">{{ error }}</div>
     {% endif %}
 
-    <div class="stack">
-      <h2 class="section-title">Смена пароля</h2>
-      <p class="form-help">Минимум 8 символов, без пробелов внутри. Пробелы по краям будут убраны.</p>
-      <form class="form" method="post" action="/cabinet/settings/password">
-        <label class="form-row">
-          <span>Текущий пароль</span>
-          <input class="input" type="password" name="current_password" autocomplete="current-password">
-        </label>
-        <label class="form-row">
-          <span>Новый пароль</span>
-          <input class="input" type="password" name="password" autocomplete="new-password">
-        </label>
-        <label class="form-row">
-          <span>Повтор нового пароля</span>
-          <input class="input" type="password" name="repeat_password" autocomplete="new-password">
-        </label>
-        <button class="button button-primary" type="submit">Сменить пароль</button>
-      </form>
-    </div>
+    <div class="settings-grid">
+      <section class="card stack settings-meta settings-summary-card">
+        <div class="settings-summary-head">
+          <span class="settings-summary-badge">Аккаунт</span>
+          <h2 class="section-title">Данные профиля</h2>
+        </div>
+        <div class="settings-summary-lines">
+          <p class="settings-summary-line"><span>Аккаунт:</span><strong>{{ user_login or user_email or "Аккаунт" }}</strong></p>
+          <p class="settings-summary-line"><span>Email:</span><strong>{{ user_email or user_login or "Аккаунт" }}</strong></p>
+        </div>
+      </section>
 
-    <div class="actions">
-      <a class="button button-secondary" href="/cabinet">Вернуться в личный кабинет</a>
+      <section class="card stack settings-form-card settings-password-card">
+        <div class="stack">
+          <p class="muted">Безопасность</p>
+          <h2 class="section-title">Смена пароля</h2>
+          <p class="form-help">Минимум 8 символов, без пробелов внутри. Пробелы по краям будут убраны.</p>
+        </div>
+        <form class="form" method="post" action="/cabinet/settings/password">
+          <label class="form-row">
+            <span>Текущий пароль</span>
+            <input class="input" type="password" name="current_password" autocomplete="current-password">
+          </label>
+          <label class="form-row">
+            <span>Новый пароль</span>
+            <input class="input" type="password" name="password" autocomplete="new-password">
+          </label>
+          <label class="form-row">
+            <span>Повтор нового пароля</span>
+            <input class="input" type="password" name="repeat_password" autocomplete="new-password">
+          </label>
+          <button class="button button-primary" type="submit">Сменить пароль</button>
+        </form>
+      </section>
+
+      <section class="card stack settings-logout-card">
+        <div class="stack">
+          <p class="muted">Сеанс</p>
+          <h2 class="section-title">Выйти из аккаунта</h2>
+          <p>Завершите текущую сессию на этом устройстве.</p>
+        </div>
+        <form class="settings-logout-form" method="post" action="/logout">
+          <button class="button button-secondary" type="submit">Выйти из аккаунта</button>
+        </form>
+        <div class="actions settings-actions">
+          <a class="button button-secondary" href="/cabinet">Вернуться в личный кабинет</a>
+        </div>
+      </section>
     </div>
   </section>
 {% endblock %}

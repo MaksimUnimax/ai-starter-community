@@ -107,7 +107,10 @@ def test_admin_can_grant_and_revoke_paid_access(client, test_settings):
     assert "Аккаунты" in cabinet_response.text
     assert "/static/cabinet-local-accounts.js" in cabinet_response.text
     assert "nav-account-compact" in cabinet_response.text
-    assert "nav-account-link" in cabinet_response.text
+    assert "nav-account-dropdown" in cabinet_response.text
+    assert "nav-account-menu" in cabinet_response.text
+    assert "nav-account-email" not in cabinet_response.text
+    assert "nav-account-link" not in cabinet_response.text
     assert "nav-settings" not in cabinet_response.text
     assert 'href="/cabinet/settings"' in cabinet_response.text
 
@@ -134,11 +137,16 @@ def test_admin_can_grant_and_revoke_paid_access(client, test_settings):
     assert "Доступ ограничен" in locked_cabinet.text
     assert "Обучение" in locked_cabinet.text
     assert "nav-account-compact" in locked_cabinet.text
-    assert "nav-account-link" in locked_cabinet.text
+    assert "nav-account-dropdown" in locked_cabinet.text
+    assert "nav-account-menu" in locked_cabinet.text
+    assert "nav-account-email" not in locked_cabinet.text
+    assert "nav-account-link" not in locked_cabinet.text
     assert "nav-settings" not in locked_cabinet.text
     assert 'href="/cabinet/settings"' in locked_cabinet.text
     assert "hero-bg-desktop" in locked_cabinet.text
     assert "hero-bg-mobile" in locked_cabinet.text
+    assert "На главную" not in locked_cabinet.text
+    assert "К обучению" not in locked_cabinet.text
     assert "/static/cabinet-local-accounts.js" not in locked_cabinet.text
 
     locked_materials = client.get("/materials", follow_redirects=False)

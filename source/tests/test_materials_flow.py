@@ -116,9 +116,11 @@ def test_materials_shows_locked_state_without_access(client, test_settings):
     assert "hero-bg-mobile" in locked_response.text
     assert "nav-account-compact" in locked_response.text
     assert "nav-account-name" in locked_response.text
-    assert "nav-account-email" in locked_response.text
+    assert "nav-account-email" not in locked_response.text
+    assert "nav-account-dropdown" in locked_response.text
+    assert "nav-account-menu" in locked_response.text
     assert "nav-settings" not in locked_response.text
-    assert "nav-account-link" in locked_response.text
+    assert "nav-account-link" not in locked_response.text
     assert 'href="/cabinet/settings"' in locked_response.text
     assert "Работа с ИИ" in locked_response.text
     assert "Курс для новичков без опыта программирования." not in locked_response.text
@@ -146,9 +148,11 @@ def test_materials_shows_placeholder_sections_when_access_granted(client, test_s
     assert course_response.status_code == 200
     assert "nav-account-compact" in course_response.text
     assert "nav-account-name" in course_response.text
-    assert "nav-account-email" in course_response.text
+    assert "nav-account-email" not in course_response.text
+    assert "nav-account-dropdown" in course_response.text
+    assert "nav-account-menu" in course_response.text
     assert "nav-settings" not in course_response.text
-    assert "nav-account-link" in course_response.text
+    assert "nav-account-link" not in course_response.text
     assert 'href="/cabinet/settings"' in course_response.text
     assert "hero-bg-desktop" in course_response.text
     assert "hero-bg-mobile" in course_response.text
@@ -182,9 +186,11 @@ def test_cabinet_contains_materials_link_and_locked_hint(client, test_settings):
     assert "Обучение" in response.text
     assert "nav-account-compact" in response.text
     assert "nav-account-name" in response.text
-    assert "nav-account-email" in response.text
+    assert "nav-account-email" not in response.text
+    assert "nav-account-dropdown" in response.text
+    assert "nav-account-menu" in response.text
     assert "nav-settings" not in response.text
-    assert "nav-account-link" in response.text
+    assert "nav-account-link" not in response.text
     assert 'href="/cabinet/settings"' in response.text
     assert 'href="/materials/drafts/dair-smoke-20260529/"' in response.text
     assert 'href="/cabinet/learning/project-file"' not in response.text
@@ -223,7 +229,9 @@ def test_cabinet_access_labels_for_staff_and_paid_user(client, test_settings):
     assert "Аккаунты" in paid_response.text
     assert "/static/cabinet-local-accounts.js" in paid_response.text
     assert "nav-account-compact" in paid_response.text
-    assert "nav-account-link" in paid_response.text
+    assert "nav-account-dropdown" in paid_response.text
+    assert "nav-account-menu" in paid_response.text
+    assert "nav-account-link" not in paid_response.text
     assert "nav-settings" not in paid_response.text
     assert 'href="/cabinet/settings"' in paid_response.text
     assert "Перейти к обучению" in paid_response.text
@@ -237,7 +245,9 @@ def test_cabinet_access_labels_for_staff_and_paid_user(client, test_settings):
     assert moderator_response.status_code == 200
     assert "Аккаунты" in moderator_response.text
     assert "nav-account-compact" in moderator_response.text
-    assert "nav-account-link" in moderator_response.text
+    assert "nav-account-dropdown" in moderator_response.text
+    assert "nav-account-menu" in moderator_response.text
+    assert "nav-account-link" not in moderator_response.text
     assert "nav-settings" not in moderator_response.text
     assert 'href="/cabinet/settings"' in moderator_response.text
     assert "Перейти к обучению" in moderator_response.text
@@ -251,7 +261,9 @@ def test_cabinet_access_labels_for_staff_and_paid_user(client, test_settings):
     assert admin_response.status_code == 200
     assert "Аккаунты" in admin_response.text
     assert "nav-account-compact" in admin_response.text
-    assert "nav-account-link" in admin_response.text
+    assert "nav-account-dropdown" in admin_response.text
+    assert "nav-account-menu" in admin_response.text
+    assert "nav-account-link" not in admin_response.text
     assert "nav-settings" not in admin_response.text
     assert 'href="/cabinet/settings"' in admin_response.text
     assert "Перейти к обучению" in admin_response.text

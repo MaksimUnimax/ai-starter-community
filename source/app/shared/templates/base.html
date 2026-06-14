@@ -26,18 +26,23 @@
                 {% if current_user.role == "admin" %}
                   <a class="button button-secondary nav-pill" href="/admin">Админ-панель</a>
                 {% endif %}
-                <form class="nav-form logout-form" method="post" action="/logout">
-                  <button class="button button-secondary nav-pill" type="submit">Выйти</button>
-                </form>
               {% else %}
                 <a class="button button-secondary nav-pill" href="/login">Вход / регистрация</a>
               {% endif %}
             </nav>
             {% if current_user %}
-              <a class="nav-account-compact nav-account-link" href="/cabinet/settings" aria-label="Открыть настройки аккаунта">
-                <span class="nav-account-name">{{ current_user.login }}</span>
-                <span class="nav-account-email">{{ current_user.email }}</span>
-              </a>
+              <details class="nav-account-dropdown">
+                <summary class="button button-secondary nav-pill nav-account-compact nav-account-trigger" aria-label="Меню аккаунта">
+                  <span class="nav-account-name">{{ current_user.login }}</span>
+                  <span class="nav-account-caret" aria-hidden="true">▾</span>
+                </summary>
+                <div class="nav-account-menu" role="menu" aria-label="Действия аккаунта">
+                  <a class="button button-secondary nav-pill nav-account-menu-link" href="/cabinet/settings">Настройки</a>
+                  <form class="nav-account-menu-form" method="post" action="/logout">
+                    <button class="button button-secondary nav-pill nav-account-menu-button" type="submit">Выйти</button>
+                  </form>
+                </div>
+              </details>
             {% endif %}
           </div>
         </div>

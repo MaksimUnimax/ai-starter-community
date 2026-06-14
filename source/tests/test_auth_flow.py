@@ -348,7 +348,7 @@ def test_route_flow_login_cabinet_logout_still_works(client, test_settings):
 
     cabinet_response = client.get("/cabinet")
     assert cabinet_response.status_code == 200
-    assert "route@example.com" in cabinet_response.text
+    assert "route@example.com" not in cabinet_response.text
     assert "routeuser" in cabinet_response.text
     assert "Личный кабинет будет доступен после оплаты" in cabinet_response.text
     assert "После оплаты тарифа откроются личный кабинет, обучение и материалы." in cabinet_response.text
@@ -415,6 +415,12 @@ def test_cabinet_settings_page_and_password_change_flow(client, test_settings):
     assert settings_page.status_code == 200
     assert "Настройки" in settings_page.text
     assert "Смена пароля" in settings_page.text
+    assert "settings-summary-card" in settings_page.text
+    assert "settings-password-card" in settings_page.text
+    assert "settings-logout-card" in settings_page.text
+    assert "Выйти из аккаунта" in settings_page.text
+    assert 'action="/logout"' in settings_page.text
+    assert 'method="post"' in settings_page.text
     assert "Личный кабинет" in settings_page.text
     assert "Аккаунт:" in settings_page.text
     assert "Email:" in settings_page.text
@@ -550,7 +556,7 @@ def test_route_flow_login_by_login_and_password_reset(client, test_settings):
     assert relogin_response.status_code == 303
     cabinet_response = client.get("/cabinet")
     assert cabinet_response.status_code == 200
-    assert "loginroute@example.com" in cabinet_response.text
+    assert "loginroute@example.com" not in cabinet_response.text
 
 
 def test_settings_page_layout_and_password_change(client, test_settings):
@@ -634,6 +640,7 @@ def test_login_and_reset_pages_show_clear_rules(client):
     assert "Зарегистрироваться" in login_response.text
     assert "Забыл пароль?" in login_response.text
     assert "Нет аккаунта?" not in login_response.text
+    assert "auth-login-panel" in login_response.text
     assert 'class="button button-secondary nav-pill"' in login_response.text
     assert 'href="/"' in login_response.text
     assert 'href="/login"' in login_response.text
@@ -702,15 +709,17 @@ def test_cabinet_shows_logout_button_and_access_text(client, test_settings):
 
     cabinet_response = client.get("/cabinet")
     assert cabinet_response.status_code == 200
-    assert "cabinetux@example.com" in cabinet_response.text
+    assert "cabinetux@example.com" not in cabinet_response.text
     assert "cabinetux" in cabinet_response.text
     assert "Личный кабинет будет доступен после оплаты" in cabinet_response.text
     assert "После оплаты тарифа откроются личный кабинет, обучение и материалы." in cabinet_response.text
     assert "Доступ ограничен" in cabinet_response.text
     assert "nav-account-compact" in cabinet_response.text
     assert "nav-account-name" in cabinet_response.text
-    assert "nav-account-email" in cabinet_response.text
-    assert "nav-account-link" in cabinet_response.text
+    assert "nav-account-email" not in cabinet_response.text
+    assert "nav-account-dropdown" in cabinet_response.text
+    assert "nav-account-menu" in cabinet_response.text
+    assert "nav-account-link" not in cabinet_response.text
     assert "nav-settings" not in cabinet_response.text
     assert 'href="/cabinet/settings"' in cabinet_response.text
     assert "hero-bg-desktop" in cabinet_response.text

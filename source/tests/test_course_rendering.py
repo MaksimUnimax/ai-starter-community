@@ -389,7 +389,10 @@ def test_materials_and_lesson_pages_render_course_content(client, test_settings)
     course_response = client.get("/materials/drafts/dair-smoke-20260529/")
     assert course_response.status_code == 200
     assert "nav-account-compact" in course_response.text
-    assert "nav-account-link" in course_response.text
+    assert "nav-account-dropdown" in course_response.text
+    assert "nav-account-menu" in course_response.text
+    assert "nav-account-email" not in course_response.text
+    assert "nav-account-link" not in course_response.text
     assert "nav-settings" not in course_response.text
     assert "Работа с ИИ" in course_response.text
     assert "Вступление к курсу" in course_response.text
@@ -427,8 +430,10 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert page_response.status_code == 200
     assert "nav-account-compact" in page_response.text
     assert "nav-account-name" in page_response.text
-    assert "nav-account-email" in page_response.text
-    assert "nav-account-link" in page_response.text
+    assert "nav-account-email" not in page_response.text
+    assert "nav-account-dropdown" in page_response.text
+    assert "nav-account-menu" in page_response.text
+    assert "nav-account-link" not in page_response.text
     assert "nav-settings" not in page_response.text
     assert "Обучение" in page_response.text
     assert "Личный кабинет" in page_response.text
@@ -441,7 +446,6 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "/static/images/mobile_vitruvian_NO_SQUARES_transparent.webp" in page_response.text
     assert "hero-bg-desktop" in page_response.text
     assert "hero-bg-mobile" in page_response.text
-    assert "На главную" in page_response.text
     assert "Структура курса" in page_response.text
     assert "Структура урока" not in page_response.text
     assert "Тестовая версия курса" not in page_response.text
@@ -1014,7 +1018,10 @@ def test_git_backed_course_map_page_requires_learning_access(client, test_settin
     assert authorized_styles.status_code == 200
     assert authorized_script.status_code == 200
     assert "nav-account-compact" in authorized_page.text
-    assert "nav-account-link" in authorized_page.text
+    assert "nav-account-dropdown" in authorized_page.text
+    assert "nav-account-menu" in authorized_page.text
+    assert "nav-account-email" not in authorized_page.text
+    assert "nav-account-link" not in authorized_page.text
     assert "nav-settings" not in authorized_page.text
     assert 'href="/cabinet/settings"' in authorized_page.text
     assert "Обучение" in authorized_page.text
@@ -1032,7 +1039,10 @@ def test_git_backed_course_map_page_requires_learning_access(client, test_settin
     assert admin_styles.status_code == 200
     assert admin_script.status_code == 200
     assert "nav-account-compact" in admin_page.text
-    assert "nav-account-link" in admin_page.text
+    assert "nav-account-dropdown" in admin_page.text
+    assert "nav-account-menu" in admin_page.text
+    assert "nav-account-email" not in admin_page.text
+    assert "nav-account-link" not in admin_page.text
     assert "nav-settings" not in admin_page.text
     assert 'href="/cabinet/settings"' in admin_page.text
     assert "Обучение" in admin_page.text

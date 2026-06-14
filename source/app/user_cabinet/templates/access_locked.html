@@ -11,27 +11,24 @@
       </div>
       <div class="hero-wrap">
         <div class="hero-copy access-locked-copy">
-          <div class="course-access-badge" role="status" aria-live="polite">
-            <p>Доступ ограничен</p>
-            {% if current_user %}
-              <p>Вы вошли как {{ current_user.email }}{% if current_user.login %} · {{ current_user.login }}{% endif %}.</p>
-            {% endif %}
+          <div class="access-locked-panel">
+            <div class="course-access-badge access-locked-badge" role="status" aria-live="polite">
+              <p>Доступ ограничен</p>
+              {% if current_user %}
+                <p>Вы вошли как {{ current_user.login }}.</p>
+              {% endif %}
+            </div>
+            <h2 class="section-title">{{ locked_title }}</h2>
+            <p class="form-help">{{ locked_message }}</p>
+            <div class="access-locked-chips" aria-label="Что откроется после оплаты">
+              <span class="access-locked-chip">Личный кабинет</span>
+              <span class="access-locked-chip">Обучение</span>
+              <span class="access-locked-chip">Материалы</span>
+            </div>
+            <p class="access-locked-note">После оплаты тариф откроет этот раздел без лишних переходов.</p>
           </div>
-          <h2 class="section-title">{{ locked_title }}</h2>
-          <p class="form-help">{{ locked_message }}</p>
         </div>
       </div>
     </section>
-
-    {% set pricing_section_id = "pricing" %}
-    {% set pricing_section_class = "account-paywall-pricing" %}
-    {% set pricing_shell_class = "pricing-shell" %}
-    {% set pricing_eyebrow = "Цена" %}
-    {% set pricing_fallback_description = "Это активный тариф, отмеченный для показа на главной странице. Он подтягивается из каталога тарифов." %}
-    {% set primary_cta_href = locked_action_url %}
-    {% set primary_cta_label = locked_action_label %}
-    {% set secondary_cta_href = locked_secondary_url or "/" %}
-    {% set secondary_cta_label = locked_secondary_label or "На главную" %}
-    {% include "tariff_pricing_section.html" %}
   </section>
 {% endblock %}
