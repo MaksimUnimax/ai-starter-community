@@ -9,6 +9,8 @@ from jinja2 import ChoiceLoader, FileSystemLoader
 
 from app.auth.service import get_current_user_from_cookies
 from app.core.config import get_settings
+from app.shared.tariff_display import get_homepage_tariff_context
+from app.tariffs.service import seed_initial_catalog
 
 router = APIRouter()
 LANDING_TITLE = "OpenScript — программы, боты и MVP без знаний и опыта"
@@ -26,11 +28,17 @@ templates.env.loader = ChoiceLoader(
 
 
 def _template(request: Request, template_name: str, **context) -> HTMLResponse:
+    settings = get_settings()
+    tariff_context = get_homepage_tariff_context(settings=settings)
+    if tariff_context["homepage_tariff"] is None:
+        seed_initial_catalog(settings=settings)
+        tariff_context = get_homepage_tariff_context(settings=settings)
     payload = {
         "request": request,
         "title": context.pop("title", "Главная"),
-        "current_user": get_current_user_from_cookies(request.cookies, settings=get_settings()),
+        "current_user": get_current_user_from_cookies(request.cookies, settings=settings),
     }
+    payload.update(tariff_context)
     payload.update(context)
     return templates.TemplateResponse(request, template_name, payload)
 

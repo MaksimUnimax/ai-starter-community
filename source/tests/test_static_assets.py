@@ -131,7 +131,9 @@ def test_cabinet_prompts_library_script_is_served(client):
 def test_global_templates_link_to_favicon():
     shared_base = (Path(__file__).resolve().parents[1] / "app" / "shared/templates/base.html").read_text(encoding="utf-8")
     admin_base = (Path(__file__).resolve().parents[1] / "app" / "admin/templates/base.html").read_text(encoding="utf-8")
+    landing_template = (Path(__file__).resolve().parents[1] / "app" / "public_landing/templates/index.html").read_text(encoding="utf-8")
+    course_index = (Path(__file__).resolve().parents[1] / "app" / "materials/course_content/drafts/dair_smoke_20260529/index.html").read_text(encoding="utf-8")
 
-    for template in (shared_base, admin_base):
+    for template in (shared_base, admin_base, landing_template, course_index):
         assert 'rel="icon" href="/static/favicon.svg" type="image/svg+xml"' in template
         assert 'rel="shortcut icon" href="/static/favicon.svg" type="image/svg+xml"' in template

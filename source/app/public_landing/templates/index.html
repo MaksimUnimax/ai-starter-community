@@ -4,6 +4,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+<link rel="shortcut icon" href="/static/favicon.svg" type="image/svg+xml">
 <title>OpenScript — Первый ИИ-бот без опыта</title>
 <style>
 :root {
@@ -1226,7 +1228,7 @@ a { color: inherit; }
     <div class="pricing-shell reveal">
       <div class="price-head">
         <span class="eyebrow">Цена</span>
-        <h2 class="section-title">Стартовый месяц OpenScript — 4 990 ₽</h2>
+        <h2 class="section-title">Стартовый месяц OpenScript — {{ homepage_tariff_price_display }}</h2>
         <p class="section-desc">Это первый управляемый месяц, в котором вы проходите стартовый проект, получаете рабочую среду, материалы, инструкции и поддержку, чтобы начать создавать свои инструменты с ИИ.</p>
       </div>
       <div class="offer-grid">
@@ -1329,7 +1331,7 @@ a { color: inherit; }
         <p>Да. Цель первого месяца — дать вам метод и понимание процесса, чтобы вы могли продолжать самостоятельно. При этом внешние инструменты, серверы или API при необходимости оплачиваются отдельно.</p>
       </details>
       <details class="faq-item">
-        <summary>Что входит в 4 990 ₽?</summary>
+        <summary>Что входит в {{ homepage_tariff_price_display }}?</summary>
         <p>Стартовый месяц, помощь с рабочей средой, ChatGPT Plus на месяц, сервер и окружение для старта, первый проект с ИИ-наставником, материалы, инструкции и доступ к комьюнити.</p>
       </details>
     </div>
