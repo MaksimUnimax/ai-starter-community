@@ -126,6 +126,7 @@ def test_authenticated_user_navigation_order_and_labels(client, test_settings):
         assert "Выйти" in nav
         assert "Выйти" not in nav_links
         assert "Настройки" not in nav_links
+        assert '/static/account-menu.js' in body
 
     assert "navuser" in landing.text
     assert "nav-user@example.com" not in landing.text

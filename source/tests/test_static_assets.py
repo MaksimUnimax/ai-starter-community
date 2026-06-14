@@ -127,6 +127,15 @@ def test_cabinet_prompts_library_script_is_served(client):
     assert 'toggleButton.addEventListener("click"' in response.text
 
 
+def test_account_menu_script_is_served(client):
+    response = client.get("/static/account-menu.js")
+    assert response.status_code == 200
+    assert "nav-account-dropdown" in response.text
+    assert 'document.addEventListener("click"' in response.text
+    assert 'document.addEventListener("keydown"' in response.text
+    assert "Escape" in response.text
+
+
 def test_global_templates_link_to_favicon():
     shared_base = (Path(__file__).resolve().parents[1] / "app" / "shared/templates/base.html").read_text(encoding="utf-8")
     admin_base = (Path(__file__).resolve().parents[1] / "app" / "admin/templates/base.html").read_text(encoding="utf-8")

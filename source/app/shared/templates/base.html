@@ -31,8 +31,8 @@
               {% endif %}
             </nav>
             {% if current_user %}
-              <details class="nav-account-dropdown">
-                <summary class="button button-secondary nav-pill nav-account-compact nav-account-trigger" aria-label="Меню аккаунта">
+              <details class="nav-account-dropdown" data-account-menu-root>
+                <summary class="button button-secondary nav-pill nav-account-compact nav-account-trigger" aria-label="Меню аккаунта" aria-haspopup="menu">
                   <span class="nav-account-name">{{ current_user.login }}</span>
                   <span class="nav-account-caret" aria-hidden="true">▾</span>
                 </summary>
@@ -51,6 +51,9 @@
         {% block content %}{% endblock %}
       </main>
     </div>
+    {% if current_user %}
+      <script src="/static/account-menu.js" defer></script>
+    {% endif %}
     <footer class="site-footer" aria-label="Юридическая информация">
       <div class="site-footer-inner">
         <p class="site-footer-title">OpenScript</p>

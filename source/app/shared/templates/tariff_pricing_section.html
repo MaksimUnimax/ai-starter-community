@@ -47,11 +47,13 @@
           </ul>
         </div>
       </div>
-      <div class="pricing-actions">
-        <a href="{{ primary_cta_href }}" class="btn btn-primary">{{ primary_cta_label }}</a>
-        <a href="{{ secondary_cta_href }}" class="btn btn-secondary">{{ secondary_cta_label }}</a>
-        <p class="pricing-note">{{ pricing_note_text or "После первого месяца вы сможете продолжать самостоятельно. Продление OpenScript не обязательно, но внешние инструменты, серверы и API при необходимости оплачиваются отдельно." }}</p>
-      </div>
+      {% if not pricing_hide_actions %}
+        <div class="pricing-actions">
+          <a href="{{ primary_cta_href }}" class="btn btn-primary">{{ primary_cta_label }}</a>
+          <a href="{{ secondary_cta_href }}" class="btn btn-secondary">{{ secondary_cta_label }}</a>
+          <p class="pricing-note">{{ pricing_note_text or "После первого месяца вы сможете продолжать самостоятельно. Продление OpenScript не обязательно, но внешние инструменты, серверы и API при необходимости оплачиваются отдельно." }}</p>
+        </div>
+      {% endif %}
     </div>
   </div>
 </section>

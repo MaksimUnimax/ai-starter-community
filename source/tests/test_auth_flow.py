@@ -26,6 +26,7 @@ from app.auth.service import (
 )
 from app.core.config import Settings, database_path_from_settings
 from app.shared.db import get_database_path
+from app.shared.tariff_display import get_homepage_tariff_context
 from app.shared.security import validate_new_password
 
 
@@ -415,12 +416,15 @@ def test_cabinet_settings_page_and_password_change_flow(client, test_settings):
     assert settings_page.status_code == 200
     assert "Настройки" in settings_page.text
     assert "Смена пароля" in settings_page.text
+    assert "settings-grid" in settings_page.text
     assert "settings-summary-card" in settings_page.text
     assert "settings-password-card" in settings_page.text
     assert "settings-logout-card" in settings_page.text
+    assert "settings-logout-form" in settings_page.text
     assert "Выйти из аккаунта" in settings_page.text
     assert 'action="/logout"' in settings_page.text
     assert 'method="post"' in settings_page.text
+    assert '/static/account-menu.js' in settings_page.text
     assert "Личный кабинет" in settings_page.text
     assert "Аккаунт:" in settings_page.text
     assert "Email:" in settings_page.text
@@ -640,7 +644,10 @@ def test_login_and_reset_pages_show_clear_rules(client):
     assert "Зарегистрироваться" in login_response.text
     assert "Забыл пароль?" in login_response.text
     assert "Нет аккаунта?" not in login_response.text
+    assert "auth-layout--login" in login_response.text
     assert "auth-login-panel" in login_response.text
+    assert "auth-login-card" in login_response.text
+    assert "auth-benefits" in login_response.text
     assert 'class="button button-secondary nav-pill"' in login_response.text
     assert 'href="/"' in login_response.text
     assert 'href="/login"' in login_response.text
@@ -722,6 +729,7 @@ def test_cabinet_shows_logout_button_and_access_text(client, test_settings):
     assert "nav-account-link" not in cabinet_response.text
     assert "nav-settings" not in cabinet_response.text
     assert 'href="/cabinet/settings"' in cabinet_response.text
+    assert '/static/account-menu.js' in cabinet_response.text
     assert "hero-bg-desktop" in cabinet_response.text
     assert "hero-bg-mobile" in cabinet_response.text
     assert "Аккаунты" not in cabinet_response.text
@@ -737,6 +745,12 @@ def test_cabinet_shows_logout_button_and_access_text(client, test_settings):
     assert "/static/styles.css" in cabinet_response.text
     assert "Обучение" in cabinet_response.text
     assert "Работа с ИИ" not in cabinet_response.text
+    homepage_tariff_context = get_homepage_tariff_context(settings=test_settings)
+    if homepage_tariff_context["homepage_tariff"] is not None:
+        assert homepage_tariff_context["homepage_tariff"].title in cabinet_response.text
+        assert homepage_tariff_context["homepage_tariff_price_display"] in cabinet_response.text
+    assert "access-locked-pricing" in cabinet_response.text
+    assert "pricing-actions" not in cabinet_response.text
 
 
 def test_password_hash_is_not_plaintext_and_session_revocation(test_settings):

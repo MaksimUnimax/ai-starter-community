@@ -5,6 +5,7 @@ import sqlite3
 
 from app.auth.service import authenticate_user, create_session, register_user, verify_email
 from app.shared.db import get_database_path
+from app.shared.tariff_display import get_homepage_tariff_context
 
 
 def _connect(settings):
@@ -113,6 +114,7 @@ def test_admin_can_grant_and_revoke_paid_access(client, test_settings):
     assert "nav-account-link" not in cabinet_response.text
     assert "nav-settings" not in cabinet_response.text
     assert 'href="/cabinet/settings"' in cabinet_response.text
+    assert '/static/account-menu.js' in cabinet_response.text
 
     materials_response = client.get("/materials", follow_redirects=False)
     assert materials_response.status_code == 303
@@ -147,6 +149,12 @@ def test_admin_can_grant_and_revoke_paid_access(client, test_settings):
     assert "hero-bg-mobile" in locked_cabinet.text
     assert "На главную" not in locked_cabinet.text
     assert "К обучению" not in locked_cabinet.text
+    homepage_tariff_context = get_homepage_tariff_context(settings=test_settings)
+    if homepage_tariff_context["homepage_tariff"] is not None:
+        assert homepage_tariff_context["homepage_tariff"].title in locked_cabinet.text
+        assert homepage_tariff_context["homepage_tariff_price_display"] in locked_cabinet.text
+    assert "access-locked-pricing" in locked_cabinet.text
+    assert "pricing-actions" not in locked_cabinet.text
     assert "/static/cabinet-local-accounts.js" not in locked_cabinet.text
 
     locked_materials = client.get("/materials", follow_redirects=False)

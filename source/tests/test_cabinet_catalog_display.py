@@ -4,6 +4,7 @@ import re
 import sqlite3
 
 from app.auth.service import register_user, verify_email
+from app.shared.tariff_display import get_homepage_tariff_context
 
 
 def _verify_registered_user(client, test_settings, email: str, login: str):
@@ -72,6 +73,7 @@ def test_cabinet_displays_course_shell_without_tariffs_or_payment_noise(client, 
     assert "nav-account-link" not in cabinet_response.text
     assert "nav-settings" not in cabinet_response.text
     assert 'href="/cabinet/settings"' in cabinet_response.text
+    assert '/static/account-menu.js' in cabinet_response.text
     assert "Обучение" in cabinet_response.text
     assert "hero-bg-desktop" in cabinet_response.text
     assert "hero-bg-mobile" in cabinet_response.text
@@ -99,6 +101,12 @@ def test_cabinet_displays_course_shell_without_tariffs_or_payment_noise(client, 
     assert "Стартовый доступ" not in cabinet_response.text
     assert "Оплата будет подключена позже." not in cabinet_response.text
     assert "Последний платёж" not in cabinet_response.text
+    homepage_tariff_context = get_homepage_tariff_context(settings=test_settings)
+    if homepage_tariff_context["homepage_tariff"] is not None:
+        assert homepage_tariff_context["homepage_tariff"].title in cabinet_response.text
+        assert homepage_tariff_context["homepage_tariff_price_display"] in cabinet_response.text
+    assert "access-locked-pricing" in cabinet_response.text
+    assert "pricing-actions" not in cabinet_response.text
 
 
 def test_cabinet_shows_active_learning_links_when_access_granted(client, test_settings):
