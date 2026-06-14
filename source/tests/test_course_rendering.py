@@ -261,11 +261,36 @@ def test_rendered_course_export_and_lesson_5_html_include_the_updates():
     assert exported_asset_names == [f"assets/static/course-assets/lesson-5/{name}" for name in expected_asset_names]
     assert all((lesson5_asset_root / name).is_file() for name in expected_asset_names)
 
+    lesson4_html = _render_section_html_via_node("lesson-4")
     lesson5_html = _render_section_html_via_node("lesson-5")
     lesson2_html = _render_section_html_via_node("lesson-2")
     lesson1_html = _render_section_html_via_node("lesson-1")
     lesson9_html = _render_section_html_via_node("lesson-9")
     lesson10_html = _render_section_html_via_node("lesson-10")
+
+    assert "Codex, AGENTS.md, токены и роль модели" in lesson4_html
+    assert "&lt;strong&gt;" not in lesson4_html
+    assert "&lt;/strong&gt;" not in lesson4_html
+    assert "Skills" not in lesson4_html
+    assert "Skill" not in lesson4_html
+    assert "/skills" not in lesson4_html
+    assert "plugins" not in lesson4_html
+    assert "/plugins" not in lesson4_html
+    assert "3 основные команды Codex внутри Terminal" in lesson4_html
+    assert "Можно не запоминать команду целиком" in lesson4_html
+    assert "<strong>/</strong>" in lesson4_html
+    assert "стрелками на клавиатуре" in lesson4_html
+    assert "/status" in lesson4_html
+    assert "/model" in lesson4_html
+    assert "/permissions" in lesson4_html
+    assert "5-часовые лимиты ресурсов" in lesson4_html
+    assert "Недельные лимиты ресурсов" in lesson4_html
+    assert "лимитов ресурсов" in lesson4_html
+    assert "рабочий шаг (run)" in lesson4_html
+    assert "рабочих шагов (run’ов)" in lesson4_html
+    assert '<a href="https://openscript.ru/cabinet" target="_blank" rel="noreferrer">личного кабинета курса</a>' in lesson5_html
+    assert '<a href="https://openscript.ru/cabinet" target="_blank" rel="noreferrer">личный кабинет курса</a>' in lesson5_html
+    assert '<a href="https://openscript.ru/cabinet" target="_blank" rel="noreferrer">личном кабинете курса</a>' in lesson5_html
 
     assert "/status" in lesson5_html
     assert "/st" in lesson5_html
@@ -388,7 +413,8 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert page_response.text.count("nav-title") == 9
     assert "data-section-nav=\"true\"" in script_response.text
     assert "renderLessonFooterNavigation" in script_response.text
-    assert "Codex, AGENTS.md, Skills, токены и роль модели" in page_response.text
+    assert "Codex, AGENTS.md, токены и роль модели" in page_response.text
+    assert "Codex, AGENTS.md, Skills, токены и роль модели" not in page_response.text
     assert "PowerShell, Terminal и подключение к серверу" in page_response.text
     assert "Процесс работы" in page_response.text
     lesson1_section = _lesson_section(script_response.text, "lesson-1", "lesson-2")
@@ -505,25 +531,27 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Урок 7 — Процесс работы" in script_response.text
     assert 'navTitle: "Урок 7 — Процесс работы"' in script_response.text
     assert 'title: "Процесс работы"' in script_response.text
-    assert "Codex, AGENTS.md, Skills, токены и роль модели" in script_response.text
+    assert "Codex, AGENTS.md, токены и роль модели" in script_response.text
+    assert "Codex, AGENTS.md, Skills, токены и роль модели" not in script_response.text
     assert "PowerShell, Terminal и подключение к серверу" in script_response.text
-    assert 'navTitle: "Урок 4 — Codex, AGENTS.md, Skills, токены и роль модели"' in script_response.text
+    assert 'navTitle: "Урок 4 — Codex, AGENTS.md, токены и роль модели"' in script_response.text
     assert 'navTitle: "Урок 5 — PowerShell, Terminal и подключение к серверу"' in script_response.text
     assert 'navTitle: "Урок 6 — Старт проекта: сначала документация, потом разработка"' in script_response.text
     assert "В нашем методе работы" in script_response.text
     assert "Как Codex тратит токены и ресурсы" in script_response.text
     assert "Как оптимизировать расход Codex" in script_response.text
     assert "Что такое permissions и как выставить допуск" in script_response.text
-    assert "5 основных команд Codex внутри Terminal" in script_response.text
+    assert "3 основные команды Codex внутри Terminal" in script_response.text
+    assert "5 основных команд Codex внутри Terminal" not in script_response.text
     assert "Что такое токены в работе Codex?" in script_response.text
     assert "Токены — это единицы ресурса" in script_response.text
-    assert "5-часовые лимиты" in script_response.text
-    assert "Недельные лимиты" in script_response.text
+    assert "5-часовые лимиты ресурсов" in script_response.text
+    assert "Недельные лимиты ресурсов" in script_response.text
     assert "/status" in script_response.text
     assert "/model" in script_response.text
     assert "/permissions" in script_response.text
-    assert "/skills" in script_response.text
-    assert "/plugins" in script_response.text
+    assert "/skills" not in script_response.text
+    assert "/plugins" not in script_response.text
     assert "token usage" in script_response.text
     assert "Где работает Codex" not in script_response.text
     assert "Пример правильной задачи для Codex" not in script_response.text
@@ -542,15 +570,17 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     lesson5_section = script_response.text[lesson5_start:lesson6_start]
     lesson6_section = script_response.text[lesson6_start:lesson7_start]
     assert script_response.text.count("Пошаговая визуальная инструкция к практическому занятию.") >= 6
-    assert "В следующем уроке разберём Codex, AGENTS.md, Skills, токены и роль модели." in lesson3_section
+    assert "В следующем уроке разберём Codex, AGENTS.md, токены и роль модели." in lesson3_section
     assert "Перейти к уроку 4" in lesson3_section
     assert "Пошаговая регистрация GitHub" not in lesson3_section
     assert "В следующем уроке разберём PowerShell, Terminal и подключение к серверу." in lesson4_section
     assert "Перейти к уроку 5" in lesson4_section
     assert "В следующем уроке разберём старт проекта: сначала документация, потом разработка." in lesson5_section
     assert "Перейти к уроку 6" in lesson5_section
-    assert '<a href="/cabinet#accounts" target="_blank" rel="noreferrer">Сервер</a>' in lesson5_section
-    assert "скопируйте пароль из <a href=\"/cabinet#accounts\" target=\"_blank\" rel=\"noreferrer\">личного кабинета</a>" in lesson5_section
+    assert 'href="https://openscript.ru/cabinet" target="_blank" rel="noreferrer"' in lesson5_section
+    assert '<a href="https://openscript.ru/cabinet" target="_blank" rel="noreferrer">личного кабинета курса</a>' in lesson5_section
+    assert '<a href="https://openscript.ru/cabinet" target="_blank" rel="noreferrer">личный кабинет курса</a>' in lesson5_section
+    assert '<a href="https://openscript.ru/cabinet" target="_blank" rel="noreferrer">личном кабинете курса</a>' in lesson5_section
     assert "символы могут не отображаться — это нормально: пароль всё равно вводится." in lesson5_section
     assert "После этого продолжайте работу, когда модель и права доступа настроены правильно." not in lesson5_section
     assert "/status" in lesson5_section
@@ -578,9 +608,9 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     lesson9_section = script_response.text[lesson9_start:lesson10_start]
     lesson10_section = script_response.text[lesson10_start:script_response.text.index("const state", lesson10_start)]
     lesson4_agents_index = lesson4_section.index('label: "AGENTS.md"')
-    lesson4_skills_index = lesson4_section.index('label: "Skills"')
+    lesson4_commands_index = lesson4_section.index('label: "Команды через /"')
     lesson4_errors_index = lesson4_section.index('label: "Частые ошибки"')
-    assert lesson4_agents_index < lesson4_skills_index < lesson4_errors_index
+    assert lesson4_agents_index < lesson4_commands_index < lesson4_errors_index
     assert "<strong>Codex</strong> — это <strong>Codex CLI</strong>." in script_response.text
     assert "<strong>Codex CLI</strong> — это инструмент OpenAI для работы с кодом и файлами проекта через терминал." in script_response.text
     assert "<strong>Терминал</strong> — это рабочее окно, через которое Codex запускается на сервере или компьютере проекта." in script_response.text

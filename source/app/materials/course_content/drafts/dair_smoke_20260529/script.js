@@ -975,18 +975,20 @@ const courseData = {
       resultTitle: "Главный вывод урока",
       resultText: "Git хранит шаги проекта, GitHub показывает их для проверки, а ChatGPT проверяет работу Codex по commit, push, diff и реальным файлам. Ученику не нужно знать все команды Git — важно понимать общий смысл и принимать результат после проверки ChatGPT.",
       nextStepTitle: "Следующий урок",
-      nextStepText: "В следующем уроке разберём Codex, AGENTS.md, Skills, токены и роль модели.",
+      nextStepText: "В следующем уроке разберём Codex, AGENTS.md, токены и роль модели.",
       nextStepButtonLabel: "Перейти к уроку 4",
       nextStepTargetId: "lesson-4"
     },
 {
   id: "lesson-4",
   navLabel: "Урок 4",
-  navTitle: "Урок 4 — Codex, AGENTS.md, Skills, токены и роль модели",
+  navTitle: "Урок 4 — Codex, AGENTS.md, токены и роль модели",
   eyebrow: "Урок 4",
-  title: "Codex, AGENTS.md, Skills, токены и роль модели",
+  title: "Codex, AGENTS.md, токены и роль модели",
+      descriptionHtml:
+        "В этом уроке разбираем, что делает <strong>Codex</strong> в нашем методе работы, как он тратит <strong>токены</strong> и <strong>ресурсы</strong>, почему с ним не ведут длинные диалоги, как выбирать модель, как выставлять <strong>permissions</strong> и какие 3 основные команды <strong>Codex</strong> внутри <strong>Terminal</strong> нужны для работы.",
       description:
-        "В этом уроке разбираем, что делает <strong>Codex</strong> в нашем методе работы, как он тратит <strong>токены</strong> и <strong>ресурсы</strong>, почему с ним не ведут длинные диалоги, как выбирать модель, как выставлять <strong>permissions</strong> и какие 5 основных команд через / нужны внутри <strong>Codex</strong> в <strong>Terminal</strong>.",
+        "В этом уроке разбираем, что делает Codex в нашем методе работы, как он тратит токены и ресурсы, почему с ним не ведут длинные диалоги, как выбирать модель, как выставлять permissions и какие 3 основные команды Codex внутри Terminal нужны для работы.",
   introLabel: "Вступление",
   intro: [],
   learningOutcomeLabel: "После урока вы сможете",
@@ -998,7 +1000,7 @@ const courseData = {
       html: `
         <p>После документации проекта появляется технический исполнитель. В нашей схеме этот исполнитель — <strong>Codex</strong>.</p>
         <p><strong>Codex</strong> не должен сам придумывать, что делать с проектом. Он получает точную задачу от <strong>ChatGPT</strong>, работает в нужной папке проекта, меняет файлы, запускает проверки и возвращает отчёт.</p>
-        <p>Главная мысль урока: <strong>ChatGPT</strong> управляет разработкой и объясняет смысл, а <strong>Codex</strong> выполняет технический <strong>run</strong> по инструкции.</p>
+        <p>Главная мысль урока: <strong>ChatGPT</strong> управляет разработкой и объясняет смысл, а <strong>Codex</strong> выполняет технический рабочий шаг (run) по инструкции.</p>
       `
     },
     {
@@ -1009,18 +1011,17 @@ const courseData = {
         <ul>
           <li>что такое <strong>Codex</strong>;</li>
           <li>зачем нужен <strong>AGENTS.md</strong>;</li>
-          <li>что такое <strong>Skills</strong>;</li>
           <li>что такое <strong>токены</strong> и <strong>ресурсы</strong> <strong>Codex</strong>;</li>
-          <li>почему <strong>ресурс</strong> <strong>Codex</strong> нужно экономить;</li>
+          <li>почему <strong>ресурсы</strong> <strong>Codex</strong> нужно экономить;</li>
           <li>почему в нашем методе с <strong>ChatGPT</strong> ведут диалоги, а с <strong>Codex</strong> — нет;</li>
-          <li>почему для обычных <strong>Codex</strong> <strong>run’ов</strong> достаточно <strong>mini-модели</strong>;</li>
+          <li>почему для обычных <strong>Codex</strong> <strong>рабочих шагов (run’ов)</strong> достаточно <strong>mini-модели</strong>;</li>
           <li>что такое <strong>permissions</strong>;</li>
           <li>зачем нужен полный рабочий допуск в безопасной серверной среде;</li>
           <li>что показывает <strong>/status</strong>;</li>
           <li>зачем нужна <strong>/model</strong>;</li>
           <li>зачем нужна <strong>/permissions</strong>;</li>
-          <li>зачем нужна <strong>/skills</strong>;</li>
-          <li>зачем нужна <strong>/plugins</strong>.</li>
+          <li>как открыть меню slash-команд внутри <strong>Codex</strong>;</li>
+          <li>почему здесь нужны только три команды: <strong>/status</strong>, <strong>/model</strong> и <strong>/permissions</strong>.</li>
         </ul>
       `
     },
@@ -1044,7 +1045,7 @@ const courseData = {
         <p><strong>Важно:</strong> Codex не является руководителем проекта.</p>
         <p><strong>Codex</strong> не должен сам выбирать стратегию, менять план курса, придумывать архитектуру или решать, какой этап делать дальше.</p>
         <p>В нашей системе это делает <strong>ChatGPT</strong>.</p>
-        <p><strong>ChatGPT</strong> понимает цель, читает правила, проверяет документацию, следит за <strong>run’ами</strong> и пишет точное задание.</p>
+        <p><strong>ChatGPT</strong> понимает цель, читает правила, проверяет документацию, следит за <strong>рабочими шагами (run’ами)</strong> и пишет точное задание.</p>
         <p><strong>Codex CLI</strong> выполняет это задание в проекте и возвращает отчёт.</p>
       `
     },
@@ -1073,7 +1074,6 @@ const courseData = {
         <ul>
           <li><strong>prompt</strong>, который вставили в <strong>Codex</strong>;</li>
           <li>правила <strong>AGENTS.md</strong>;</li>
-          <li>выбранные <strong>Skills</strong>;</li>
           <li>файлы, которые <strong>Codex</strong> читает;</li>
           <li>логи и ошибки;</li>
           <li>результаты проверок;</li>
@@ -1091,24 +1091,24 @@ const courseData = {
           <li>слишком большие <strong>prompt’ы</strong>;</li>
           <li>чтение лишних файлов;</li>
           <li>длинные логи;</li>
-          <li>попытки решить несколько задач за один <strong>run</strong>;</li>
+          <li>попытки решить несколько задач за один рабочий шаг (run);</li>
           <li>повторные исправления без точной причины;</li>
           <li>лишние объяснения вместо короткого отчёта.</li>
         </ul>
         <p>Меньше <strong>ресурса</strong> тратится, когда:</p>
         <ul>
           <li><strong>ChatGPT</strong> заранее сформулировал точную задачу;</li>
-          <li><strong>Codex</strong> получает один конкретный <strong>run</strong>;</li>
+          <li><strong>Codex</strong> получает один конкретный рабочий шаг (run);</li>
           <li>указаны точные файлы и границы;</li>
           <li>нет лишних документов;</li>
           <li>отчёт короткий и структурированный;</li>
           <li>не ведётся свободный диалог с <strong>Codex</strong>.</li>
         </ul>
-        <p><strong>5-часовые лимиты</strong> — это лимиты, которые считаются в окне примерно на 5 часов.</p>
-        <p><strong>Недельные лимиты</strong> — это дополнительные ограничения, которые тоже могут применяться.</p>
+        <p><strong>5-часовые лимиты ресурсов</strong> — это лимиты ресурсов, которые считаются в окне примерно на 5 часов.</p>
+        <p><strong>Недельные лимиты ресурсов</strong> — это дополнительные лимиты ресурсов, которые тоже могут применяться.</p>
         <p>Точные остатки зависят от плана, модели и версии Codex.</p>
         <p>Состояние текущей <strong>Codex</strong>-сессии и доступные остатки <strong>ресурсов</strong> смотрят через <strong>/status</strong> внутри открытого <strong>Codex</strong> в <strong>Terminal</strong>, если <strong>Codex</strong> показывает их в этой версии.</p>
-        <p><strong>Важно:</strong> для проверки <strong>лимитов</strong> и состояния используем <strong>/status</strong>.</p>
+        <p><strong>Важно:</strong> для проверки <strong>лимитов ресурсов</strong> и состояния используем <strong>/status</strong>.</p>
       `
     },
     {
@@ -1116,7 +1116,7 @@ const courseData = {
       title: "Как оптимизировать расход Codex",
       html: `
         <p><strong>Codex</strong> может отвечать как собеседник, но в нашей системе мы не используем его для свободных диалогов.</p>
-        <p>Причина простая: диалоги с <strong>Codex</strong> тратят <strong>токены</strong>, <strong>лимиты</strong> и время.</p>
+        <p>Причина простая: диалоги с <strong>Codex</strong> тратят <strong>токены</strong>, <strong>лимиты ресурсов</strong> и время.</p>
         <p>Все обсуждения, вопросы, объяснения, решения и выбор следующего шага идут через <strong>ChatGPT</strong>.</p>
         <p><strong>Codex</strong> получает только готовый технический <strong>prompt</strong>:</p>
         <ul>
@@ -1132,7 +1132,7 @@ const courseData = {
           <li>не вести с ним длинный разговор;</li>
           <li>не отправлять ему лишние документы;</li>
           <li>не просить читать весь проект без причины;</li>
-          <li>не запускать несколько разных задач одним <strong>run’ом</strong>;</li>
+          <li>не запускать несколько разных задач одним рабочим шагом (run’ом);</li>
           <li>давать точные файлы, точный результат и точные проверки;</li>
           <li>просить короткий структурированный отчёт, а не длинное рассуждение.</li>
         </ul>
@@ -1145,7 +1145,7 @@ const courseData = {
       html: `
         <p>Модель — это “мозг”, на котором работает <strong>Codex</strong>.</p>
         <p>Есть более сильные флагманские модели, а есть более дешёвые и быстрые mini-модели.</p>
-        <p>В нашем методе по умолчанию не нужно использовать флагманскую модель для обычных <strong>Codex</strong> <strong>run’ов</strong>.</p>
+        <p>В нашем методе по умолчанию не нужно использовать флагманскую модель для обычных <strong>Codex</strong> <strong>рабочих шагов (run’ов)</strong>.</p>
         <p>Почему:</p>
         <ul>
           <li>сложное рассуждение делает <strong>ChatGPT</strong>;</li>
@@ -1173,7 +1173,7 @@ const courseData = {
         </ul>
         <p>В нашем методе <strong>Codex</strong> находится в подготовленной серверной среде проекта, а не на личном компьютере ученика.</p>
         <p>Там не должно быть личных фотографий, личных документов, переписок и случайной личной информации.</p>
-        <p>Поэтому для обычного рабочего <strong>run’а</strong> в безопасной серверной среде проекта <strong>Codex</strong> должен получать полный рабочий допуск.</p>
+        <p>Поэтому для обычного рабочего шага (run’а) в безопасной серверной среде проекта <strong>Codex</strong> должен получать полный рабочий допуск.</p>
         <p>Иначе он будет спрашивать разрешение на каждое действие и мешать нормальной работе.</p>
         <p>Допуск внутри открытого <strong>Codex</strong> меняют через:</p>
         <p><strong>/permissions</strong></p>
@@ -1193,13 +1193,14 @@ const courseData = {
     },
     {
       label: "Команды через /",
-      title: "5 основных команд Codex внутри Terminal",
+      title: "3 основные команды Codex внутри Terminal",
       html: `
         <p>В нашем методе <strong>Codex</strong> работает в <strong>Terminal</strong>.</p>
         <p>Когда <strong>Codex</strong> уже открыт, его настройки открываются командами через символ /.</p>
         <p>Это не обычные команды компьютера.</p>
         <p>Это команды управления самим <strong>Codex</strong> внутри открытой <strong>Terminal</strong>-сессии.</p>
-        <p>Нам нужны 5 основных команд.</p>
+        <p>Можно не запоминать команду целиком: внутри открытого <strong>Codex</strong> в <strong>Terminal</strong> нажмите <strong>/</strong>, и откроется меню slash-команд. По пунктам меню можно перемещаться стрелками на клавиатуре, а выбранный пункт подтвердить <strong>Enter</strong>.</p>
+        <p>Нам нужны 3 основные команды <strong>Codex</strong> внутри <strong>Terminal</strong>.</p>
         <p><strong>1. /status</strong></p>
         <p><strong>/status</strong> показывает состояние текущей <strong>Codex</strong>-сессии.</p>
         <p>Через <strong>/status</strong> смотрим:</p>
@@ -1209,42 +1210,28 @@ const courseData = {
           <li>какая рабочая папка используется;</li>
           <li>сколько контекста занято;</li>
           <li><strong>token usage</strong>;</li>
-          <li>доступную информацию по лимитам, если Codex показывает её в этой версии.</li>
+          <li>доступную информацию по лимитам ресурсов, если Codex показывает её в этой версии.</li>
         </ul>
         <p><strong>Простой смысл:</strong></p>
         <p><strong>/status</strong> нужен, чтобы понять, в каком состоянии сейчас Codex.</p>
         <p><strong>2. /model</strong></p>
         <p><strong>/model</strong> открывает выбор модели.</p>
         <p>Через <strong>/model</strong> выбираем, на какой модели работает <strong>Codex</strong>.</p>
-        <p>В нашем методе для обычных рабочих <strong>run’ов</strong> выбираем <strong>mini-модель</strong>, потому что <strong>ChatGPT</strong> уже подготовил точную инструкцию, а <strong>Codex</strong> должен в основном выполнить задачу.</p>
+        <p>В нашем методе для обычных рабочих шагов (run’ов) выбираем <strong>mini-модель</strong>, потому что <strong>ChatGPT</strong> уже подготовил точную инструкцию, а <strong>Codex</strong> должен в основном выполнить задачу.</p>
         <p><strong>Простой смысл:</strong></p>
         <p><strong>/model</strong> нужен, чтобы выбрать модель.</p>
         <p><strong>3. /permissions</strong></p>
         <p><strong>/permissions</strong> открывает настройки допуска <strong>Codex</strong>.</p>
         <p>Через <strong>/permissions</strong> выбираем, что <strong>Codex</strong> может делать сам, а где он должен спрашивать подтверждение.</p>
-        <p>В нашей подготовленной серверной среде проекта для обычного рабочего <strong>run’а</strong> ставим полный рабочий допуск.</p>
+        <p>В нашей подготовленной серверной среде проекта для обычного рабочего шага (run’а) ставим полный рабочий допуск.</p>
         <p>Так Codex не спрашивает разрешение на каждое действие и может нормально выполнить техническую задачу.</p>
         <p><strong>Простой смысл:</strong></p>
         <p><strong>/permissions</strong> нужен, чтобы выставить допуск Codex.</p>
-        <p><strong>4. /skills</strong></p>
-        <p><strong>/skills</strong> открывает <strong>Skills</strong>.</p>
-        <p>Skills — это дополнительные умения и правила для конкретных типов задач.</p>
-        <p>Например, Skill может помогать работать с документами, таблицами, PDF, тестами, отчётами или другим типом работы.</p>
-        <p><strong>Простой смысл:</strong></p>
-        <p><strong>/skills</strong> нужен, чтобы выбрать подходящий навык для задачи.</p>
-        <p><strong>5. /plugins</strong></p>
-        <p><strong>/plugins</strong> открывает доступные <strong>plugins</strong>.</p>
-        <p>Для ученика это можно понимать как магазин или каталог дополнительных возможностей <strong>Codex</strong>.</p>
-        <p>Через <strong>/plugins</strong> можно смотреть, какие дополнительные инструменты доступны, установлены или могут быть подключены.</p>
-        <p><strong>Простой смысл:</strong></p>
-        <p><strong>/plugins</strong> нужен, чтобы открыть каталог дополнительных инструментов Codex.</p>
         <p><strong>Главное правило:</strong></p>
-        <p>Внутри <strong>Codex</strong> в <strong>Terminal</strong> ученик в первую очередь запоминает 5 команд:</p>
-        <p><strong>/status</strong> — посмотреть состояние, <strong>token usage</strong>, <strong>лимиты</strong>, модель, <strong>permissions</strong> и контекст.</p>
+        <p>Внутри <strong>Codex</strong> в <strong>Terminal</strong> ученик в первую очередь запоминает только три команды:</p>
+        <p><strong>/status</strong> — посмотреть состояние, <strong>token usage</strong>, <strong>лимиты ресурсов</strong>, модель, <strong>permissions</strong> и контекст.</p>
         <p><strong>/model</strong> — выбрать модель.</p>
         <p><strong>/permissions</strong> — выбрать допуск.</p>
-        <p><strong>/skills</strong> — выбрать навык для задачи.</p>
-        <p><strong>/plugins</strong> — открыть каталог дополнительных инструментов.</p>
       `
     },
     {
@@ -1255,7 +1242,7 @@ const courseData = {
         <p>Но в нашем курсе ученику сейчас не нужно устанавливать Codex вручную.</p>
         <p>В нашей рабочей схеме Codex уже доступен по подписке и подготовлен на сервере.</p>
         <p>Поэтому ученик изучает не установку ради установки, а правильную схему работы:</p>
-        <p>ChatGPT готовит задачу -&gt; Codex выполняет run -&gt; пользователь и ChatGPT проверяют результат.</p>
+        <p>ChatGPT готовит задачу -&gt; Codex выполняет рабочий шаг (run) -&gt; пользователь и ChatGPT проверяют результат.</p>
       `
     },
     {
@@ -1278,43 +1265,16 @@ const courseData = {
       `
     },
     {
-      label: "Skills",
-      title: "Что такое Skills",
-      html: `
-        <p><strong>Skills</strong> — это дополнительные правила или умения для конкретных типов задач.</p>
-        <p>Например, отдельные Skills могут помогать правильно работать с:</p>
-        <ul>
-          <li>документами;</li>
-          <li>таблицами;</li>
-          <li>презентациями;</li>
-          <li>PDF;</li>
-          <li>кодом;</li>
-          <li>тестами;</li>
-          <li>отчётами;</li>
-          <li>отдельными инструментами.</li>
-        </ul>
-        <p><strong>Skills</strong> внутри <strong>Codex</strong> открывают через:</p>
-        <p><strong>/skills</strong></p>
-        <p>Дополнительные инструменты и каталог <strong>plugins</strong> открывают через:</p>
-        <p><strong>/plugins</strong></p>
-        <p>Для ученика <strong>/plugins</strong> можно понимать как магазин или каталог дополнительных возможностей Codex.</p>
-        <p><strong>Простой смысл:</strong></p>
-        <p><strong>AGENTS.md</strong> задаёт общие правила проекта.</p>
-        <p><strong>Skills</strong> помогают выполнить конкретный тип работы.</p>
-        <p><strong>/plugins</strong> показывает дополнительные инструменты, которые могут быть доступны <strong>Codex</strong>.</p>
-      `
-    },
-    {
       label: "Частые ошибки",
       title: "Что часто путают",
       html: `
         <p><strong>Ошибка 1:</strong> просить <strong>Codex</strong> “сам всё продумать”.</p>
-        <p><strong>Правильно:</strong> сначала <strong>ChatGPT</strong> проектирует шаг, потом <strong>Codex</strong> выполняет.</p>
+        <p><strong>Правильно:</strong> сначала <strong>ChatGPT</strong> проектирует шаг, потом <strong>Codex</strong> выполняет рабочий шаг (run).</p>
         <p><strong>Ошибка 2:</strong> вести долгий диалог с <strong>Codex</strong>.</p>
-        <p><strong>Правильно:</strong> обсуждать с <strong>ChatGPT</strong>, а <strong>Codex</strong> давать точный <strong>prompt</strong>.</p>
+        <p><strong>Правильно:</strong> обсуждать с <strong>ChatGPT</strong>, а <strong>Codex</strong> давать точный <strong>prompt</strong> для одного рабочего шага (run’а).</p>
         <p><strong>Ошибка 3:</strong> включать самую дорогую модель на обычную правку.</p>
         <p><strong>Правильно:</strong> по умолчанию использовать <strong>mini-модель</strong>, если <strong>ChatGPT</strong> не выбрал иначе.</p>
-        <p><strong>Ошибка 4:</strong> оставлять слабые <strong>permissions</strong> на рабочем серверном <strong>run’е</strong>.</p>
+        <p><strong>Ошибка 4:</strong> оставлять слабые <strong>permissions</strong> на рабочем серверном шаге.</p>
         <p><strong>Правильно:</strong> в безопасной серверной среде проекта через <strong>/permissions</strong> выставить полный рабочий допуск, чтобы <strong>Codex</strong> не спрашивал подтверждение на каждое действие.</p>
         <p><strong>Ошибка 5:</strong> включать полный допуск рядом с личными файлами.</p>
         <p><strong>Правильно:</strong> полный допуск использовать только в подготовленной рабочей среде проекта.</p>
@@ -1325,10 +1285,10 @@ const courseData = {
       title: "Главное",
       html: `
         <p>В нашем методе работы <strong>ChatGPT</strong> управляет разработкой, а <strong>Codex</strong> исполняет точную техническую задачу.</p>
-        <p><strong>Codex</strong> работает по <strong>AGENTS.md</strong> и <strong>Skills</strong>, тратит <strong>токены</strong> и <strong>лимиты</strong> на чтение файлов, логи, команды, ответы и внутреннюю работу модели.</p>
-        <p>Поэтому с <strong>ChatGPT</strong> мы обсуждаем, проектируем и принимаем решения, а <strong>Codex</strong> используем экономно: один <strong>run</strong> — одна конкретная задача.</p>
+        <p><strong>Codex</strong> работает по <strong>AGENTS.md</strong>, тратит <strong>токены</strong> и <strong>лимиты ресурсов</strong> на чтение файлов, логи, команды, ответы и внутреннюю работу модели.</p>
+        <p>Поэтому с <strong>ChatGPT</strong> мы обсуждаем, проектируем и принимаем решения, а <strong>Codex</strong> используем экономно: один рабочий шаг (run) — одна конкретная задача.</p>
         <p>Настройки <strong>Codex</strong> внутри <strong>Terminal</strong> делаются через команды с /.</p>
-        <p>Главные команды: <strong>/status</strong>, <strong>/model</strong>, <strong>/permissions</strong>, <strong>/skills</strong> и <strong>/plugins</strong>.</p>
+        <p>Главные команды: <strong>/status</strong>, <strong>/model</strong>, <strong>/permissions</strong>.</p>
       `
     }
   ],
@@ -1342,7 +1302,7 @@ const courseData = {
       ],
       answerIndex: 0,
       feedbackCorrect:
-        "Верно. Codex выполняет технический run, а управление проектом остаётся у ChatGPT и пользователя.",
+        "Верно. Codex выполняет технический рабочий шаг (run), а управление проектом остаётся у ChatGPT и пользователя.",
       feedbackIncorrect:
         "Неверно. В нашей схеме Codex не руководит проектом, а выполняет точную техническую задачу."
     },
@@ -1363,12 +1323,12 @@ const courseData = {
       prompt: "Через какую команду смотрят состояние Codex-сессии?",
       options: [
         "/model",
-        "/plugins",
+        "/permissions",
         "/status"
       ],
       answerIndex: 2,
       feedbackCorrect:
-        "Верно. Через /status смотрят состояние сессии, модель, permissions, контекст, token usage и доступную информацию по лимитам.",
+        "Верно. Через /status смотрят состояние сессии, модель, permissions, контекст, token usage и доступную информацию по лимитам ресурсов.",
       feedbackIncorrect:
         "Неверно. Состояние Codex-сессии смотрят через /status."
     },
@@ -1377,7 +1337,7 @@ const courseData = {
       options: [
         "/model",
         "/status",
-        "/skills"
+        "/permissions"
       ],
       answerIndex: 0,
       feedbackCorrect:
@@ -1388,7 +1348,7 @@ const courseData = {
     {
       prompt: "Через какую команду выставляют допуск Codex?",
       options: [
-        "/plugins",
+        "/model",
         "/permissions",
         "/status"
       ],
@@ -1399,37 +1359,37 @@ const courseData = {
         "Неверно. Для настройки допуска используется /permissions."
     },
     {
-      prompt: "Какая команда открывает Skills?",
+      prompt: "Как открыть меню slash-команд?",
       options: [
-        "/model",
-        "/status",
-        "/skills"
-      ],
-      answerIndex: 2,
-      feedbackCorrect:
-        "Верно. Skills открывают через /skills.",
-      feedbackIncorrect:
-        "Неверно. Skills открывают через /skills."
-    },
-    {
-      prompt: "Какая команда открывает каталог дополнительных инструментов Codex?",
-      options: [
-        "/plugins",
-        "/permissions",
-        "/model"
+        "Нажать / внутри Codex",
+        "Набрать полный адрес команды вручную",
+        "Набрать полный адрес команды вручную"
       ],
       answerIndex: 0,
       feedbackCorrect:
-        "Верно. /plugins открывает доступные plugins, то есть каталог дополнительных инструментов Codex.",
+        "Верно. Внутри открытого Codex в Terminal достаточно нажать /, после чего можно выбрать нужную команду стрелками и подтвердить Enter.",
       feedbackIncorrect:
-        "Неверно. Каталог дополнительных инструментов открывают через /plugins."
+        "Неверно. Меню slash-команд открывается нажатием / внутри Codex."
+    },
+    {
+      prompt: "Какая команда нужна, чтобы выбрать модель?",
+      options: [
+        "/model",
+        "/status",
+        "/permissions"
+      ],
+      answerIndex: 0,
+      feedbackCorrect:
+        "Верно. Для выбора модели используется /model.",
+      feedbackIncorrect:
+        "Неверно. Модель выбирают через /model."
     },
     {
       prompt: "Почему в нашем методе не ведут длинные диалоги с Codex?",
       options: [
-        "Потому что все обсуждения ведём с ChatGPT, а ресурс Codex экономим для точного технического run’а",
+        "Потому что все обсуждения ведём с ChatGPT, а ресурс Codex экономим для точного технического рабочего шага (run’а)",
         "Потому что Codex не умеет писать текст",
-        "Потому что /plugins удаляет файлы"
+        "Потому что /permissions удаляет файлы"
       ],
       answerIndex: 0,
       feedbackCorrect:
@@ -1439,7 +1399,7 @@ const courseData = {
     }
   ],
   resultTitle: "Главный вывод урока",
-  resultText: "Codex — это исполнитель на сервере или в рабочей папке проекта. Он должен получать точную техническую задачу от ChatGPT, работать по AGENTS.md и Skills, экономно тратить токены, использовать подходящую модель и возвращать проверяемый отчёт. В нашей системе ChatGPT управляет разработкой, а Codex исполняет инструкции.",
+  resultText: "Codex — это исполнитель на сервере или в рабочей папке проекта. Он должен получать точную техническую задачу от ChatGPT, работать по AGENTS.md, экономно тратить токены, соблюдать лимиты ресурсов, использовать подходящую модель и возвращать проверяемый отчёт. В нашей системе ChatGPT управляет разработкой, а Codex исполняет инструкцию по одному рабочему шагу (run).",
   nextStepTitle: "Следующий урок",
   nextStepText: "В следующем уроке разберём PowerShell, Terminal и подключение к серверу.",
   nextStepButtonLabel: "Перейти к уроку 5",
@@ -1480,8 +1440,8 @@ const courseData = {
           <li>зачем проекту удалённый сервер;</li>
           <li>как открыть <strong>PowerShell</strong> на Windows;</li>
           <li>как открыть <strong>Terminal</strong> на macOS;</li>
-          <li>как подключиться к серверу по SSH-команде из личного кабинета;</li>
-          <li>как ввести пароль из личного кабинета;</li>
+          <li>как подключиться к серверу по SSH-команде из <a href="https://openscript.ru/cabinet" target="_blank" rel="noreferrer">личного кабинета курса</a>;</li>
+          <li>как ввести пароль из <a href="https://openscript.ru/cabinet" target="_blank" rel="noreferrer">личного кабинета курса</a>;</li>
           <li>как запустить <strong>Codex</strong> командой <strong>codex</strong>;</li>
           <li>как написать первое сообщение и получить ответ от <strong>Codex</strong>.</li>
         </ul>
@@ -1520,7 +1480,7 @@ const courseData = {
       html: `
         <p><strong>SSH</strong> — это способ подключиться к серверу.</p>
         <p>SSH-команда открывает вход на сервер. Вы вставляете SSH-команду в <strong>Terminal</strong> или <strong>PowerShell</strong>, вводите пароль и попадаете в рабочую среду проекта.</p>
-        <p>SSH-команду и пароль вы берёте в личном кабинете курса. Придумывать их не нужно.</p>
+        <p>SSH-команду и пароль вы берёте в <a href="https://openscript.ru/cabinet" target="_blank" rel="noreferrer">личном кабинете курса</a>. Придумывать их не нужно.</p>
       `
     },
     {
@@ -1534,9 +1494,9 @@ const courseData = {
           <li>Начните писать <strong>PowerShell</strong>.</li>
           <li>Откройте приложение <strong>Windows PowerShell</strong> или <strong>PowerShell</strong>.</li>
           <li>Появится окно с тёмным или синим фоном.</li>
-          <li>В это окно нужно вставить SSH-команду из личного кабинета.</li>
+          <li>В это окно нужно вставить SSH-команду из <a href="https://openscript.ru/cabinet" target="_blank" rel="noreferrer">личного кабинета курса</a>.</li>
           <li>Нажмите <strong>Enter</strong>.</li>
-          <li>Когда система попросит пароль, введите пароль из личного кабинета.</li>
+          <li>Когда система попросит пароль, введите пароль из <a href="https://openscript.ru/cabinet" target="_blank" rel="noreferrer">личного кабинета курса</a>.</li>
         </ol>
         <p>Если символы пароля не отображаются при вводе, это нормально. Введите пароль и нажмите <strong>Enter</strong>.</p>
       `
@@ -1558,8 +1518,8 @@ const courseData = {
           <li>Напишите <strong>Terminal</strong>.</li>
           <li>Нажмите <strong>Enter</strong>.</li>
         </ol>
-        <p>После этого откроется окно <strong>Terminal</strong>. В это окно нужно вставить SSH-команду из личного кабинета и нажать <strong>Enter</strong>.</p>
-        <p>Когда система попросит пароль, введите пароль из личного кабинета и нажмите <strong>Enter</strong>. Если пароль не виден при вводе, это нормально.</p>
+        <p>После этого откроется окно <strong>Terminal</strong>. В это окно нужно вставить SSH-команду из <a href="https://openscript.ru/cabinet" target="_blank" rel="noreferrer">личного кабинета курса</a> и нажать <strong>Enter</strong>.</p>
+        <p>Когда система попросит пароль, введите пароль из <a href="https://openscript.ru/cabinet" target="_blank" rel="noreferrer">личного кабинета курса</a> и нажмите <strong>Enter</strong>. Если пароль не виден при вводе, это нормально.</p>
       `
     },
     {
@@ -1568,13 +1528,13 @@ const courseData = {
       html: `
         <p><strong>Порядок подключения такой:</strong></p>
         <ol>
-          <li>Откройте личный кабинет курса.</li>
+          <li>Откройте <a href="https://openscript.ru/cabinet" target="_blank" rel="noreferrer">личный кабинет курса</a>.</li>
           <li>Найдите SSH-команду для подключения к серверу.</li>
           <li>Скопируйте SSH-команду.</li>
           <li>Откройте <strong>PowerShell</strong> на Windows или <strong>Terminal</strong> на macOS.</li>
           <li>Вставьте SSH-команду в окно.</li>
           <li>Нажмите <strong>Enter</strong>.</li>
-          <li>Когда появится запрос пароля, возьмите пароль из личного кабинета.</li>
+          <li>Когда появится запрос пароля, возьмите пароль из <a href="https://openscript.ru/cabinet" target="_blank" rel="noreferrer">личного кабинета курса</a>.</li>
           <li>Введите пароль.</li>
           <li>Нажмите <strong>Enter</strong>.</li>
         </ol>
@@ -1639,7 +1599,7 @@ const courseData = {
         <p><strong>Ошибка 1:</strong> думать, что <strong>Terminal</strong> нужен только для программистов.</p>
         <p>Правильно: вам нужен <strong>Terminal</strong> или <strong>PowerShell</strong> как окно связи с сервером.</p>
         <p><strong>Ошибка 2:</strong> искать SSH-команду в интернете.</p>
-        <p>Правильно: SSH-команду нужно брать в личном кабинете курса.</p>
+        <p>Правильно: SSH-команду нужно брать в <a href="https://openscript.ru/cabinet" target="_blank" rel="noreferrer">личном кабинете курса</a>.</p>
         <p><strong>Ошибка 3:</strong> пугаться, если пароль при вводе не виден.</p>
         <p>Правильно: это нормально. Введите пароль и нажмите <strong>Enter</strong>.</p>
         <p><strong>Ошибка 4:</strong> пытаться запускать <strong>Codex</strong> до подключения к серверу.</p>
@@ -1690,13 +1650,13 @@ const courseData = {
       options: [
         "Придумать самостоятельно",
         "Найти случайную команду в интернете",
-        "В личном кабинете курса"
+        "В разделе аккаунтов курса"
       ],
       answerIndex: 2,
       feedbackCorrect:
-        "Верно. SSH-команду и пароль нужно брать из личного кабинета курса.",
+        "Верно. SSH-команду и пароль нужно брать из раздела аккаунтов.",
       feedbackIncorrect:
-        "Неверно. В нашем курсе SSH-команда и пароль берутся из личного кабинета."
+        "Неверно. В нашем курсе SSH-команда и пароль берутся из раздела аккаунтов."
     },
     {
       prompt: "Как запустить Codex после подключения к серверу?",
@@ -4068,13 +4028,14 @@ function renderStructuredLesson(section) {
       `
     : "";
   const nextStep = renderLessonFooterNavigation(section);
+  const description = section.descriptionHtml || escapeHTML(section.description);
 
   return `
     <article class="section-card">
       <header class="section-header">
         <p class="eyebrow">${escapeHTML(section.eyebrow)}</p>
         <h3>${escapeHTML(section.title)}</h3>
-        <p class="muted">${escapeHTML(section.description)}</p>
+        <p class="muted">${description}</p>
       </header>
 
       <div class="section-body">
