@@ -54,13 +54,14 @@ def _read_lesson_test_asset(filename: str) -> str:
 
 
 def _template(request: Request, template_name: str, **context) -> HTMLResponse:
+    status_code = context.pop("status_code", 200)
     payload = {
         "request": request,
         "title": context.pop("title", "Работа с ИИ"),
         "current_user": get_current_user_from_cookies(request.cookies, settings=get_settings()),
     }
     payload.update(context)
-    return templates.TemplateResponse(request, template_name, payload)
+    return templates.TemplateResponse(request, template_name, payload, status_code=status_code)
 
 
 def _locked_response(
@@ -89,12 +90,13 @@ def _locked_response(
     )
 
 
-def _learning_paywall_response(request: Request, user) -> HTMLResponse:
+def _learning_paywall_response(request: Request, user, *, status_code: int = 200) -> HTMLResponse:
     settings = get_settings()
     return _template(
         request,
         "learning_locked.html",
         title="Работа с ИИ",
+        status_code=status_code,
         current_user=user,
         primary_cta_href="/cabinet",
         primary_cta_label="В личный кабинет",
@@ -179,7 +181,7 @@ def lesson_test_page(request: Request):
     if user is None:
         return RedirectResponse(url="/login", status_code=303)
     if not user_has_materials_access(user):
-        return _learning_paywall_response(request, user)
+        return _learning_paywall_response(request, user, status_code=403)
     return HTMLResponse(_read_lesson_test_asset("index.html"))
 
 
