@@ -155,12 +155,28 @@ def role_label_ru(role: str) -> str:
     return ROLE_LABELS_RU.get(role, role)
 
 
+def _normalized_role_value(value: UserPublic | str | None) -> str | None:
+    if value is None:
+        return None
+    if isinstance(value, str):
+        return value.strip().lower() or None
+    role = getattr(value, "role", None)
+    if isinstance(role, str):
+        return role.strip().lower() or None
+    return None
+
+
 def is_admin_role(role: str) -> bool:
-    return role == ROLE_ADMIN
+    return (_normalized_role_value(role) or "") == ROLE_ADMIN
+
+
+def is_moderator_role(role: str) -> bool:
+    return (_normalized_role_value(role) or "") == ROLE_MODERATOR
 
 
 def has_staff_materials_access(role: str) -> bool:
-    return role in {ROLE_ADMIN, ROLE_MODERATOR}
+    normalized = _normalized_role_value(role)
+    return normalized in {ROLE_ADMIN, ROLE_MODERATOR}
 
 
 def user_can_access_materials(user: UserPublic | None) -> bool:
@@ -174,7 +190,12 @@ def user_can_access_materials(user: UserPublic | None) -> bool:
 
 
 def can_manage_account_blocks(user: UserPublic | None) -> bool:
-    return bool(user and has_staff_materials_access(user.role))
+    normalized = _normalized_role_value(user)
+    return normalized in {ROLE_ADMIN, ROLE_MODERATOR}
+
+
+def can_manage_moderators(actor: UserPublic | str | None) -> bool:
+    return (_normalized_role_value(actor) or "") == ROLE_ADMIN
 
 
 def _build_public_url(settings: Settings, path: str) -> str:
@@ -386,6 +407,39 @@ def update_user_role(
         updated = connection.execute("SELECT * FROM users WHERE id = ?", (int(user_id),)).fetchone()
         if updated is None:
             raise AuthError("role update failed")
+        return _public_user_from_row(updated)
+
+
+def set_user_materials_access(
+    *,
+    user_id: int,
+    granted: bool,
+    settings: Settings | None = None,
+) -> UserPublic:
+    resolved = _settings(settings)
+    target_access_status = "activated" if granted else "not_activated"
+    target_granted_at = utc_now_iso() if granted else None
+    with _connection(resolved) as connection:
+        row = connection.execute("SELECT * FROM users WHERE id = ?", (int(user_id),)).fetchone()
+        if row is None:
+            raise NotFoundError("user not found")
+        current_granted = row["materials_access_granted_at"] is not None
+        current_access_status = str(row["access_status"])
+        if current_granted == granted and current_access_status == target_access_status:
+            return _public_user_from_row(row)
+
+        now_iso = utc_now_iso()
+        connection.execute(
+            """
+            UPDATE users
+            SET materials_access_granted_at = ?, access_status = ?, updated_at = ?
+            WHERE id = ?
+            """,
+            (target_granted_at, target_access_status, now_iso, int(user_id)),
+        )
+        updated = connection.execute("SELECT * FROM users WHERE id = ?", (int(user_id),)).fetchone()
+        if updated is None:
+            raise AuthError("materials access update failed")
         return _public_user_from_row(updated)
 
 

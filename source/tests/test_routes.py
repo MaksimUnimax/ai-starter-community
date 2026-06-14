@@ -48,7 +48,7 @@ def test_landing_page(client):
     assert "Начать первый проект" in response.text
     assert "Войти" in response.text
     assert "Вы покупаете не курс, а первый управляемый опыт разработки" in response.text
-    assert "Стартовый месяц OpenScript — 4 990 ₽" in response.text
+    assert "Стартовый доступ — 4 990 ₽" in response.text
     assert "Вопросы перед стартом" in response.text
     assert 'href="#how-it-works"' in response.text
     assert 'href="/login"' in response.text
@@ -117,10 +117,9 @@ def test_login_and_register_pages(client):
     assert cabinet_response.headers["location"] == "/login"
     assert "Вход в аккаунт" in login_response.text
     assert "Регистрация" in register_response.text
-    assert "Регистрация временно закрыта" in register_response.text
-    assert "Перейти ко входу" in register_response.text
+    assert "Создать аккаунт" in register_response.text
     assert "/login" in register_response.text
-    assert "Создать аккаунт" not in register_response.text
+    assert "Регистрация временно закрыта" not in register_response.text
     assert "Нет аккаунта?" in login_response.text
     assert "Зарегистрироваться" in login_response.text
     assert "Забыли пароль?" in login_response.text
@@ -133,9 +132,8 @@ def test_login_and_register_pages(client):
     assert "/static/styles.css" in login_response.text
     assert "/static/styles.css" in register_response.text
     assert "Электронная почта или логин" in login_response.text
-    assert "Регистрация временно закрыта" in register_response.text
-    assert "Перейти ко входу" in register_response.text
-    assert "Создать аккаунт" not in register_response.text
+    assert "Создать аккаунт" in register_response.text
+    assert "Регистрация временно закрыта" not in register_response.text
     assert "Подтверждение почты" not in login_response.text
     assert "Не пришло письмо подтверждения?" not in login_response.text
     assert "Отправить письмо подтверждения" not in login_response.text
@@ -200,7 +198,6 @@ def test_placeholder_post_routes_redirect(client):
     )
     logout_response = client.post("/logout", follow_redirects=False)
     assert login_response.status_code == 200
-    assert register_response.status_code == 403
-    assert "Регистрация временно закрыта" in register_response.text
-    assert "/login" in register_response.text
+    assert register_response.status_code == 303
+    assert register_response.headers["location"] == "/check-email?registered=1"
     assert logout_response.status_code == 303

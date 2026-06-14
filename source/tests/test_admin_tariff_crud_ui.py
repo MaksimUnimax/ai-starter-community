@@ -105,6 +105,7 @@ def test_admin_can_open_tariff_create_page(client, test_settings):
     assert "Description" not in body
     assert "Price, RUB" not in body
     assert 'name="code"' in body
+    assert 'name="show_on_homepage"' in body
     assert "Нужен программе. Можно оставить пустым — система создаст код автоматически." in body
 
 
@@ -120,6 +121,7 @@ def test_admin_can_create_tariff_via_ui(client, test_settings):
             "price_rub": "12.34",
             "currency": "RUB",
             "status": "active",
+            "show_on_homepage": "1",
             "sort_order": "7",
         },
         follow_redirects=False,
@@ -135,6 +137,7 @@ def test_admin_can_create_tariff_via_ui(client, test_settings):
     assert tariff.price_amount_minor == 1234
     assert tariff.currency == "RUB"
     assert tariff.status == "active"
+    assert tariff.show_on_homepage is True
     assert tariff.sort_order == 7
 
 
@@ -225,6 +228,7 @@ def test_admin_edit_page_shows_code_as_read_only(client, test_settings):
         title="UI Tariff",
         description="Initial description",
         price_amount_minor=1000,
+        show_on_homepage=True,
         status="active",
         settings=test_settings,
     )
@@ -251,7 +255,9 @@ def test_admin_edit_page_shows_code_as_read_only(client, test_settings):
     assert "Code" not in body
     assert "Title" not in body
     assert 'name="code"' in body
+    assert 'name="show_on_homepage"' in body
     assert "readonly" in body
+    assert "checked" in body
     assert "ui_tariff_edit" in body
     assert "Системный код нельзя изменить после создания." in body
 
@@ -278,6 +284,7 @@ def test_admin_post_edit_updates_allowed_fields_and_keeps_code(client, test_sett
             "price_rub": "55.50",
             "currency": "RUB",
             "status": "hidden",
+            "show_on_homepage": "",
             "sort_order": "9",
         },
         follow_redirects=False,
@@ -292,6 +299,7 @@ def test_admin_post_edit_updates_allowed_fields_and_keeps_code(client, test_sett
     assert tariff.description == "Updated description"
     assert tariff.price_amount_minor == 5550
     assert tariff.status == "hidden"
+    assert tariff.show_on_homepage is False
     assert tariff.sort_order == 9
 
 

@@ -43,8 +43,7 @@ def test_stylesheet_is_served(client):
     assert ".accounts-grid" in response.text
     assert ".account-card" in response.text
     assert ".account-password-row" in response.text
-    assert "width: min(100%, 320px);" in response.text
-    assert "max-width: 340px;" in response.text
+    assert "width: min(100%, 34rem);" in response.text
     assert ".accounts-builder .select {" in response.text
     assert "min-height: 38px;" in response.text
     assert ".accounts-builder .button {" in response.text

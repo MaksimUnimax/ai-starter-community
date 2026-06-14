@@ -15,10 +15,9 @@
       <div class="alert alert-error">{{ error }}</div>
     {% endif %}
     {% if unverified %}
-      <div class="alert alert-info stack login-unverified">
-        <p class="login-unverified__title">Email не подтверждён.</p>
-        <p class="login-unverified__text">Не пришло письмо подтверждения?</p>
-        <a class="button button-secondary login-unverified__action" href="/resend-verification">Отправить письмо подтверждения ещё раз</a>
+      <div class="alert alert-info stack">
+        <p>Email не подтверждён.</p>
+        <p>Не пришло письмо подтверждения? <a href="/resend-verification">Отправить письмо подтверждения ещё раз</a>.</p>
       </div>
     {% endif %}
 
@@ -29,7 +28,10 @@
       </label>
       <label class="form-row">
         <span>Пароль</span>
-        <input class="input" type="password" name="password" autocomplete="current-password">
+        <div class="password-field" data-password-field>
+          <input class="input" type="password" name="password" autocomplete="current-password" data-password-input>
+          <button class="button button-secondary password-toggle" type="button" data-password-toggle aria-pressed="false" aria-label="Показать пароль">Показать пароль</button>
+        </div>
       </label>
       <button class="button button-primary" type="submit">Войти</button>
     </form>
@@ -39,4 +41,6 @@
       <a class="button button-secondary" href="/forgot-password">Забыли пароль?</a>
     </div>
   </section>
+
+  <script src="/static/auth-password-toggle.js" defer></script>
 {% endblock %}

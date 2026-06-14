@@ -12,45 +12,19 @@
   <body class="page{% if request.url.path == '/' %} page--landing{% endif %}">
     <div class="page-shell">
       <header class="top-nav" aria-label="Основная навигация">
-        <div class="nav-inner">
-          <div class="nav-brand-row">
-            <a class="nav-logo" href="/">OpenScript</a>
-            {% if current_user %}
-              <div class="nav-account-compact" aria-label="Текущий аккаунт">
-                <span class="nav-account-name">{{ current_user.login or current_user.email or "Аккаунт" }}</span>
-                <span class="nav-account-email">{{ current_user.email or current_user.login or "Аккаунт" }}</span>
-              </div>
-            {% endif %}
-          </div>
-          <div class="nav-menu-row">
-            <nav class="nav-links" aria-label="Навигация">
-              {% if current_user %}
-                <a class="button button-secondary nav-pill" href="/">Главная</a>
-                {% if current_user.materials_access_granted or current_user.role in ["admin", "moderator"] %}
-                  <a class="button button-secondary nav-pill" href="/materials/drafts/dair-smoke-20260529/">Обучение</a>
-                {% else %}
-                  <button class="button button-secondary nav-pill" type="button" disabled>Обучение</button>
-                {% endif %}
-                <a class="button button-secondary nav-pill" href="/cabinet">Личный кабинет</a>
-                {% if current_user.role == "admin" %}
-                  <a class="button button-secondary nav-pill" href="/admin">Админ-панель</a>
-                {% endif %}
-                <a class="button button-secondary nav-pill nav-settings" href="/cabinet/settings" title="Настройки" aria-label="Настройки">
-                  <span class="nav-settings-label">Настройки</span>
-                </a>
-                <form class="nav-form" method="post" action="/logout">
-                  <button class="button button-secondary nav-pill" type="submit">Выйти</button>
-                </form>
-              {% else %}
-                <a href="#what-you-get">Что вы получите</a>
-                <a href="#first-project">Первый проект</a>
-                <a href="#how-it-works">Как проходит работа</a>
-                <a href="#pricing">Цена</a>
-                <a href="/login">Войти</a>
-              {% endif %}
-            </nav>
-          </div>
-        </div>
+        <a class="nav-link" href="/">Главная</a>
+        {% if current_user %}
+          <a class="nav-link" href="/materials">Работа с ИИ</a>
+          <a class="nav-link" href="/cabinet">Личный кабинет</a>
+          {% if current_user.role == "admin" %}
+            <a class="nav-link" href="/admin">Админ-панель</a>
+          {% endif %}
+          <form class="nav-form" method="post" action="/logout">
+            <button class="nav-link nav-button" type="submit">Выйти</button>
+          </form>
+        {% else %}
+          <a class="nav-link" href="/login">Вход / регистрация</a>
+        {% endif %}
       </header>
       <main class="page-content">
         {% block content %}{% endblock %}

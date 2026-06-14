@@ -295,17 +295,14 @@ def test_route_flow_register_page_is_closed(client, test_settings):
 
     register_response = client.get("/register")
     assert register_response.status_code == 200
-    assert "Регистрация временно закрыта" in register_response.text
-    assert "Перейти ко входу" in register_response.text
-    assert 'class="button button-secondary nav-pill" href="/"' in register_response.text
-    assert 'class="button button-secondary nav-pill" href="/login"' in register_response.text
-    assert 'class="button button-secondary nav-pill" href="/register"' in register_response.text
-    assert "Что вы получите" not in register_response.text
-    assert "Первый проект" not in register_response.text
-    assert "Как проходит работа" not in register_response.text
-    assert "Цена" not in register_response.text
-    assert 'class="button button-secondary nav-pill" href="/"' in register_response.text
-    assert "Создать аккаунт" not in register_response.text
+    assert "Регистрация" in register_response.text
+    assert "Создайте аккаунт, затем подтвердите почту по ссылке из письма." in register_response.text
+    assert "После регистрации вы увидите страницу подтверждения почты." in register_response.text
+    assert "Регистрация временно закрыта" not in register_response.text
+    assert "Создать аккаунт" in register_response.text
+    assert 'data-password-field' in register_response.text
+    assert 'data-password-toggle' in register_response.text
+    assert 'auth-password-toggle.js' in register_response.text
 
     register_post_response = client.post(
         "/register",
@@ -317,11 +314,9 @@ def test_route_flow_register_page_is_closed(client, test_settings):
         },
         follow_redirects=False,
     )
-    assert register_post_response.status_code == 403
-    assert "Регистрация временно закрыта" in register_post_response.text
-    assert "/login" in register_post_response.text
-
-    assert not db_path.exists()
+    assert register_post_response.status_code == 303
+    assert register_post_response.headers["location"] == "/check-email?registered=1"
+    assert db_path.exists()
 
 
 def test_route_flow_login_cabinet_logout_still_works(client, test_settings):
@@ -364,7 +359,7 @@ def test_route_flow_login_cabinet_logout_still_works(client, test_settings):
     assert "Обучающий проект" not in cabinet_response.text
     assert "Перейти к обучению" not in cabinet_response.text
     assert "Скачать файл" not in cabinet_response.text
-    assert 'href="/materials/drafts/dair-smoke-20260529/"' not in cabinet_response.text
+    assert 'href="/materials/drafts/dair-smoke-20260529/"' in cabinet_response.text
     assert 'href="/cabinet/learning/project-file"' not in cabinet_response.text
     assert "Выйти" in cabinet_response.text
 
@@ -420,6 +415,9 @@ def test_cabinet_settings_page_and_password_change_flow(client, test_settings):
     assert settings_page.status_code == 200
     assert "Настройки" in settings_page.text
     assert "Смена пароля" in settings_page.text
+    assert "Личный кабинет" in settings_page.text
+    assert "Аккаунт:" in settings_page.text
+    assert "Email:" in settings_page.text
     assert 'name="current_password"' in settings_page.text
     assert 'name="password"' in settings_page.text
     assert 'name="repeat_password"' in settings_page.text
@@ -581,11 +579,10 @@ def test_settings_page_layout_and_password_change(client, test_settings):
 
     settings_response = client.get("/cabinet/settings")
     assert settings_response.status_code == 200
-    assert "settings-shell" in settings_response.text
-    assert "settings-card" in settings_response.text
-    assert "settings-meta" in settings_response.text
-    assert "settings-form" in settings_response.text
-    assert "Управляйте паролем и данными учётной записи без лишнего визуального шума." in settings_response.text
+    assert "Личный кабинет" in settings_response.text
+    assert "Настройки" in settings_response.text
+    assert "Аккаунт:" in settings_response.text
+    assert "Email:" in settings_response.text
     assert "Аккаунт" in settings_response.text
     assert "Email" in settings_response.text
     assert "Смена пароля" in settings_response.text
@@ -624,7 +621,7 @@ def test_unverified_login_shows_resend_link(client, test_settings):
     assert login_response.text.count("Email не подтверждён.") == 1
     assert "Не пришло письмо подтверждения?" in login_response.text
     assert "/resend-verification" in login_response.text
-    assert 'class="button button-secondary login-unverified__action"' in login_response.text
+    assert "Отправить письмо подтверждения ещё раз" in login_response.text
     assert "Подтверждение почты" not in client.get("/login").text
 
 
@@ -636,9 +633,9 @@ def test_login_and_reset_pages_show_clear_rules(client):
     assert "Электронная почта или логин" in login_response.text
     assert "Зарегистрироваться" in login_response.text
     assert "Забыли пароль?" in login_response.text
-    assert 'class="button button-secondary nav-pill" href="/"' in login_response.text
-    assert 'class="button button-secondary nav-pill" href="/login"' in login_response.text
-    assert 'class="button button-secondary nav-pill" href="/register"' in login_response.text
+    assert 'class="nav-link" href="/"' in login_response.text
+    assert 'class="nav-link" href="/login"' in login_response.text
+    assert "Вход / регистрация" in login_response.text
     assert "Что вы получите" not in login_response.text
     assert "Первый проект" not in login_response.text
     assert "Как проходит работа" not in login_response.text
@@ -714,11 +711,11 @@ def test_cabinet_shows_logout_button_and_access_text(client, test_settings):
     assert "Обучающий проект" not in cabinet_response.text
     assert "Перейти к обучению" not in cabinet_response.text
     assert "Скачать файл" not in cabinet_response.text
-    assert 'href="/materials/drafts/dair-smoke-20260529/"' not in cabinet_response.text
+    assert 'href="/materials/drafts/dair-smoke-20260529/"' in cabinet_response.text
     assert 'href="/cabinet/learning/project-file"' not in cabinet_response.text
     assert "Выйти" in cabinet_response.text
     assert "/static/styles.css" in cabinet_response.text
-    assert "Работа с ИИ" not in cabinet_response.text
+    assert "Работа с ИИ" in cabinet_response.text
 
 
 def test_password_hash_is_not_plaintext_and_session_revocation(test_settings):

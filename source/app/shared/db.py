@@ -57,6 +57,31 @@ CREATE TABLE IF NOT EXISTS email_outbox (
     error TEXT NULL
 );
 
+CREATE TABLE IF NOT EXISTS account_blocks (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    owner_user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    type TEXT NOT NULL,
+    title TEXT NOT NULL,
+    login TEXT NOT NULL DEFAULT '',
+    password_secret TEXT NOT NULL DEFAULT '',
+    email TEXT NULL,
+    status TEXT NOT NULL DEFAULT 'inactive',
+    duration_days INTEGER NOT NULL DEFAULT 60,
+    activated_at TEXT NULL,
+    expires_at TEXT NULL,
+    created_by_user_id INTEGER NULL REFERENCES users(id) ON DELETE SET NULL,
+    updated_by_user_id INTEGER NULL REFERENCES users(id) ON DELETE SET NULL,
+    activated_by_user_id INTEGER NULL REFERENCES users(id) ON DELETE SET NULL,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    CHECK (type IN ('chatgpt', 'server', 'mail', 'vpn')),
+    CHECK (status IN ('inactive', 'active', 'expired'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_account_blocks_owner_user_id ON account_blocks(owner_user_id);
+CREATE INDEX IF NOT EXISTS idx_account_blocks_owner_user_type ON account_blocks(owner_user_id, type);
+CREATE INDEX IF NOT EXISTS idx_account_blocks_status ON account_blocks(status);
+
 CREATE TABLE IF NOT EXISTS tariffs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     code TEXT UNIQUE NOT NULL,
@@ -65,6 +90,7 @@ CREATE TABLE IF NOT EXISTS tariffs (
     price_amount_minor INTEGER NOT NULL,
     currency TEXT NOT NULL DEFAULT 'RUB',
     status TEXT NOT NULL DEFAULT 'active',
+    show_on_homepage INTEGER NOT NULL DEFAULT 0,
     sort_order INTEGER NOT NULL DEFAULT 0,
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL
@@ -121,6 +147,7 @@ def initialize_database(path: Path | str) -> None:
         connection.execute("PRAGMA foreign_keys = ON")
         connection.executescript(SCHEMA_SQL)
         _ensure_users_materials_access_granted_at_column(connection)
+        _ensure_tariffs_show_on_homepage_column(connection)
 
 
 def _ensure_users_materials_access_granted_at_column(connection: sqlite3.Connection) -> None:
@@ -130,3 +157,12 @@ def _ensure_users_materials_access_granted_at_column(connection: sqlite3.Connect
     }
     if "materials_access_granted_at" not in columns:
         connection.execute("ALTER TABLE users ADD COLUMN materials_access_granted_at TEXT NULL")
+
+
+def _ensure_tariffs_show_on_homepage_column(connection: sqlite3.Connection) -> None:
+    columns = {
+        row[1]
+        for row in connection.execute("PRAGMA table_info(tariffs)").fetchall()
+    }
+    if "show_on_homepage" not in columns:
+        connection.execute("ALTER TABLE tariffs ADD COLUMN show_on_homepage INTEGER NOT NULL DEFAULT 0")

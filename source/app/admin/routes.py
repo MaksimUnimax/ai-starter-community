@@ -6,8 +6,9 @@ import re
 from datetime import date
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
+from urllib.parse import urlencode
 
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, PlainTextResponse, RedirectResponse, Response
 from fastapi.templating import Jinja2Templates
 
@@ -18,11 +19,30 @@ from app.auth.service import (
     ROLE_LABELS_RU,
     NotFoundError as AuthNotFoundError,
     RoleError,
+    ValidationError as AuthValidationError,
+    get_user_by_email,
     get_user_by_session_token,
     list_users_for_admin,
+    role_label_ru,
+    set_user_materials_access,
     update_user_role,
 )
 from app.admin.course_export import build_course_export
+from app.account_blocks.schemas import AccountBlockCreateInput, AccountBlockUpdateInput
+from app.account_blocks.service import (
+    DEFAULT_ACCOUNT_BLOCK_DURATION_DAYS,
+    AccountBlockNotFoundError,
+    AccountBlockPermissionError,
+    AccountBlockValidationError,
+    activate_account_block,
+    create_account_block,
+    delete_account_block,
+    get_account_block_copy_data,
+    get_account_block_public,
+    list_account_blocks_for_viewer,
+    renew_account_block,
+    update_account_block,
+)
 from app.core.config import get_settings
 from app.paid_options.schemas import PaidOptionCreateInput, PaidOptionUpdateInput
 from app.paid_options.service import (
@@ -137,6 +157,224 @@ def _status_label(value: str) -> str:
     }.get(value, value)
 
 
+ACCOUNT_BLOCK_MANAGEMENT_QUERY_PARAM = "account_blocks_user_email"
+ACCOUNT_BLOCK_NOTICE_MESSAGES = {
+    "created": "Блок создан.",
+    "updated": "Блок сохранён.",
+    "deleted": "Блок удалён.",
+    "activated": "Блок активирован.",
+    "renewed": "Активация продлена.",
+    "activated_email_sent": "Блок активирован. Уведомление отправлено на почту пользователя.",
+    "activated_email_failed": "Блок активирован, но письмо отправить не удалось.",
+    "selected_user_not_found": "Пользователь не найден.",
+}
+
+
+def _account_block_notice(request: Request) -> str | None:
+    notice_key = (request.query_params.get("account_blocks_notice") or "").strip().lower()
+    return ACCOUNT_BLOCK_NOTICE_MESSAGES.get(notice_key)
+
+
+def _selected_account_block_email(request: Request, fallback_email: str) -> str:
+    raw_email = (request.query_params.get(ACCOUNT_BLOCK_MANAGEMENT_QUERY_PARAM) or "").strip()
+    return raw_email or fallback_email
+
+
+def _user_attr(user, key: str):
+    if isinstance(user, dict):
+        return user.get(key)
+    return getattr(user, key)
+
+
+def _account_block_owner_email(settings, owner_user_id: int) -> str | None:
+    for owner in list_users_for_admin(settings=settings):
+        if int(_user_attr(owner, "id")) == int(owner_user_id):
+            return str(_user_attr(owner, "email"))
+    return None
+
+
+def _account_block_owner_summary(user) -> dict[str, object]:
+    return {
+        "id": int(_user_attr(user, "id")),
+        "email": str(_user_attr(user, "email")),
+        "login": str(_user_attr(user, "login")),
+        "role": str(_user_attr(user, "role")),
+        "role_label": role_label_ru(str(_user_attr(user, "role"))),
+        "display_label": f"{_user_attr(user, 'login')} · {_user_attr(user, 'email')}",
+    }
+
+
+def _account_block_card_context(block, copy_data, owner_summary: dict[str, object] | None = None) -> dict[str, object]:
+    return {
+        "id": block.id,
+        "owner_user_id": block.owner_user_id,
+        "owner": owner_summary,
+        "type": block.type,
+        "type_label": {
+            "chatgpt": "ChatGPT",
+            "server": "Сервер",
+            "mail": "Почта",
+            "vpn": "ВПН",
+        }.get(block.type, block.type),
+        "display_title": {
+            "chatgpt": "Chat",
+            "server": "Сервер",
+            "mail": "Почта",
+            "vpn": "ВПН",
+        }.get(block.type, block.title),
+        "display_type_label": {
+            "chatgpt": "GPT",
+            "server": "Сервер",
+            "mail": "Почта",
+            "vpn": "ВПН",
+        }.get(block.type, block.type),
+        "title": block.title,
+        "login": copy_data.login,
+        "password_secret": copy_data.password_secret,
+        "status": block.status,
+        "status_label": {
+            "active": "Активно",
+            "inactive": "Неактивно",
+            "expired": "Истекло",
+        }.get(block.status, block.status),
+        "duration_days": block.duration_days,
+        "activation_day": block.activation_day,
+        "activation_summary": block.activation_summary,
+        "is_active": block.is_active,
+        "is_expired": block.is_expired,
+    }
+
+
+def _resolve_account_block_selected_user(user, settings, request: Request):
+    selected_email = _selected_account_block_email(request, user.email)
+    notice = _account_block_notice(request)
+    if selected_email == user.email:
+        return user, selected_email, notice
+    try:
+        selected_user = get_user_by_email(selected_email, settings=settings)
+    except AuthValidationError:
+        return None, selected_email, "Пользователь не найден."
+    if selected_user is None:
+        return None, selected_email, "Пользователь не найден."
+    return selected_user, selected_email, notice
+
+
+def _parse_account_block_duration(value: str | None, *, default: int = DEFAULT_ACCOUNT_BLOCK_DURATION_DAYS) -> int:
+    raw = (value or "").strip()
+    if not raw:
+        return default
+    try:
+        parsed = int(raw)
+    except ValueError as exc:
+        raise AccountBlockValidationError("duration_days must be an integer") from exc
+    if parsed <= 0:
+        raise AccountBlockValidationError("duration_days must be greater than 0")
+    return parsed
+
+
+def _parse_optional_account_block_duration(value: str | None) -> int | None:
+    raw = (value or "").strip()
+    if not raw:
+        return None
+    try:
+        parsed = int(raw)
+    except ValueError as exc:
+        raise AccountBlockValidationError("duration_days must be an integer") from exc
+    if parsed <= 0:
+        raise AccountBlockValidationError("duration_days must be greater than 0")
+    return parsed
+
+
+def _resolve_create_duration_days(form, settings) -> int:
+    raw_duration_days = (form.get("duration_days") or "").strip()
+    if raw_duration_days:
+        return _parse_account_block_duration(
+            raw_duration_days,
+            default=DEFAULT_ACCOUNT_BLOCK_DURATION_DAYS,
+        )
+
+    paid_option_code = (form.get("paid_option_code") or "").strip().lower()
+    if paid_option_code:
+        try:
+            paid_option = get_paid_option_by_code(paid_option_code, settings=settings)
+        except PaidOptionNotFoundError:
+            raise AccountBlockValidationError("paid_option_code is invalid")
+        if paid_option.default_duration_days is not None and int(paid_option.default_duration_days) > 0:
+            return int(paid_option.default_duration_days)
+
+    return DEFAULT_ACCOUNT_BLOCK_DURATION_DAYS
+
+
+def _admin_account_block_query_string(selected_email: str | None) -> str:
+    if not selected_email:
+        return ""
+    return f"?{urlencode({ACCOUNT_BLOCK_MANAGEMENT_QUERY_PARAM: selected_email})}"
+
+
+def _admin_account_block_page_context(user, settings, request: Request) -> dict[str, object]:
+    selected_user, selected_email, notice = _resolve_account_block_selected_user(user, settings, request)
+    selected_summary = _account_block_owner_summary(selected_user) if selected_user is not None else None
+    blocks = []
+    if selected_user is not None:
+        blocks = [
+            _account_block_card_context(
+                block,
+                get_account_block_copy_data(actor=user, block_id=block.id, settings=settings),
+                selected_summary,
+            )
+            for block in list_account_blocks_for_viewer(user, owner_user_id=int(selected_user.id), settings=settings)
+        ]
+    return {
+        "account_blocks_manage_mode": True,
+        "account_block_notice": notice,
+        "account_block_selected_user": selected_user,
+        "account_block_selected_user_email": selected_email,
+        "account_block_selected_user_summary": selected_summary,
+        "account_block_owner_options": [
+            {
+                "email": _user_attr(owner, "email"),
+                "login": _user_attr(owner, "login"),
+                "role": _user_attr(owner, "role"),
+                "role_label": role_label_ru(_user_attr(owner, "role")),
+                "display_label": f"{_user_attr(owner, 'login')} · {_user_attr(owner, 'email')}",
+            }
+            for owner in list_users_for_admin(settings=settings)
+        ],
+        "account_block_blocks": blocks,
+        "account_block_query_string": _admin_account_block_query_string(selected_email),
+        "account_block_paid_options": [
+            {
+                "code": option.code,
+                "title": option.title,
+                "status_label": _status_label(option.status),
+                "default_duration_days": option.default_duration_days,
+            }
+            for option in list_paid_options(settings=settings)
+        ],
+        "account_block_type_options": [
+            {"value": "chatgpt", "label": "ChatGPT"},
+            {"value": "server", "label": "Сервер"},
+            {"value": "mail", "label": "Почта"},
+            {"value": "vpn", "label": "ВПН"},
+        ],
+    }
+
+
+def _admin_account_block_redirect(*, notice_key: str, selected_user_email: str | None = None) -> RedirectResponse:
+    query = {"account_blocks_notice": notice_key}
+    if selected_user_email:
+        query[ACCOUNT_BLOCK_MANAGEMENT_QUERY_PARAM] = selected_user_email
+    return RedirectResponse(url=f"/admin/account-blocks?{urlencode(query)}", status_code=303)
+
+
+def _selected_email_for_block(request: Request, settings, fallback_email: str, owner_user_id: int) -> str:
+    selected_email = _selected_account_block_email(request, fallback_email)
+    if selected_email != fallback_email:
+        return selected_email
+    owner_email = _account_block_owner_email(settings, owner_user_id)
+    return owner_email or fallback_email
+
+
 def _role_error_response(message: str) -> PlainTextResponse:
     lowered = message.lower()
     if "last admin" in lowered:
@@ -146,6 +384,13 @@ def _role_error_response(message: str) -> PlainTextResponse:
     else:
         text = "Не удалось изменить роль пользователя."
     return PlainTextResponse(text, status_code=400)
+
+
+def _admin_users_redirect(request: Request) -> RedirectResponse:
+    redirect_url = "/admin/users"
+    if request.url.query:
+        redirect_url = f"{redirect_url}?{request.url.query}"
+    return RedirectResponse(url=redirect_url, status_code=303)
 
 
 def _template(request: Request, template_name: str, **context) -> HTMLResponse:
@@ -187,6 +432,7 @@ def _empty_tariff_form_data() -> dict[str, str]:
         "price_rub": "",
         "currency": "RUB",
         "status": "active",
+        "show_on_homepage": "0",
         "sort_order": "0",
     }
 
@@ -199,6 +445,7 @@ def _tariff_form_data_from_tariff(tariff) -> dict[str, str]:
         "price_rub": _format_price_input(tariff.price_amount_minor),
         "currency": tariff.currency,
         "status": tariff.status,
+        "show_on_homepage": "1" if tariff.show_on_homepage else "0",
         "sort_order": str(tariff.sort_order),
     }
 
@@ -211,6 +458,7 @@ def _tariff_form_data_from_form(form) -> dict[str, str]:
         "price_rub": _normalize_text(form.get("price_rub")),
         "currency": _normalize_text(form.get("currency")) or "RUB",
         "status": _normalize_text(form.get("status")) or "active",
+        "show_on_homepage": "1" if _checkbox_is_true(form.get("show_on_homepage")) else "0",
         "sort_order": _normalize_text(form.get("sort_order")) or "0",
     }
 
@@ -296,6 +544,7 @@ def _validate_tariff_form_input(
     raw_price_rub: str | None = None,
     raw_currency: str | None = None,
     raw_status: str | None = None,
+    raw_show_on_homepage=None,
     raw_sort_order: str | None = None,
     include_code: bool = True,
 ) -> tuple[dict[str, object], dict[str, str]]:
@@ -306,6 +555,7 @@ def _validate_tariff_form_input(
     price_minor, price_error = _parse_positive_money_to_minor(raw_price_rub)
     currency = (_normalize_text(raw_currency) or "RUB").upper()
     status = (_normalize_text(raw_status) or "active").lower()
+    show_on_homepage = _checkbox_is_true(raw_show_on_homepage)
     sort_order, sort_error = _parse_non_negative_int(raw_sort_order, "sort_order")
 
     if include_code:
@@ -344,6 +594,7 @@ def _validate_tariff_form_input(
         "price_amount_minor": price_minor,
         "currency": currency,
         "status": status,
+        "show_on_homepage": show_on_homepage,
         "sort_order": sort_order if sort_order is not None else 0,
     }
     return payload, errors
@@ -637,6 +888,7 @@ def _tariffs_for_admin(settings):
                 "price_display": _format_minor_amount(tariff.price_amount_minor),
                 "currency": tariff.currency,
                 "status_label": _status_label(tariff.status),
+                "show_on_homepage_label": "Да" if tariff.show_on_homepage else "Нет",
                 "sort_order": tariff.sort_order,
                 "included_options_summary": ", ".join(option["title"] for option in linked_options) if linked_options else "—",
                 "created_at": tariff.created_at,
@@ -775,10 +1027,213 @@ async def admin_user_role_update(request: Request, user_id: int):
         raise HTTPException(status_code=404, detail="user not found")
     except RoleError as exc:
         return _role_error_response(str(exc))
-    redirect_url = "/admin/users"
-    if request.url.query:
-        redirect_url = f"{redirect_url}?{request.url.query}"
-    return RedirectResponse(url=redirect_url, status_code=303)
+    return _admin_users_redirect(request)
+
+
+@router.post("/admin/users/{user_id}/materials-access/grant")
+def admin_user_materials_access_grant(request: Request, user_id: int):
+    settings = get_settings()
+    _, response = _admin_user_or_redirect(request, settings=settings)
+    if response is not None:
+        return response
+    try:
+        set_user_materials_access(user_id=user_id, granted=True, settings=settings)
+    except AuthNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="user not found") from exc
+    return _admin_users_redirect(request)
+
+
+@router.post("/admin/users/{user_id}/materials-access/revoke")
+def admin_user_materials_access_revoke(request: Request, user_id: int):
+    settings = get_settings()
+    _, response = _admin_user_or_redirect(request, settings=settings)
+    if response is not None:
+        return response
+    try:
+        set_user_materials_access(user_id=user_id, granted=False, settings=settings)
+    except AuthNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="user not found") from exc
+    return _admin_users_redirect(request)
+
+
+@router.api_route("/admin/account-blocks", methods=["GET", "HEAD"], response_class=HTMLResponse)
+def admin_account_blocks(request: Request):
+    settings = get_settings()
+    user, response = _admin_user_or_redirect(request, settings=settings)
+    if response is not None:
+        return response
+    return _template(
+        request,
+        "account_blocks.html",
+        title=page_title("Блоки аккаунтов"),
+        admin_email=user.email,
+        admin_login=user.login,
+        **_admin_account_block_page_context(user, settings, request),
+    )
+
+
+@router.post("/admin/account-blocks")
+async def admin_account_blocks_create(
+    request: Request,
+    type: str = Form(default=""),
+    paid_option_code: str = Form(default=""),
+    login: str = Form(default=""),
+    password_secret: str = Form(default=""),
+    duration_days: str = Form(default=""),
+):
+    settings = get_settings()
+    user, response = _admin_user_or_redirect(request, settings=settings)
+    if response is not None:
+        return response
+    form = await request.form()
+    selected_user, selected_email, _ = _resolve_account_block_selected_user(user, settings, request)
+    if selected_user is None:
+        raise HTTPException(status_code=400, detail="Пользователь не найден.")
+    try:
+        create_account_block(
+            actor=user,
+            data=AccountBlockCreateInput(
+                owner_user_id=int(selected_user.id),
+                type=str(form.get("type") or type),
+                login=str(form.get("login") or login),
+                password_secret=str(form.get("password_secret") or password_secret),
+                duration_days=_resolve_create_duration_days(form, settings),
+            ),
+            settings=settings,
+        )
+    except AccountBlockPermissionError as exc:
+        raise HTTPException(status_code=403, detail=str(exc)) from exc
+    except (AccountBlockValidationError, AccountBlockNotFoundError, AuthValidationError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return _admin_account_block_redirect(notice_key="created", selected_user_email=selected_email)
+
+
+@router.post("/admin/account-blocks/{block_id}")
+async def admin_account_blocks_update(
+    request: Request,
+    block_id: int,
+    login: str = Form(default=""),
+    password_secret: str = Form(default=""),
+):
+    settings = get_settings()
+    user, response = _admin_user_or_redirect(request, settings=settings)
+    if response is not None:
+        return response
+    try:
+        existing_block = get_account_block_public(actor=user, block_id=block_id, settings=settings)
+        selected_email = _selected_email_for_block(
+            request,
+            settings,
+            user.email,
+            existing_block.owner_user_id,
+        )
+        update_account_block(
+            actor=user,
+            block_id=block_id,
+            data=AccountBlockUpdateInput(
+                login=login,
+                password_secret=password_secret,
+            ),
+            settings=settings,
+        )
+    except AccountBlockPermissionError as exc:
+        raise HTTPException(status_code=403, detail=str(exc)) from exc
+    except AccountBlockNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except AccountBlockValidationError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return _admin_account_block_redirect(notice_key="updated", selected_user_email=selected_email)
+
+
+@router.post("/admin/account-blocks/{block_id}/delete")
+def admin_account_blocks_delete(request: Request, block_id: int):
+    settings = get_settings()
+    user, response = _admin_user_or_redirect(request, settings=settings)
+    if response is not None:
+        return response
+    try:
+        existing_block = get_account_block_public(actor=user, block_id=block_id, settings=settings)
+        selected_email = _selected_email_for_block(
+            request,
+            settings,
+            user.email,
+            existing_block.owner_user_id,
+        )
+        delete_account_block(actor=user, block_id=block_id, settings=settings)
+    except AccountBlockPermissionError as exc:
+        raise HTTPException(status_code=403, detail=str(exc)) from exc
+    except AccountBlockNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    return _admin_account_block_redirect(notice_key="deleted", selected_user_email=selected_email)
+
+
+@router.post("/admin/account-blocks/{block_id}/activate")
+def admin_account_blocks_activate(request: Request, block_id: int, duration_days: str = Form(default="")):
+    settings = get_settings()
+    user, response = _admin_user_or_redirect(request, settings=settings)
+    if response is not None:
+        return response
+    try:
+        existing_block = get_account_block_public(actor=user, block_id=block_id, settings=settings)
+        selected_email = _selected_email_for_block(
+            request,
+            settings,
+            user.email,
+            existing_block.owner_user_id,
+        )
+        activation_result = activate_account_block(
+            actor=user,
+            block_id=block_id,
+            duration_days=_parse_optional_account_block_duration(duration_days),
+            settings=settings,
+        )
+        notice_key = "activated"
+        if activation_result.notification is not None:
+            try:
+                from app.notifications.email_service import send_account_block_activation_email
+
+                send_account_block_activation_email(activation_result.notification, settings=settings)
+                notice_key = "activated_email_sent"
+            except Exception:  # pragma: no cover - defensive logging path
+                notice_key = "activated_email_failed"
+        else:
+            notice_key = "activated_email_failed"
+    except AccountBlockPermissionError as exc:
+        raise HTTPException(status_code=403, detail=str(exc)) from exc
+    except AccountBlockNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except AccountBlockValidationError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return _admin_account_block_redirect(notice_key=notice_key, selected_user_email=selected_email)
+
+
+@router.post("/admin/account-blocks/{block_id}/renew")
+def admin_account_blocks_renew(request: Request, block_id: int, duration_days: str = Form(default="")):
+    settings = get_settings()
+    user, response = _admin_user_or_redirect(request, settings=settings)
+    if response is not None:
+        return response
+    try:
+        existing_block = get_account_block_public(actor=user, block_id=block_id, settings=settings)
+        selected_email = _selected_email_for_block(
+            request,
+            settings,
+            user.email,
+            existing_block.owner_user_id,
+        )
+        renew_account_block(
+            actor=user,
+            block_id=block_id,
+            duration_days=_parse_optional_account_block_duration(duration_days),
+            settings=settings,
+        )
+    except AccountBlockPermissionError as exc:
+        raise HTTPException(status_code=403, detail=str(exc)) from exc
+    except AccountBlockNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except AccountBlockValidationError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return _admin_account_block_redirect(notice_key="renewed", selected_user_email=selected_email)
 
 
 @router.api_route("/admin/tariffs", methods=["GET", "HEAD"], response_class=HTMLResponse)
@@ -819,6 +1274,7 @@ async def admin_tariffs_new_submit(request: Request):
         raw_price_rub=form.get("price_rub"),
         raw_currency=form.get("currency"),
         raw_status=form.get("status"),
+        raw_show_on_homepage=form.get("show_on_homepage"),
         raw_sort_order=form.get("sort_order"),
         include_code=True,
     )
@@ -886,6 +1342,7 @@ async def admin_tariffs_edit_submit(request: Request, code: str):
         raw_price_rub=form.get("price_rub"),
         raw_currency=form.get("currency"),
         raw_status=form.get("status"),
+        raw_show_on_homepage=form.get("show_on_homepage"),
         raw_sort_order=form.get("sort_order"),
         include_code=False,
     )
@@ -911,6 +1368,7 @@ async def admin_tariffs_edit_submit(request: Request, code: str):
                 price_amount_minor=payload["price_amount_minor"],
                 currency=payload["currency"],
                 status=payload["status"],
+                show_on_homepage=payload["show_on_homepage"],
                 sort_order=payload["sort_order"],
             ),
             settings=settings,

@@ -107,25 +107,24 @@ def test_materials_shows_locked_state_without_access(client, test_settings):
     response = client.get("/materials")
     assert response.status_code == 200
     assert "/static/styles.css" in response.text
+    assert "Обучение" in response.text
     assert "Работа с ИИ" in response.text
-    assert "Курс для новичков без опыта программирования." in response.text
-    assert "Уроки курса" in response.text
-    assert "Как мы работаем: ChatGPT проектирует, Codex выполняет, пользователь проверяет" in response.text
-    assert "/materials/lessons/kak-my-rabotaem-chatgpt-codex-user" in response.text
-    assert "Вернуться в личный кабинет" in response.text
+    assert "Полный доступ откроется после оплаты тарифа." in response.text
+    assert "В личный кабинет" in response.text
+    assert "Курс для новичков без опыта программирования." not in response.text
+    assert "Уроки курса" not in response.text
+    assert "Как мы работаем: ChatGPT проектирует, Codex выполняет, пользователь проверяет" not in response.text
+    assert "/materials/lessons/kak-my-rabotaem-chatgpt-codex-user" not in response.text
     assert "/cabinet" in response.text
-    assert "Доступные тарифы" not in response.text
-    assert "Оплата" not in response.text
-    assert "Что дальше" not in response.text
-    assert "Раздел «Работа с ИИ» будет доступен после оплаты." not in response.text
-    assert "После первой оплаты доступ к разделу останется навсегда." not in response.text
-    assert "Быстрый старт" not in response.text
-    assert "Как работать с AI-агентом" not in response.text
-    assert "Команды для копирования" not in response.text
     assert "/admin" not in response.text
     assert "Payment" not in response.text
     assert "Locked" not in response.text
 
+    lesson_response = client.get("/materials/lessons/kak-my-rabotaem-chatgpt-codex-user")
+    assert lesson_response.status_code == 200
+    assert "Доступ ограничен" in lesson_response.text
+    assert "Урок и его материалы откроются после оплаты тарифа." in lesson_response.text
+    assert "lesson-content" not in lesson_response.text
 
 def test_materials_shows_placeholder_sections_when_access_granted(client, test_settings):
     _prepare_and_login_verified_user(client, test_settings, "materials-open@example.com", "materialsopen", grant_access=True)
@@ -150,18 +149,20 @@ def test_cabinet_contains_materials_link_and_locked_hint(client, test_settings):
     response = client.get("/cabinet")
     assert response.status_code == 200
     assert "Главная" in response.text
-    assert "Обучающий блок" in response.text
-    assert "Обучение" in response.text
-    assert "Перейти к обучению" in response.text
-    assert "Обучающий проект" in response.text
-    assert "Скачать файл" in response.text
-    assert "Доступ откроется после оплаты." in response.text
-    assert response.text.count('class="button button-primary learning-button"') == 2
-    assert 'href="/materials/drafts/dair-smoke-20260529/"' not in response.text
+    assert "Личный кабинет будет доступен после оплаты" in response.text
+    assert "После оплаты тарифа откроются личный кабинет, обучение и материалы." in response.text
+    assert "Обучающий блок" not in response.text
+    assert "Перейти к обучению" not in response.text
+    assert "Обучающий проект" not in response.text
+    assert "Скачать файл" not in response.text
+    assert "Доступ откроется после оплаты." not in response.text
+    assert response.text.count('class="button button-primary learning-button"') == 0
+    assert "К обучению" in response.text
+    assert 'href="/materials/drafts/dair-smoke-20260529/"' in response.text
     assert 'href="/cabinet/learning/project-file"' not in response.text
-    assert "Аккаунты" in response.text
-    assert "/static/cabinet-local-accounts.js" in response.text
-    assert "Пройдите обучение, затем скачайте файл, вставьте в чат ChatGPT и следуйте его инструкциям." in response.text
+    assert "Аккаунты" not in response.text
+    assert "/static/cabinet-local-accounts.js" not in response.text
+    assert "Пройдите обучение, затем скачайте файл, вставьте в чат ChatGPT и следуйте его инструкциям." not in response.text
     assert "Раздел «Работа с ИИ» будет доступен после оплаты." not in response.text
 
 
