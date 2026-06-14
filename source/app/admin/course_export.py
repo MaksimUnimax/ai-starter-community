@@ -88,6 +88,13 @@ def _manifest_path(path: Path) -> str:
     return path.resolve().relative_to(SOURCE_ROOT).as_posix()
 
 
+def _source_tree_path(manifest_path: str | Path) -> Path:
+    path = Path(manifest_path)
+    if path.is_absolute():
+        return path
+    return SOURCE_ROOT / path
+
+
 def _decode_js_string(value: str) -> str:
     return html.unescape(json.loads(f'"{value}"'))
 
@@ -457,7 +464,7 @@ def build_course_export(*, generated_at: datetime | None = None) -> CourseExport
             archive.writestr(prompt["archive_path"], prompt["markdown"].encode("utf-8"))
 
         for asset in asset_files:
-            source_path = Path(asset["source_path"])
+            source_path = _source_tree_path(asset["source_path"])
             archive.writestr(asset["archive_path"], source_path.read_bytes())
 
     return CourseExportPackage(filename=archive_filename, content=buffer.getvalue(), manifest=manifest)

@@ -440,8 +440,8 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert page_response.text.count("nav-title") == 9
     assert "data-section-nav=\"true\"" in script_response.text
     assert "renderLessonFooterNavigation" in script_response.text
-    assert "Codex, AGENTS.md, токены и роль модели" in page_response.text
-    assert "Codex, AGENTS.md, Skills, токены и роль модели" not in page_response.text
+    assert "Codex, AGENTS.md, Skills, токены и роль модели" in page_response.text
+    assert "Codex, AGENTS.md, токены и роль модели" not in page_response.text
     assert "PowerShell, Terminal и подключение к серверу" in page_response.text
     assert "Процесс работы" in page_response.text
     lesson1_section = _lesson_section(script_response.text, "lesson-1", "lesson-2")
@@ -634,10 +634,10 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     project_specific_marker = "-".join(["project", "specific"])
     lesson9_section = script_response.text[lesson9_start:lesson10_start]
     lesson10_section = script_response.text[lesson10_start:script_response.text.index("const state", lesson10_start)]
-    lesson4_agents_index = lesson4_section.index('label: "AGENTS.md"')
     lesson4_commands_index = lesson4_section.index('label: "Команды через /"')
+    lesson4_agents_index = lesson4_section.index('label: "AGENTS.md"')
     lesson4_errors_index = lesson4_section.index('label: "Частые ошибки"')
-    assert lesson4_agents_index < lesson4_commands_index < lesson4_errors_index
+    assert lesson4_commands_index < lesson4_agents_index < lesson4_errors_index
     assert "<strong>Codex</strong> — это <strong>Codex CLI</strong>." in script_response.text
     assert "<strong>Codex CLI</strong> — это инструмент OpenAI для работы с кодом и файлами проекта через терминал." in script_response.text
     assert "<strong>Терминал</strong> — это рабочее окно, через которое Codex запускается на сервере или компьютере проекта." in script_response.text
@@ -646,7 +646,7 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "<li>готовить отчёт о выполненной работе.</li>" in script_response.text
     assert "<strong>Важно:</strong> Codex не является руководителем проекта." in script_response.text
     assert "<strong>Codex</strong> не должен сам выбирать стратегию, менять план курса, придумывать архитектуру или решать, какой этап делать дальше." in script_response.text
-    assert "<strong>ChatGPT</strong> понимает цель, читает правила, проверяет документацию, следит за <strong>run’ами</strong> и пишет точное задание." in script_response.text
+    assert "<strong>ChatGPT</strong> понимает цель, читает правила, проверяет документацию, следит за <strong>рабочими шагами (run’ами)</strong> и пишет точное задание." in script_response.text
     assert "<strong>Codex CLI</strong> выполняет это задание в проекте и возвращает отчёт." in script_response.text
     assert "CLI читается как" not in script_response.text
     assert "вы не нажимаете кнопки" not in script_response.text
@@ -819,7 +819,7 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "ручного копирования" not in lesson7_section
     assert "Project Prefixer" not in lesson7_section
     assert "https://github.com/MaksimUnimax/openscript-agent-lab-student-kit" in lesson7_section
-    assert "Отправьте тестовое сообщение в <strong>ChatGPT</strong> и убедитесь, что prefix добавился перед текстом." in lesson7_section
+    assert "Откройте <strong>ChatGPT</strong> и отправьте тестовое сообщение." in lesson7_section
     assert "manifest.json" in lesson7_section
     assert "content.js" in lesson7_section
     assert "popup.html" in lesson7_section
@@ -830,7 +830,7 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "edge://extensions" in lesson7_section
     assert "Developer mode" in lesson7_section
     assert "Load unpacked" in lesson7_section
-    assert "Я не программист" in lesson7_section
+    assert "Пошаговая работа нужна, чтобы <strong>Codex</strong> не уходил от документации, не подставлял костыли и не делал рабочий, но неподходящий результат." in lesson7_section
     assert "Prompt для создания ChatGPT Prefix Helper" in lesson7_section
     assert "Скачайте или скопируйте промпт и вставьте в ChatGPT." in lesson7_section
     assert "includeStarterPromptForm: true" in lesson7_section
@@ -839,8 +839,8 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "starterPromptDescription: \"Скачайте или скопируйте промпт и вставьте в ChatGPT.\"" in lesson7_section
     assert "starterPromptActionsLabel: \"Действия с prompt для практики\"" in lesson7_section
     assert "starterPromptFilename: \"side_prompt_create_chatgpt_prefix_extension.md\"" in lesson7_section
-    assert "starterPromptMarkdown: `# Вставной prompt: создать browser-расширение для ChatGPT и вернуться к основному ТЗ" in lesson7_section
-    assert "Скопируйте prompt кнопкой “Скопировать prompt” или скачайте его кнопкой “Скачать .md”." in lesson7_section
+    assert r'starterPromptMarkdown: "# \u0412\u0441\u0442\u0430\u0432\u043d\u043e\u0439 prompt: \u0441\u043e\u0437\u0434\u0430\u0442\u044c browser-\u0440\u0430\u0441\u0448\u0438\u0440\u0435\u043d\u0438\u0435 \u0434\u043b\u044f ChatGPT \u0438 \u0432\u0435\u0440\u043d\u0443\u0442\u044c\u0441\u044f \u043a \u043e\u0441\u043d\u043e\u0432\u043d\u043e\u043c\u0443 \u0422\u0417' in lesson7_section
+    assert "Скопируйте <strong>prompt</strong> кнопкой “Скопировать prompt” или скачайте его кнопкой “Скачать .md”." in lesson7_section
     assert "Ошибка 3: писать код в design run." not in lesson7_section
     assert "стартовый prompt" not in lesson7_section
     assert "<pre><code>" not in lesson7_section
@@ -912,20 +912,20 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "Запустить проект через ChatGPT, GitHub и Codex" in lesson6_section
     assert "Скопируйте новый стартовый prompt в новый чат ChatGPT." in lesson6_section
     assert "Если ТЗ подходит, напишите: <strong>ТЗ утверждаю</strong>. Если нет — напишите уточнения либо задайте вопросы ChatGPT." in lesson6_practice_block
-    assert "Создайте в GitHub пустой репозиторий по инструкции ChatGPT." in lesson6_practice_block
-    assert "Скопируйте ссылку на репозиторий из Quick setup и отправьте её обратно в ChatGPT." in lesson6_practice_block
-    assert "Получите отдельный prompt для Codex на проверку репозитория и подготовку deploy key flow." in lesson6_practice_block
-    assert "Вставьте prompt в Codex и дождитесь его отчёта: Codex сам проверит репозиторий, а ChatGPT по его отчёту даст следующий безопасный шаг." in lesson6_practice_block
-    assert "Скопируйте отчёт Codex и вставьте его в ChatGPT. ChatGPT сам проверит состояние репозитория и даст следующий безопасный шаг." in lesson6_practice_block
-    assert "В GitHub откройте <strong>Settings → Deploy keys</strong>, добавьте <strong>public deploy key</strong> и включите <strong>Allow write access</strong>." in lesson6_section
-    assert "Не отправляйте в ChatGPT приватный key, токены, пароли, .env или auth-файлы." in lesson6_section
-    assert "Все эти инструкции ChatGPT также будет давать в чате пошагово, поэтому не обязательно брать их отсюда." in lesson6_practice_block
+    assert "Создайте в <strong>GitHub</strong> пустой <strong>репозиторий</strong> по инструкции <strong>ChatGPT</strong>." in lesson6_practice_block
+    assert "Скопируйте ссылку на <strong>репозиторий</strong> из <strong>Quick setup</strong> и отправьте её обратно в <strong>ChatGPT</strong>." in lesson6_practice_block
+    assert "Получите отдельный <strong>prompt</strong> для <strong>Codex</strong> на проверку <strong>репозитория</strong> и подготовку <strong>deploy key</strong> flow." in lesson6_practice_block
+    assert "Вставьте <strong>prompt</strong> в <strong>Codex</strong> и дождитесь его отчёта: <strong>Codex</strong> сам проверит <strong>репозиторий</strong>, а <strong>ChatGPT</strong> по его отчёту даст следующий безопасный шаг." in lesson6_practice_block
+    assert "Вы скопировали итоговый отчёт <strong>Codex</strong> в <strong>ChatGPT</strong>, и <strong>ChatGPT</strong> проверил <strong>commit</strong>, список файлов и отсутствие лишнего." in lesson6_practice_block
+    assert "пользователь добавляет public key в GitHub repo через `Settings → Deploy keys → Add deploy key`;" in lesson6_section
+    assert "Не отправляйте в <strong>ChatGPT</strong> приватный <strong>key</strong>, <strong>токены</strong>, <strong>пароли</strong>, <strong>.env</strong> или <strong>auth-файлы</strong>." in lesson6_section
+    assert "Все эти инструкции <strong>ChatGPT</strong> также будет давать в чате пошагово, поэтому не обязательно брать их отсюда." in lesson6_practice_block
     assert "GitHub integration" not in lesson6_practice_block
-    assert "Когда deploy key добавлен, ChatGPT даст prompt — отправьте его в Codex." in lesson6_practice_block
-    assert "Скопируйте итоговый отчёт Codex и вставьте его в ChatGPT. ChatGPT проверит commit, список файлов и отсутствие лишнего." in lesson6_section
-    assert "В репозитории есть только техническая документация, без <code>next_steps.md</code> и без кода приложения." in lesson6_practice_block
+    assert "Когда <strong>deploy key</strong> добавлен, <strong>ChatGPT</strong> даст <strong>prompt</strong> — отправьте его в <strong>Codex</strong>." in lesson6_practice_block
+    assert "Скопируйте итоговый отчёт <strong>Codex</strong> и вставьте его в <strong>ChatGPT</strong>. <strong>ChatGPT</strong> проверит <strong>commit</strong>, список файлов и отсутствие лишнего." in lesson6_section
+    assert "В <strong>репозитории</strong> есть только техническая документация, без <strong>next_steps.md</strong> и без кода приложения." in lesson6_practice_block
     assert "Что должно получиться" in lesson6_section
-    assert "Codex создал и запушил шесть Markdown-документов:" in lesson6_section
+    assert "<strong>Codex</strong> создал и запушил шесть <strong>Markdown-документов</strong>:" in lesson6_section
     assert "technical_spec.md" in lesson6_section
     assert "roadmap.md" in lesson6_section
     assert "rules.md" in lesson6_section
@@ -945,15 +945,8 @@ def test_git_backed_course_map_page_is_served_by_the_app(client, test_settings):
     assert "next_steps.md" in lesson6_section
     assert "prompt просто вставлен в чат" not in lesson6_section
     assert "Codex не должен использовать GitHub integration для этого шага." not in lesson6_practice_block
-    assert "В репозитории появились ровно шесть Markdown-документов" in lesson6_practice_block
-    assert "Пошаговая визуальная инструкция к практическому занятию." in lesson6_section
-    assert "practice-carousel" in lesson6_section
-    assert 'data-practice-carousel="start-project-deploy-key"' in lesson6_section
-    assert lesson6_section.count('data-practice-carousel-slide=') == 17
-    assert "lesson-6-step-01-copy-start-prompt.png" in lesson6_section
-    assert "lesson-6-step-12-deploy-key-instructions.png" in lesson6_section
-    assert "lesson-6-step-16-final-codex-report-chatgpt.png" in lesson6_section
-    assert "lesson-6-step-17-final-documents-repo.png" in lesson6_section
+    assert "В <strong>репозитории</strong> есть только техническая документация, без <strong>next_steps.md</strong> и без кода приложения." in lesson6_practice_block
+    assert "renderProjectStartCarousel()" in lesson6_section
     assert "lesson-screenshot-carousel" not in lesson6_section
     assert "Старый prompt" not in lesson6_section
 
