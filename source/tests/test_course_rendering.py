@@ -1098,7 +1098,8 @@ def test_lesson8_docs_workflow_prompt_and_carousel_are_rendered(client, test_set
     assert 'markdown: "# Prompt для обновления документов проекта' in lesson8_section
     assert "Проектный docs-update prompt" in lesson8_section
     assert "Codex docs-only update prompt" in lesson8_section
-    assert "Получите prompt обновления документов проекта и промпт для кодекса" in rendered_lesson8_html
+    assert "Запустите prompt обновления документов в ChatGPT из шаблона урока" in rendered_lesson8_html
+    assert "Получите prompt обновления документов проекта и промпт для Codex" in rendered_lesson8_html
     assert "Скопируйте промпт для Codex" in rendered_lesson8_html
     assert "Вставьте промпт в Codex" in rendered_lesson8_html
     assert "Скопируйте отчёт Codex и вставьте его в ChatGPT" in rendered_lesson8_html
@@ -1126,6 +1127,7 @@ def test_lesson8_docs_workflow_prompt_and_carousel_are_rendered(client, test_set
         "Проверьте результат docs-update",
         "Получите prompt для нового диалога",
         "Начните новый диалог с актуального prompt",
+        "промпт для кодекса",
     ]:
         assert forbidden not in rendered_lesson8_html
 

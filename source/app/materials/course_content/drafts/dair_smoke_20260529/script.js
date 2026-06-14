@@ -2560,7 +2560,7 @@ const courseData = {
     <p><strong>ChatGPT</strong> сверяет <strong>current_status.md</strong>, <strong>roadmap.md</strong>, <strong>rules.md</strong>, <strong>module_map.md</strong>, <strong>technical_spec.md</strong> и <strong>start_prompt_for_next_chat.md</strong>, а также следит, чтобы в документы не попали <strong>.env</strong>, <strong>токены</strong>, <strong>пароли</strong>, <strong>private key</strong> и <strong>auth-файлы</strong>.</p>
     <p>Что нужно сделать:</p>
     <ol>
-      <li>Получите prompt обновления документов проекта и промпт для кодекса.</li>
+      <li>Получите prompt обновления документов проекта и промпт для Codex.</li>
       <li>Скопируйте промпт для Codex.</li>
       <li>Вставьте промпт в Codex.</li>
       <li>Скопируйте отчёт Codex и вставьте его в ChatGPT.</li>
@@ -3570,15 +3570,15 @@ function renderLesson8PracticeCarousel() {
   const slides = [
     {
       stepLabel: "Шаг 1",
-      title: "Запустите prompt обновления документов в ChatGPT",
+      title: "Запустите prompt обновления документов в ChatGPT из шаблона урока",
       image: "/static/course-assets/lesson-8/lesson-8-step-01-run-docs-update-prompt.png",
-      alt: "Запустите prompt обновления документов в ChatGPT",
+      alt: "Запустите prompt обновления документов в ChatGPT из шаблона урока",
     },
     {
       stepLabel: "Шаг 2",
-      title: "Получите prompt обновления документов проекта и промпт для кодекса",
+      title: "Получите prompt обновления документов проекта и промпт для Codex",
       image: "/static/course-assets/lesson-8/lesson-8-step-02-get-project-docs-update-prompt.png",
-      alt: "Получите prompt обновления документов проекта и промпт для кодекса",
+      alt: "Получите prompt обновления документов проекта и промпт для Codex",
     },
     {
       stepLabel: "Шаг 3",

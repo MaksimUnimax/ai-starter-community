@@ -36,7 +36,11 @@ def _skip_whitespace(text: str, index: int) -> int:
 
 def _extract_template_literal(text: str, index: int) -> tuple[str, int]:
     position = _skip_whitespace(text, index)
-    if position >= len(text) or text[position] != "`":
+    if position >= len(text):
+        raise ValueError("Expected a template literal")
+
+    quote = text[position]
+    if quote not in {"`", '"', "'"}:
         raise ValueError("Expected a template literal")
 
     chars: list[str] = []
@@ -47,17 +51,15 @@ def _extract_template_literal(text: str, index: int) -> tuple[str, int]:
             if cursor + 1 >= len(text):
                 raise ValueError("Unterminated escape in template literal")
             escaped = text[cursor + 1]
-            if escaped == "`":
-                chars.append("`")
-                cursor += 2
-                continue
-            if escaped == "\\":
-                chars.append("\\")
-                cursor += 2
-                continue
-            if escaped == "$" and cursor + 2 < len(text) and text[cursor + 2] == "{":
+            if quote == "`" and escaped == "$" and cursor + 2 < len(text) and text[cursor + 2] == "{":
                 chars.append("${")
                 cursor += 3
+                continue
+            if escaped == quote or escaped == "\\":
+                chars.append("`")
+                if escaped != "`":
+                    chars[-1] = escaped
+                cursor += 2
                 continue
             escape_map = {
                 "n": "\n",
@@ -71,7 +73,7 @@ def _extract_template_literal(text: str, index: int) -> tuple[str, int]:
             chars.append(escape_map.get(escaped, escaped))
             cursor += 2
             continue
-        if char == "`":
+        if char == quote:
             return "".join(chars), cursor + 1
         chars.append(char)
         cursor += 1
