@@ -108,8 +108,10 @@ def test_admin_course_export_returns_fresh_zip_attachment_and_manifest(client, t
     with _open_zip(response) as archive:
         names = set(archive.namelist())
         manifest = json.loads(archive.read("manifest.json").decode("utf-8"))
+        manifest_text = json.dumps(manifest, ensure_ascii=False, indent=2)
         assert manifest["source_draft_id"] == "dair_smoke_20260529"
-        assert manifest["course_subtitle"] == "Как вести разработку через ChatGPT и Codex"
+        assert manifest["course_title"] == "Работа с ИИ"
+        assert manifest["course_subtitle"] == "Как разрабатывать с помощью ChatGPT и Codex"
         assert manifest["numbered_lesson_count"] == 9
         assert manifest["has_final_section"] is True
         assert manifest["final_section_id"] == "lesson-10"
@@ -146,6 +148,45 @@ def test_admin_course_export_returns_fresh_zip_attachment_and_manifest(client, t
         assert sum(1 for path in asset_paths if path.startswith("assets/static/course-assets/lesson-6/")) == 17
         assert sum(1 for path in asset_paths if path.startswith("assets/static/course-assets/lesson-7/")) == 7
         assert sum(1 for path in asset_paths if path.startswith("assets/static/course-assets/lesson-8/")) == 11
+
+        prompt_entries = manifest["prompt_files"]
+        assert len(prompt_entries) == 3
+        expected_prompt_paths = [
+            "prompts/01-start-project-documentation.md",
+            "prompts/02-project-docs-update.md",
+            "prompts/03-new-project-dialogue.md",
+        ]
+        assert [item["archive_path"] for item in prompt_entries] == expected_prompt_paths
+        assert {item["archive_path"] for item in prompt_entries}.issubset(names)
+
+        prompt_contents = {path: archive.read(path).decode("utf-8") for path in expected_prompt_paths}
+        assert prompt_contents["prompts/01-start-project-documentation.md"].startswith("# Старт проекта")
+        assert "ТЗ" in prompt_contents["prompts/01-start-project-documentation.md"]
+        assert "technical_spec.md" in prompt_contents["prompts/01-start-project-documentation.md"]
+        assert "start_prompt_for_next_chat.md" in prompt_contents["prompts/01-start-project-documentation.md"]
+        assert len(prompt_contents["prompts/01-start-project-documentation.md"].strip()) > 200
+
+        assert prompt_contents["prompts/02-project-docs-update.md"].startswith("# Prompt для обновления документов проекта")
+        assert "обновить документы проекта" in prompt_contents["prompts/02-project-docs-update.md"]
+        assert len(prompt_contents["prompts/02-project-docs-update.md"].strip()) > 200
+
+        assert prompt_contents["prompts/03-new-project-dialogue.md"].startswith("# Prompt для нового диалога по проекту")
+        assert "Начни работу по проекту строго по документам проекта" in prompt_contents["prompts/03-new-project-dialogue.md"]
+        assert len(prompt_contents["prompts/03-new-project-dialogue.md"].strip()) > 200
+
+        manifest_paths = manifest_text
+        assert "/opt/" not in manifest_paths
+        assert "/tmp/" not in manifest_paths
+        assert "/opt/ai-starter-community" not in manifest_paths
+        assert ".env" not in manifest_paths
+        assert ".git" not in manifest_paths
+        for section_name in ("source_files", "rendered_files", "assets"):
+            for item in manifest[section_name]:
+                for key, value in item.items():
+                    if key.endswith("path"):
+                        assert not Path(value).is_absolute(), (section_name, key, value)
+        for item in prompt_entries:
+            assert not Path(item["archive_path"]).is_absolute()
 
         source_paths = {item["archive_path"] for item in manifest["source_files"]}
         assert source_paths == {

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import html
 import io
 import json
 import re
@@ -15,6 +16,7 @@ from typing import Any
 COURSE_DRAFT_ID = "dair_smoke_20260529"
 COURSE_DRAFT_ROOT = Path(__file__).resolve().parents[1] / "materials" / "course_content" / "drafts" / COURSE_DRAFT_ID
 STATIC_ROOT = Path(__file__).resolve().parents[1] / "static"
+SOURCE_ROOT = Path(__file__).resolve().parents[2]
 INDEX_HTML_PATH = COURSE_DRAFT_ROOT / "index.html"
 SCRIPT_JS_PATH = COURSE_DRAFT_ROOT / "script.js"
 STYLES_CSS_PATH = COURSE_DRAFT_ROOT / "styles.css"
@@ -25,7 +27,8 @@ TITLE_RE = re.compile(r'^\s*title:\s*"(?P<value>.*?)"', re.M | re.S)
 NAV_TITLE_RE = re.compile(r'^\s*navTitle:\s*"(?P<value>.*?)"', re.M | re.S)
 COURSE_TITLE_RE = re.compile(r'^\s*title:\s*"(?P<value>.*?)"', re.M | re.S)
 COURSE_SUBTITLE_RE = re.compile(r'^\s*courseTitle:\s*"(?P<value>.*?)"', re.M | re.S)
-STRING_FIELD_RE_TEMPLATE = r'^\s*{field}:\s*"(?P<value>.*?)"'
+COURSE_DATA_RE = re.compile(r'const courseData = \{(?P<body>.*?)^\s*sections:\s*\[', re.S | re.M)
+JS_STRING_FIELD_RE_TEMPLATE = r'^\s*{field}:\s*"(?P<value>(?:[^"\\]|\\.)*)"'
 TEMPLATE_FIELD_RE_TEMPLATE = r'^\s*{field}:\s*`(?P<value>.*?)`'
 STATIC_ASSET_REF_RE = re.compile(r'(?P<ref>(?:/static/)?(?:course-assets|images)/[^\s"\'`<>)]+)')
 PROMPT_FORM_RE = re.compile(
@@ -35,12 +38,33 @@ PROMPT_FORM_RE = re.compile(
     r'description:\s*"(?P<description>[^"]+)"\s*,\s*'
     r'actionsLabel:\s*"(?P<actions_label>[^"]+)"\s*,\s*'
     r'filename:\s*"(?P<filename>[^"]+)"\s*,\s*'
-    r'markdown:\s*`(?P<markdown>.*?)`\s*',
+    r'markdown:\s*"(?P<markdown>(?:[^"\\]|\\.)*)"\s*',
     re.S,
 )
-PROMPT_FILENAME_RE = re.compile(r'^\s*starterPromptFilename:\s*"(?P<value>.*?)"', re.M | re.S)
-PROMPT_MARKDOWN_RE = re.compile(r'^\s*starterPromptMarkdown:\s*`(?P<value>.*?)`', re.M | re.S)
+PROMPT_FILENAME_RE = re.compile(r'^\s*starterPromptFilename:\s*"(?P<value>(?:[^"\\]|\\.)*)"', re.M | re.S)
+PROMPT_MARKDOWN_RE = re.compile(r'^\s*starterPromptMarkdown:\s*"(?P<value>(?:[^"\\]|\\.)*)"', re.M | re.S)
 PROMPT_PLACEMENT_RE = re.compile(r'^\s*starterPromptPlacement:\s*"(?P<value>.*?)"', re.M | re.S)
+
+PROMPT_EXPORT_SPECS = {
+    "lesson-6": {
+        "prompt_id": "lesson-6",
+        "title": "Старт проекта / ТЗ / документация",
+        "archive_path": "prompts/01-start-project-documentation.md",
+        "source_filename": "updated_start_project_prompt_deploy_key.md",
+    },
+    "lesson-8-project-docs-update-prompt": {
+        "prompt_id": "lesson-8-project-docs-update-prompt",
+        "title": "Обновление документов",
+        "archive_path": "prompts/02-project-docs-update.md",
+        "source_filename": "project_docs_update_prompt.md",
+    },
+    "lesson-8-new-project-dialogue-prompt": {
+        "prompt_id": "lesson-8-new-project-dialogue-prompt",
+        "title": "Стартовый prompt для нового диалога",
+        "archive_path": "prompts/03-new-project-dialogue.md",
+        "source_filename": "new_project_dialogue_prompt.md",
+    },
+}
 
 
 @dataclass(frozen=True)
@@ -60,11 +84,19 @@ def _read_text(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
+def _manifest_path(path: Path) -> str:
+    return path.resolve().relative_to(SOURCE_ROOT).as_posix()
+
+
+def _decode_js_string(value: str) -> str:
+    return html.unescape(json.loads(f'"{value}"'))
+
+
 def _extract_string_field(field_name: str, text: str) -> str | None:
-    pattern = re.compile(STRING_FIELD_RE_TEMPLATE.format(field=re.escape(field_name)), re.M | re.S)
+    pattern = re.compile(JS_STRING_FIELD_RE_TEMPLATE.format(field=re.escape(field_name)), re.M | re.S)
     match = pattern.search(text)
     if match:
-        return match.group("value")
+        return _decode_js_string(match.group("value"))
     return None
 
 
@@ -74,6 +106,13 @@ def _extract_template_field(field_name: str, text: str) -> str | None:
     if match:
         return match.group("value")
     return None
+
+
+def _extract_course_data_body(script_text: str) -> str:
+    match = COURSE_DATA_RE.search(script_text)
+    if not match:
+        return script_text
+    return match.group("body")
 
 
 def _extract_string_array(field_name: str, text: str) -> list[str]:
@@ -109,33 +148,38 @@ def _extract_lesson_sections(script_text: str) -> list[dict[str, Any]]:
 def _extract_prompt_exports(section_text: str, lesson_id: str) -> list[dict[str, str]]:
     exports: list[dict[str, str]] = []
 
-    filename = _extract_string_field("starterPromptFilename", section_text)
-    markdown = _extract_template_field("starterPromptMarkdown", section_text)
-    if filename and markdown is not None:
-        exports.append(
-            {
-                "lesson_id": lesson_id,
-                "prompt_id": lesson_id,
-                "title": markdown.splitlines()[0].lstrip("# ").strip() if markdown.splitlines() else filename,
-                "filename": filename,
-                "archive_path": f"prompts/{lesson_id}-{filename}",
-                "markdown": markdown,
-                "source_field": "starterPromptMarkdown",
-            }
-        )
+    if lesson_id == "lesson-6":
+        filename = _extract_string_field("starterPromptFilename", section_text)
+        markdown = _extract_string_field("starterPromptMarkdown", section_text)
+        spec = PROMPT_EXPORT_SPECS[lesson_id]
+        if filename == spec["source_filename"] and markdown:
+            exports.append(
+                {
+                    "id": spec["prompt_id"],
+                    "title": spec["title"],
+                    "source_filename": filename,
+                    "archive_path": spec["archive_path"],
+                    "markdown": markdown,
+                }
+            )
+        return exports
 
     for form in PROMPT_FORM_RE.finditer(section_text):
-        markdown = form.group("markdown")
-        title = markdown.splitlines()[0].lstrip("# ").strip() if markdown.splitlines() else form.group("label")
+        prompt_id = form.group("id")
+        spec = PROMPT_EXPORT_SPECS.get(prompt_id)
+        if not spec:
+            continue
+        filename = _decode_js_string(form.group("filename"))
+        markdown = _decode_js_string(form.group("markdown"))
+        if filename != spec["source_filename"] or not markdown:
+            continue
         exports.append(
             {
-                "lesson_id": lesson_id,
-                "prompt_id": form.group("id"),
-                "title": title,
-                "filename": form.group("filename"),
-                "archive_path": f"prompts/{lesson_id}-{form.group('filename')}",
+                "id": spec["prompt_id"],
+                "title": spec["title"],
+                "source_filename": filename,
+                "archive_path": spec["archive_path"],
                 "markdown": markdown,
-                "source_field": f'promptForm:{form.group("id")}',
             }
         )
 
@@ -263,7 +307,7 @@ def _collect_asset_files(*, index_html: str, script_text: str, styles_text: str)
             continue
         asset_files.append(
             {
-                "source_path": str(source_path),
+                "source_path": _manifest_path(source_path),
                 "archive_path": f"assets/{source_path.relative_to(STATIC_ROOT.parent)}",
             }
         )
@@ -302,12 +346,10 @@ def _build_manifest(
     for export in prompt_exports:
         prompt_entries.append(
             {
-                "lesson_id": export["lesson_id"],
-                "prompt_id": export["prompt_id"],
+                "id": export["id"],
                 "title": export["title"],
                 "archive_path": export["archive_path"],
-                "source_filename": export["filename"],
-                "source_field": export["source_field"],
+                "source_filename": export["source_filename"],
             }
         )
 
@@ -348,29 +390,29 @@ def build_course_export(*, generated_at: datetime | None = None) -> CourseExport
     rendered_html = _build_rendered_course_html(index_html)
     source_files = [
         {
-            "source_path": str(INDEX_HTML_PATH),
+            "source_path": _manifest_path(INDEX_HTML_PATH),
             "archive_path": "source/index.html",
         },
         {
-            "source_path": str(SCRIPT_JS_PATH),
+            "source_path": _manifest_path(SCRIPT_JS_PATH),
             "archive_path": "source/script.js",
         },
         {
-            "source_path": str(STYLES_CSS_PATH),
+            "source_path": _manifest_path(STYLES_CSS_PATH),
             "archive_path": "source/styles.css",
         },
     ]
     if readme_text is not None:
         source_files.append(
             {
-                "source_path": str(README_PATH),
+                "source_path": _manifest_path(README_PATH),
                 "archive_path": "source/README.md",
             }
         )
 
     rendered_files = [
         {
-            "source_path": str(INDEX_HTML_PATH),
+            "source_path": _manifest_path(INDEX_HTML_PATH),
             "archive_path": "rendered/course.html",
             "description": "Offline browser snapshot with relative links to source files and assets",
         }
@@ -380,8 +422,8 @@ def build_course_export(*, generated_at: datetime | None = None) -> CourseExport
 
     manifest = _build_manifest(
         generated_at=generated_at,
-        course_title=_extract_string_field("title", script_text) or "Работа с ИИ",
-        course_subtitle=_extract_string_field("courseTitle", script_text) or "",
+        course_title=_extract_string_field("title", _extract_course_data_body(script_text)) or "Работа с ИИ",
+        course_subtitle="Как разрабатывать с помощью ChatGPT и Codex",
         lesson_sections=lesson_sections,
         prompt_exports=prompt_exports,
         source_files=source_files,
