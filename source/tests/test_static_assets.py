@@ -69,6 +69,8 @@ def test_stylesheet_is_served(client):
     assert ".account-password-toggle {" in response.text
     assert ".pricing-tariff-card {" in response.text
     assert ".pricing-tariff-card--featured {" in response.text
+    assert "border: 1px solid #d3b186;" in response.text
+    assert response.text.count("background: linear-gradient(180deg, #fffaf0 0%, var(--tariff-cream-strong) 100%);") >= 2
     assert ".tariff-card-align-left {" in response.text
     assert ".tariff-card-align-center {" in response.text
     assert ".auth-spotlight {" in response.text

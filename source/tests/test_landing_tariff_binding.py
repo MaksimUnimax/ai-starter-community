@@ -151,6 +151,10 @@ def test_homepage_tariffs_context_returns_two_selected_tariffs_in_stable_order(t
         "Homepage selected alpha",
         "Homepage selected beta",
     ]
+    assert [card["is_primary"] for card in context["homepage_tariff_cards"]] == [
+        True,
+        False,
+    ]
     assert [card["alignment_class"] for card in context["homepage_tariff_cards"]] == [
         "tariff-card-align-left",
         "tariff-card-align-center",

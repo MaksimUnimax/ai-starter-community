@@ -232,6 +232,8 @@ def test_locked_cabinet_pricing_renders_two_selected_tariffs(client, test_settin
     assert "pricing-tariff-badge" not in body
     assert "ТАРИФ 1" not in body
     assert "ТАРИФ 2" not in body
+    assert '<article class="pricing-tariff-card pricing-tariff-card--featured tariff-card-align-left">' in body
+    assert '<article class="pricing-tariff-card tariff-card-align-center">' in body
     assert "tariff-card-align-left" in body
     assert "tariff-card-align-center" in body
     assert "access-locked-pricing" in body
