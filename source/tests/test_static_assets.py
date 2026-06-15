@@ -69,15 +69,26 @@ def test_stylesheet_is_served(client):
     assert ".account-password-toggle {" in response.text
     assert ".pricing-tariff-card {" in response.text
     assert ".pricing-tariff-card--featured {" in response.text
+    assert ".pricing-tariff-title {" in response.text
+    assert ".pricing-tariff-price {" in response.text
+    assert ".pricing-tariff-description {" in response.text
     assert "border: 1px solid #d3b186;" in response.text
     assert response.text.count("background: linear-gradient(180deg, #fffaf0 0%, var(--tariff-cream-strong) 100%);") >= 2
     assert ".tariff-card-align-left {" in response.text
     assert ".tariff-card-align-center {" in response.text
     assert ".auth-spotlight {" in response.text
+    assert ".auth-layout--login .auth-login-panel," in response.text
+    assert ".auth-layout--login .auth-login-card {" in response.text
     assert ".auth-login-card {" in response.text
-    assert ".auth-login-card .input," in response.text
-    assert ".auth-login-card input," in response.text
+    assert ".auth-layout--login .auth-login-card .input," in response.text
+    assert ".auth-layout--login .auth-login-card input," in response.text
+    assert ".auth-layout--login .password-field .input {" in response.text
+    assert ".auth-layout--login .auth-login-card .input:focus," in response.text
+    assert ".auth-layout--login .password-field .input:focus" in response.text
+    assert "-webkit-autofill" in response.text
+    assert ".auth-layout--login .password-toggle {" in response.text
     assert ".auth-chip {" in response.text
+    assert ".auth-layout--login .auth-chip {" in response.text
     assert ".access-locked-chip {" in response.text
     assert "rgba(33, 68, 216, 0.18)" not in response.text
     assert "rgba(33, 68, 216, 0.5)" not in response.text
