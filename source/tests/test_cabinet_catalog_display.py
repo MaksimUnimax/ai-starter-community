@@ -232,6 +232,7 @@ def test_locked_cabinet_pricing_renders_two_selected_tariffs(client, test_settin
     assert body.count("pricing-tariff-title") >= 2
     assert body.count("pricing-tariff-price") >= 2
     assert body.count("pricing-tariff-description") >= 2
+    assert body.count('class="pricing-tariff-card') >= 2
     assert "pricing-tariff-badge" not in body
     assert "ТАРИФ 1" not in body
     assert "ТАРИФ 2" not in body
