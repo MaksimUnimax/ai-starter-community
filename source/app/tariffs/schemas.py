@@ -16,6 +16,7 @@ class TariffPublic:
     status: str
     show_on_homepage: bool
     sort_order: int
+    pricing_text_align: str
     created_at: str
     updated_at: str
 
@@ -32,6 +33,7 @@ class TariffCreateInput:
     status: str = "active"
     show_on_homepage: bool = False
     sort_order: int = 0
+    pricing_text_align: str = "left"
     code: str | None = None
 
 
@@ -44,6 +46,7 @@ class TariffUpdateInput:
     status: str | None = None
     show_on_homepage: bool | None = None
     sort_order: int | None = None
+    pricing_text_align: str | None = None
 
 
 @dataclass(frozen=True, slots=True)

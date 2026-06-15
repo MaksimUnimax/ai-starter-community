@@ -22,6 +22,7 @@
           <th>Статус</th>
           <th>На главной</th>
           <th>Порядок сортировки</th>
+          <th>Выравнивание</th>
           <th>Включённые опции</th>
           <th>Создан</th>
           <th>Обновлён</th>
@@ -39,6 +40,7 @@
             <td>{{ tariff.status_label }}</td>
             <td>{{ tariff.show_on_homepage_label }}</td>
             <td>{{ tariff.sort_order }}</td>
+            <td>{{ tariff.pricing_text_align_label }}</td>
             <td>{{ tariff.included_options_summary }}</td>
             <td>{{ tariff.created_at }}</td>
             <td>{{ tariff.updated_at }}</td>
@@ -54,7 +56,7 @@
           </tr>
         {% else %}
           <tr>
-            <td colspan="12">Тарифов пока нет.</td>
+            <td colspan="13">Тарифов пока нет.</td>
           </tr>
         {% endfor %}
       </tbody>

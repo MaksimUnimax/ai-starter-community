@@ -25,6 +25,12 @@ def test_favicon_svg_is_served_and_matches_constraints(client):
 def test_stylesheet_is_served(client):
     response = client.get("/static/styles.css")
     assert response.status_code == 200
+    assert "--panel-soft: #fff9f2;" in response.text
+    assert "--control-surface: #fffaf4;" in response.text
+    assert "--control-border: #e7d6c2;" in response.text
+    assert "--control-focus: rgba(196, 92, 38, 0.22);" in response.text
+    assert "--chip-surface: rgba(196, 92, 38, 0.08);" in response.text
+    assert "--chip-border: rgba(196, 92, 38, 0.14);" in response.text
     assert ".card" in response.text
     assert ".button-primary" in response.text
     assert ".top-nav" in response.text
@@ -54,6 +60,15 @@ def test_stylesheet_is_served(client):
     assert ".account-actions .button {" in response.text
     assert ".account-actions .button:disabled {" in response.text
     assert ".account-password-toggle {" in response.text
+    assert ".pricing-tariff-card {" in response.text
+    assert ".pricing-tariff-card--featured {" in response.text
+    assert ".tariff-card-align-left {" in response.text
+    assert ".tariff-card-align-center {" in response.text
+    assert ".auth-chip {" in response.text
+    assert ".access-locked-chip {" in response.text
+    assert "rgba(33, 68, 216, 0.18)" not in response.text
+    assert "rgba(33, 68, 216, 0.5)" not in response.text
+    assert ".pricing-tariff-badge" not in response.text
     assert ".prompts-library-card {" in response.text
     assert "--prompt-card-collapsed-height: 192px;" in response.text
     assert ".prompts-library-header {" in response.text

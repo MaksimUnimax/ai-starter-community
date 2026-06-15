@@ -92,8 +92,10 @@ CREATE TABLE IF NOT EXISTS tariffs (
     status TEXT NOT NULL DEFAULT 'active',
     show_on_homepage INTEGER NOT NULL DEFAULT 0,
     sort_order INTEGER NOT NULL DEFAULT 0,
+    pricing_text_align TEXT NOT NULL DEFAULT 'left',
     created_at TEXT NOT NULL,
-    updated_at TEXT NOT NULL
+    updated_at TEXT NOT NULL,
+    CHECK (pricing_text_align IN ('left', 'center'))
 );
 
 CREATE TABLE IF NOT EXISTS paid_options (
@@ -148,6 +150,7 @@ def initialize_database(path: Path | str) -> None:
         connection.executescript(SCHEMA_SQL)
         _ensure_users_materials_access_granted_at_column(connection)
         _ensure_tariffs_show_on_homepage_column(connection)
+        _ensure_tariffs_pricing_text_align_column(connection)
 
 
 def _ensure_users_materials_access_granted_at_column(connection: sqlite3.Connection) -> None:
@@ -166,3 +169,12 @@ def _ensure_tariffs_show_on_homepage_column(connection: sqlite3.Connection) -> N
     }
     if "show_on_homepage" not in columns:
         connection.execute("ALTER TABLE tariffs ADD COLUMN show_on_homepage INTEGER NOT NULL DEFAULT 0")
+
+
+def _ensure_tariffs_pricing_text_align_column(connection: sqlite3.Connection) -> None:
+    columns = {
+        row[1]
+        for row in connection.execute("PRAGMA table_info(tariffs)").fetchall()
+    }
+    if "pricing_text_align" not in columns:
+        connection.execute("ALTER TABLE tariffs ADD COLUMN pricing_text_align TEXT NOT NULL DEFAULT 'left'")

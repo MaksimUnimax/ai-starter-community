@@ -23,11 +23,8 @@
       {% if tariff_cards %}
         <div class="pricing-tariff-grid" aria-label="{{ pricing_cards_aria_label or 'Выбранные тарифы' }}">
           {% for tariff_card in tariff_cards %}
-            <article class="pricing-tariff-card{% if tariff_card.is_primary %} pricing-tariff-card--featured{% endif %}">
-              <div class="pricing-tariff-card-head">
-                <span class="pricing-tariff-badge">{{ pricing_card_badge_label or "Тариф" }} {{ loop.index }}</span>
-                <h3 class="pricing-tariff-title">{{ tariff_card.title }}</h3>
-              </div>
+            <article class="pricing-tariff-card{% if tariff_card.is_primary %} pricing-tariff-card--featured{% endif %} {{ tariff_card.alignment_class or 'tariff-card-align-left' }}">
+              <h3 class="pricing-tariff-title">{{ tariff_card.title }}</h3>
               <p class="pricing-tariff-price">{{ tariff_card.price_display }}</p>
               {% if tariff_card.description %}
                 <p class="pricing-tariff-description">{{ tariff_card.description }}</p>
@@ -35,13 +32,10 @@
             </article>
           {% endfor %}
         </div>
-      {% elif homepage_tariff %}
+      {% elif homepage_tariff_card %}
         <div class="pricing-tariff-grid" aria-label="{{ pricing_cards_aria_label or 'Тариф' }}">
-          <article class="pricing-tariff-card pricing-tariff-card--featured">
-            <div class="pricing-tariff-card-head">
-              <span class="pricing-tariff-badge">{{ pricing_card_badge_label or "Тариф" }} 1</span>
-              <h3 class="pricing-tariff-title">{{ homepage_tariff.title }}</h3>
-            </div>
+          <article class="pricing-tariff-card pricing-tariff-card--featured {{ homepage_tariff_card.alignment_class or 'tariff-card-align-left' }}">
+            <h3 class="pricing-tariff-title">{{ homepage_tariff.title }}</h3>
             <p class="pricing-tariff-price">{{ homepage_tariff_price_display }}</p>
             {% if homepage_tariff.description %}
               <p class="pricing-tariff-description">{{ homepage_tariff.description }}</p>

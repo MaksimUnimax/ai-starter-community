@@ -82,8 +82,21 @@
       <label class="form-row">
         <span>Порядок сортировки</span>
         <input class="input" type="number" name="sort_order" min="0" step="1" value="{{ form_data.sort_order }}">
+        <span class="form-help">Меньшее значение показывает тариф раньше в выбранных карточках и на витрине.</span>
         {% if errors.sort_order %}
           <span class="alert alert-error">{{ errors.sort_order }}</span>
+        {% endif %}
+      </label>
+
+      <label class="form-row">
+        <span>Выравнивание текста карточки</span>
+        <select class="select" name="pricing_text_align">
+          <option value="left" {% if form_data.pricing_text_align == "left" %}selected{% endif %}>Слева</option>
+          <option value="center" {% if form_data.pricing_text_align == "center" %}selected{% endif %}>По центру</option>
+        </select>
+        <span class="form-help">Определяет выравнивание заголовка, цены и описания в карточке тарифа.</span>
+        {% if errors.pricing_text_align %}
+          <span class="alert alert-error">{{ errors.pricing_text_align }}</span>
         {% endif %}
       </label>
 

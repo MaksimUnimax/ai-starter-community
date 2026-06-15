@@ -24,6 +24,8 @@ DESCRIPTION_MAX_LENGTH = 4000
 INT_RE = re.compile(r"^-?\d+$")
 CURRENCY_RE = re.compile(r"^[A-Z]{3}$")
 ALLOWED_STATUSES = {"active", "hidden", "archived"}
+ALLOWED_PRICING_TEXT_ALIGNMENTS = {"left", "center"}
+DEFAULT_PRICING_TEXT_ALIGN = "left"
 _UNSET = object()
 
 
@@ -117,6 +119,13 @@ def _normalize_status(value: str | None) -> str:
     return normalized
 
 
+def _normalize_pricing_text_align(value: str | None) -> str:
+    normalized = DEFAULT_PRICING_TEXT_ALIGN if value is None else str(value).strip().lower()
+    if normalized not in ALLOWED_PRICING_TEXT_ALIGNMENTS:
+        raise ValidationError("pricing_text_align must be left or center")
+    return normalized
+
+
 def _normalize_int(value, field_name: str, *, allow_none: bool = False, minimum: int = 0) -> int | None:
     if value is None:
         if allow_none:
@@ -160,6 +169,7 @@ def _tariff_from_row(row) -> TariffPublic:
         status=str(row["status"]),
         show_on_homepage=bool(row["show_on_homepage"]),
         sort_order=int(row["sort_order"]),
+        pricing_text_align=_normalize_pricing_text_align(row["pricing_text_align"]),
         created_at=str(row["created_at"]),
         updated_at=str(row["updated_at"]),
     )
@@ -275,9 +285,10 @@ def _coerce_create_payload(
     status: str | None,
     show_on_homepage,
     sort_order,
+    pricing_text_align,
 ) -> dict:
     if data is not None:
-        if any(value is not None for value in (code, title, description, price_amount_minor, currency, status, show_on_homepage, sort_order)):
+        if any(value is not None for value in (code, title, description, price_amount_minor, currency, status, show_on_homepage, sort_order, pricing_text_align)):
             raise ValidationError("pass either data or keyword arguments, not both")
         return asdict(data)
     return {
@@ -289,6 +300,7 @@ def _coerce_create_payload(
         "status": status,
         "show_on_homepage": show_on_homepage,
         "sort_order": sort_order,
+        "pricing_text_align": pricing_text_align,
     }
 
 
@@ -302,9 +314,10 @@ def _coerce_update_payload(
     status,
     show_on_homepage,
     sort_order,
+    pricing_text_align,
 ) -> dict:
     if data is not None:
-        if any(value is not _UNSET for value in (title, description, price_amount_minor, currency, status, show_on_homepage, sort_order)):
+        if any(value is not _UNSET for value in (title, description, price_amount_minor, currency, status, show_on_homepage, sort_order, pricing_text_align)):
             raise ValidationError("pass either data or keyword arguments, not both")
         return asdict(data)
     return {
@@ -315,6 +328,7 @@ def _coerce_update_payload(
         "status": status,
         "show_on_homepage": show_on_homepage,
         "sort_order": sort_order,
+        "pricing_text_align": pricing_text_align,
     }
 
 
@@ -401,6 +415,7 @@ def create_tariff(
     status: str | None = None,
     show_on_homepage=None,
     sort_order=None,
+    pricing_text_align=None,
     settings: Settings | None = None,
 ) -> TariffPublic:
     payload = _coerce_create_payload(
@@ -413,6 +428,7 @@ def create_tariff(
         status=status,
         show_on_homepage=show_on_homepage,
         sort_order=sort_order,
+        pricing_text_align=pricing_text_align,
     )
     normalized_title = _normalize_title(payload["title"])
     normalized_description = _normalize_description(payload["description"])
@@ -421,6 +437,9 @@ def create_tariff(
     normalized_status = _normalize_status("active" if payload["status"] is None else payload["status"])
     normalized_show_on_homepage = _normalize_boolish(False if payload["show_on_homepage"] is None else payload["show_on_homepage"], "show_on_homepage")
     normalized_sort_order = _normalize_int(0 if payload["sort_order"] is None else payload["sort_order"], "sort_order", allow_none=False, minimum=0)
+    normalized_pricing_text_align = _normalize_pricing_text_align(
+        DEFAULT_PRICING_TEXT_ALIGN if payload["pricing_text_align"] is None else payload["pricing_text_align"]
+    )
 
     resolved = _settings(settings)
     now_iso = utc_now_iso()
@@ -436,9 +455,9 @@ def create_tariff(
                     """
                     INSERT INTO tariffs (
                         code, title, description, price_amount_minor, currency,
-                        status, show_on_homepage, sort_order, created_at, updated_at
+                        status, show_on_homepage, sort_order, pricing_text_align, created_at, updated_at
                     )
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """,
                     (
                         normalized_code,
@@ -449,6 +468,7 @@ def create_tariff(
                         normalized_status,
                         normalized_show_on_homepage,
                         normalized_sort_order,
+                        normalized_pricing_text_align,
                         now_iso,
                         now_iso,
                     ),
@@ -475,6 +495,7 @@ def update_tariff(
     status=_UNSET,
     show_on_homepage=_UNSET,
     sort_order=_UNSET,
+    pricing_text_align=_UNSET,
     settings: Settings | None = None,
 ) -> TariffPublic:
     normalized_code = _normalize_code(code)
@@ -487,6 +508,7 @@ def update_tariff(
         status=status,
         show_on_homepage=show_on_homepage,
         sort_order=sort_order,
+        pricing_text_align=pricing_text_align,
     )
     updates: dict[str, object] = {}
     if payload["title"] is not _UNSET:
@@ -507,6 +529,8 @@ def update_tariff(
         updates["show_on_homepage"] = _normalize_boolish(payload["show_on_homepage"], "show_on_homepage")
     if payload["sort_order"] is not _UNSET:
         updates["sort_order"] = _normalize_int(payload["sort_order"], "sort_order", minimum=0)
+    if payload["pricing_text_align"] is not _UNSET and payload["pricing_text_align"] is not None:
+        updates["pricing_text_align"] = _normalize_pricing_text_align(payload["pricing_text_align"])
 
     resolved = _settings(settings)
     now_iso = utc_now_iso()
@@ -813,6 +837,7 @@ def upsert_tariff(
     status: str = "active",
     show_on_homepage: bool = False,
     sort_order: int = 0,
+    pricing_text_align: str = "left",
     settings: Settings | None = None,
 ) -> TariffPublic:
     normalized_code = (code or "").strip().lower()
@@ -829,6 +854,7 @@ def upsert_tariff(
         status=status,
         show_on_homepage=show_on_homepage,
         sort_order=sort_order,
+        pricing_text_align=pricing_text_align,
         settings=settings,
     )
 

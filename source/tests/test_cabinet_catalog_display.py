@@ -206,6 +206,7 @@ def test_locked_cabinet_pricing_renders_two_selected_tariffs(client, test_settin
         status="active",
         show_on_homepage=True,
         sort_order=2,
+        pricing_text_align="center",
         settings=test_settings,
     )
     _verify_registered_user(client, test_settings, "cabinet-selected@example.com", "cabinetselected")
@@ -228,4 +229,9 @@ def test_locked_cabinet_pricing_renders_two_selected_tariffs(client, test_settin
     assert "3 000 ₽" in body
     assert body.index("Cabinet selected alpha") < body.index("Cabinet selected beta")
     assert body.count("pricing-tariff-card") >= 2
+    assert "pricing-tariff-badge" not in body
+    assert "ТАРИФ 1" not in body
+    assert "ТАРИФ 2" not in body
+    assert "tariff-card-align-left" in body
+    assert "tariff-card-align-center" in body
     assert "access-locked-pricing" in body

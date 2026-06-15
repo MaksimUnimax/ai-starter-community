@@ -643,11 +643,14 @@ def test_login_and_reset_pages_show_clear_rules(client):
     assert "Электронная почта или логин" in login_response.text
     assert "Зарегистрироваться" in login_response.text
     assert "Не помню пароль?" in login_response.text
+    assert "Забыл пароль?" not in login_response.text
     assert "Нет аккаунта?" not in login_response.text
     assert "auth-layout--login" in login_response.text
     assert "auth-login-panel" in login_response.text
     assert "auth-login-card" in login_response.text
     assert "auth-benefits" in login_response.text
+    assert "auth-chip-row" in login_response.text
+    assert "auth-chip" in login_response.text
     assert 'class="button button-secondary nav-pill"' in login_response.text
     assert 'href="/"' in login_response.text
     assert 'href="/login"' in login_response.text

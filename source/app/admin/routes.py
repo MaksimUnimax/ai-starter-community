@@ -59,6 +59,7 @@ from app.paid_options.service import (
 from app.shared.utils import page_title
 from app.tariffs.schemas import TariffCreateInput, TariffUpdateInput
 from app.tariffs.service import (
+    ALLOWED_PRICING_TEXT_ALIGNMENTS,
     ConflictError as TariffConflictError,
     NotFoundError as TariffNotFoundError,
     ValidationError as TariffValidationError,
@@ -78,6 +79,10 @@ templates = Jinja2Templates(directory=str(Path(__file__).resolve().parent / "tem
 
 TARIFF_CODE_RE = re.compile(r"^[a-z0-9_-]{3,64}$")
 ALLOWED_TARIFF_STATUSES = {"active", "hidden", "archived"}
+TARIFF_PRICING_TEXT_ALIGN_LABELS = {
+    "left": "Слева",
+    "center": "По центру",
+}
 ADMIN_USER_SORT_OPTIONS = {"desc": "Сначала новые", "asc": "Сначала старые"}
 
 
@@ -155,6 +160,10 @@ def _status_label(value: str) -> str:
         "hidden": "скрыт",
         "archived": "архив",
     }.get(value, value)
+
+
+def _pricing_text_align_label(value: str) -> str:
+    return TARIFF_PRICING_TEXT_ALIGN_LABELS.get(value, TARIFF_PRICING_TEXT_ALIGN_LABELS["left"])
 
 
 ACCOUNT_BLOCK_MANAGEMENT_QUERY_PARAM = "account_blocks_user_email"
@@ -434,6 +443,7 @@ def _empty_tariff_form_data() -> dict[str, str]:
         "status": "active",
         "show_on_homepage": "0",
         "sort_order": "0",
+        "pricing_text_align": "left",
     }
 
 
@@ -447,10 +457,14 @@ def _tariff_form_data_from_tariff(tariff) -> dict[str, str]:
         "status": tariff.status,
         "show_on_homepage": "1" if tariff.show_on_homepage else "0",
         "sort_order": str(tariff.sort_order),
+        "pricing_text_align": tariff.pricing_text_align,
     }
 
 
 def _tariff_form_data_from_form(form) -> dict[str, str]:
+    pricing_text_align = _normalize_text(form.get("pricing_text_align")).lower() or "left"
+    if pricing_text_align not in ALLOWED_PRICING_TEXT_ALIGNMENTS:
+        pricing_text_align = "left"
     return {
         "code": _normalize_text(form.get("code")),
         "title": _normalize_text(form.get("title")),
@@ -460,6 +474,7 @@ def _tariff_form_data_from_form(form) -> dict[str, str]:
         "status": _normalize_text(form.get("status")) or "active",
         "show_on_homepage": "1" if _checkbox_is_true(form.get("show_on_homepage")) else "0",
         "sort_order": _normalize_text(form.get("sort_order")) or "0",
+        "pricing_text_align": pricing_text_align,
     }
 
 
@@ -533,6 +548,8 @@ def _tariff_form_errors_from_service(exc: Exception) -> dict[str, str]:
         return {"status": "Статус должен быть активен, скрыт или архив."}
     if lowered.startswith("sort_order "):
         return {"sort_order": "Порядок сортировки должен быть целым числом не меньше 0."}
+    if lowered.startswith("pricing_text_align "):
+        return {"pricing_text_align": "Выберите допустимое выравнивание текста карточки."}
     return {"form": "Не удалось сохранить тариф."}
 
 
@@ -546,6 +563,7 @@ def _validate_tariff_form_input(
     raw_status: str | None = None,
     raw_show_on_homepage=None,
     raw_sort_order: str | None = None,
+    raw_pricing_text_align: str | None = None,
     include_code: bool = True,
 ) -> tuple[dict[str, object], dict[str, str]]:
     errors: dict[str, str] = {}
@@ -557,6 +575,7 @@ def _validate_tariff_form_input(
     status = (_normalize_text(raw_status) or "active").lower()
     show_on_homepage = _checkbox_is_true(raw_show_on_homepage)
     sort_order, sort_error = _parse_non_negative_int(raw_sort_order, "sort_order")
+    pricing_text_align = (_normalize_text(raw_pricing_text_align) or "left").lower()
 
     if include_code:
         if code and not TARIFF_CODE_RE.fullmatch(code):
@@ -586,6 +605,8 @@ def _validate_tariff_form_input(
         errors["status"] = "Статус должен быть активен, скрыт или архив."
     if sort_error:
         errors["sort_order"] = "Порядок сортировки должен быть целым числом не меньше 0."
+    if pricing_text_align not in ALLOWED_PRICING_TEXT_ALIGNMENTS:
+        errors["pricing_text_align"] = "Выберите левое или центральное выравнивание текста карточки."
 
     payload = {
         "code": code,
@@ -596,6 +617,7 @@ def _validate_tariff_form_input(
         "status": status,
         "show_on_homepage": show_on_homepage,
         "sort_order": sort_order if sort_order is not None else 0,
+        "pricing_text_align": pricing_text_align,
     }
     return payload, errors
 
@@ -890,6 +912,7 @@ def _tariffs_for_admin(settings):
                 "status_label": _status_label(tariff.status),
                 "show_on_homepage_label": "Да" if tariff.show_on_homepage else "Нет",
                 "sort_order": tariff.sort_order,
+                "pricing_text_align_label": _pricing_text_align_label(tariff.pricing_text_align),
                 "included_options_summary": ", ".join(option["title"] for option in linked_options) if linked_options else "—",
                 "created_at": tariff.created_at,
                 "updated_at": tariff.updated_at,
@@ -1276,6 +1299,7 @@ async def admin_tariffs_new_submit(request: Request):
         raw_status=form.get("status"),
         raw_show_on_homepage=form.get("show_on_homepage"),
         raw_sort_order=form.get("sort_order"),
+        raw_pricing_text_align=form.get("pricing_text_align"),
         include_code=True,
     )
     if errors:
@@ -1344,6 +1368,7 @@ async def admin_tariffs_edit_submit(request: Request, code: str):
         raw_status=form.get("status"),
         raw_show_on_homepage=form.get("show_on_homepage"),
         raw_sort_order=form.get("sort_order"),
+        raw_pricing_text_align=form.get("pricing_text_align"),
         include_code=False,
     )
     posted_code = _normalize_text(form.get("code")).lower()
@@ -1370,6 +1395,7 @@ async def admin_tariffs_edit_submit(request: Request, code: str):
                 status=payload["status"],
                 show_on_homepage=payload["show_on_homepage"],
                 sort_order=payload["sort_order"],
+                pricing_text_align=payload["pricing_text_align"],
             ),
             settings=settings,
         )

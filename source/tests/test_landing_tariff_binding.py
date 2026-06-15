@@ -127,6 +127,7 @@ def test_homepage_tariffs_context_returns_two_selected_tariffs_in_stable_order(t
         status="active",
         show_on_homepage=True,
         sort_order=1,
+        pricing_text_align="center",
         settings=test_settings,
     )
     create_tariff(
@@ -150,6 +151,13 @@ def test_homepage_tariffs_context_returns_two_selected_tariffs_in_stable_order(t
         "Homepage selected alpha",
         "Homepage selected beta",
     ]
+    assert [card["alignment_class"] for card in context["homepage_tariff_cards"]] == [
+        "tariff-card-align-left",
+        "tariff-card-align-center",
+    ]
     assert context["homepage_tariff"].code == "homepage_selected_alpha"
     assert context["homepage_tariff_price_display"] == "2 000 ₽"
-    assert get_homepage_tariff_context(settings=test_settings)["homepage_tariff"] is not None
+    single_context = get_homepage_tariff_context(settings=test_settings)
+    assert single_context["homepage_tariff"] is not None
+    assert single_context["homepage_tariff_card"] is not None
+    assert single_context["homepage_tariff_card"]["alignment_class"] == "tariff-card-align-left"

@@ -50,6 +50,7 @@ def test_create_tariff_accepts_dataclass_input_and_persists(test_settings):
             currency="rub",
             status="hidden",
             sort_order=5,
+            pricing_text_align="center",
         ),
         settings=test_settings,
     )
@@ -61,6 +62,7 @@ def test_create_tariff_accepts_dataclass_input_and_persists(test_settings):
     assert tariff.currency == "RUB"
     assert tariff.status == "hidden"
     assert tariff.sort_order == 5
+    assert tariff.pricing_text_align == "center"
 
 
 def test_create_tariff_generates_safe_unique_code_when_blank(test_settings):
@@ -131,6 +133,7 @@ def test_update_tariff_edits_allowed_fields_and_keeps_code(test_settings):
             currency="usd",
             status="hidden",
             sort_order=9,
+            pricing_text_align="center",
         ),
         settings=test_settings,
     )
@@ -142,6 +145,23 @@ def test_update_tariff_edits_allowed_fields_and_keeps_code(test_settings):
     assert updated.currency == "USD"
     assert updated.status == "hidden"
     assert updated.sort_order == 9
+    assert updated.pricing_text_align == "center"
+
+
+def test_update_tariff_rejects_invalid_alignment(test_settings):
+    created = tariff_service.create_tariff(
+        code="align_plan",
+        title="Align plan",
+        price_amount_minor=1000,
+        settings=test_settings,
+    )
+
+    with pytest.raises(tariff_service.ValidationError):
+        tariff_service.update_tariff(
+            created.code,
+            pricing_text_align="diagonal",
+            settings=test_settings,
+        )
 
 
 def test_archive_tariff_hides_it_from_public_listing_and_admin_listing_keeps_it(test_settings):

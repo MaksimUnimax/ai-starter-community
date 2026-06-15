@@ -100,12 +100,17 @@ def test_admin_can_open_tariff_create_page(client, test_settings):
     assert "Валюта" in body
     assert "Статус" in body
     assert "Порядок сортировки" in body
+    assert "Выравнивание текста карточки" in body
     assert "Code" not in body
     assert "Title" not in body
     assert "Description" not in body
     assert "Price, RUB" not in body
     assert 'name="code"' in body
     assert 'name="show_on_homepage"' in body
+    assert 'name="pricing_text_align"' in body
+    assert 'option value="left"' in body
+    assert 'option value="center"' in body
+    assert 'value="left" selected' in body
     assert "Нужен программе. Можно оставить пустым — система создаст код автоматически." in body
 
 
@@ -123,6 +128,7 @@ def test_admin_can_create_tariff_via_ui(client, test_settings):
             "status": "active",
             "show_on_homepage": "1",
             "sort_order": "7",
+            "pricing_text_align": "center",
         },
         follow_redirects=False,
     )
@@ -139,6 +145,7 @@ def test_admin_can_create_tariff_via_ui(client, test_settings):
     assert tariff.status == "active"
     assert tariff.show_on_homepage is True
     assert tariff.sort_order == 7
+    assert tariff.pricing_text_align == "center"
 
 
 def test_admin_can_create_tariff_without_code_via_ui(client, test_settings):
@@ -162,6 +169,7 @@ def test_admin_can_create_tariff_without_code_via_ui(client, test_settings):
     created = next(item for item in list_tariffs_for_admin(settings=test_settings) if item.title == "UI Tariff Without Code")
     assert created.code.startswith("tariff_")
     assert re.fullmatch(r"[a-z0-9_-]{3,64}", created.code)
+    assert created.pricing_text_align == "left"
 
 
 def test_admin_tariff_create_rejects_duplicate_code_safely(client, test_settings):
@@ -229,6 +237,7 @@ def test_admin_edit_page_shows_code_as_read_only(client, test_settings):
         description="Initial description",
         price_amount_minor=1000,
         show_on_homepage=True,
+        pricing_text_align="center",
         status="active",
         settings=test_settings,
     )
@@ -252,10 +261,13 @@ def test_admin_edit_page_shows_code_as_read_only(client, test_settings):
     assert "Валюта" in body
     assert "Статус" in body
     assert "Порядок сортировки" in body
+    assert "Выравнивание текста карточки" in body
     assert "Code" not in body
     assert "Title" not in body
     assert 'name="code"' in body
     assert 'name="show_on_homepage"' in body
+    assert 'name="pricing_text_align"' in body
+    assert 'value="center" selected' in body
     assert "readonly" in body
     assert "checked" in body
     assert "ui_tariff_edit" in body
@@ -272,6 +284,7 @@ def test_admin_post_edit_updates_allowed_fields_and_keeps_code(client, test_sett
         currency="RUB",
         status="active",
         sort_order=1,
+        pricing_text_align="left",
         settings=test_settings,
     )
 
@@ -286,6 +299,7 @@ def test_admin_post_edit_updates_allowed_fields_and_keeps_code(client, test_sett
             "status": "hidden",
             "show_on_homepage": "",
             "sort_order": "9",
+            "pricing_text_align": "center",
         },
         follow_redirects=False,
     )
@@ -301,6 +315,7 @@ def test_admin_post_edit_updates_allowed_fields_and_keeps_code(client, test_sett
     assert tariff.status == "hidden"
     assert tariff.show_on_homepage is False
     assert tariff.sort_order == 9
+    assert tariff.pricing_text_align == "center"
 
 
 def test_admin_post_edit_rejects_code_changes(client, test_settings):
@@ -313,6 +328,7 @@ def test_admin_post_edit_rejects_code_changes(client, test_settings):
         currency="RUB",
         status="active",
         sort_order=1,
+        pricing_text_align="left",
         settings=test_settings,
     )
 
@@ -326,11 +342,13 @@ def test_admin_post_edit_rejects_code_changes(client, test_settings):
             "currency": "RUB",
             "status": "hidden",
             "sort_order": "9",
+            "pricing_text_align": "sideways",
         },
     )
 
     assert response.status_code == 400
     assert "системный код" in response.text.lower()
+    assert "выравнив" in response.text.lower()
 
     tariff = get_tariff_by_code("ui_tariff_code_lock", settings=test_settings)
     assert tariff is not None
@@ -365,6 +383,16 @@ def test_admin_post_archive_sets_tariff_status_archived(client, test_settings):
 def test_admin_tariff_list_shows_controls_without_paid_option_crud_ui(client, test_settings):
     _make_admin(client, test_settings)
     seed_initial_catalog(settings=test_settings)
+    create_tariff(
+        code="ui_tariff_list_center",
+        title="UI Tariff List Center",
+        price_amount_minor=1500,
+        currency="RUB",
+        status="active",
+        sort_order=4,
+        pricing_text_align="center",
+        settings=test_settings,
+    )
 
     response = client.get("/admin/tariffs")
     assert response.status_code == 200
@@ -377,6 +405,9 @@ def test_admin_tariff_list_shows_controls_without_paid_option_crud_ui(client, te
     assert "/admin/paid-options/new" not in body
     assert "/admin/paid-options/" not in body
     assert "/admin/payments" not in body
+    assert "Выравнивание" in body
+    assert "Слева" in body
+    assert "По центру" in body
 
 
 def test_admin_tariff_form_does_not_expose_payment_ui(client, test_settings):
@@ -385,3 +416,24 @@ def test_admin_tariff_form_does_not_expose_payment_ui(client, test_settings):
     body = response.text
     assert "payment" not in body.lower()
     assert "оплата" not in body.lower()
+
+
+def test_admin_tariff_form_rejects_invalid_alignment(client, test_settings):
+    _make_admin(client, test_settings)
+    response = client.post(
+        "/admin/tariffs/new",
+        data={
+            "code": "ui_tariff_invalid_align",
+            "title": "UI Tariff",
+            "description": "",
+            "price_rub": "10",
+            "currency": "RUB",
+            "status": "active",
+            "sort_order": "0",
+            "pricing_text_align": "right",
+        },
+    )
+
+    assert response.status_code == 400
+    assert "выравни" in response.text.lower()
+    assert get_tariff_by_code("ui_tariff_invalid_align", settings=test_settings) is None
