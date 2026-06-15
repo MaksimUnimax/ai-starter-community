@@ -89,6 +89,10 @@ TARIFF_PRICING_TEXT_ALIGN_LABELS = {
     "left": "Слева",
     "center": "По центру",
 }
+TARIFF_FORM_NOTICE_MESSAGES = {
+    "created": "Тариф создан.",
+    "updated": "Изменения сохранены.",
+}
 ADMIN_USER_SORT_OPTIONS = {"desc": "Сначала новые", "asc": "Сначала старые"}
 
 
@@ -182,6 +186,11 @@ def _tariff_font_size_summary(tariff) -> str:
         f" · Цена: {_tariff_font_size_label(tariff.price_font_size_px)}"
         f" · Описание: {_tariff_font_size_label(tariff.description_font_size_px)}"
     )
+
+
+def _tariff_form_notice(request: Request) -> str | None:
+    notice_key = (request.query_params.get("tariff_notice") or "").strip().lower()
+    return TARIFF_FORM_NOTICE_MESSAGES.get(notice_key)
 
 
 ACCOUNT_BLOCK_MANAGEMENT_QUERY_PARAM = "account_blocks_user_email"
@@ -1013,6 +1022,7 @@ def _render_tariff_form(
     form_data: dict[str, str],
     errors: dict[str, str] | None = None,
     tariff=None,
+    notice: str | None = None,
     status_code: int = 200,
 ):
     is_create = mode == "create"
@@ -1026,6 +1036,7 @@ def _render_tariff_form(
         tariff=tariff,
         form_data=form_data,
         errors=errors or {},
+        notice=notice,
         submit_label="Создать тариф" if is_create else "Сохранить изменения",
     )
 
@@ -1400,7 +1411,7 @@ async def admin_tariffs_new_submit(request: Request):
         )
 
     try:
-        create_tariff(data=TariffCreateInput(**payload), settings=settings)
+        created_tariff = create_tariff(data=TariffCreateInput(**payload), settings=settings)
     except TariffConflictError as exc:
         errors = _tariff_form_errors_from_service(exc)
         return _render_tariff_form(
@@ -1420,7 +1431,7 @@ async def admin_tariffs_new_submit(request: Request):
             status_code=400,
         )
 
-    return RedirectResponse(url="/admin/tariffs", status_code=303)
+    return RedirectResponse(url=f"/admin/tariffs/{created_tariff.code}/edit?tariff_notice=created", status_code=303)
 
 
 @router.api_route("/admin/tariffs/{code}/edit", methods=["GET", "HEAD"], response_class=HTMLResponse)
@@ -1433,7 +1444,13 @@ def admin_tariffs_edit(request: Request, code: str):
     tariff = get_tariff_by_code(code, settings=settings)
     if tariff is None:
         raise HTTPException(status_code=404, detail="Not Found")
-    return _render_tariff_form(request, mode="edit", form_data=_tariff_form_data_from_tariff(tariff), tariff=tariff)
+    return _render_tariff_form(
+        request,
+        mode="edit",
+        form_data=_tariff_form_data_from_tariff(tariff),
+        tariff=tariff,
+        notice=_tariff_form_notice(request),
+    )
 
 
 @router.post("/admin/tariffs/{code}/edit", response_class=HTMLResponse)
@@ -1506,7 +1523,7 @@ async def admin_tariffs_edit_submit(request: Request, code: str):
             status_code=400,
         )
 
-    return RedirectResponse(url="/admin/tariffs", status_code=303)
+    return RedirectResponse(url=f"/admin/tariffs/{tariff.code}/edit?tariff_notice=updated", status_code=303)
 
 
 @router.post("/admin/tariffs/{code}/archive")

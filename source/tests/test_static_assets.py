@@ -75,9 +75,9 @@ def test_stylesheet_is_served(client):
     assert "font-size: var(--tariff-title-font-size, 1.24rem);" in response.text
     assert "font-size: var(--tariff-price-font-size, 1.9rem);" in response.text
     assert "font-size: var(--tariff-description-font-size, 1rem);" in response.text
-    assert "--pricing-title-row: 3.2em;" in response.text
-    assert "--pricing-price-row: 2.2em;" in response.text
-    assert "grid-template-rows: var(--pricing-title-row) var(--pricing-price-row) auto;" in response.text
+    assert "--pricing-title-row: calc(var(--tariff-title-font-size, 1.24rem) * 1.35);" in response.text
+    assert "--pricing-price-row: calc(var(--tariff-price-font-size, 1.9rem) * 1.2);" in response.text
+    assert "grid-template-rows: minmax(var(--pricing-title-row), auto) minmax(var(--pricing-price-row), auto) auto;" in response.text
     assert "border: 1px solid #d3b186;" in response.text
     assert response.text.count("background: linear-gradient(180deg, #fffaf0 0%, var(--tariff-cream-strong) 100%);") >= 2
     assert ".tariff-card-align-left {" in response.text

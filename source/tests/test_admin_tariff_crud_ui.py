@@ -151,7 +151,7 @@ def test_admin_can_create_tariff_via_ui(client, test_settings):
     )
 
     assert response.status_code == 303
-    assert response.headers["location"] == "/admin/tariffs"
+    assert response.headers["location"] == "/admin/tariffs/ui_tariff_create/edit?tariff_notice=created"
 
     tariff = get_tariff_by_code("ui_tariff_create", settings=test_settings)
     assert tariff is not None
@@ -190,6 +190,7 @@ def test_admin_can_create_tariff_without_code_via_ui(client, test_settings):
 
     assert response.status_code == 303
     created = next(item for item in list_tariffs_for_admin(settings=test_settings) if item.title == "UI Tariff Without Code")
+    assert response.headers["location"] == f"/admin/tariffs/{created.code}/edit?tariff_notice=created"
     assert created.code.startswith("tariff_")
     assert re.fullmatch(r"[a-z0-9_-]{3,64}", created.code)
     assert created.pricing_text_align == "left"
@@ -402,7 +403,7 @@ def test_admin_post_edit_updates_allowed_fields_and_keeps_code(client, test_sett
         follow_redirects=False,
     )
     assert response.status_code == 303
-    assert response.headers["location"] == "/admin/tariffs"
+    assert response.headers["location"] == "/admin/tariffs/ui_tariff_update/edit?tariff_notice=updated"
 
     tariff = get_tariff_by_code("ui_tariff_update", settings=test_settings)
     assert tariff is not None
@@ -417,6 +418,10 @@ def test_admin_post_edit_updates_allowed_fields_and_keeps_code(client, test_sett
     assert tariff.title_font_size_px == 22
     assert tariff.price_font_size_px == 48
     assert tariff.description_font_size_px == 15
+
+    success_page = client.get(response.headers["location"])
+    assert success_page.status_code == 200
+    assert "Изменения сохранены." in success_page.text
 
 
 def test_admin_post_edit_rejects_code_changes(client, test_settings):

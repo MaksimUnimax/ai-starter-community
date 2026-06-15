@@ -253,3 +253,63 @@ def test_locked_cabinet_pricing_renders_two_selected_tariffs(client, test_settin
     assert "tariff-card-align-left" in body
     assert "tariff-card-align-center" in body
     assert "access-locked-pricing" in body
+
+
+def test_locked_cabinet_pricing_supports_max_font_sizes(client, test_settings):
+    seed_initial_catalog(settings=test_settings)
+    update_tariff(
+        STARTER_TARIFF_CODE,
+        show_on_homepage=False,
+        settings=test_settings,
+    )
+    create_tariff(
+        code="cabinet_selected_max_alpha",
+        title="Cabinet selected max alpha",
+        description="Первая карточка с максимальными размерами шрифтов.",
+        price_amount_minor=400000,
+        currency="RUB",
+        status="active",
+        show_on_homepage=True,
+        sort_order=1,
+        title_font_size_px=40,
+        price_font_size_px=56,
+        description_font_size_px=24,
+        settings=test_settings,
+    )
+    create_tariff(
+        code="cabinet_selected_max_beta",
+        title="Cabinet selected max beta",
+        description="Вторая карточка с максимальными размерами шрифтов.",
+        price_amount_minor=500000,
+        currency="RUB",
+        status="active",
+        show_on_homepage=True,
+        sort_order=2,
+        pricing_text_align="center",
+        title_font_size_px=40,
+        price_font_size_px=56,
+        description_font_size_px=24,
+        settings=test_settings,
+    )
+    _verify_registered_user(client, test_settings, "cabinet-selected-max@example.com", "cabinetselectedmax")
+    token = _extract_token_from_db(test_settings, "cabinet-selected-max@example.com")
+    verify_email(token, settings=test_settings)
+
+    login_response = client.post(
+        "/login",
+        data={"email_or_login": "cabinet-selected-max@example.com", "password": "Secret123"},
+        follow_redirects=False,
+    )
+    assert login_response.status_code == 303
+
+    cabinet_response = client.get("/cabinet")
+    assert cabinet_response.status_code == 200
+    body = cabinet_response.text
+    assert "cabinet_selected_max_alpha" not in body
+    assert "Cabinet selected max alpha" in body
+    assert "Cabinet selected max beta" in body
+    assert "--tariff-title-font-size: 40px" in body
+    assert "--tariff-price-font-size: 56px" in body
+    assert "--tariff-description-font-size: 24px" in body
+    assert '<article class="pricing-tariff-card pricing-tariff-card--featured tariff-card-align-left"' in body
+    assert '<article class="pricing-tariff-card tariff-card-align-center"' in body

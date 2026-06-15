@@ -624,6 +624,12 @@ button:hover {
   border-color: var(--error-border);
 }
 
+.alert-success {
+  background: var(--success-soft);
+  border-color: rgba(71, 100, 74, 0.2);
+  color: var(--success);
+}
+
 .login-unverified {
   gap: 10px;
 }
@@ -985,10 +991,10 @@ button:hover {
 }
 
 .pricing-tariff-card {
-  --pricing-title-row: 3.2em;
-  --pricing-price-row: 2.2em;
+  --pricing-title-row: calc(var(--tariff-title-font-size, 1.24rem) * 1.35);
+  --pricing-price-row: calc(var(--tariff-price-font-size, 1.9rem) * 1.2);
   display: grid;
-  gap: 10px;
+  gap: 12px;
   padding: 22px;
   border-radius: 22px;
   border: 1px solid #d3b186;
@@ -997,7 +1003,7 @@ button:hover {
   justify-items: start;
   align-content: start;
   text-align: left;
-  grid-template-rows: var(--pricing-title-row) var(--pricing-price-row) auto;
+  grid-template-rows: minmax(var(--pricing-title-row), auto) minmax(var(--pricing-price-row), auto) auto;
 }
 
 .pricing-tariff-card--featured {
@@ -1025,7 +1031,6 @@ button:hover {
   font-size: var(--tariff-title-font-size, 1.24rem);
   line-height: 1.2;
   letter-spacing: -0.02em;
-  min-block-size: var(--pricing-title-row);
 }
 
 .pricing-tariff-price {
@@ -1035,7 +1040,6 @@ button:hover {
   line-height: 1.1;
   letter-spacing: -0.03em;
   color: var(--text);
-  min-block-size: var(--pricing-price-row);
 }
 
 .pricing-tariff-description {
