@@ -26,6 +26,13 @@ def test_stylesheet_is_served(client):
     response = client.get("/static/styles.css")
     assert response.status_code == 200
     assert "--panel-soft: #fff9f2;" in response.text
+    assert "--auth-panel-soft: #fff4e7;" in response.text
+    assert "--auth-panel-strong: #f3dfc5;" in response.text
+    assert "--auth-control-surface: #fff9f2;" in response.text
+    assert "--auth-control-border: #e5d3bd;" in response.text
+    assert "--tariff-cream-soft: #fffdf6;" in response.text
+    assert "--tariff-cream-strong: #f6ead7;" in response.text
+    assert "--tariff-cream-border: #e3c9a8;" in response.text
     assert "--control-surface: #fffaf4;" in response.text
     assert "--control-border: #e7d6c2;" in response.text
     assert "--control-focus: rgba(196, 92, 38, 0.22);" in response.text
@@ -64,6 +71,10 @@ def test_stylesheet_is_served(client):
     assert ".pricing-tariff-card--featured {" in response.text
     assert ".tariff-card-align-left {" in response.text
     assert ".tariff-card-align-center {" in response.text
+    assert ".auth-spotlight {" in response.text
+    assert ".auth-login-card {" in response.text
+    assert ".auth-login-card .input," in response.text
+    assert ".auth-login-card input," in response.text
     assert ".auth-chip {" in response.text
     assert ".access-locked-chip {" in response.text
     assert "rgba(33, 68, 216, 0.18)" not in response.text

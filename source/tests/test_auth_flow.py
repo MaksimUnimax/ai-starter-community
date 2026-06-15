@@ -651,6 +651,7 @@ def test_login_and_reset_pages_show_clear_rules(client):
     assert "auth-benefits" in login_response.text
     assert "auth-chip-row" in login_response.text
     assert "auth-chip" in login_response.text
+    assert "auth-spotlight" in login_response.text
     assert 'class="button button-secondary nav-pill"' in login_response.text
     assert 'href="/"' in login_response.text
     assert 'href="/login"' in login_response.text
@@ -674,6 +675,7 @@ def test_login_and_reset_pages_show_clear_rules(client):
     assert 'data-password-toggle' in login_response.text
     assert 'auth-password-toggle.js' in login_response.text
     assert 'Показать пароль' in login_response.text
+    assert "password-toggle" in login_response.text
 
 
 def test_register_template_supports_password_toggle_when_open():

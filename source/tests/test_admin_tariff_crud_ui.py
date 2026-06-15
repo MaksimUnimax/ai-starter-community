@@ -101,6 +101,8 @@ def test_admin_can_open_tariff_create_page(client, test_settings):
     assert "Статус" in body
     assert "Порядок сортировки" in body
     assert "Выравнивание текста карточки" in body
+    assert "Меньшее значение показывает тариф раньше в выбранных карточках и на витрине." in body
+    assert "Определяет выравнивание заголовка, цены и описания в карточке тарифа." in body
     assert "Code" not in body
     assert "Title" not in body
     assert "Description" not in body
@@ -262,6 +264,8 @@ def test_admin_edit_page_shows_code_as_read_only(client, test_settings):
     assert "Статус" in body
     assert "Порядок сортировки" in body
     assert "Выравнивание текста карточки" in body
+    assert "Меньшее значение показывает тариф раньше в выбранных карточках и на витрине." in body
+    assert "Определяет выравнивание заголовка, цены и описания в карточке тарифа." in body
     assert "Code" not in body
     assert "Title" not in body
     assert 'name="code"' in body
