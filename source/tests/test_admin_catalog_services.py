@@ -51,6 +51,9 @@ def test_create_tariff_accepts_dataclass_input_and_persists(test_settings):
             status="hidden",
             sort_order=5,
             pricing_text_align="center",
+            title_font_size_px=30,
+            price_font_size_px=44,
+            description_font_size_px=18,
         ),
         settings=test_settings,
     )
@@ -63,6 +66,17 @@ def test_create_tariff_accepts_dataclass_input_and_persists(test_settings):
     assert tariff.status == "hidden"
     assert tariff.sort_order == 5
     assert tariff.pricing_text_align == "center"
+    assert tariff.title_font_size_px == 30
+    assert tariff.price_font_size_px == 44
+    assert tariff.description_font_size_px == 18
+
+
+def test_tariff_schema_includes_font_size_columns(test_settings):
+    tariff_service.seed_initial_catalog(settings=test_settings)
+    with _connect(test_settings) as conn:
+        columns = {row["name"] for row in conn.execute("PRAGMA table_info(tariffs)").fetchall()}
+
+    assert {"title_font_size_px", "price_font_size_px", "description_font_size_px"}.issubset(columns)
 
 
 def test_create_tariff_generates_safe_unique_code_when_blank(test_settings):
@@ -117,6 +131,31 @@ def test_create_tariff_rejects_duplicate_code(test_settings):
         )
 
 
+def test_create_tariff_clamps_font_sizes_and_rejects_invalid_font_size_inputs(test_settings):
+    created = tariff_service.create_tariff(
+        code="font_size_plan",
+        title="Font size plan",
+        price_amount_minor=1000,
+        title_font_size_px=10,
+        price_font_size_px=999,
+        description_font_size_px=1,
+        settings=test_settings,
+    )
+
+    assert created.title_font_size_px == 16
+    assert created.price_font_size_px == 56
+    assert created.description_font_size_px == 12
+
+    with pytest.raises(tariff_service.ValidationError):
+        tariff_service.create_tariff(
+            code="font_size_invalid",
+            title="Font size invalid",
+            price_amount_minor=1000,
+            title_font_size_px="abc",
+            settings=test_settings,
+        )
+
+
 def test_update_tariff_edits_allowed_fields_and_keeps_code(test_settings):
     created = tariff_service.create_tariff(
         code="edit_plan",
@@ -134,6 +173,9 @@ def test_update_tariff_edits_allowed_fields_and_keeps_code(test_settings):
             status="hidden",
             sort_order=9,
             pricing_text_align="center",
+            title_font_size_px=20,
+            price_font_size_px=48,
+            description_font_size_px=14,
         ),
         settings=test_settings,
     )
@@ -146,6 +188,9 @@ def test_update_tariff_edits_allowed_fields_and_keeps_code(test_settings):
     assert updated.status == "hidden"
     assert updated.sort_order == 9
     assert updated.pricing_text_align == "center"
+    assert updated.title_font_size_px == 20
+    assert updated.price_font_size_px == 48
+    assert updated.description_font_size_px == 14
 
 
 def test_update_tariff_rejects_invalid_alignment(test_settings):

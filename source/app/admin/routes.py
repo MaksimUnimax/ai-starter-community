@@ -60,9 +60,15 @@ from app.shared.utils import page_title
 from app.tariffs.schemas import TariffCreateInput, TariffUpdateInput
 from app.tariffs.service import (
     ALLOWED_PRICING_TEXT_ALIGNMENTS,
+    DESCRIPTION_FONT_SIZE_MAX,
+    DESCRIPTION_FONT_SIZE_MIN,
     ConflictError as TariffConflictError,
     NotFoundError as TariffNotFoundError,
+    PRICE_FONT_SIZE_MAX,
+    PRICE_FONT_SIZE_MIN,
     ValidationError as TariffValidationError,
+    TITLE_FONT_SIZE_MAX,
+    TITLE_FONT_SIZE_MIN,
     attach_option_to_tariff,
     archive_tariff,
     detach_option_from_tariff,
@@ -164,6 +170,18 @@ def _status_label(value: str) -> str:
 
 def _pricing_text_align_label(value: str) -> str:
     return TARIFF_PRICING_TEXT_ALIGN_LABELS.get(value, TARIFF_PRICING_TEXT_ALIGN_LABELS["left"])
+
+
+def _tariff_font_size_label(value: int | None) -> str:
+    return "—" if value is None else f"{value}px"
+
+
+def _tariff_font_size_summary(tariff) -> str:
+    return (
+        f"Заголовок: {_tariff_font_size_label(tariff.title_font_size_px)}"
+        f" · Цена: {_tariff_font_size_label(tariff.price_font_size_px)}"
+        f" · Описание: {_tariff_font_size_label(tariff.description_font_size_px)}"
+    )
 
 
 ACCOUNT_BLOCK_MANAGEMENT_QUERY_PARAM = "account_blocks_user_email"
@@ -444,6 +462,9 @@ def _empty_tariff_form_data() -> dict[str, str]:
         "show_on_homepage": "0",
         "sort_order": "0",
         "pricing_text_align": "left",
+        "title_font_size_px": "",
+        "price_font_size_px": "",
+        "description_font_size_px": "",
     }
 
 
@@ -458,6 +479,9 @@ def _tariff_form_data_from_tariff(tariff) -> dict[str, str]:
         "show_on_homepage": "1" if tariff.show_on_homepage else "0",
         "sort_order": str(tariff.sort_order),
         "pricing_text_align": tariff.pricing_text_align,
+        "title_font_size_px": "" if tariff.title_font_size_px is None else str(tariff.title_font_size_px),
+        "price_font_size_px": "" if tariff.price_font_size_px is None else str(tariff.price_font_size_px),
+        "description_font_size_px": "" if tariff.description_font_size_px is None else str(tariff.description_font_size_px),
     }
 
 
@@ -475,6 +499,9 @@ def _tariff_form_data_from_form(form) -> dict[str, str]:
         "show_on_homepage": "1" if _checkbox_is_true(form.get("show_on_homepage")) else "0",
         "sort_order": _normalize_text(form.get("sort_order")) or "0",
         "pricing_text_align": pricing_text_align,
+        "title_font_size_px": _normalize_text(form.get("title_font_size_px")),
+        "price_font_size_px": _normalize_text(form.get("price_font_size_px")),
+        "description_font_size_px": _normalize_text(form.get("description_font_size_px")),
     }
 
 
@@ -521,6 +548,27 @@ def _parse_optional_non_negative_int(value: str | None, field_name: str) -> tupl
     return parsed, None
 
 
+def _parse_optional_font_size(
+    value: str | None,
+    field_name: str,
+    *,
+    minimum: int,
+    maximum: int,
+) -> tuple[int | None, str | None]:
+    raw = (value or "").strip()
+    if not raw:
+        return None, None
+    try:
+        parsed = int(raw)
+    except ValueError:
+        return None, f"{field_name} must be an integer"
+    if parsed < minimum:
+        return minimum, None
+    if parsed > maximum:
+        return maximum, None
+    return parsed, None
+
+
 def _normalize_text(value: str | None) -> str:
     return (value or "").strip()
 
@@ -550,6 +598,12 @@ def _tariff_form_errors_from_service(exc: Exception) -> dict[str, str]:
         return {"sort_order": "Порядок сортировки должен быть целым числом не меньше 0."}
     if lowered.startswith("pricing_text_align "):
         return {"pricing_text_align": "Выберите допустимое выравнивание текста карточки."}
+    if lowered.startswith("title_font_size_px "):
+        return {"title_font_size_px": "Размер заголовка должен быть целым числом."}
+    if lowered.startswith("price_font_size_px "):
+        return {"price_font_size_px": "Размер цены должен быть целым числом."}
+    if lowered.startswith("description_font_size_px "):
+        return {"description_font_size_px": "Размер описания должен быть целым числом."}
     return {"form": "Не удалось сохранить тариф."}
 
 
@@ -564,6 +618,9 @@ def _validate_tariff_form_input(
     raw_show_on_homepage=None,
     raw_sort_order: str | None = None,
     raw_pricing_text_align: str | None = None,
+    raw_title_font_size_px: str | None = None,
+    raw_price_font_size_px: str | None = None,
+    raw_description_font_size_px: str | None = None,
     include_code: bool = True,
 ) -> tuple[dict[str, object], dict[str, str]]:
     errors: dict[str, str] = {}
@@ -576,6 +633,24 @@ def _validate_tariff_form_input(
     show_on_homepage = _checkbox_is_true(raw_show_on_homepage)
     sort_order, sort_error = _parse_non_negative_int(raw_sort_order, "sort_order")
     pricing_text_align = (_normalize_text(raw_pricing_text_align) or "left").lower()
+    title_font_size_px, title_font_size_error = _parse_optional_font_size(
+        raw_title_font_size_px,
+        "title_font_size_px",
+        minimum=TITLE_FONT_SIZE_MIN,
+        maximum=TITLE_FONT_SIZE_MAX,
+    )
+    price_font_size_px, price_font_size_error = _parse_optional_font_size(
+        raw_price_font_size_px,
+        "price_font_size_px",
+        minimum=PRICE_FONT_SIZE_MIN,
+        maximum=PRICE_FONT_SIZE_MAX,
+    )
+    description_font_size_px, description_font_size_error = _parse_optional_font_size(
+        raw_description_font_size_px,
+        "description_font_size_px",
+        minimum=DESCRIPTION_FONT_SIZE_MIN,
+        maximum=DESCRIPTION_FONT_SIZE_MAX,
+    )
 
     if include_code:
         if code and not TARIFF_CODE_RE.fullmatch(code):
@@ -607,6 +682,12 @@ def _validate_tariff_form_input(
         errors["sort_order"] = "Порядок сортировки должен быть целым числом не меньше 0."
     if pricing_text_align not in ALLOWED_PRICING_TEXT_ALIGNMENTS:
         errors["pricing_text_align"] = "Выберите левое или центральное выравнивание текста карточки."
+    if title_font_size_error:
+        errors["title_font_size_px"] = "Размер заголовка должен быть целым числом."
+    if price_font_size_error:
+        errors["price_font_size_px"] = "Размер цены должен быть целым числом."
+    if description_font_size_error:
+        errors["description_font_size_px"] = "Размер описания должен быть целым числом."
 
     payload = {
         "code": code,
@@ -618,6 +699,9 @@ def _validate_tariff_form_input(
         "show_on_homepage": show_on_homepage,
         "sort_order": sort_order if sort_order is not None else 0,
         "pricing_text_align": pricing_text_align,
+        "title_font_size_px": title_font_size_px,
+        "price_font_size_px": price_font_size_px,
+        "description_font_size_px": description_font_size_px,
     }
     return payload, errors
 
@@ -913,6 +997,7 @@ def _tariffs_for_admin(settings):
                 "show_on_homepage_label": "Да" if tariff.show_on_homepage else "Нет",
                 "sort_order": tariff.sort_order,
                 "pricing_text_align_label": _pricing_text_align_label(tariff.pricing_text_align),
+                "font_size_summary": _tariff_font_size_summary(tariff),
                 "included_options_summary": ", ".join(option["title"] for option in linked_options) if linked_options else "—",
                 "created_at": tariff.created_at,
                 "updated_at": tariff.updated_at,
@@ -1300,6 +1385,9 @@ async def admin_tariffs_new_submit(request: Request):
         raw_show_on_homepage=form.get("show_on_homepage"),
         raw_sort_order=form.get("sort_order"),
         raw_pricing_text_align=form.get("pricing_text_align"),
+        raw_title_font_size_px=form.get("title_font_size_px"),
+        raw_price_font_size_px=form.get("price_font_size_px"),
+        raw_description_font_size_px=form.get("description_font_size_px"),
         include_code=True,
     )
     if errors:
@@ -1369,6 +1457,9 @@ async def admin_tariffs_edit_submit(request: Request, code: str):
         raw_show_on_homepage=form.get("show_on_homepage"),
         raw_sort_order=form.get("sort_order"),
         raw_pricing_text_align=form.get("pricing_text_align"),
+        raw_title_font_size_px=form.get("title_font_size_px"),
+        raw_price_font_size_px=form.get("price_font_size_px"),
+        raw_description_font_size_px=form.get("description_font_size_px"),
         include_code=False,
     )
     posted_code = _normalize_text(form.get("code")).lower()
@@ -1396,6 +1487,9 @@ async def admin_tariffs_edit_submit(request: Request, code: str):
                 show_on_homepage=payload["show_on_homepage"],
                 sort_order=payload["sort_order"],
                 pricing_text_align=payload["pricing_text_align"],
+                title_font_size_px=payload["title_font_size_px"],
+                price_font_size_px=payload["price_font_size_px"],
+                description_font_size_px=payload["description_font_size_px"],
             ),
             settings=settings,
         )

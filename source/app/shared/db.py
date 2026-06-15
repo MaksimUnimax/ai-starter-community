@@ -93,6 +93,9 @@ CREATE TABLE IF NOT EXISTS tariffs (
     show_on_homepage INTEGER NOT NULL DEFAULT 0,
     sort_order INTEGER NOT NULL DEFAULT 0,
     pricing_text_align TEXT NOT NULL DEFAULT 'left',
+    title_font_size_px INTEGER NULL,
+    price_font_size_px INTEGER NULL,
+    description_font_size_px INTEGER NULL,
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL,
     CHECK (pricing_text_align IN ('left', 'center'))
@@ -151,6 +154,9 @@ def initialize_database(path: Path | str) -> None:
         _ensure_users_materials_access_granted_at_column(connection)
         _ensure_tariffs_show_on_homepage_column(connection)
         _ensure_tariffs_pricing_text_align_column(connection)
+        _ensure_tariffs_title_font_size_column(connection)
+        _ensure_tariffs_price_font_size_column(connection)
+        _ensure_tariffs_description_font_size_column(connection)
 
 
 def _ensure_users_materials_access_granted_at_column(connection: sqlite3.Connection) -> None:
@@ -178,3 +184,30 @@ def _ensure_tariffs_pricing_text_align_column(connection: sqlite3.Connection) ->
     }
     if "pricing_text_align" not in columns:
         connection.execute("ALTER TABLE tariffs ADD COLUMN pricing_text_align TEXT NOT NULL DEFAULT 'left'")
+
+
+def _ensure_tariffs_title_font_size_column(connection: sqlite3.Connection) -> None:
+    columns = {
+        row[1]
+        for row in connection.execute("PRAGMA table_info(tariffs)").fetchall()
+    }
+    if "title_font_size_px" not in columns:
+        connection.execute("ALTER TABLE tariffs ADD COLUMN title_font_size_px INTEGER NULL")
+
+
+def _ensure_tariffs_price_font_size_column(connection: sqlite3.Connection) -> None:
+    columns = {
+        row[1]
+        for row in connection.execute("PRAGMA table_info(tariffs)").fetchall()
+    }
+    if "price_font_size_px" not in columns:
+        connection.execute("ALTER TABLE tariffs ADD COLUMN price_font_size_px INTEGER NULL")
+
+
+def _ensure_tariffs_description_font_size_column(connection: sqlite3.Connection) -> None:
+    columns = {
+        row[1]
+        for row in connection.execute("PRAGMA table_info(tariffs)").fetchall()
+    }
+    if "description_font_size_px" not in columns:
+        connection.execute("ALTER TABLE tariffs ADD COLUMN description_font_size_px INTEGER NULL")

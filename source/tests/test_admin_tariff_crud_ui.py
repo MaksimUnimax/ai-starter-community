@@ -101,6 +101,9 @@ def test_admin_can_open_tariff_create_page(client, test_settings):
     assert "Статус" in body
     assert "Порядок сортировки" in body
     assert "Выравнивание текста карточки" in body
+    assert "Заголовок: размер шрифта, px" in body
+    assert "Цена: размер шрифта, px" in body
+    assert "Описание: размер шрифта, px" in body
     assert "Меньшее значение показывает тариф раньше в выбранных карточках и на витрине." in body
     assert "Определяет выравнивание заголовка, цены и описания в карточке тарифа." in body
     assert "Code" not in body
@@ -110,6 +113,15 @@ def test_admin_can_open_tariff_create_page(client, test_settings):
     assert 'name="code"' in body
     assert 'name="show_on_homepage"' in body
     assert 'name="pricing_text_align"' in body
+    assert 'name="title_font_size_px"' in body
+    assert 'name="price_font_size_px"' in body
+    assert 'name="description_font_size_px"' in body
+    assert 'min="16"' in body
+    assert 'max="40"' in body
+    assert 'min="20"' in body
+    assert 'max="56"' in body
+    assert 'min="12"' in body
+    assert 'max="24"' in body
     assert 'option value="left"' in body
     assert 'option value="center"' in body
     assert 'value="left" selected' in body
@@ -131,6 +143,9 @@ def test_admin_can_create_tariff_via_ui(client, test_settings):
             "show_on_homepage": "1",
             "sort_order": "7",
             "pricing_text_align": "center",
+            "title_font_size_px": "30",
+            "price_font_size_px": "44",
+            "description_font_size_px": "18",
         },
         follow_redirects=False,
     )
@@ -148,6 +163,9 @@ def test_admin_can_create_tariff_via_ui(client, test_settings):
     assert tariff.show_on_homepage is True
     assert tariff.sort_order == 7
     assert tariff.pricing_text_align == "center"
+    assert tariff.title_font_size_px == 30
+    assert tariff.price_font_size_px == 44
+    assert tariff.description_font_size_px == 18
 
 
 def test_admin_can_create_tariff_without_code_via_ui(client, test_settings):
@@ -163,6 +181,9 @@ def test_admin_can_create_tariff_without_code_via_ui(client, test_settings):
             "currency": "RUB",
             "status": "active",
             "sort_order": "7",
+            "title_font_size_px": "",
+            "price_font_size_px": "",
+            "description_font_size_px": "",
         },
         follow_redirects=False,
     )
@@ -172,6 +193,61 @@ def test_admin_can_create_tariff_without_code_via_ui(client, test_settings):
     assert created.code.startswith("tariff_")
     assert re.fullmatch(r"[a-z0-9_-]{3,64}", created.code)
     assert created.pricing_text_align == "left"
+    assert created.title_font_size_px is None
+    assert created.price_font_size_px is None
+    assert created.description_font_size_px is None
+
+
+def test_admin_tariff_font_size_inputs_clamp_safely_in_ui(client, test_settings):
+    _make_admin(client, test_settings)
+
+    response = client.post(
+        "/admin/tariffs/new",
+        data={
+            "code": "ui_tariff_clamp",
+            "title": "UI Tariff Clamp",
+            "description": "Tariff created with out-of-range font sizes",
+            "price_rub": "15",
+            "currency": "RUB",
+            "status": "active",
+            "sort_order": "3",
+            "title_font_size_px": "10",
+            "price_font_size_px": "99",
+            "description_font_size_px": "8",
+        },
+        follow_redirects=False,
+    )
+
+    assert response.status_code == 303
+    tariff = get_tariff_by_code("ui_tariff_clamp", settings=test_settings)
+    assert tariff is not None
+    assert tariff.title_font_size_px == 16
+    assert tariff.price_font_size_px == 56
+    assert tariff.description_font_size_px == 12
+
+
+def test_admin_tariff_font_size_inputs_reject_non_integer_ui_values(client, test_settings):
+    _make_admin(client, test_settings)
+
+    response = client.post(
+        "/admin/tariffs/new",
+        data={
+            "code": "ui_tariff_bad_font",
+            "title": "UI Tariff Bad Font",
+            "description": "",
+            "price_rub": "15",
+            "currency": "RUB",
+            "status": "active",
+            "sort_order": "3",
+            "title_font_size_px": "abc",
+            "price_font_size_px": "40",
+            "description_font_size_px": "16",
+        },
+    )
+
+    assert response.status_code == 400
+    assert "Размер заголовка должен быть целым числом." in response.text
+    assert get_tariff_by_code("ui_tariff_bad_font", settings=test_settings) is None
 
 
 def test_admin_tariff_create_rejects_duplicate_code_safely(client, test_settings):
@@ -240,6 +316,9 @@ def test_admin_edit_page_shows_code_as_read_only(client, test_settings):
         price_amount_minor=1000,
         show_on_homepage=True,
         pricing_text_align="center",
+        title_font_size_px=26,
+        price_font_size_px=40,
+        description_font_size_px=16,
         status="active",
         settings=test_settings,
     )
@@ -264,6 +343,9 @@ def test_admin_edit_page_shows_code_as_read_only(client, test_settings):
     assert "Статус" in body
     assert "Порядок сортировки" in body
     assert "Выравнивание текста карточки" in body
+    assert "Заголовок: размер шрифта, px" in body
+    assert "Цена: размер шрифта, px" in body
+    assert "Описание: размер шрифта, px" in body
     assert "Меньшее значение показывает тариф раньше в выбранных карточках и на витрине." in body
     assert "Определяет выравнивание заголовка, цены и описания в карточке тарифа." in body
     assert "Code" not in body
@@ -271,6 +353,12 @@ def test_admin_edit_page_shows_code_as_read_only(client, test_settings):
     assert 'name="code"' in body
     assert 'name="show_on_homepage"' in body
     assert 'name="pricing_text_align"' in body
+    assert 'name="title_font_size_px"' in body
+    assert 'name="price_font_size_px"' in body
+    assert 'name="description_font_size_px"' in body
+    assert 'value="26"' in body
+    assert 'value="40"' in body
+    assert 'value="16"' in body
     assert 'value="center" selected' in body
     assert "readonly" in body
     assert "checked" in body
@@ -289,6 +377,9 @@ def test_admin_post_edit_updates_allowed_fields_and_keeps_code(client, test_sett
         status="active",
         sort_order=1,
         pricing_text_align="left",
+        title_font_size_px=18,
+        price_font_size_px=32,
+        description_font_size_px=13,
         settings=test_settings,
     )
 
@@ -304,6 +395,9 @@ def test_admin_post_edit_updates_allowed_fields_and_keeps_code(client, test_sett
             "show_on_homepage": "",
             "sort_order": "9",
             "pricing_text_align": "center",
+            "title_font_size_px": "22",
+            "price_font_size_px": "48",
+            "description_font_size_px": "15",
         },
         follow_redirects=False,
     )
@@ -320,6 +414,9 @@ def test_admin_post_edit_updates_allowed_fields_and_keeps_code(client, test_sett
     assert tariff.show_on_homepage is False
     assert tariff.sort_order == 9
     assert tariff.pricing_text_align == "center"
+    assert tariff.title_font_size_px == 22
+    assert tariff.price_font_size_px == 48
+    assert tariff.description_font_size_px == 15
 
 
 def test_admin_post_edit_rejects_code_changes(client, test_settings):
@@ -395,6 +492,9 @@ def test_admin_tariff_list_shows_controls_without_paid_option_crud_ui(client, te
         status="active",
         sort_order=4,
         pricing_text_align="center",
+        title_font_size_px=24,
+        price_font_size_px=36,
+        description_font_size_px=14,
         settings=test_settings,
     )
 
@@ -412,6 +512,10 @@ def test_admin_tariff_list_shows_controls_without_paid_option_crud_ui(client, te
     assert "Выравнивание" in body
     assert "Слева" in body
     assert "По центру" in body
+    assert "Типографика" in body
+    assert "Заголовок: 24px" in body
+    assert "Цена: 36px" in body
+    assert "Описание: 14px" in body
 
 
 def test_admin_tariff_form_does_not_expose_payment_ui(client, test_settings):

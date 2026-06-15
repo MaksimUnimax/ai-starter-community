@@ -195,6 +195,9 @@ def test_locked_cabinet_pricing_renders_two_selected_tariffs(client, test_settin
         status="active",
         show_on_homepage=True,
         sort_order=1,
+        title_font_size_px=24,
+        price_font_size_px=38,
+        description_font_size_px=14,
         settings=test_settings,
     )
     create_tariff(
@@ -207,6 +210,9 @@ def test_locked_cabinet_pricing_renders_two_selected_tariffs(client, test_settin
         show_on_homepage=True,
         sort_order=2,
         pricing_text_align="center",
+        title_font_size_px=28,
+        price_font_size_px=42,
+        description_font_size_px=16,
         settings=test_settings,
     )
     _verify_registered_user(client, test_settings, "cabinet-selected@example.com", "cabinetselected")
@@ -233,11 +239,17 @@ def test_locked_cabinet_pricing_renders_two_selected_tariffs(client, test_settin
     assert body.count("pricing-tariff-price") >= 2
     assert body.count("pricing-tariff-description") >= 2
     assert body.count('class="pricing-tariff-card') >= 2
+    assert body.count("--tariff-title-font-size: 24px") == 1
+    assert body.count("--tariff-title-font-size: 28px") == 1
+    assert body.count("--tariff-price-font-size: 38px") == 1
+    assert body.count("--tariff-price-font-size: 42px") == 1
+    assert body.count("--tariff-description-font-size: 14px") == 1
+    assert body.count("--tariff-description-font-size: 16px") == 1
     assert "pricing-tariff-badge" not in body
     assert "ТАРИФ 1" not in body
     assert "ТАРИФ 2" not in body
-    assert '<article class="pricing-tariff-card pricing-tariff-card--featured tariff-card-align-left">' in body
-    assert '<article class="pricing-tariff-card tariff-card-align-center">' in body
+    assert '<article class="pricing-tariff-card pricing-tariff-card--featured tariff-card-align-left"' in body
+    assert '<article class="pricing-tariff-card tariff-card-align-center"' in body
     assert "tariff-card-align-left" in body
     assert "tariff-card-align-center" in body
     assert "access-locked-pricing" in body

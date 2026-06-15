@@ -23,7 +23,7 @@
       {% if tariff_cards %}
         <div class="pricing-tariff-grid" aria-label="{{ pricing_cards_aria_label or 'Выбранные тарифы' }}">
           {% for tariff_card in tariff_cards %}
-            <article class="pricing-tariff-card{% if tariff_card.is_primary %} pricing-tariff-card--featured{% endif %} {{ tariff_card.alignment_class or 'tariff-card-align-left' }}">
+            <article class="pricing-tariff-card{% if tariff_card.is_primary %} pricing-tariff-card--featured{% endif %} {{ tariff_card.alignment_class or 'tariff-card-align-left' }}"{% if tariff_card.style_variables %} style="{{ tariff_card.style_variables }}"{% endif %}>
               <h3 class="pricing-tariff-title">{{ tariff_card.title }}</h3>
               <p class="pricing-tariff-price">{{ tariff_card.price_display }}</p>
               {% if tariff_card.description %}
@@ -34,7 +34,7 @@
         </div>
       {% elif homepage_tariff_card %}
         <div class="pricing-tariff-grid" aria-label="{{ pricing_cards_aria_label or 'Тариф' }}">
-          <article class="pricing-tariff-card pricing-tariff-card--featured {{ homepage_tariff_card.alignment_class or 'tariff-card-align-left' }}">
+          <article class="pricing-tariff-card pricing-tariff-card--featured {{ homepage_tariff_card.alignment_class or 'tariff-card-align-left' }}"{% if homepage_tariff_card.style_variables %} style="{{ homepage_tariff_card.style_variables }}"{% endif %}>
             <h3 class="pricing-tariff-title">{{ homepage_tariff.title }}</h3>
             <p class="pricing-tariff-price">{{ homepage_tariff_price_display }}</p>
             {% if homepage_tariff.description %}

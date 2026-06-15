@@ -30,6 +30,19 @@ def _tariff_alignment_class(pricing_text_align: str | None) -> str:
     return f"tariff-card-align-{align}"
 
 
+def _tariff_font_size_style(tariff) -> str | None:
+    declarations: list[str] = []
+    if getattr(tariff, "title_font_size_px", None) is not None:
+        declarations.append(f"--tariff-title-font-size: {int(tariff.title_font_size_px)}px")
+    if getattr(tariff, "price_font_size_px", None) is not None:
+        declarations.append(f"--tariff-price-font-size: {int(tariff.price_font_size_px)}px")
+    if getattr(tariff, "description_font_size_px", None) is not None:
+        declarations.append(f"--tariff-description-font-size: {int(tariff.description_font_size_px)}px")
+    if not declarations:
+        return None
+    return "; ".join(declarations)
+
+
 def _tariff_card_context(tariff, *, is_primary: bool) -> dict[str, object]:
     return {
         "id": tariff.id,
@@ -40,6 +53,10 @@ def _tariff_card_context(tariff, *, is_primary: bool) -> dict[str, object]:
         "sort_order": tariff.sort_order,
         "pricing_text_align": tariff.pricing_text_align,
         "alignment_class": _tariff_alignment_class(tariff.pricing_text_align),
+        "title_font_size_px": getattr(tariff, "title_font_size_px", None),
+        "price_font_size_px": getattr(tariff, "price_font_size_px", None),
+        "description_font_size_px": getattr(tariff, "description_font_size_px", None),
+        "style_variables": _tariff_font_size_style(tariff),
         "is_primary": is_primary,
     }
 

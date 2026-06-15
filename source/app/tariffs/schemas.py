@@ -17,6 +17,9 @@ class TariffPublic:
     show_on_homepage: bool
     sort_order: int
     pricing_text_align: str
+    title_font_size_px: int | None
+    price_font_size_px: int | None
+    description_font_size_px: int | None
     created_at: str
     updated_at: str
 
@@ -34,6 +37,9 @@ class TariffCreateInput:
     show_on_homepage: bool = False
     sort_order: int = 0
     pricing_text_align: str = "left"
+    title_font_size_px: int | None = None
+    price_font_size_px: int | None = None
+    description_font_size_px: int | None = None
     code: str | None = None
 
 
@@ -47,6 +53,9 @@ class TariffUpdateInput:
     show_on_homepage: bool | None = None
     sort_order: int | None = None
     pricing_text_align: str | None = None
+    title_font_size_px: int | None = None
+    price_font_size_px: int | None = None
+    description_font_size_px: int | None = None
 
 
 @dataclass(frozen=True, slots=True)

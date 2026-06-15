@@ -117,6 +117,9 @@ def test_homepage_tariffs_context_returns_two_selected_tariffs_in_stable_order(t
         status="active",
         show_on_homepage=True,
         sort_order=1,
+        title_font_size_px=24,
+        price_font_size_px=38,
+        description_font_size_px=14,
         settings=test_settings,
     )
     create_tariff(
@@ -128,6 +131,9 @@ def test_homepage_tariffs_context_returns_two_selected_tariffs_in_stable_order(t
         show_on_homepage=True,
         sort_order=1,
         pricing_text_align="center",
+        title_font_size_px=28,
+        price_font_size_px=42,
+        description_font_size_px=16,
         settings=test_settings,
     )
     create_tariff(
@@ -159,6 +165,15 @@ def test_homepage_tariffs_context_returns_two_selected_tariffs_in_stable_order(t
         "tariff-card-align-left",
         "tariff-card-align-center",
     ]
+    assert [card["title_font_size_px"] for card in context["homepage_tariff_cards"]] == [24, 28]
+    assert [card["price_font_size_px"] for card in context["homepage_tariff_cards"]] == [38, 42]
+    assert [card["description_font_size_px"] for card in context["homepage_tariff_cards"]] == [14, 16]
+    assert context["homepage_tariff_cards"][0]["style_variables"] == (
+        "--tariff-title-font-size: 24px; --tariff-price-font-size: 38px; --tariff-description-font-size: 14px"
+    )
+    assert context["homepage_tariff_cards"][1]["style_variables"] == (
+        "--tariff-title-font-size: 28px; --tariff-price-font-size: 42px; --tariff-description-font-size: 16px"
+    )
     assert context["homepage_tariff"].code == "homepage_selected_alpha"
     assert context["homepage_tariff_price_display"] == "2 000 ₽"
     single_context = get_homepage_tariff_context(settings=test_settings)

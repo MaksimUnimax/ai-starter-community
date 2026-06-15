@@ -1022,7 +1022,7 @@ button:hover {
 .pricing-tariff-title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: 1.24rem;
+  font-size: var(--tariff-title-font-size, 1.24rem);
   line-height: 1.2;
   letter-spacing: -0.02em;
   min-block-size: var(--pricing-title-row);
@@ -1031,7 +1031,7 @@ button:hover {
 .pricing-tariff-price {
   margin: 0;
   font-family: var(--font-display);
-  font-size: 1.9rem;
+  font-size: var(--tariff-price-font-size, 1.9rem);
   line-height: 1.1;
   letter-spacing: -0.03em;
   color: var(--text);
@@ -1041,6 +1041,7 @@ button:hover {
 .pricing-tariff-description {
   margin: 0;
   color: var(--muted);
+  font-size: var(--tariff-description-font-size, 1rem);
   line-height: 1.55;
   text-align: inherit;
 }

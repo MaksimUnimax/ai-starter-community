@@ -26,6 +26,12 @@ CURRENCY_RE = re.compile(r"^[A-Z]{3}$")
 ALLOWED_STATUSES = {"active", "hidden", "archived"}
 ALLOWED_PRICING_TEXT_ALIGNMENTS = {"left", "center"}
 DEFAULT_PRICING_TEXT_ALIGN = "left"
+TITLE_FONT_SIZE_MIN = 16
+TITLE_FONT_SIZE_MAX = 40
+PRICE_FONT_SIZE_MIN = 20
+PRICE_FONT_SIZE_MAX = 56
+DESCRIPTION_FONT_SIZE_MIN = 12
+DESCRIPTION_FONT_SIZE_MAX = 24
 _UNSET = object()
 
 
@@ -126,6 +132,33 @@ def _normalize_pricing_text_align(value: str | None) -> str:
     return normalized
 
 
+def _normalize_font_size_px(
+    value,
+    field_name: str,
+    *,
+    minimum: int,
+    maximum: int,
+) -> int | None:
+    if value is None:
+        return None
+    if isinstance(value, bool):
+        raise ValidationError(f"{field_name} must be an integer")
+    if isinstance(value, int):
+        normalized = value
+    else:
+        raw = str(value).strip()
+        if not raw:
+            return None
+        if not INT_RE.fullmatch(raw):
+            raise ValidationError(f"{field_name} must be an integer")
+        normalized = int(raw)
+    if normalized < minimum:
+        return minimum
+    if normalized > maximum:
+        return maximum
+    return normalized
+
+
 def _normalize_int(value, field_name: str, *, allow_none: bool = False, minimum: int = 0) -> int | None:
     if value is None:
         if allow_none:
@@ -170,6 +203,24 @@ def _tariff_from_row(row) -> TariffPublic:
         show_on_homepage=bool(row["show_on_homepage"]),
         sort_order=int(row["sort_order"]),
         pricing_text_align=_normalize_pricing_text_align(row["pricing_text_align"]),
+        title_font_size_px=_normalize_font_size_px(
+            row["title_font_size_px"] if "title_font_size_px" in row.keys() else None,
+            "title_font_size_px",
+            minimum=TITLE_FONT_SIZE_MIN,
+            maximum=TITLE_FONT_SIZE_MAX,
+        ),
+        price_font_size_px=_normalize_font_size_px(
+            row["price_font_size_px"] if "price_font_size_px" in row.keys() else None,
+            "price_font_size_px",
+            minimum=PRICE_FONT_SIZE_MIN,
+            maximum=PRICE_FONT_SIZE_MAX,
+        ),
+        description_font_size_px=_normalize_font_size_px(
+            row["description_font_size_px"] if "description_font_size_px" in row.keys() else None,
+            "description_font_size_px",
+            minimum=DESCRIPTION_FONT_SIZE_MIN,
+            maximum=DESCRIPTION_FONT_SIZE_MAX,
+        ),
         created_at=str(row["created_at"]),
         updated_at=str(row["updated_at"]),
     )
@@ -286,9 +337,28 @@ def _coerce_create_payload(
     show_on_homepage,
     sort_order,
     pricing_text_align,
+    title_font_size_px,
+    price_font_size_px,
+    description_font_size_px,
 ) -> dict:
     if data is not None:
-        if any(value is not None for value in (code, title, description, price_amount_minor, currency, status, show_on_homepage, sort_order, pricing_text_align)):
+        if any(
+            value is not None
+            for value in (
+                code,
+                title,
+                description,
+                price_amount_minor,
+                currency,
+                status,
+                show_on_homepage,
+                sort_order,
+                pricing_text_align,
+                title_font_size_px,
+                price_font_size_px,
+                description_font_size_px,
+            )
+        ):
             raise ValidationError("pass either data or keyword arguments, not both")
         return asdict(data)
     return {
@@ -301,6 +371,9 @@ def _coerce_create_payload(
         "show_on_homepage": show_on_homepage,
         "sort_order": sort_order,
         "pricing_text_align": pricing_text_align,
+        "title_font_size_px": title_font_size_px,
+        "price_font_size_px": price_font_size_px,
+        "description_font_size_px": description_font_size_px,
     }
 
 
@@ -315,9 +388,27 @@ def _coerce_update_payload(
     show_on_homepage,
     sort_order,
     pricing_text_align,
+    title_font_size_px,
+    price_font_size_px,
+    description_font_size_px,
 ) -> dict:
     if data is not None:
-        if any(value is not _UNSET for value in (title, description, price_amount_minor, currency, status, show_on_homepage, sort_order, pricing_text_align)):
+        if any(
+            value is not _UNSET
+            for value in (
+                title,
+                description,
+                price_amount_minor,
+                currency,
+                status,
+                show_on_homepage,
+                sort_order,
+                pricing_text_align,
+                title_font_size_px,
+                price_font_size_px,
+                description_font_size_px,
+            )
+        ):
             raise ValidationError("pass either data or keyword arguments, not both")
         return asdict(data)
     return {
@@ -329,6 +420,9 @@ def _coerce_update_payload(
         "show_on_homepage": show_on_homepage,
         "sort_order": sort_order,
         "pricing_text_align": pricing_text_align,
+        "title_font_size_px": title_font_size_px,
+        "price_font_size_px": price_font_size_px,
+        "description_font_size_px": description_font_size_px,
     }
 
 
@@ -416,6 +510,9 @@ def create_tariff(
     show_on_homepage=None,
     sort_order=None,
     pricing_text_align=None,
+    title_font_size_px=None,
+    price_font_size_px=None,
+    description_font_size_px=None,
     settings: Settings | None = None,
 ) -> TariffPublic:
     payload = _coerce_create_payload(
@@ -429,6 +526,9 @@ def create_tariff(
         show_on_homepage=show_on_homepage,
         sort_order=sort_order,
         pricing_text_align=pricing_text_align,
+        title_font_size_px=title_font_size_px,
+        price_font_size_px=price_font_size_px,
+        description_font_size_px=description_font_size_px,
     )
     normalized_title = _normalize_title(payload["title"])
     normalized_description = _normalize_description(payload["description"])
@@ -439,6 +539,24 @@ def create_tariff(
     normalized_sort_order = _normalize_int(0 if payload["sort_order"] is None else payload["sort_order"], "sort_order", allow_none=False, minimum=0)
     normalized_pricing_text_align = _normalize_pricing_text_align(
         DEFAULT_PRICING_TEXT_ALIGN if payload["pricing_text_align"] is None else payload["pricing_text_align"]
+    )
+    normalized_title_font_size_px = _normalize_font_size_px(
+        payload["title_font_size_px"],
+        "title_font_size_px",
+        minimum=TITLE_FONT_SIZE_MIN,
+        maximum=TITLE_FONT_SIZE_MAX,
+    )
+    normalized_price_font_size_px = _normalize_font_size_px(
+        payload["price_font_size_px"],
+        "price_font_size_px",
+        minimum=PRICE_FONT_SIZE_MIN,
+        maximum=PRICE_FONT_SIZE_MAX,
+    )
+    normalized_description_font_size_px = _normalize_font_size_px(
+        payload["description_font_size_px"],
+        "description_font_size_px",
+        minimum=DESCRIPTION_FONT_SIZE_MIN,
+        maximum=DESCRIPTION_FONT_SIZE_MAX,
     )
 
     resolved = _settings(settings)
@@ -455,9 +573,11 @@ def create_tariff(
                     """
                     INSERT INTO tariffs (
                         code, title, description, price_amount_minor, currency,
-                        status, show_on_homepage, sort_order, pricing_text_align, created_at, updated_at
+                        status, show_on_homepage, sort_order, pricing_text_align,
+                        title_font_size_px, price_font_size_px, description_font_size_px,
+                        created_at, updated_at
                     )
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """,
                     (
                         normalized_code,
@@ -469,6 +589,9 @@ def create_tariff(
                         normalized_show_on_homepage,
                         normalized_sort_order,
                         normalized_pricing_text_align,
+                        normalized_title_font_size_px,
+                        normalized_price_font_size_px,
+                        normalized_description_font_size_px,
                         now_iso,
                         now_iso,
                     ),
@@ -496,6 +619,9 @@ def update_tariff(
     show_on_homepage=_UNSET,
     sort_order=_UNSET,
     pricing_text_align=_UNSET,
+    title_font_size_px=_UNSET,
+    price_font_size_px=_UNSET,
+    description_font_size_px=_UNSET,
     settings: Settings | None = None,
 ) -> TariffPublic:
     normalized_code = _normalize_code(code)
@@ -509,6 +635,9 @@ def update_tariff(
         show_on_homepage=show_on_homepage,
         sort_order=sort_order,
         pricing_text_align=pricing_text_align,
+        title_font_size_px=title_font_size_px,
+        price_font_size_px=price_font_size_px,
+        description_font_size_px=description_font_size_px,
     )
     updates: dict[str, object] = {}
     if payload["title"] is not _UNSET:
@@ -531,6 +660,27 @@ def update_tariff(
         updates["sort_order"] = _normalize_int(payload["sort_order"], "sort_order", minimum=0)
     if payload["pricing_text_align"] is not _UNSET and payload["pricing_text_align"] is not None:
         updates["pricing_text_align"] = _normalize_pricing_text_align(payload["pricing_text_align"])
+    if payload["title_font_size_px"] is not _UNSET:
+        updates["title_font_size_px"] = _normalize_font_size_px(
+            payload["title_font_size_px"],
+            "title_font_size_px",
+            minimum=TITLE_FONT_SIZE_MIN,
+            maximum=TITLE_FONT_SIZE_MAX,
+        )
+    if payload["price_font_size_px"] is not _UNSET:
+        updates["price_font_size_px"] = _normalize_font_size_px(
+            payload["price_font_size_px"],
+            "price_font_size_px",
+            minimum=PRICE_FONT_SIZE_MIN,
+            maximum=PRICE_FONT_SIZE_MAX,
+        )
+    if payload["description_font_size_px"] is not _UNSET:
+        updates["description_font_size_px"] = _normalize_font_size_px(
+            payload["description_font_size_px"],
+            "description_font_size_px",
+            minimum=DESCRIPTION_FONT_SIZE_MIN,
+            maximum=DESCRIPTION_FONT_SIZE_MAX,
+        )
 
     resolved = _settings(settings)
     now_iso = utc_now_iso()
@@ -643,6 +793,24 @@ def list_active_tariffs_with_options(settings: Settings | None = None) -> list[d
         result: list[dict] = []
         for tariff_row in tariffs:
             tariff_payload = dict(tariff_row)
+            tariff_payload["title_font_size_px"] = _normalize_font_size_px(
+                tariff_payload.get("title_font_size_px"),
+                "title_font_size_px",
+                minimum=TITLE_FONT_SIZE_MIN,
+                maximum=TITLE_FONT_SIZE_MAX,
+            )
+            tariff_payload["price_font_size_px"] = _normalize_font_size_px(
+                tariff_payload.get("price_font_size_px"),
+                "price_font_size_px",
+                minimum=PRICE_FONT_SIZE_MIN,
+                maximum=PRICE_FONT_SIZE_MAX,
+            )
+            tariff_payload["description_font_size_px"] = _normalize_font_size_px(
+                tariff_payload.get("description_font_size_px"),
+                "description_font_size_px",
+                minimum=DESCRIPTION_FONT_SIZE_MIN,
+                maximum=DESCRIPTION_FONT_SIZE_MAX,
+            )
             tariff_payload["options"] = _linked_option_rows(
                 connection,
                 int(tariff_row["id"]),
@@ -838,6 +1006,9 @@ def upsert_tariff(
     show_on_homepage: bool = False,
     sort_order: int = 0,
     pricing_text_align: str = "left",
+    title_font_size_px: int | None = None,
+    price_font_size_px: int | None = None,
+    description_font_size_px: int | None = None,
     settings: Settings | None = None,
 ) -> TariffPublic:
     normalized_code = (code or "").strip().lower()
@@ -855,6 +1026,9 @@ def upsert_tariff(
         show_on_homepage=show_on_homepage,
         sort_order=sort_order,
         pricing_text_align=pricing_text_align,
+        title_font_size_px=title_font_size_px,
+        price_font_size_px=price_font_size_px,
+        description_font_size_px=description_font_size_px,
         settings=settings,
     )
 

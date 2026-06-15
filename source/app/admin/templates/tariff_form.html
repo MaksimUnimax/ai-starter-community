@@ -100,6 +100,33 @@
         {% endif %}
       </label>
 
+      <label class="form-row">
+        <span>Заголовок: размер шрифта, px</span>
+        <input class="input" type="number" name="title_font_size_px" min="16" max="40" step="1" value="{{ form_data.title_font_size_px }}">
+        <span class="form-help">Допустимо от 16 до 40 px. Пустое значение оставляет системный размер.</span>
+        {% if errors.title_font_size_px %}
+          <span class="alert alert-error">{{ errors.title_font_size_px }}</span>
+        {% endif %}
+      </label>
+
+      <label class="form-row">
+        <span>Цена: размер шрифта, px</span>
+        <input class="input" type="number" name="price_font_size_px" min="20" max="56" step="1" value="{{ form_data.price_font_size_px }}">
+        <span class="form-help">Допустимо от 20 до 56 px. Пустое значение оставляет системный размер.</span>
+        {% if errors.price_font_size_px %}
+          <span class="alert alert-error">{{ errors.price_font_size_px }}</span>
+        {% endif %}
+      </label>
+
+      <label class="form-row">
+        <span>Описание: размер шрифта, px</span>
+        <input class="input" type="number" name="description_font_size_px" min="12" max="24" step="1" value="{{ form_data.description_font_size_px }}">
+        <span class="form-help">Допустимо от 12 до 24 px. Пустое значение оставляет системный размер.</span>
+        {% if errors.description_font_size_px %}
+          <span class="alert alert-error">{{ errors.description_font_size_px }}</span>
+        {% endif %}
+      </label>
+
       <div class="form-actions">
         <button class="button button-primary" type="submit">{{ submit_label }}</button>
         <a class="button button-secondary" href="/admin/tariffs">Назад к списку</a>

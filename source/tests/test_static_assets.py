@@ -72,6 +72,9 @@ def test_stylesheet_is_served(client):
     assert ".pricing-tariff-title {" in response.text
     assert ".pricing-tariff-price {" in response.text
     assert ".pricing-tariff-description {" in response.text
+    assert "font-size: var(--tariff-title-font-size, 1.24rem);" in response.text
+    assert "font-size: var(--tariff-price-font-size, 1.9rem);" in response.text
+    assert "font-size: var(--tariff-description-font-size, 1rem);" in response.text
     assert "--pricing-title-row: 3.2em;" in response.text
     assert "--pricing-price-row: 2.2em;" in response.text
     assert "grid-template-rows: var(--pricing-title-row) var(--pricing-price-row) auto;" in response.text
