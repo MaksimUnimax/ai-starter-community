@@ -225,6 +225,35 @@ def _fetch_user_row(user_id: int, settings: Settings | None = None):
         return connection.execute("SELECT * FROM users WHERE id = ?", (int(user_id),)).fetchone()
 
 
+def _fetch_user_rows_by_ids(user_ids: list[int], settings: Settings | None = None):
+    normalized_user_ids = _normalize_unique_ids(user_ids)
+    if not normalized_user_ids:
+        return {}
+    placeholders = ", ".join("?" for _ in normalized_user_ids)
+    with _connection(settings) as connection:
+        rows = connection.execute(
+            f"""
+            SELECT id, email, login, role
+            FROM users
+            WHERE id IN ({placeholders})
+            """,
+            normalized_user_ids,
+        ).fetchall()
+    return {int(row["id"]): row for row in rows}
+
+
+def _normalize_unique_ids(values: list[int]) -> list[int]:
+    unique_ids: list[int] = []
+    seen: set[int] = set()
+    for value in values:
+        normalized = int(value)
+        if normalized in seen:
+            continue
+        seen.add(normalized)
+        unique_ids.append(normalized)
+    return unique_ids
+
+
 def _assert_actor_can_manage(actor: UserPublic | None) -> None:
     if actor is None or not can_manage_account_blocks(actor):
         raise AccountBlockPermissionError("account block management requires admin or moderator access")
@@ -280,12 +309,13 @@ def _activation_progress_for_row(row) -> tuple[int | None, str]:
     return None, "Не активирован"
 
 
-def _account_block_from_row(row) -> AccountBlockPublic:
+def _account_block_from_row(row, *, owner_email: str | None = None) -> AccountBlockPublic:
     status, is_active, is_expired, remaining_days = _effective_status(str(row["status"]), row["expires_at"])
     activation_day, activation_summary = _activation_progress_for_row(row)
     title = _account_block_title_for_type(str(row["type"]))
-    owner_row = _fetch_user_row(int(row["owner_user_id"]))
-    owner_email = owner_row["email"] if owner_row is not None else None
+    if owner_email is None and str(row["type"]) == "mail":
+        owner_row = _fetch_user_row(int(row["owner_user_id"]))
+        owner_email = owner_row["email"] if owner_row is not None else None
     email = owner_email if str(row["type"]) == "mail" else row["email"]
     return AccountBlockPublic(
         id=int(row["id"]),
@@ -311,6 +341,19 @@ def _account_block_from_row(row) -> AccountBlockPublic:
     )
 
 
+def _account_block_copy_data_from_row(row, *, owner_email: str | None, settings: Settings | None = None) -> AccountBlockCopyData:
+    try:
+        password_secret = decrypt_password_secret(row["password_secret"], settings=settings)
+    except PasswordSecretCryptoError as exc:
+        raise AccountBlockValidationError(str(exc)) from exc
+    email = owner_email if str(row["type"]) == "mail" else row["email"]
+    return AccountBlockCopyData(
+        login=str(row["login"]),
+        password_secret=password_secret,
+        email=email,
+    )
+
+
 def _fetch_account_block_row(block_id: int, settings: Settings | None = None):
     with _connection(settings) as connection:
         return connection.execute("SELECT * FROM account_blocks WHERE id = ?", (int(block_id),)).fetchone()
@@ -321,8 +364,8 @@ def _assert_owner_exists(owner_user_id: int, settings: Settings | None = None) -
         raise AccountBlockNotFoundError("owner user not found")
 
 
-def _public_view_for_block(block_row) -> AccountBlockPublic:
-    return _account_block_from_row(block_row)
+def _public_view_for_block(block_row, *, owner_email: str | None = None) -> AccountBlockPublic:
+    return _account_block_from_row(block_row, owner_email=owner_email)
 
 
 def list_account_blocks_for_viewer(
@@ -364,7 +407,14 @@ def list_account_blocks_for_viewer(
                 """,
                 (resolved_owner_user_id,),
             ).fetchall()
-    return [_public_view_for_block(row) for row in rows]
+    owner_rows = _fetch_user_rows_by_ids([int(row["owner_user_id"]) for row in rows], settings=settings)
+    return [
+        _public_view_for_block(
+            row,
+            owner_email=owner_rows.get(int(row["owner_user_id"]))["email"] if int(row["owner_user_id"]) in owner_rows else None,
+        )
+        for row in rows
+    ]
 
 
 def get_account_block_public(
@@ -392,18 +442,40 @@ def get_account_block_copy_data(
     _assert_viewer_can_access_block(actor, int(row["owner_user_id"]))
     owner_row = _fetch_user_row(int(row["owner_user_id"]), settings=settings)
     owner_email = owner_row["email"] if owner_row is not None else None
-    email = row["email"]
-    if row["type"] == "mail":
-        email = owner_email
-    try:
-        password_secret = decrypt_password_secret(row["password_secret"], settings=settings)
-    except PasswordSecretCryptoError as exc:
-        raise AccountBlockValidationError(str(exc)) from exc
-    return AccountBlockCopyData(
-        login=str(row["login"]),
-        password_secret=password_secret,
-        email=email,
-    )
+    return _account_block_copy_data_from_row(row, owner_email=owner_email, settings=settings)
+
+
+def _fetch_account_block_rows_by_ids(block_ids: list[int], settings: Settings | None = None):
+    normalized_block_ids = _normalize_unique_ids(block_ids)
+    if not normalized_block_ids:
+        return {}
+    placeholders = ", ".join("?" for _ in normalized_block_ids)
+    with _connection(settings) as connection:
+        rows = connection.execute(
+            f"""
+            SELECT id, owner_user_id, type, login, password_secret, email
+            FROM account_blocks
+            WHERE id IN ({placeholders})
+            """,
+            normalized_block_ids,
+        ).fetchall()
+    return {int(row["id"]): row for row in rows}
+
+
+def get_account_block_copy_data_map(
+    *,
+    block_ids: list[int],
+    owner_email: str | None,
+    settings: Settings | None = None,
+) -> dict[int, AccountBlockCopyData]:
+    normalized_block_ids = _normalize_unique_ids(block_ids)
+    rows_by_id = _fetch_account_block_rows_by_ids(normalized_block_ids, settings=settings)
+    if len(rows_by_id) != len(normalized_block_ids):
+        raise AccountBlockNotFoundError("account block not found")
+    return {
+        block_id: _account_block_copy_data_from_row(rows_by_id[block_id], owner_email=owner_email, settings=settings)
+        for block_id in normalized_block_ids
+    }
 
 
 def create_account_block(

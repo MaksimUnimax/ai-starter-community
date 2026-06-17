@@ -191,3 +191,55 @@ def test_admin_can_search_user_by_email_and_manage_selected_user_blocks(client, 
     renewed_body = renewed_page.text
     assert "Осталось 74 дня" in renewed_body
     assert "Продлить активацию" in renewed_body
+
+
+def test_admin_account_blocks_page_avoids_per_row_owner_lookup(client, test_settings):
+    admin = _create_verified_user(test_settings, "admin-ui-bulk-admin@example.com", "adminuibulkadmin", role="admin")
+    owner = _create_verified_user(test_settings, "admin-ui-bulk-owner@example.com", "adminuibulkowner")
+
+    create_account_block(
+        actor=admin,
+        data=AccountBlockCreateInput(
+            owner_user_id=owner.id,
+            type="mail",
+            login="bulk-mail-login",
+            password_secret="bulk-mail-secret",
+        ),
+        settings=test_settings,
+    )
+    create_account_block(
+        actor=admin,
+        data=AccountBlockCreateInput(
+            owner_user_id=owner.id,
+            type="server",
+            login="bulk-server-login",
+            password_secret="bulk-server-secret",
+        ),
+        settings=test_settings,
+    )
+    create_account_block(
+        actor=admin,
+        data=AccountBlockCreateInput(
+            owner_user_id=owner.id,
+            type="chatgpt",
+            login="bulk-chat-login",
+            password_secret="bulk-chat-secret",
+        ),
+        settings=test_settings,
+    )
+
+    _login_as(client, test_settings, admin.email)
+
+    with patch("app.account_blocks.service._fetch_user_row", side_effect=AssertionError("unexpected per-row owner lookup")):
+        response = client.get(f"/admin/account-blocks?{urlencode({'account_blocks_user_email': owner.email})}")
+
+    assert response.status_code == 200
+    body = response.text
+    assert owner.email in body
+    assert owner.login in body
+    assert "bulk-mail-login" in body
+    assert "bulk-mail-secret" in body
+    assert "bulk-server-login" in body
+    assert "bulk-server-secret" in body
+    assert "bulk-chat-login" in body
+    assert "bulk-chat-secret" in body

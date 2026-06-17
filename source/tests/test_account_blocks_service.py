@@ -15,6 +15,7 @@ from app.account_blocks.service import (
     create_account_block,
     delete_account_block,
     get_account_block_copy_data,
+    get_account_block_copy_data_map,
     get_account_block_public,
     list_account_blocks_for_viewer,
     renew_account_block,
@@ -252,6 +253,64 @@ def test_user_can_only_view_own_blocks_and_cannot_manage(test_settings):
         get_account_block_public(actor=other_owner, block_id=block.id, settings=test_settings)
     with pytest.raises(AccountBlockPermissionError):
         get_account_block_copy_data(actor=other_owner, block_id=block.id, settings=test_settings)
+
+
+def test_bulk_account_block_copy_data_uses_single_block_lookup_and_preserves_owner_email(test_settings, monkeypatch):
+    admin = _create_verified_user(test_settings, "ab-bulk-admin@example.com", "abbulkadmin", role="admin")
+    owner = _create_verified_user(test_settings, "ab-bulk-owner@example.com", "abbulkowner")
+
+    mail_block = create_account_block(
+        actor=admin,
+        data=AccountBlockCreateInput(
+            owner_user_id=owner.id,
+            type="mail",
+            login="mail-login",
+            password_secret="mail-secret",
+            email="ignored@example.com",
+        ),
+        settings=test_settings,
+    )
+    server_block = create_account_block(
+        actor=admin,
+        data=AccountBlockCreateInput(
+            owner_user_id=owner.id,
+            type="server",
+            login="server-login",
+            password_secret="server-secret",
+        ),
+        settings=test_settings,
+    )
+    chatgpt_block = create_account_block(
+        actor=admin,
+        data=AccountBlockCreateInput(
+            owner_user_id=owner.id,
+            type="chatgpt",
+            login="chat-login",
+            password_secret="chat-secret",
+        ),
+        settings=test_settings,
+    )
+
+    def _unexpected_owner_lookup(*_args, **_kwargs):
+        raise AssertionError("unexpected per-row owner lookup")
+
+    monkeypatch.setattr("app.account_blocks.service._fetch_user_row", _unexpected_owner_lookup)
+
+    copy_data_by_id = get_account_block_copy_data_map(
+        block_ids=[mail_block.id, server_block.id, chatgpt_block.id],
+        owner_email=owner.email,
+        settings=test_settings,
+    )
+
+    assert copy_data_by_id[mail_block.id].login == "mail-login"
+    assert copy_data_by_id[mail_block.id].password_secret == "mail-secret"
+    assert copy_data_by_id[mail_block.id].email == owner.email
+    assert copy_data_by_id[server_block.id].login == "server-login"
+    assert copy_data_by_id[server_block.id].password_secret == "server-secret"
+    assert copy_data_by_id[server_block.id].email is None
+    assert copy_data_by_id[chatgpt_block.id].login == "chat-login"
+    assert copy_data_by_id[chatgpt_block.id].password_secret == "chat-secret"
+    assert copy_data_by_id[chatgpt_block.id].email is None
 
 
 def test_invalid_account_block_payloads_are_rejected(test_settings):

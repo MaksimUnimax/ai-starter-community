@@ -37,7 +37,7 @@ from app.account_blocks.service import (
     activate_account_block,
     create_account_block,
     delete_account_block,
-    get_account_block_copy_data,
+    get_account_block_copy_data_map,
     get_account_block_public,
     list_account_blocks_for_viewer,
     renew_account_block,
@@ -354,13 +354,19 @@ def _admin_account_block_page_context(user, settings, request: Request) -> dict[
     selected_summary = _account_block_owner_summary(selected_user) if selected_user is not None else None
     blocks = []
     if selected_user is not None:
+        visible_blocks = list_account_blocks_for_viewer(user, owner_user_id=int(selected_user.id), settings=settings)
+        copy_data_by_block_id = get_account_block_copy_data_map(
+            block_ids=[block.id for block in visible_blocks],
+            owner_email=str(selected_user.email) if selected_user.email is not None else None,
+            settings=settings,
+        )
         blocks = [
             _account_block_card_context(
                 block,
-                get_account_block_copy_data(actor=user, block_id=block.id, settings=settings),
+                copy_data_by_block_id[block.id],
                 selected_summary,
             )
-            for block in list_account_blocks_for_viewer(user, owner_user_id=int(selected_user.id), settings=settings)
+            for block in visible_blocks
         ]
     return {
         "account_blocks_manage_mode": True,
