@@ -36,7 +36,6 @@ def _template(request: Request, template_name: str, **context) -> HTMLResponse:
         seed_initial_catalog(settings=settings)
         homepage_tariff = get_homepage_tariff(settings=settings)
     payload = {
-        "request": request,
         "title": context.pop("title", "Главная"),
         "current_user": get_current_user_from_cookies(request.cookies, settings=settings),
         "homepage_tariff": homepage_tariff,

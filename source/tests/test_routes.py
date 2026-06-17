@@ -25,6 +25,12 @@ def _extract_verify_token(settings, email: str) -> str:
     return match.group(1)
 
 
+def _extract_csrf_token(body_text: str) -> str:
+    match = re.search(r'name="_csrf_token" value="([^"]+)"', body_text)
+    assert match
+    return match.group(1)
+
+
 def _make_authenticated_user(client, test_settings, email: str = "landing@example.com", login: str = "landinguser"):
     register_user(
         email=email,
@@ -65,6 +71,7 @@ def test_authenticated_landing_page_switches_to_account_and_learning_links(clien
 
     response = client.get("/")
     assert response.status_code == 200
+    assert 'name="_csrf_token"' in response.text
     assert "Войти" not in response.text
     assert "Начать первый проект" not in response.text
     assert "Работа с ИИ" not in response.text
@@ -181,11 +188,15 @@ def test_auth_utility_pages_use_shared_base_and_styles(client):
 
 
 def test_placeholder_post_routes_redirect(client):
+    login_page = client.get("/login")
+    login_csrf_token = _extract_csrf_token(login_page.text)
     login_response = client.post(
         "/login",
-        data={"email_or_login": "user@example.com", "password": "secret"},
+        data={"email_or_login": "user@example.com", "password": "secret", "_csrf_token": login_csrf_token},
         follow_redirects=False,
     )
+    register_page = client.get("/register")
+    register_csrf_token = _extract_csrf_token(register_page.text)
     register_response = client.post(
         "/register",
         data={
@@ -193,10 +204,11 @@ def test_placeholder_post_routes_redirect(client):
             "login": "user123",
             "password": "Secret123",
             "repeat_password": "Secret123",
+            "_csrf_token": register_csrf_token,
         },
         follow_redirects=False,
     )
-    logout_response = client.post("/logout", follow_redirects=False)
+    logout_response = client.post("/logout", data={"_csrf_token": login_csrf_token}, follow_redirects=False)
     assert login_response.status_code == 200
     assert register_response.status_code == 303
     assert register_response.headers["location"] == "/check-email?registered=1"
