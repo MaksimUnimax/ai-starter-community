@@ -5,7 +5,7 @@ import sqlite3
 from urllib.parse import unquote
 
 from app.auth.service import authenticate_user, create_session, register_user, verify_email
-from app.materials.routes import LESSON_TEST_SCRIPT_URL, LESSON_TEST_STYLES_URL, LESSON_TEST_URL
+from app.materials.routes import LESSON_TEST_SCRIPT_URL, LESSON_TEST_STYLES_URL, LESSON_TEST_URL, templates as materials_templates
 from app.materials.service import user_has_materials_access
 from app.shared.db import get_database_path, initialize_database
 from app.user_cabinet.routes import (
@@ -102,6 +102,10 @@ def test_shared_stylesheet_uses_main_page_theme(client):
     assert "text-align: center;" in response.text
 
 
+def test_materials_templates_register_csrf_helper():
+    assert "csrf_input" in materials_templates.env.globals
+
+
 def test_materials_shows_locked_state_without_access(client, test_settings):
     _prepare_and_login_verified_user(client, test_settings, "materials-locked@example.com", "materialslocked")
     response = client.get("/materials", follow_redirects=False)
@@ -146,6 +150,7 @@ def test_materials_shows_placeholder_sections_when_access_granted(client, test_s
 
     course_response = client.get("/materials/drafts/dair-smoke-20260529/")
     assert course_response.status_code == 200
+    assert 'name="_csrf_token"' in course_response.text
     assert "nav-account-compact" in course_response.text
     assert "nav-account-name" in course_response.text
     assert "nav-account-email" not in course_response.text

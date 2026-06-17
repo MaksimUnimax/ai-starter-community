@@ -20,6 +20,7 @@ from app.materials.course_loader import (
     LessonNotFoundError,
 )
 from app.materials.service import user_has_materials_access
+from app.shared.csrf import configure_template_environment, render_template_response
 from app.shared.tariff_display import get_homepage_tariff_context
 
 router = APIRouter()
@@ -31,6 +32,7 @@ templates.env.loader = ChoiceLoader(
         FileSystemLoader(str(Path(__file__).resolve().parents[1] / "shared" / "templates")),
     ]
 )
+configure_template_environment(templates)
 LESSON_TEST_URL = "/materials/drafts/dair-smoke-20260529/"
 LESSON_TEST_STYLES_URL = "/materials/drafts/dair-smoke-20260529/styles.css"
 LESSON_TEST_SCRIPT_URL = "/materials/drafts/dair-smoke-20260529/script.js"
@@ -73,14 +75,14 @@ def _extract_lesson_test_body(document: str) -> str:
 
 
 def _template(request: Request, template_name: str, **context) -> HTMLResponse:
+    settings = get_settings()
     status_code = context.pop("status_code", 200)
     payload = {
-        "request": request,
         "title": context.pop("title", "Работа с ИИ"),
-        "current_user": get_current_user_from_cookies(request.cookies, settings=get_settings()),
+        "current_user": get_current_user_from_cookies(request.cookies, settings=settings),
     }
     payload.update(context)
-    return templates.TemplateResponse(request, template_name, payload, status_code=status_code)
+    return render_template_response(templates, request, template_name, settings=settings, status_code=status_code, **payload)
 
 
 def _locked_response(
