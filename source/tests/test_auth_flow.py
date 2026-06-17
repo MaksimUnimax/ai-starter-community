@@ -24,7 +24,7 @@ from app.auth.service import (
     revoke_session,
     verify_email,
 )
-from app.core.config import Settings, database_path_from_settings
+from app.core.config import Settings, database_path_from_settings, get_settings
 from app.shared.db import get_database_path
 from app.shared.tariff_display import get_homepage_tariff_context
 from app.shared.security import validate_new_password
@@ -60,11 +60,47 @@ def _make_test_user(settings: Settings):
     )
 
 
+def _make_verified_test_user(settings: Settings, *, email: str = "user@example.com", login: str = "testuser"):
+    user = register_user(
+        email=email,
+        login=login,
+        password="Secret123",
+        repeat_password="Secret123",
+        settings=settings,
+    )
+    verification_row = _fetch_one(
+        settings,
+        "SELECT body_text FROM email_outbox WHERE recipient_email = ? AND template_key = ? ORDER BY id DESC LIMIT 1",
+        (user.email, "email_verification"),
+    )
+    assert verification_row is not None
+    verify_email(_extract_token_from_link(verification_row["body_text"]), settings=settings)
+    return user
+
+
 def test_default_database_path_points_into_state():
     default_settings = Settings()
     path = database_path_from_settings(default_settings)
     assert str(path).startswith("/opt/ai-starter-community/state/")
     assert str(path).endswith("ai_starter_community.sqlite3")
+
+
+def test_default_session_cookie_secure_is_safe_for_production(monkeypatch):
+    get_settings.cache_clear()
+    monkeypatch.delenv("SESSION_COOKIE_SECURE", raising=False)
+    monkeypatch.setenv("APP_ENV", "production")
+    settings = get_settings()
+    assert settings.session_cookie_secure is True
+    get_settings.cache_clear()
+
+
+def test_session_cookie_secure_can_be_disabled_for_local_override(monkeypatch):
+    get_settings.cache_clear()
+    monkeypatch.setenv("APP_ENV", "development")
+    monkeypatch.setenv("SESSION_COOKIE_SECURE", "false")
+    settings = get_settings()
+    assert settings.session_cookie_secure is False
+    get_settings.cache_clear()
 
 
 def test_register_creates_unverified_user_and_outbox(test_settings):
@@ -135,6 +171,75 @@ def test_resend_verification_request_is_generic_for_missing_or_verified_user(tes
     verify_token = _extract_token_from_link(verification_row["body_text"])
     verify_email(verify_token, settings=test_settings)
     assert resend_verification_request("user@example.com", settings=test_settings) is False
+
+
+def test_login_route_does_not_enumerate_unknown_accounts(client, test_settings):
+    _make_verified_test_user(test_settings, email="login-message@example.com", login="loginmessage")
+
+    wrong_password_response = client.post(
+        "/login",
+        data={"email_or_login": "loginmessage@example.com", "password": "Wrong123"},
+        follow_redirects=False,
+    )
+    unknown_account_response = client.post(
+        "/login",
+        data={"email_or_login": "missing@example.com", "password": "Wrong123"},
+        follow_redirects=False,
+    )
+
+    assert wrong_password_response.status_code == 200
+    assert unknown_account_response.status_code == 200
+    assert "Неверная почта, логин или пароль." in wrong_password_response.text
+    assert "Неверная почта, логин или пароль." in unknown_account_response.text
+
+
+def test_login_rate_limit_blocks_after_five_failed_attempts(monkeypatch, test_settings):
+    _make_verified_test_user(test_settings, email="rate-limit@example.com", login="ratelimit")
+    calls: list[tuple[str, str]] = []
+
+    def fake_verify_password(password: str, password_hash: str) -> bool:
+        calls.append((password, password_hash))
+        return False
+
+    monkeypatch.setattr("app.auth.service.verify_password", fake_verify_password)
+
+    for _ in range(5):
+        with pytest.raises(UnauthorizedError):
+            authenticate_user("rate-limit@example.com", "Wrong123", settings=test_settings)
+
+    assert len(calls) == 5
+
+    with pytest.raises(UnauthorizedError):
+        authenticate_user("rate-limit@example.com", "Wrong123", settings=test_settings)
+
+    assert len(calls) == 5
+
+
+def test_successful_login_clears_failed_attempts(monkeypatch, test_settings):
+    user = _make_verified_test_user(test_settings, email="rate-reset@example.com", login="ratereset")
+    calls: list[tuple[str, str]] = []
+
+    def fake_verify_password(password: str, password_hash: str) -> bool:
+        calls.append((password, password_hash))
+        return password == "Secret123"
+
+    monkeypatch.setattr("app.auth.service.verify_password", fake_verify_password)
+
+    for _ in range(4):
+        with pytest.raises(UnauthorizedError):
+            authenticate_user("rate-reset@example.com", "Wrong123", settings=test_settings)
+
+    assert len(calls) == 4
+
+    assert authenticate_user("rate-reset@example.com", "Secret123", settings=test_settings).id == user.id
+    assert len(calls) == 5
+
+    with pytest.raises(UnauthorizedError):
+        authenticate_user("rate-reset@example.com", "Wrong123", settings=test_settings)
+    with pytest.raises(UnauthorizedError):
+        authenticate_user("rate-reset@example.com", "Wrong123", settings=test_settings)
+
+    assert len(calls) == 7
 
 
 def test_register_rejects_duplicates_and_password_rules(test_settings):

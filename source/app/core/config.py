@@ -40,6 +40,11 @@ def _env_optional_int(name: str) -> int | None:
     return int(raw_value)
 
 
+def _default_session_cookie_secure(app_env: str) -> bool:
+    normalized_env = (app_env or "").strip().lower()
+    return normalized_env in {"production", "prod", "staging"}
+
+
 @dataclass(frozen=True)
 class Settings:
     app_name: str = "AI Starter Community"
@@ -50,7 +55,7 @@ class Settings:
     database_path: str = "/opt/ai-starter-community/state/ai_starter_community.sqlite3"
     session_cookie_name: str = "ai_starter_community_session"
     session_expiry_hours: int = 168
-    session_cookie_secure: bool = False
+    session_cookie_secure: bool = True
     email_mode: str = "outbox"
     email_from_address: str | None = None
     email_from_name: str | None = None
@@ -67,9 +72,10 @@ class Settings:
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
+    app_env = os.getenv("APP_ENV", "development")
     return Settings(
         app_name=os.getenv("APP_NAME", "AI Starter Community"),
-        app_env=os.getenv("APP_ENV", "development"),
+        app_env=app_env,
         app_host=os.getenv("APP_HOST", "127.0.0.1"),
         app_port=_env_int("APP_PORT", 8089),
         base_url=os.getenv("BASE_URL", "http://127.0.0.1:8089") or "http://127.0.0.1:8089",
@@ -79,7 +85,7 @@ def get_settings() -> Settings:
         ),
         session_cookie_name=os.getenv("SESSION_COOKIE_NAME", "ai_starter_community_session"),
         session_expiry_hours=_env_int("SESSION_EXPIRY_HOURS", 168),
-        session_cookie_secure=_env_bool("SESSION_COOKIE_SECURE", False),
+        session_cookie_secure=_env_bool("SESSION_COOKIE_SECURE", _default_session_cookie_secure(app_env)),
         email_mode=os.getenv("EMAIL_MODE", "outbox"),
         email_from_address=_env_optional_str("EMAIL_FROM_ADDRESS"),
         email_from_name=_env_optional_str("EMAIL_FROM_NAME"),

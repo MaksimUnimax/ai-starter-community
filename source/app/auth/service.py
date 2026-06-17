@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import re
+from collections import deque
 from datetime import date, datetime, time, timedelta, timezone
 from collections.abc import Mapping
+from threading import Lock
 
 from app.auth.schemas import UserPublic
 from app.core.config import Settings, get_settings
@@ -44,6 +46,10 @@ ROLE_LABELS_RU = {
     ROLE_ADMIN: "администратор",
 }
 EMAIL_DELIVERY_FAILURE_MESSAGE_RU = "Не удалось отправить письмо. Попробуйте позже."
+LOGIN_RATE_LIMIT_MAX_FAILURES = 5
+LOGIN_RATE_LIMIT_WINDOW = timedelta(minutes=15)
+_LOGIN_RATE_LIMIT_LOCK = Lock()
+_LOGIN_RATE_LIMITS: dict[tuple[str, str], deque[datetime]] = {}
 
 
 class AuthError(Exception):
@@ -207,6 +213,56 @@ def _build_public_url(settings: Settings, path: str) -> str:
 
 def _raise_email_delivery_error(exc: Exception) -> None:
     raise AuthError(EMAIL_DELIVERY_FAILURE_MESSAGE_RU) from exc
+
+
+def _login_rate_limit_key(settings: Settings, attempt_key: str) -> tuple[str, str]:
+    return (str(settings.database_path), attempt_key)
+
+
+def _login_rate_limit_attempt_key(
+    identifier_kind: str,
+    identifier_value: str,
+    *,
+    user_id: int | None = None,
+) -> str:
+    if user_id is not None:
+        return f"user:{int(user_id)}"
+    return f"identifier:{identifier_kind}:{identifier_value}"
+
+
+def _prune_login_rate_limit_attempts(attempts: deque[datetime], *, now: datetime) -> None:
+    cutoff = now - LOGIN_RATE_LIMIT_WINDOW
+    while attempts and attempts[0] <= cutoff:
+        attempts.popleft()
+
+
+def _login_rate_limit_is_blocked(settings: Settings, attempt_key: str, *, now: datetime | None = None) -> bool:
+    resolved_now = now or utc_now()
+    bucket_key = _login_rate_limit_key(settings, attempt_key)
+    with _LOGIN_RATE_LIMIT_LOCK:
+        attempts = _LOGIN_RATE_LIMITS.get(bucket_key)
+        if attempts is None:
+            return False
+        _prune_login_rate_limit_attempts(attempts, now=resolved_now)
+        if not attempts:
+            _LOGIN_RATE_LIMITS.pop(bucket_key, None)
+            return False
+        return len(attempts) >= LOGIN_RATE_LIMIT_MAX_FAILURES
+
+
+def _login_rate_limit_record_failure(settings: Settings, attempt_key: str, *, now: datetime | None = None) -> None:
+    resolved_now = now or utc_now()
+    bucket_key = _login_rate_limit_key(settings, attempt_key)
+    with _LOGIN_RATE_LIMIT_LOCK:
+        attempts = _LOGIN_RATE_LIMITS.setdefault(bucket_key, deque())
+        _prune_login_rate_limit_attempts(attempts, now=resolved_now)
+        attempts.append(resolved_now)
+
+
+def _login_rate_limit_clear(settings: Settings, attempt_key: str) -> None:
+    bucket_key = _login_rate_limit_key(settings, attempt_key)
+    with _LOGIN_RATE_LIMIT_LOCK:
+        _LOGIN_RATE_LIMITS.pop(bucket_key, None)
 
 
 def _issue_auth_token(
@@ -597,15 +653,26 @@ def authenticate_user(email_or_login: str, password: str, settings: Settings | N
     identifier_kind, identifier_value = _normalize_identifier(email_or_login)
     resolved = _settings(settings)
     user_row = _fetch_user_by_identifier(identifier_kind, identifier_value, settings=resolved)
+    attempt_key = _login_rate_limit_attempt_key(
+        identifier_kind,
+        identifier_value,
+        user_id=int(user_row["id"]) if user_row is not None else None,
+    )
+    if _login_rate_limit_is_blocked(resolved, attempt_key):
+        raise UnauthorizedError("invalid credentials")
     if user_row is None or not bool(user_row["is_active"]):
+        _login_rate_limit_record_failure(resolved, attempt_key)
         raise UnauthorizedError("invalid credentials")
     if user_row["email_verified_at"] is None:
+        _login_rate_limit_record_failure(resolved, attempt_key)
         raise NotVerifiedError("email is not verified")
     try:
         if not verify_password(password, str(user_row["password_hash"])):
+            _login_rate_limit_record_failure(resolved, attempt_key)
             raise UnauthorizedError("invalid credentials")
     except ValueError as exc:
         raise ValidationError(str(exc)) from exc
+    _login_rate_limit_clear(resolved, attempt_key)
     return _public_user_from_row(user_row)
 
 
