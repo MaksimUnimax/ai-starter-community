@@ -89,6 +89,49 @@ def test_materials_redirects_unauthenticated_user(client):
     assert response.headers["location"] == "/login"
 
 
+def test_public_preview_materials_paths_remain_protected_by_default(client):
+    page_response = client.get(LESSON_TEST_URL, follow_redirects=False)
+    styles_response = client.get(LESSON_TEST_STYLES_URL, follow_redirects=False)
+    script_response = client.get(LESSON_TEST_SCRIPT_URL, follow_redirects=False)
+    lesson_response = client.get("/materials/lessons/kak-my-rabotaem-chatgpt-codex-user", follow_redirects=False)
+    post_response = client.post(LESSON_TEST_URL, follow_redirects=False)
+
+    assert page_response.status_code == 303
+    assert page_response.headers["location"] == "/login"
+    assert styles_response.status_code == 303
+    assert styles_response.headers["location"] == "/login"
+    assert script_response.status_code == 303
+    assert script_response.headers["location"] == "/login"
+    assert lesson_response.status_code == 303
+    assert lesson_response.headers["location"] == "/login"
+    assert post_response.status_code == 405
+
+
+def test_public_preview_flag_allows_only_explicit_draft_paths(monkeypatch, client):
+    monkeypatch.setenv("APP_ENV", "staging")
+    monkeypatch.setenv("STAGING_PUBLIC_COURSE_PREVIEW", "1")
+
+    page_response = client.get(f"{LESSON_TEST_URL}?lesson=lesson-8", follow_redirects=False)
+    styles_response = client.get(LESSON_TEST_STYLES_URL, follow_redirects=False)
+    script_response = client.get(LESSON_TEST_SCRIPT_URL, follow_redirects=False)
+    head_response = client.head(LESSON_TEST_URL, follow_redirects=False)
+    materials_response = client.get("/materials", follow_redirects=False)
+    lesson_response = client.get("/materials/lessons/kak-my-rabotaem-chatgpt-codex-user", follow_redirects=False)
+    post_response = client.post(LESSON_TEST_URL, follow_redirects=False)
+
+    assert page_response.status_code == 200
+    assert "Вступление к курсу" in page_response.text
+    assert "Структура курса" in page_response.text
+    assert styles_response.status_code == 200
+    assert script_response.status_code == 200
+    assert head_response.status_code == 405
+    assert materials_response.status_code == 303
+    assert materials_response.headers["location"] == "/login"
+    assert lesson_response.status_code == 303
+    assert lesson_response.headers["location"] == "/login"
+    assert post_response.status_code == 405
+
+
 def test_shared_stylesheet_uses_main_page_theme(client):
     response = client.get("/static/styles.css")
     assert response.status_code == 200

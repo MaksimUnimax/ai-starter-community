@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+import os
 from pathlib import Path
 
 from fastapi import APIRouter, HTTPException, Request
@@ -37,9 +38,34 @@ LESSON_TEST_URL = "/materials/drafts/dair-smoke-20260529/"
 LESSON_TEST_STYLES_URL = "/materials/drafts/dair-smoke-20260529/styles.css"
 LESSON_TEST_SCRIPT_URL = "/materials/drafts/dair-smoke-20260529/script.js"
 LESSON_TEST_ROOT = Path(__file__).resolve().parent / "course_content" / "drafts" / "dair_smoke_20260529"
+PUBLIC_PREVIEW_ENV_FLAG = "STAGING_PUBLIC_COURSE_PREVIEW"
+PUBLIC_PREVIEW_ALLOWED_PATHS = {
+    LESSON_TEST_URL,
+    LESSON_TEST_STYLES_URL,
+    LESSON_TEST_SCRIPT_URL,
+}
+
+
+def _public_course_preview_enabled() -> bool:
+    return os.getenv("APP_ENV", "").strip().lower() == "staging" and os.getenv(PUBLIC_PREVIEW_ENV_FLAG, "").strip().lower() in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
+
+
+def _public_course_preview_allowed(request: Request) -> bool:
+    return (
+        _public_course_preview_enabled()
+        and request.method in {"GET", "HEAD"}
+        and request.url.path in PUBLIC_PREVIEW_ALLOWED_PATHS
+    )
 
 
 def _require_learning_access(request: Request):
+    if _public_course_preview_allowed(request):
+        return None, None
     settings = get_settings()
     user = get_current_user_from_cookies(request.cookies, settings=settings)
     if user is None:
@@ -182,12 +208,13 @@ def lesson_head(request: Request, slug: str):
 
 @router.get(LESSON_TEST_URL, response_class=HTMLResponse)
 def lesson_test_page(request: Request):
-    settings = get_settings()
-    user = get_current_user_from_cookies(request.cookies, settings=settings)
-    if user is None:
-        return RedirectResponse(url="/login", status_code=303)
-    if not user_has_materials_access(user):
-        return _learning_paywall_response(request, user, status_code=403)
+    if not _public_course_preview_allowed(request):
+        settings = get_settings()
+        user = get_current_user_from_cookies(request.cookies, settings=settings)
+        if user is None:
+            return RedirectResponse(url="/login", status_code=303)
+        if not user_has_materials_access(user):
+            return _learning_paywall_response(request, user, status_code=403)
     document = _read_lesson_test_document()
     return _template(
         request,
