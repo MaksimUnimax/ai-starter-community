@@ -7,6 +7,8 @@ from pathlib import Path
 
 from app.core.config import Settings, database_path_from_settings
 
+SQLITE_BUSY_TIMEOUT_MS = 5000
+
 SCHEMA_SQL = """
 PRAGMA foreign_keys = ON;
 
@@ -138,18 +140,42 @@ def ensure_database_parent_exists(path: Path | str) -> Path:
     return db_path
 
 
+def _is_in_memory_database(path: Path | str) -> bool:
+    path_text = str(path).strip()
+    if not path_text:
+        return False
+    if path_text == ":memory:":
+        return True
+    if path_text.startswith("file::memory:"):
+        return True
+    return "mode=memory" in path_text
+
+
+def _prepare_database_path(path: Path | str) -> Path | str:
+    if _is_in_memory_database(path):
+        return str(path)
+    return ensure_database_parent_exists(path)
+
+
+def _configure_connection(connection: sqlite3.Connection, path: Path | str) -> None:
+    connection.execute(f"PRAGMA busy_timeout = {SQLITE_BUSY_TIMEOUT_MS}")
+    if not _is_in_memory_database(path):
+        connection.execute("PRAGMA journal_mode = WAL")
+    connection.execute("PRAGMA foreign_keys = ON")
+
+
 def get_connection(path: Path | str) -> sqlite3.Connection:
-    db_path = Path(path)
+    db_path = _prepare_database_path(path)
     connection = sqlite3.connect(str(db_path))
     connection.row_factory = sqlite3.Row
-    connection.execute("PRAGMA foreign_keys = ON")
+    _configure_connection(connection, db_path)
     return connection
 
 
 def initialize_database(path: Path | str) -> None:
-    db_path = ensure_database_parent_exists(path)
+    db_path = _prepare_database_path(path)
     with sqlite3.connect(str(db_path)) as connection:
-        connection.execute("PRAGMA foreign_keys = ON")
+        _configure_connection(connection, db_path)
         connection.executescript(SCHEMA_SQL)
         _ensure_users_materials_access_granted_at_column(connection)
         _ensure_tariffs_show_on_homepage_column(connection)
