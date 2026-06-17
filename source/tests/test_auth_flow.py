@@ -17,6 +17,7 @@ from app.auth.service import (
     authenticate_user,
     create_password_reset_request,
     create_session,
+    change_password,
     get_user_by_session_token,
     register_user,
     resend_verification_request,
@@ -364,6 +365,34 @@ def test_password_reset_flow_revokes_sessions(test_settings):
     assert authenticate_user("user@example.com", "NewSecret123", settings=test_settings).id == user.id
 
 
+def test_change_password_revokes_sessions_and_requires_relogin(test_settings):
+    user = _make_test_user(test_settings)
+    verification_row = _fetch_one(
+        test_settings,
+        "SELECT * FROM email_outbox WHERE recipient_email = ? ORDER BY id DESC LIMIT 1",
+        (user.email,),
+    )
+    verify_token = _extract_token_from_link(verification_row["body_text"])
+    verify_email(verify_token, settings=test_settings)
+
+    session_token = create_session(user.id, settings=test_settings)
+    assert get_user_by_session_token(session_token, settings=test_settings) is not None
+
+    changed_user = change_password(
+        user_id=user.id,
+        current_password="Secret123",
+        new_password="NewSecret123",
+        repeat_password="NewSecret123",
+        settings=test_settings,
+    )
+    assert changed_user.id == user.id
+    assert get_user_by_session_token(session_token, settings=test_settings) is None
+
+    with pytest.raises(UnauthorizedError):
+        authenticate_user("user@example.com", "Secret123", settings=test_settings)
+    assert authenticate_user("user@example.com", "NewSecret123", settings=test_settings).id == user.id
+
+
 def test_forgot_password_generic_behavior_and_reused_token_fail(test_settings):
     user = _make_test_user(test_settings)
     verify_row = _fetch_one(
@@ -611,11 +640,16 @@ def test_cabinet_settings_page_and_password_change_flow(client, test_settings):
         follow_redirects=False,
     )
     assert success_response.status_code == 303
-    assert success_response.headers["location"] == "/cabinet/settings?success=1"
+    assert success_response.headers["location"] == "/login?reset=1"
+    assert test_settings.session_cookie_name in success_response.headers.get("set-cookie", "")
 
-    success_page = client.get("/cabinet/settings?success=1")
-    assert success_page.status_code == 200
-    assert "Пароль изменён." in success_page.text
+    post_change_cabinet = client.get("/cabinet", follow_redirects=False)
+    assert post_change_cabinet.status_code == 303
+    assert post_change_cabinet.headers["location"] == "/login"
+
+    login_after_change = client.get("/login?reset=1")
+    assert login_after_change.status_code == 200
+    assert "Пароль изменён. Войдите с новым паролем." in login_after_change.text
 
     with pytest.raises(UnauthorizedError):
         authenticate_user("settings@example.com", "Secret123", settings=test_settings)
@@ -755,7 +789,19 @@ def test_settings_page_layout_and_password_change(client, test_settings):
         follow_redirects=False,
     )
     assert password_response.status_code == 303
-    assert password_response.headers["location"] == "/cabinet/settings?success=1"
+    assert password_response.headers["location"] == "/login?reset=1"
+    assert test_settings.session_cookie_name in password_response.headers.get("set-cookie", "")
+    assert client.get("/cabinet", follow_redirects=False).headers["location"] == "/login"
+
+    relogin_page = client.get("/login")
+    assert relogin_page.status_code == 200
+    relogin_csrf_token = _extract_csrf_token(relogin_page.text)
+    relogin_response = client.post(
+        "/login",
+        data={"email_or_login": "settingsflow@example.com", "password": "Secret456", "_csrf_token": relogin_csrf_token},
+        follow_redirects=False,
+    )
+    assert relogin_response.status_code == 303
     assert authenticate_user("settingsflow@example.com", "Secret456", settings=test_settings).email == "settingsflow@example.com"
 
 

@@ -39,7 +39,7 @@ from app.account_blocks.service import (
 from app.core.config import get_settings
 from app.notifications.email_service import send_account_block_activation_email
 from app.shared.tariff_display import get_homepage_tariffs_context
-from app.shared.csrf import configure_template_environment, render_template_response, require_csrf_token
+from app.shared.csrf import CSRF_COOKIE_NAME, configure_template_environment, render_template_response, require_csrf_token
 from app.paid_options.service import list_paid_options
 from app.materials.service import user_has_materials_access
 from app.user_cabinet.prompts_library import load_cabinet_prompts
@@ -542,7 +542,10 @@ def cabinet_change_password(
             error=_password_change_message(exc),
             success=False,
         )
-    return RedirectResponse(url="/cabinet/settings?success=1", status_code=303)
+    response = RedirectResponse(url="/login?reset=1", status_code=303)
+    response.delete_cookie(key=settings.session_cookie_name, path="/")
+    response.delete_cookie(key=CSRF_COOKIE_NAME, path="/")
+    return response
 
 
 @router.post("/cabinet/account-blocks")

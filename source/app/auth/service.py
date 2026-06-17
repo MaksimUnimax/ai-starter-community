@@ -844,6 +844,10 @@ def change_password(
             "UPDATE users SET password_hash = ?, updated_at = ? WHERE id = ?",
             (new_password_hash, now_iso, int(row["id"])),
         )
+        connection.execute(
+            "UPDATE sessions SET revoked_at = ? WHERE user_id = ? AND revoked_at IS NULL",
+            (now_iso, int(row["id"])),
+        )
         updated = connection.execute("SELECT * FROM users WHERE id = ?", (int(row["id"]),)).fetchone()
         if updated is None:
             raise AuthError("password change user lookup failed")
