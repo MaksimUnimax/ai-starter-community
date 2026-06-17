@@ -364,6 +364,8 @@ def test_moderator_can_search_user_by_email_and_manage_selected_user_blocks(clie
     assert row["title"] == "Сервер"
     assert row["email"] is None
     assert int(row["duration_days"]) == 30
+    created_page = client.get(f"/cabinet?{urlencode({'account_blocks_user_email': owner_a.email})}")
+    assert "mod-block-password" in created_page.text
 
     update_response = client.post(
         f"/cabinet/account-blocks/{block_id}",
@@ -406,12 +408,12 @@ def test_moderator_can_search_user_by_email_and_manage_selected_user_blocks(clie
     assert updated_row["type"] == "server"
     assert updated_row["title"] == "Сервер"
     assert updated_row["login"] == "updated-login"
-    assert updated_row["password_secret"] == "updated-password"
+    assert updated_row["password_secret"].startswith("enc:v1:")
+    assert "updated-password" not in updated_row["password_secret"]
     assert updated_row["email"] is None
     assert updated_row["status"] == "active"
     assert updated_row["activated_at"] == activation_now.isoformat()
     assert updated_row["expires_at"] == (activation_now + timedelta(days=30)).isoformat()
-
     with _connect(test_settings) as conn:
         email_row = conn.execute(
             """
@@ -432,6 +434,7 @@ def test_moderator_can_search_user_by_email_and_manage_selected_user_blocks(clie
     with patch("app.account_blocks.service.utc_now", return_value=renewal_now):
         active_page = client.get(f"/cabinet?{urlencode({'account_blocks_user_email': owner_a.email})}")
     accounts_section = _extract_accounts_section(active_page.text)
+    assert "updated-password" in active_page.text
     assert "Редактировать" in accounts_section
     assert "Удалить" in accounts_section
     assert "Активировать" in accounts_section

@@ -13,6 +13,11 @@ from app.core.config import Settings, get_settings
 from app.shared.db import get_connection, get_database_path, initialize_database
 from app.shared.utils import utc_now, utc_now_iso
 
+from .secret_crypto import (
+    PasswordSecretCryptoError,
+    decrypt_password_secret,
+    store_password_secret,
+)
 from .schemas import (
     AccountBlockActivationNotification,
     AccountBlockActivationResult,
@@ -162,9 +167,14 @@ def _normalize_email(value: str | None) -> str | None:
     return normalized.lower()
 
 
-def _normalize_password_secret(value: str | None) -> str:
-    # Password values are kept behind the service boundary. App-level encryption is not yet implemented.
-    return _normalize_text(value, "password_secret", allow_empty=True)
+def _normalize_password_secret(value: str | None, *, settings: Settings | None = None) -> str:
+    normalized = _normalize_text(value, "password_secret", allow_empty=True)
+    if not normalized:
+        return ""
+    try:
+        return store_password_secret(normalized, settings=settings)
+    except PasswordSecretCryptoError as exc:
+        raise AccountBlockValidationError(str(exc)) from exc
 
 
 def _account_block_type_label(block_type: str) -> str:
@@ -175,7 +185,12 @@ def _account_block_title_for_type(block_type: str) -> str:
     return _account_block_type_label(block_type)
 
 
-def _normalize_account_block_input(data: AccountBlockCreateInput | AccountBlockUpdateInput | None = None, *, create: bool) -> dict[str, object]:
+def _normalize_account_block_input(
+    data: AccountBlockCreateInput | AccountBlockUpdateInput | None = None,
+    *,
+    create: bool,
+    settings: Settings | None = None,
+) -> dict[str, object]:
     if data is None:
         raise AccountBlockValidationError("data is required")
     if create:
@@ -183,7 +198,7 @@ def _normalize_account_block_input(data: AccountBlockCreateInput | AccountBlockU
         owner_user_id = _normalize_owner_user_id(payload["owner_user_id"])
         block_type = _normalize_block_type(payload["type"])
         login = _normalize_text(payload.get("login"), "login", allow_empty=True)
-        password_secret = _normalize_password_secret(payload.get("password_secret"))
+        password_secret = _normalize_password_secret(payload.get("password_secret"), settings=settings)
         _normalize_duration_days(payload.get("duration_days"))
         return {
             "owner_user_id": owner_user_id,
@@ -199,7 +214,7 @@ def _normalize_account_block_input(data: AccountBlockCreateInput | AccountBlockU
     if payload.get("login") is not _UNSET:
         cleaned["login"] = _normalize_text(payload["login"], "login", allow_empty=True)
     if payload.get("password_secret") is not _UNSET:
-        cleaned["password_secret"] = _normalize_password_secret(payload["password_secret"])
+        cleaned["password_secret"] = _normalize_password_secret(payload["password_secret"], settings=settings)
     if not cleaned:
         raise AccountBlockValidationError("no account block fields provided")
     return cleaned
@@ -380,9 +395,13 @@ def get_account_block_copy_data(
     email = row["email"]
     if row["type"] == "mail":
         email = owner_email
+    try:
+        password_secret = decrypt_password_secret(row["password_secret"], settings=settings)
+    except PasswordSecretCryptoError as exc:
+        raise AccountBlockValidationError(str(exc)) from exc
     return AccountBlockCopyData(
         login=str(row["login"]),
-        password_secret=str(row["password_secret"]),
+        password_secret=password_secret,
         email=email,
     )
 
@@ -394,7 +413,7 @@ def create_account_block(
     settings: Settings | None = None,
 ) -> AccountBlockPublic:
     _assert_actor_can_manage(actor)
-    payload = _normalize_account_block_input(data, create=True)
+    payload = _normalize_account_block_input(data, create=True, settings=settings)
     owner_user_id = int(payload["owner_user_id"])
     _assert_owner_exists(owner_user_id, settings=settings)
     owner_row = _fetch_user_row(owner_user_id, settings=settings)
@@ -442,7 +461,7 @@ def update_account_block(
     settings: Settings | None = None,
 ) -> AccountBlockPublic:
     _assert_actor_can_manage(actor)
-    payload = _normalize_account_block_input(data, create=False)
+    payload = _normalize_account_block_input(data, create=False, settings=settings)
     with _connection(settings) as connection:
         row = connection.execute("SELECT * FROM account_blocks WHERE id = ?", (int(block_id),)).fetchone()
         if row is None:

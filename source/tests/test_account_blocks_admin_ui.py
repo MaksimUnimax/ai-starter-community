@@ -91,6 +91,7 @@ def test_admin_can_search_user_by_email_and_manage_selected_user_blocks(client, 
     assert "Email пользователя" in body
     assert owner.email in body
     assert "seed-login" in body
+    assert "seed-secret" in body
     assert "Платная опция" in body
     assert 'name="account_blocks_user_email"' in body
     assert 'name="paid_option_code"' in body

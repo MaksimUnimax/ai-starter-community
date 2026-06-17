@@ -1,11 +1,17 @@
 from __future__ import annotations
 
+import base64
 import importlib
 
 import pytest
 from fastapi.testclient import TestClient
 
 from app.core.config import Settings, get_settings
+
+
+ACCOUNT_BLOCKS_PASSWORD_SECRET_KEY = base64.urlsafe_b64encode(
+    b"0123456789abcdef0123456789abcdef"
+).decode("ascii").rstrip("=")
 
 
 @pytest.fixture()
@@ -20,6 +26,7 @@ def test_settings(tmp_path, monkeypatch) -> Settings:
     monkeypatch.setenv("SESSION_COOKIE_NAME", "ai_starter_community_session_test")
     monkeypatch.setenv("SESSION_EXPIRY_HOURS", "168")
     monkeypatch.setenv("SESSION_COOKIE_SECURE", "false")
+    monkeypatch.setenv("ACCOUNT_BLOCKS_PASSWORD_SECRET_KEY", ACCOUNT_BLOCKS_PASSWORD_SECRET_KEY)
     monkeypatch.setenv("EMAIL_MODE", "outbox")
     monkeypatch.setenv("EMAIL_VERIFICATION_TOKEN_EXPIRY_HOURS", "24")
     monkeypatch.setenv("PASSWORD_RESET_TOKEN_EXPIRY_MINUTES", "30")
@@ -34,6 +41,7 @@ def test_settings(tmp_path, monkeypatch) -> Settings:
         session_cookie_name="ai_starter_community_session_test",
         session_expiry_hours=168,
         session_cookie_secure=False,
+        account_blocks_password_secret_key=ACCOUNT_BLOCKS_PASSWORD_SECRET_KEY,
         email_mode="outbox",
         email_verification_token_expiry_hours=24,
         password_reset_token_expiry_minutes=30,

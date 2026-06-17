@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import base64
 import re
 import sqlite3
+from dataclasses import replace
 
 import pytest
 
@@ -18,8 +20,12 @@ from app.account_blocks.service import (
     renew_account_block,
     update_account_block,
 )
-from app.auth.service import authenticate_user, create_session, register_user, verify_email
+from app.auth.service import authenticate_user, register_user, verify_email
 from app.shared.db import get_database_path, initialize_database
+
+
+def _encode_key(raw: bytes) -> str:
+    return base64.urlsafe_b64encode(raw).decode("ascii").rstrip("=")
 
 
 def _connect(settings):
@@ -107,6 +113,11 @@ def test_admin_and_moderator_can_create_update_list_and_delete_blocks_with_deriv
         ),
         settings=test_settings,
     )
+    with _connect(test_settings) as conn:
+        admin_row = conn.execute("SELECT * FROM account_blocks WHERE id = ?", (admin_block.id,)).fetchone()
+    assert admin_row is not None
+    assert admin_row["password_secret"].startswith("enc:v1:")
+    assert "chat-secret" not in admin_row["password_secret"]
     moderator_block = create_account_block(
         actor=moderator,
         data=AccountBlockCreateInput(
@@ -119,6 +130,11 @@ def test_admin_and_moderator_can_create_update_list_and_delete_blocks_with_deriv
         ),
         settings=test_settings,
     )
+    with _connect(test_settings) as conn:
+        moderator_row = conn.execute("SELECT * FROM account_blocks WHERE id = ?", (moderator_block.id,)).fetchone()
+    assert moderator_row is not None
+    assert moderator_row["password_secret"].startswith("enc:v1:")
+    assert "mail-secret" not in moderator_row["password_secret"]
 
     assert admin_block.owner_user_id == owner.id
     assert admin_block.title == "ChatGPT"
@@ -142,6 +158,11 @@ def test_admin_and_moderator_can_create_update_list_and_delete_blocks_with_deriv
         ),
         settings=test_settings,
     )
+    with _connect(test_settings) as conn:
+        updated_row = conn.execute("SELECT * FROM account_blocks WHERE id = ?", (admin_block.id,)).fetchone()
+    assert updated_row is not None
+    assert updated_row["password_secret"].startswith("enc:v1:")
+    assert "new-secret" not in updated_row["password_secret"]
     assert updated_block.owner_user_id == owner.id
     assert updated_block.type == "chatgpt"
     assert updated_block.title == "ChatGPT"
@@ -259,3 +280,131 @@ def test_invalid_account_block_payloads_are_rejected(test_settings):
         )
     with pytest.raises(AccountBlockNotFoundError):
         get_account_block_public(actor=admin, block_id=99999, settings=test_settings)
+
+
+def test_password_secret_round_trips_through_encrypted_storage_and_legacy_plaintext_rows_still_read(test_settings):
+    admin = _create_verified_user(test_settings, "ab-encrypt-admin@example.com", "abencryptadmin", role="admin")
+    owner = _create_verified_user(test_settings, "ab-encrypt-owner@example.com", "abencryptowner")
+
+    encrypted_block = create_account_block(
+        actor=admin,
+        data=AccountBlockCreateInput(
+            owner_user_id=owner.id,
+            type="server",
+            login="encrypted-login",
+            password_secret="encrypted-secret",
+        ),
+        settings=test_settings,
+    )
+    with _connect(test_settings) as conn:
+        encrypted_row = conn.execute("SELECT * FROM account_blocks WHERE id = ?", (encrypted_block.id,)).fetchone()
+    assert encrypted_row is not None
+    assert encrypted_row["password_secret"].startswith("enc:v1:")
+    assert "encrypted-secret" not in encrypted_row["password_secret"]
+
+    copy_data = get_account_block_copy_data(actor=owner, block_id=encrypted_block.id, settings=test_settings)
+    assert copy_data.password_secret == "encrypted-secret"
+
+    with _connect(test_settings) as conn:
+        conn.execute(
+            """
+            INSERT INTO account_blocks (
+                owner_user_id, type, title, login, password_secret, email,
+                status, duration_days, activated_at, expires_at,
+                created_by_user_id, updated_by_user_id, activated_by_user_id,
+                created_at, updated_at
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL, NULL, ?, ?, NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+            """,
+            (
+                owner.id,
+                "server",
+                "Сервер",
+                "legacy-login",
+                "legacy-secret",
+                None,
+                "inactive",
+                60,
+                admin.id,
+                admin.id,
+            ),
+        )
+        legacy_row = conn.execute(
+            "SELECT id FROM account_blocks WHERE login = ? ORDER BY id DESC LIMIT 1",
+            ("legacy-login",),
+        ).fetchone()
+    assert legacy_row is not None
+    legacy_copy = get_account_block_copy_data(actor=owner, block_id=int(legacy_row["id"]), settings=test_settings)
+    assert legacy_copy.password_secret == "legacy-secret"
+
+
+def test_empty_password_secret_stays_empty_without_encryption(test_settings):
+    admin = _create_verified_user(test_settings, "ab-empty-admin@example.com", "abemptyadmin", role="admin")
+    owner = _create_verified_user(test_settings, "ab-empty-owner@example.com", "abemptyowner")
+
+    block = create_account_block(
+        actor=admin,
+        data=AccountBlockCreateInput(
+            owner_user_id=owner.id,
+            type="mail",
+            login="empty-login",
+            password_secret="",
+        ),
+        settings=test_settings,
+    )
+    with _connect(test_settings) as conn:
+        row = conn.execute("SELECT * FROM account_blocks WHERE id = ?", (block.id,)).fetchone()
+    assert row is not None
+    assert row["password_secret"] == ""
+    copy_data = get_account_block_copy_data(actor=owner, block_id=block.id, settings=test_settings)
+    assert copy_data.password_secret == ""
+
+
+def test_missing_password_secret_key_blocks_new_secret_write(test_settings):
+    admin = _create_verified_user(test_settings, "ab-missing-key-admin@example.com", "abmissingkeyadmin", role="admin")
+    owner = _create_verified_user(test_settings, "ab-missing-key-owner@example.com", "abmissingkeyowner")
+    missing_key_settings = replace(test_settings, account_blocks_password_secret_key=None)
+
+    with pytest.raises(AccountBlockValidationError):
+        create_account_block(
+            actor=admin,
+            data=AccountBlockCreateInput(
+                owner_user_id=owner.id,
+                type="chatgpt",
+                login="missing-key-login",
+                password_secret="missing-key-secret",
+            ),
+            settings=missing_key_settings,
+        )
+
+
+def test_malformed_and_wrong_key_encrypted_password_secret_fail_closed_on_read(test_settings):
+    admin = _create_verified_user(test_settings, "ab-bad-admin@example.com", "abbadadmin", role="admin")
+    owner = _create_verified_user(test_settings, "ab-bad-owner@example.com", "abbadowner")
+
+    block = create_account_block(
+        actor=admin,
+        data=AccountBlockCreateInput(
+            owner_user_id=owner.id,
+            type="server",
+            login="bad-login",
+            password_secret="bad-secret",
+        ),
+        settings=test_settings,
+    )
+
+    wrong_key_settings = replace(
+        test_settings,
+        account_blocks_password_secret_key=_encode_key(b"fedcba9876543210fedcba9876543210"),
+    )
+    with pytest.raises(AccountBlockValidationError):
+        get_account_block_copy_data(actor=owner, block_id=block.id, settings=wrong_key_settings)
+
+    with _connect(test_settings) as conn:
+        conn.execute(
+            "UPDATE account_blocks SET password_secret = ? WHERE id = ?",
+            ("enc:v1:invalid.invalid", block.id),
+        )
+
+    with pytest.raises(AccountBlockValidationError):
+        get_account_block_copy_data(actor=owner, block_id=block.id, settings=test_settings)

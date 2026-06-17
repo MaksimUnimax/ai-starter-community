@@ -56,6 +56,7 @@ class Settings:
     session_cookie_name: str = "ai_starter_community_session"
     session_expiry_hours: int = 168
     session_cookie_secure: bool = True
+    account_blocks_password_secret_key: str | None = None
     email_mode: str = "outbox"
     email_from_address: str | None = None
     email_from_name: str | None = None
@@ -86,6 +87,7 @@ def get_settings() -> Settings:
         session_cookie_name=os.getenv("SESSION_COOKIE_NAME", "ai_starter_community_session"),
         session_expiry_hours=_env_int("SESSION_EXPIRY_HOURS", 168),
         session_cookie_secure=_env_bool("SESSION_COOKIE_SECURE", _default_session_cookie_secure(app_env)),
+        account_blocks_password_secret_key=_env_optional_str("ACCOUNT_BLOCKS_PASSWORD_SECRET_KEY"),
         email_mode=os.getenv("EMAIL_MODE", "outbox"),
         email_from_address=_env_optional_str("EMAIL_FROM_ADDRESS"),
         email_from_name=_env_optional_str("EMAIL_FROM_NAME"),
