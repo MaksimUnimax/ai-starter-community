@@ -50,6 +50,12 @@ def _extract_token_from_link(body_text: str) -> str:
     return match.group(1)
 
 
+def _extract_csrf_token(body_text: str) -> str:
+    match = re.search(r'name="_csrf_token" value="([^"]+)"', body_text)
+    assert match, "csrf token not found"
+    return match.group(1)
+
+
 def _make_test_user(settings: Settings):
     return register_user(
         email="user@example.com",
@@ -175,15 +181,18 @@ def test_resend_verification_request_is_generic_for_missing_or_verified_user(tes
 
 def test_login_route_does_not_enumerate_unknown_accounts(client, test_settings):
     _make_verified_test_user(test_settings, email="login-message@example.com", login="loginmessage")
+    login_page = client.get("/login")
+    assert login_page.status_code == 200
+    csrf_token = _extract_csrf_token(login_page.text)
 
     wrong_password_response = client.post(
         "/login",
-        data={"email_or_login": "loginmessage@example.com", "password": "Wrong123"},
+        data={"email_or_login": "loginmessage@example.com", "password": "Wrong123", "_csrf_token": csrf_token},
         follow_redirects=False,
     )
     unknown_account_response = client.post(
         "/login",
-        data={"email_or_login": "missing@example.com", "password": "Wrong123"},
+        data={"email_or_login": "missing@example.com", "password": "Wrong123", "_csrf_token": csrf_token},
         follow_redirects=False,
     )
 
@@ -401,6 +410,7 @@ def test_route_flow_register_page_is_closed(client, test_settings):
 
     register_response = client.get("/register")
     assert register_response.status_code == 200
+    register_csrf_token = _extract_csrf_token(register_response.text)
     assert "Регистрация" in register_response.text
     assert "Создайте аккаунт, затем подтвердите почту по ссылке из письма." in register_response.text
     assert "После регистрации вы увидите страницу подтверждения почты." in register_response.text
@@ -417,6 +427,7 @@ def test_route_flow_register_page_is_closed(client, test_settings):
             "login": "routeuser",
             "password": "Secret123",
             "repeat_password": "Secret123",
+            "_csrf_token": register_csrf_token,
         },
         follow_redirects=False,
     )
@@ -443,9 +454,12 @@ def test_route_flow_login_cabinet_logout_still_works(client, test_settings):
     assert verify_response.status_code == 200
     assert "Почта подтверждена" in verify_response.text
 
+    login_page = client.get("/login")
+    assert login_page.status_code == 200
+    login_csrf_token = _extract_csrf_token(login_page.text)
     login_email_response = client.post(
         "/login",
-        data={"email_or_login": "route@example.com", "password": "Secret123"},
+        data={"email_or_login": "route@example.com", "password": "Secret123", "_csrf_token": login_csrf_token},
         follow_redirects=False,
     )
     assert login_email_response.status_code == 303
@@ -468,8 +482,9 @@ def test_route_flow_login_cabinet_logout_still_works(client, test_settings):
     assert 'href="/materials/drafts/dair-smoke-20260529/"' in cabinet_response.text
     assert 'href="/cabinet/learning/project-file"' not in cabinet_response.text
     assert "Выйти" in cabinet_response.text
+    cabinet_csrf_token = _extract_csrf_token(cabinet_response.text)
 
-    logout_response = client.post("/logout", follow_redirects=False)
+    logout_response = client.post("/logout", data={"_csrf_token": cabinet_csrf_token}, follow_redirects=False)
     assert logout_response.status_code == 303
     assert test_settings.session_cookie_name in logout_response.headers.get("set-cookie", "")
 
@@ -510,15 +525,19 @@ def test_cabinet_settings_page_and_password_change_flow(client, test_settings):
     assert anon_submit.status_code == 303
     assert anon_submit.headers["location"] == "/login"
 
+    login_page = client.get("/login")
+    assert login_page.status_code == 200
+    login_csrf_token = _extract_csrf_token(login_page.text)
     login_response = client.post(
         "/login",
-        data={"email_or_login": "settings@example.com", "password": "Secret123"},
+        data={"email_or_login": "settings@example.com", "password": "Secret123", "_csrf_token": login_csrf_token},
         follow_redirects=False,
     )
     assert login_response.status_code == 303
 
     settings_page = client.get("/cabinet/settings")
     assert settings_page.status_code == 200
+    settings_csrf_token = _extract_csrf_token(settings_page.text)
     assert "Настройки" in settings_page.text
     assert "Смена пароля" in settings_page.text
     assert "settings-grid" in settings_page.text
@@ -553,6 +572,7 @@ def test_cabinet_settings_page_and_password_change_flow(client, test_settings):
             "current_password": "WrongSecret123",
             "password": "NewSecret123",
             "repeat_password": "NewSecret123",
+            "_csrf_token": settings_csrf_token,
         },
     )
     assert wrong_current_response.status_code == 200
@@ -569,6 +589,7 @@ def test_cabinet_settings_page_and_password_change_flow(client, test_settings):
             "current_password": "Secret123",
             "password": "NewSecret123",
             "repeat_password": "NewSecret124",
+            "_csrf_token": settings_csrf_token,
         },
     )
     assert mismatch_response.status_code == 200
@@ -585,6 +606,7 @@ def test_cabinet_settings_page_and_password_change_flow(client, test_settings):
             "current_password": "Secret123",
             "password": "NewSecret123",
             "repeat_password": "NewSecret123",
+            "_csrf_token": settings_csrf_token,
         },
         follow_redirects=False,
     )
@@ -623,15 +645,21 @@ def test_route_flow_login_by_login_and_password_reset(client, test_settings):
     verify_response = client.get(f"/verify-email/{verify_token}")
     assert verify_response.status_code == 200
 
+    login_page = client.get("/login")
+    assert login_page.status_code == 200
+    login_csrf_token = _extract_csrf_token(login_page.text)
     login_response = client.post(
         "/login",
-        data={"email_or_login": "loginroute", "password": "Secret123"},
+        data={"email_or_login": "loginroute", "password": "Secret123", "_csrf_token": login_csrf_token},
         follow_redirects=False,
     )
     assert login_response.status_code == 303
     assert test_settings.session_cookie_name in login_response.headers.get("set-cookie", "")
 
-    forgot_response = client.post("/forgot-password", data={"email": "loginroute@example.com"})
+    forgot_page = client.get("/forgot-password")
+    assert forgot_page.status_code == 200
+    forgot_csrf_token = _extract_csrf_token(forgot_page.text)
+    forgot_response = client.post("/forgot-password", data={"email": "loginroute@example.com", "_csrf_token": forgot_csrf_token})
     assert forgot_response.status_code == 200
     assert "Если такой адрес электронной почты зарегистрирован" in forgot_response.text
     assert forgot_response.text.count("Если такой адрес электронной почты зарегистрирован") == 1
@@ -645,21 +673,28 @@ def test_route_flow_login_by_login_and_password_reset(client, test_settings):
         ("loginroute@example.com", "password_reset"),
     )
     reset_token = _extract_token_from_link(reset_row["body_text"])
+    reset_page = client.get(f"/reset-password/{reset_token}")
+    assert reset_page.status_code == 200
+    reset_csrf_token = _extract_csrf_token(reset_page.text)
     reset_response = client.post(
         "/reset-password",
         data={
             "token": reset_token,
             "password": "NewSecret123",
             "repeat_password": "NewSecret123",
+            "_csrf_token": reset_csrf_token,
         },
     )
     assert reset_response.status_code == 200
     assert "Теперь можно войти в систему" in reset_response.text
     assert "Вернуться ко входу" in reset_response.text or "Войти" in reset_response.text
 
+    relogin_page = client.get("/login")
+    assert relogin_page.status_code == 200
+    relogin_csrf_token = _extract_csrf_token(relogin_page.text)
     relogin_response = client.post(
         "/login",
-        data={"email_or_login": "loginroute", "password": "NewSecret123"},
+        data={"email_or_login": "loginroute", "password": "NewSecret123", "_csrf_token": relogin_csrf_token},
         follow_redirects=False,
     )
     assert relogin_response.status_code == 303
@@ -685,15 +720,19 @@ def test_settings_page_layout_and_password_change(client, test_settings):
     verify_response = client.get(f"/verify-email/{verify_token}")
     assert verify_response.status_code == 200
 
+    login_page = client.get("/login")
+    assert login_page.status_code == 200
+    login_csrf_token = _extract_csrf_token(login_page.text)
     login_response = client.post(
         "/login",
-        data={"email_or_login": "settingsflow@example.com", "password": "Secret123"},
+        data={"email_or_login": "settingsflow@example.com", "password": "Secret123", "_csrf_token": login_csrf_token},
         follow_redirects=False,
     )
     assert login_response.status_code == 303
 
     settings_response = client.get("/cabinet/settings")
     assert settings_response.status_code == 200
+    settings_csrf_token = _extract_csrf_token(settings_response.text)
     assert "Личный кабинет" in settings_response.text
     assert "Настройки" in settings_response.text
     assert "Аккаунт:" in settings_response.text
@@ -711,6 +750,7 @@ def test_settings_page_layout_and_password_change(client, test_settings):
             "current_password": "Secret123",
             "password": "Secret456",
             "repeat_password": "Secret456",
+            "_csrf_token": settings_csrf_token,
         },
         follow_redirects=False,
     )
@@ -728,9 +768,12 @@ def test_unverified_login_shows_resend_link(client, test_settings):
         settings=test_settings,
     )
 
+    login_page = client.get("/login")
+    assert login_page.status_code == 200
+    login_csrf_token = _extract_csrf_token(login_page.text)
     login_response = client.post(
         "/login",
-        data={"email_or_login": "needsverify@example.com", "password": "Secret123"},
+        data={"email_or_login": "needsverify@example.com", "password": "Secret123", "_csrf_token": login_csrf_token},
     )
     assert login_response.status_code == 200
     assert login_response.text.count("Email не подтверждён.") == 1
@@ -746,6 +789,7 @@ def test_login_and_reset_pages_show_clear_rules(client):
     reset_response = client.get("/reset-password/example-token")
 
     assert "Электронная почта или логин" in login_response.text
+    assert 'name="_csrf_token"' in login_response.text
     assert "Зарегистрироваться" in login_response.text
     assert "Не помню пароль?" in login_response.text
     assert "Забыл пароль?" not in login_response.text
@@ -769,10 +813,12 @@ def test_login_and_reset_pages_show_clear_rules(client):
     assert "Не пришло письмо подтверждения?" not in login_response.text
     assert "/resend-verification" not in login_response.text
     assert "Укажите адрес электронной почты, чтобы мы смогли найти ваш аккаунт." in forgot_response.text
+    assert 'name="_csrf_token"' in forgot_response.text
     assert "Если такой адрес электронной почты зарегистрирован" not in forgot_response.text
     assert "Подтвердить почту" not in forgot_response.text
     assert "Вернуться ко входу" in forgot_response.text
     assert "минимум 8 символов" in reset_response.text
+    assert 'name="_csrf_token"' in reset_response.text
     assert "без пробелов внутри" in reset_response.text
     assert "Вернуться ко входу" in reset_response.text or "Войти" in reset_response.text
     assert "/static/styles.css" in login_response.text
@@ -817,9 +863,12 @@ def test_cabinet_shows_logout_button_and_access_text(client, test_settings):
     verify_token = _extract_token_from_link(verification_row["body_text"])
     verify_email(verify_token, settings=test_settings)
 
+    login_page = client.get("/login")
+    assert login_page.status_code == 200
+    login_csrf_token = _extract_csrf_token(login_page.text)
     login_response = client.post(
         "/login",
-        data={"email_or_login": "cabinetux@example.com", "password": "Secret123"},
+        data={"email_or_login": "cabinetux@example.com", "password": "Secret123", "_csrf_token": login_csrf_token},
         follow_redirects=False,
     )
     assert login_response.status_code == 303

@@ -46,6 +46,7 @@
               <div class="table-actions">
                 <a class="button button-secondary" href="/admin/paid-options/{{ option.code }}/edit">Редактировать</a>
                 <form method="post" action="/admin/paid-options/{{ option.code }}/archive">
+                  {{ csrf_input() }}
                   <button class="button button-danger" type="submit">Архивировать</button>
                 </form>
               </div>

@@ -29,6 +29,12 @@ def _extract_verify_token(settings, email: str) -> str:
     return match.group(1)
 
 
+def _extract_csrf_token(body_text: str) -> str:
+    match = re.search(r'name="_csrf_token" value="([^"]+)"', body_text)
+    assert match, "csrf token not found"
+    return match.group(1)
+
+
 def _create_verified_user(test_settings, email: str, login: str, role: str = "user"):
     register_user(
         email=email,
@@ -320,6 +326,7 @@ def test_moderator_can_search_user_by_email_and_manage_selected_user_blocks(clie
 
     cabinet_response = client.get(f"/cabinet?account_blocks_user_email={owner_a.email}")
     assert cabinet_response.status_code == 200
+    csrf_token = _extract_csrf_token(cabinet_response.text)
     assert '<h2 class="section-title">Аккаунты</h2>' in cabinet_response.text
     assert "Администратор и модератор выбирают пользователя по email и управляют только его блоками." not in cabinet_response.text
     assert "Email пользователя" in cabinet_response.text
@@ -349,6 +356,7 @@ def test_moderator_can_search_user_by_email_and_manage_selected_user_blocks(clie
             "duration_days": "",
             "login": "mod-block-login",
             "password_secret": "mod-block-password",
+            "_csrf_token": csrf_token,
         },
         follow_redirects=False,
     )
@@ -375,6 +383,7 @@ def test_moderator_can_search_user_by_email_and_manage_selected_user_blocks(clie
             "login": "updated-login",
             "password_secret": "updated-password",
             "email": "updated@example.com",
+            "_csrf_token": csrf_token,
         },
         follow_redirects=False,
     )
@@ -395,6 +404,7 @@ def test_moderator_can_search_user_by_email_and_manage_selected_user_blocks(clie
             f"/cabinet/account-blocks/{block_id}/activate?{urlencode({'account_blocks_user_email': owner_a.email})}",
             data={
                 "duration_days": "",
+                "_csrf_token": csrf_token,
             },
             follow_redirects=False,
         )
@@ -460,6 +470,7 @@ def test_moderator_can_search_user_by_email_and_manage_selected_user_blocks(clie
             f"/cabinet/account-blocks/{block_id}/renew?{urlencode({'account_blocks_user_email': owner_a.email})}",
             data={
                 "duration_days": "30",
+                "_csrf_token": csrf_token,
             },
             follow_redirects=False,
         )
@@ -473,6 +484,7 @@ def test_moderator_can_search_user_by_email_and_manage_selected_user_blocks(clie
 
     delete_response = client.post(
         f"/cabinet/account-blocks/{block_id}/delete?{urlencode({'account_blocks_user_email': owner_a.email})}",
+        data={"_csrf_token": csrf_token},
         follow_redirects=False,
     )
     assert delete_response.status_code == 303
@@ -511,12 +523,17 @@ def test_moderator_can_manage_account_blocks_but_cannot_access_admin_dashboard(c
     admin_blocks_response = client.get("/admin/account-blocks?account_blocks_user_email=test@example.com")
     assert admin_blocks_response.status_code == 403
 
+    cabinet_response = client.get(f"/cabinet?{urlencode({'account_blocks_user_email': owner.email})}")
+    assert cabinet_response.status_code == 200
+    csrf_token = _extract_csrf_token(cabinet_response.text)
+
     create_response = client.post(
         f"/cabinet/account-blocks?{urlencode({'account_blocks_user_email': owner.email})}",
         data={
             "type": "chatgpt",
             "login": "moderator-login",
             "password_secret": "moderator-password",
+            "_csrf_token": csrf_token,
         },
         follow_redirects=False,
     )
@@ -536,6 +553,7 @@ def test_moderator_can_manage_account_blocks_but_cannot_access_admin_dashboard(c
             "login": "moderator-login-updated",
             "password_secret": "moderator-password-updated",
             "email": "ignored@example.com",
+            "_csrf_token": csrf_token,
         },
         follow_redirects=False,
     )
@@ -546,7 +564,7 @@ def test_moderator_can_manage_account_blocks_but_cannot_access_admin_dashboard(c
     with patch("app.account_blocks.service.utc_now", return_value=activation_now):
         activate_response = client.post(
             f"/cabinet/account-blocks/{block_id}/activate?{urlencode({'account_blocks_user_email': owner.email})}",
-            data={"duration_days": "45"},
+            data={"duration_days": "45", "_csrf_token": csrf_token},
             follow_redirects=False,
         )
     assert activate_response.status_code == 303
@@ -565,7 +583,7 @@ def test_moderator_can_manage_account_blocks_but_cannot_access_admin_dashboard(c
 
     renew_response = client.post(
         f"/cabinet/account-blocks/{block_id}/renew?{urlencode({'account_blocks_user_email': owner.email})}",
-        data={"duration_days": "30"},
+        data={"duration_days": "30", "_csrf_token": csrf_token},
         follow_redirects=False,
     )
     assert renew_response.status_code == 303
@@ -573,6 +591,7 @@ def test_moderator_can_manage_account_blocks_but_cannot_access_admin_dashboard(c
 
     delete_response = client.post(
         f"/cabinet/account-blocks/{block_id}/delete?{urlencode({'account_blocks_user_email': owner.email})}",
+        data={"_csrf_token": csrf_token},
         follow_redirects=False,
     )
     assert delete_response.status_code == 303

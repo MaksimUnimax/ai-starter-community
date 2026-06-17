@@ -39,6 +39,7 @@
       {% endif %}
 
       <form class="form" method="post" action="/login">
+        {{ csrf_input() }}
         <label class="form-row">
           <span>Электронная почта или логин</span>
           <input class="input" type="text" name="email_or_login" value="{{ email_or_login or '' }}" autocomplete="username">

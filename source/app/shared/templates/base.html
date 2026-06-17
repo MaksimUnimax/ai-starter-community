@@ -39,6 +39,7 @@
                 <div class="nav-account-menu" role="menu" aria-label="Действия аккаунта">
                   <a class="button button-secondary nav-pill nav-account-menu-link" href="/cabinet/settings">Настройки</a>
                   <form class="nav-account-menu-form" method="post" action="/logout">
+                    {{ csrf_input() }}
                     <button class="button button-secondary nav-pill nav-account-menu-button" type="submit">Выйти</button>
                   </form>
                 </div>

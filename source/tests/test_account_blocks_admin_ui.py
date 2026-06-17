@@ -31,6 +31,12 @@ def _extract_verify_token(settings, email: str) -> str:
     return match.group(1)
 
 
+def _extract_csrf_token(body_text: str) -> str:
+    match = re.search(r'name="_csrf_token" value="([^"]+)"', body_text)
+    assert match, "csrf token not found"
+    return match.group(1)
+
+
 def _create_verified_user(test_settings, email: str, login: str, role: str = "user"):
     register_user(
         email=email,
@@ -101,6 +107,7 @@ def test_admin_can_search_user_by_email_and_manage_selected_user_blocks(client, 
     assert "Добавить блок" in body
     assert "Неактивно" in body or "Не активирован" in body
     assert "Продлить активацию" not in body
+    csrf_token = _extract_csrf_token(body)
 
     create_response = client.post(
         f"/admin/account-blocks?{urlencode({'account_blocks_user_email': owner.email})}",
@@ -110,6 +117,7 @@ def test_admin_can_search_user_by_email_and_manage_selected_user_blocks(client, 
             "duration_days": "",
             "login": "admin-ui-login",
             "password_secret": "admin-ui-password",
+            "_csrf_token": csrf_token,
         },
         follow_redirects=False,
     )
@@ -128,7 +136,7 @@ def test_admin_can_search_user_by_email_and_manage_selected_user_blocks(client, 
     with patch("app.account_blocks.service.utc_now", return_value=activation_now):
         activate_response = client.post(
             f"/admin/account-blocks/{block_id}/activate?{urlencode({'account_blocks_user_email': owner.email})}",
-            data={"duration_days": "45"},
+            data={"duration_days": "45", "_csrf_token": csrf_token},
             follow_redirects=False,
         )
     assert activate_response.status_code == 303
@@ -166,7 +174,7 @@ def test_admin_can_search_user_by_email_and_manage_selected_user_blocks(client, 
     with patch("app.account_blocks.service.utc_now", return_value=renewal_now):
         renew_response = client.post(
             f"/admin/account-blocks/{block_id}/renew?{urlencode({'account_blocks_user_email': owner.email})}",
-            data={"duration_days": "30"},
+            data={"duration_days": "30", "_csrf_token": csrf_token},
             follow_redirects=False,
         )
     assert renew_response.status_code == 303

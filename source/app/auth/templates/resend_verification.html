@@ -16,6 +16,7 @@
     {% endif %}
 
     <form class="form" method="post" action="/resend-verification">
+      {{ csrf_input() }}
       <label class="form-row">
         <span>Электронная почта</span>
         <input class="input" type="email" name="email" value="{{ email or '' }}" autocomplete="email">

@@ -27,6 +27,7 @@ from app.auth.service import (
     verify_email,
 )
 from app.core.config import get_settings
+from app.shared.csrf import CSRF_COOKIE_NAME, configure_template_environment, render_template_response, require_csrf_token
 router = APIRouter()
 templates = Jinja2Templates(directory=str(Path(__file__).resolve().parent / "templates"))
 templates.env.loader = ChoiceLoader(
@@ -35,19 +36,20 @@ templates.env.loader = ChoiceLoader(
         FileSystemLoader(str(Path(__file__).resolve().parents[1] / "shared" / "templates")),
     ]
 )
+configure_template_environment(templates)
 PENDING_VERIFICATION_EMAIL_COOKIE = "pending_verification_email"
 PENDING_VERIFICATION_EMAIL_COOKIE_MAX_AGE_SECONDS = 24 * 3600
 VERIFICATION_RESEND_COOLDOWN_SECONDS = 60
 
 
 def _template(request: Request, template_name: str, **context) -> HTMLResponse:
+    settings = get_settings()
     payload = {
-        "request": request,
         "title": context.pop("title", "Страница"),
-        "current_user": get_current_user_from_cookies(request.cookies),
+        "current_user": get_current_user_from_cookies(request.cookies, settings=settings),
     }
     payload.update(context)
-    return templates.TemplateResponse(request, template_name, payload)
+    return render_template_response(templates, request, template_name, settings=settings, **payload)
 
 
 def _login_notice(request: Request) -> str | None:
@@ -91,7 +93,9 @@ def register_submit(
     login: str = Form(default=""),
     password: str = Form(default=""),
     repeat_password: str = Form(default=""),
+    csrf_token: str = Form(alias="_csrf_token", default=""),
 ) -> HTMLResponse:
+    require_csrf_token(request, csrf_token, settings=get_settings())
     try:
         user = register_user(email=email, login=login, password=password, repeat_password=repeat_password)
     except (ValidationError, ConflictError) as exc:
@@ -187,8 +191,10 @@ def resend_verification_head(request: Request) -> HTMLResponse:
 def resend_verification_submit(
     request: Request,
     email: str = Form(default=""),
+    csrf_token: str = Form(alias="_csrf_token", default=""),
 ) -> HTMLResponse:
     settings = get_settings()
+    require_csrf_token(request, csrf_token, settings=settings)
     requested_email = (email or "").strip()
     pending_email = _pending_verification_email(request)
     target_email = requested_email or pending_email
@@ -319,8 +325,10 @@ def login_submit(
     request: Request,
     email_or_login: str = Form(default=""),
     password: str = Form(default=""),
+    csrf_token: str = Form(alias="_csrf_token", default=""),
 ):
     settings = get_settings()
+    require_csrf_token(request, csrf_token, settings=settings)
     try:
         user = authenticate_user(email_or_login=email_or_login, password=password, settings=settings)
         session_token = create_session(user.id, settings=settings)
@@ -370,13 +378,18 @@ def login_submit(
 
 
 @router.post("/logout")
-def logout(request: Request) -> RedirectResponse:
+def logout(
+    request: Request,
+    csrf_token: str = Form(alias="_csrf_token", default=""),
+) -> RedirectResponse:
     settings = get_settings()
+    require_csrf_token(request, csrf_token, settings=settings)
     session_token = request.cookies.get(settings.session_cookie_name)
+    response = RedirectResponse(url="/login", status_code=303)
     if session_token:
         revoke_session(session_token, settings=settings)
-    response = RedirectResponse(url="/login", status_code=303)
     response.delete_cookie(key=settings.session_cookie_name, path="/")
+    response.delete_cookie(key=CSRF_COOKIE_NAME, path="/")
     return response
 
 
@@ -401,7 +414,9 @@ def forgot_password_head(request: Request) -> HTMLResponse:
 def forgot_password_submit(
     request: Request,
     email: str = Form(default=""),
+    csrf_token: str = Form(alias="_csrf_token", default=""),
 ) -> HTMLResponse:
+    require_csrf_token(request, csrf_token, settings=get_settings())
     try:
         create_password_reset_request(email=email)
     except ValidationError as exc:
@@ -445,7 +460,9 @@ def reset_password_submit(
     token: str = Form(default=""),
     password: str = Form(default=""),
     repeat_password: str = Form(default=""),
+    csrf_token: str = Form(alias="_csrf_token", default=""),
 ) -> HTMLResponse:
+    require_csrf_token(request, csrf_token, settings=get_settings())
     try:
         reset_password(token=token, new_password=password, repeat_password=repeat_password)
     except (ValidationError, NotFoundError, AuthError) as exc:

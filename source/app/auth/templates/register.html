@@ -29,6 +29,7 @@
 
     {% if not registration_closed %}
       <form class="form" method="post" action="/register">
+        {{ csrf_input() }}
         <label class="form-row">
           <span>Электронная почта</span>
           <input class="input" type="email" name="email" value="{{ email or '' }}" autocomplete="email">

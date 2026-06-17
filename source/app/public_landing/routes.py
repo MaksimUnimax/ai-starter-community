@@ -10,6 +10,7 @@ from jinja2 import ChoiceLoader, FileSystemLoader
 
 from app.auth.service import get_current_user_from_cookies
 from app.core.config import get_settings
+from app.shared.csrf import configure_template_environment, render_template_response
 from app.tariffs.service import get_homepage_tariff, seed_initial_catalog
 
 router = APIRouter()
@@ -25,6 +26,7 @@ templates.env.loader = ChoiceLoader(
         FileSystemLoader(str(Path(__file__).resolve().parents[1] / "shared" / "templates")),
     ]
 )
+configure_template_environment(templates)
 
 
 def _template(request: Request, template_name: str, **context) -> HTMLResponse:
@@ -43,7 +45,7 @@ def _template(request: Request, template_name: str, **context) -> HTMLResponse:
         else None,
     }
     payload.update(context)
-    return templates.TemplateResponse(request, template_name, payload)
+    return render_template_response(templates, request, template_name, settings=settings, **payload)
 
 
 def _format_price(amount_minor: int | None, currency: str | None) -> str:

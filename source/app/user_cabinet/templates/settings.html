@@ -34,6 +34,7 @@
           <p class="form-help">Минимум 8 символов, без пробелов внутри. Пробелы по краям будут убраны.</p>
         </div>
         <form class="form" method="post" action="/cabinet/settings/password">
+          {{ csrf_input() }}
           <label class="form-row">
             <span>Текущий пароль</span>
             <input class="input" type="password" name="current_password" autocomplete="current-password">
@@ -57,6 +58,7 @@
           <p>Завершите текущую сессию на этом устройстве.</p>
         </div>
         <form class="settings-logout-form" method="post" action="/logout">
+          {{ csrf_input() }}
           <button class="button button-secondary" type="submit">Выйти из аккаунта</button>
         </form>
         <div class="actions settings-actions">

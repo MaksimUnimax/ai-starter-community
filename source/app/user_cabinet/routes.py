@@ -39,6 +39,7 @@ from app.account_blocks.service import (
 from app.core.config import get_settings
 from app.notifications.email_service import send_account_block_activation_email
 from app.shared.tariff_display import get_homepage_tariffs_context
+from app.shared.csrf import configure_template_environment, render_template_response, require_csrf_token
 from app.paid_options.service import list_paid_options
 from app.materials.service import user_has_materials_access
 from app.user_cabinet.prompts_library import load_cabinet_prompts
@@ -52,6 +53,7 @@ templates.env.loader = ChoiceLoader(
         FileSystemLoader(str(Path(__file__).resolve().parents[1] / "shared" / "templates")),
     ]
 )
+configure_template_environment(templates)
 LEARNING_COURSE_URL = "/materials/drafts/dair-smoke-20260529/"
 LEARNING_PROJECT_DOWNLOAD_URL = "/cabinet/learning/project-file"
 LEARNING_PROJECT_FILE_NAME = "02_СТАРТ_ПРОЕКТА_GIT_ДОКУМЕНТАЦИЯ_СТРУКТУРА.md"
@@ -364,12 +366,11 @@ def _active_paid_options_for_cabinet(settings):
 
 def _template(request: Request, template_name: str, **context) -> HTMLResponse:
     payload = {
-        "request": request,
         "title": context.pop("title", "Страница"),
         "current_user": get_current_user_from_cookies(request.cookies, settings=get_settings()),
     }
     payload.update(context)
-    return templates.TemplateResponse(request, template_name, payload)
+    return render_template_response(templates, request, template_name, settings=get_settings(), **payload)
 
 
 def _locked_response(
@@ -515,10 +516,12 @@ def cabinet_change_password(
     current_password: str = Form(default=""),
     password: str = Form(default=""),
     repeat_password: str = Form(default=""),
+    csrf_token: str = Form(alias="_csrf_token", default=""),
 ) -> HTMLResponse:
     settings, user, redirect_response = _require_authenticated_user(request)
     if redirect_response is not None:
         return redirect_response
+    require_csrf_token(request, csrf_token, settings=settings)
     try:
         change_password(
             user_id=user.id,
@@ -549,12 +552,14 @@ def cabinet_create_account_block(
     login: str = Form(default=""),
     password_secret: str = Form(default=""),
     duration_days: str = Form(default=""),
+    csrf_token: str = Form(alias="_csrf_token", default=""),
 ):
     settings, user, redirect_response = _require_authenticated_user(request)
     if redirect_response is not None:
         return redirect_response
     if not can_manage_account_blocks(user):
         raise HTTPException(status_code=403, detail="account block management requires moderator or admin access")
+    require_csrf_token(request, csrf_token, settings=settings)
     try:
         selected_user, selected_email, _ = _resolve_account_block_selected_user(user, settings, request)
         if selected_user is None:
@@ -583,12 +588,14 @@ def cabinet_update_account_block(
     block_id: int,
     login: str = Form(default=""),
     password_secret: str = Form(default=""),
+    csrf_token: str = Form(alias="_csrf_token", default=""),
 ):
     settings, user, redirect_response = _require_authenticated_user(request)
     if redirect_response is not None:
         return redirect_response
     if not can_manage_account_blocks(user):
         raise HTTPException(status_code=403, detail="account block management requires moderator or admin access")
+    require_csrf_token(request, csrf_token, settings=settings)
     try:
         existing_block = get_account_block_public(actor=user, block_id=block_id, settings=settings)
         selected_email = _selected_email_for_block(
@@ -616,12 +623,17 @@ def cabinet_update_account_block(
 
 
 @router.post("/cabinet/account-blocks/{block_id}/delete")
-def cabinet_delete_account_block(request: Request, block_id: int):
+def cabinet_delete_account_block(
+    request: Request,
+    block_id: int,
+    csrf_token: str = Form(alias="_csrf_token", default=""),
+):
     settings, user, redirect_response = _require_authenticated_user(request)
     if redirect_response is not None:
         return redirect_response
     if not can_manage_account_blocks(user):
         raise HTTPException(status_code=403, detail="account block management requires moderator or admin access")
+    require_csrf_token(request, csrf_token, settings=settings)
     try:
         existing_block = get_account_block_public(actor=user, block_id=block_id, settings=settings)
         selected_email = _selected_email_for_block(
@@ -643,12 +655,14 @@ def cabinet_activate_account_block(
     request: Request,
     block_id: int,
     duration_days: str = Form(default=""),
+    csrf_token: str = Form(alias="_csrf_token", default=""),
 ):
     settings, user, redirect_response = _require_authenticated_user(request)
     if redirect_response is not None:
         return redirect_response
     if not can_manage_account_blocks(user):
         raise HTTPException(status_code=403, detail="account block management requires moderator or admin access")
+    require_csrf_token(request, csrf_token, settings=settings)
     try:
         existing_block = get_account_block_public(actor=user, block_id=block_id, settings=settings)
         selected_email = _selected_email_for_block(
@@ -696,12 +710,14 @@ def cabinet_renew_account_block(
     request: Request,
     block_id: int,
     duration_days: str = Form(default=""),
+    csrf_token: str = Form(alias="_csrf_token", default=""),
 ):
     settings, user, redirect_response = _require_authenticated_user(request)
     if redirect_response is not None:
         return redirect_response
     if not can_manage_account_blocks(user):
         raise HTTPException(status_code=403, detail="account block management requires moderator or admin access")
+    require_csrf_token(request, csrf_token, settings=settings)
     try:
         existing_block = get_account_block_public(actor=user, block_id=block_id, settings=settings)
         selected_email = _selected_email_for_block(

@@ -51,6 +51,7 @@
                 <a class="button button-secondary" href="/admin/tariffs/{{ tariff.code }}/options">Настроить опции</a>
                 <a class="button button-secondary" href="/admin/tariffs/{{ tariff.code }}/edit">Редактировать</a>
                 <form method="post" action="/admin/tariffs/{{ tariff.code }}/archive">
+                  {{ csrf_input() }}
                   <button class="button button-danger" type="submit">Архивировать</button>
                 </form>
               </div>

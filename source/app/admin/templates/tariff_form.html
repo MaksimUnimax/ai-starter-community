@@ -16,6 +16,7 @@
     {% endif %}
 
     <form class="form" method="post">
+      {{ csrf_input() }}
       <label class="form-row">
         <span>Системный код</span>
         {% if is_create %}

@@ -31,6 +31,7 @@
           <p class="form-help">Включённый срок, дней и включённое количество можно оставить пустыми.</p>
           {% if available_paid_options %}
             <form method="post" action="/admin/tariffs/{{ tariff.code }}/options/attach" class="compact-form stack">
+              {{ csrf_input() }}
               <div class="form-row">
                 <label for="option_code">Платная опция</label>
                 <select id="option_code" name="option_code" class="select">
@@ -119,6 +120,7 @@
               <td>
                 <div class="table-actions">
                   <form method="post" action="/admin/tariffs/{{ tariff.code }}/options/{{ option.code }}/update" class="inline-form compact-form stack">
+                    {{ csrf_input() }}
                     <div class="form-row">
                       <label for="duration-{{ option.code }}">Включённый срок, дней</label>
                       <input id="duration-{{ option.code }}" type="number" name="included_duration_days" min="0" step="1" value="{{ option.included_duration_days }}" class="input">
@@ -140,6 +142,7 @@
                     </div>
                   </form>
                   <form method="post" action="/admin/tariffs/{{ tariff.code }}/options/{{ option.code }}/detach" class="inline-form danger-zone">
+                    {{ csrf_input() }}
                     <button type="submit" class="button button-danger">Отвязать</button>
                   </form>
                 </div>

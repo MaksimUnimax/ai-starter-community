@@ -83,6 +83,7 @@
           action="/cabinet/account-blocks{{ account_block_query_string }}"
           data-account-block-form="create"
         >
+          {{ csrf_input() }}
           <label class="form-row accounts-type-field">
             <span>Тип блока</span>
             <select class="select" name="type" required>
@@ -162,9 +163,11 @@
                   <div class="account-actions account-actions--view">
                     <button class="button button-secondary account-card__edit-toggle" type="button" data-account-card-edit-toggle>Редактировать</button>
                     <form class="account-action-form" method="post" action="/cabinet/account-blocks/{{ block.id }}/delete{{ account_block_query_string }}" data-account-block-form="delete">
+                      {{ csrf_input() }}
                       <button class="button button-secondary button-danger account-card__delete" type="submit">Удалить</button>
                     </form>
                     <form class="account-action-form" method="post" action="/cabinet/account-blocks/{{ block.id }}/activate{{ account_block_query_string }}" data-account-block-form="activate">
+                      {{ csrf_input() }}
                       <label class="account-field account-field--compact">
                         <span>Срок, дней</span>
                         <input class="input" name="duration_days" type="number" min="1" value="{{ block.duration_days }}" data-account-block-duration-input>
@@ -173,6 +176,7 @@
                     </form>
                     {% if block.is_active %}
                       <form class="account-action-form" method="post" action="/cabinet/account-blocks/{{ block.id }}/renew{{ account_block_query_string }}" data-account-block-form="renew">
+                        {{ csrf_input() }}
                         <label class="account-field account-field--compact">
                           <span>Срок, дней</span>
                           <input class="input" name="duration_days" type="number" min="1" value="{{ block.duration_days }}" data-account-block-duration-input>
@@ -186,6 +190,7 @@
 
               {% if account_blocks_manage_mode %}
                 <form class="account-card__edit-form" method="post" action="/cabinet/account-blocks/{{ block.id }}{{ account_block_query_string }}" hidden data-account-card-edit-form data-account-block-form="update">
+                  {{ csrf_input() }}
                   <label class="account-field">
                     <span>Логин</span>
                     <input class="input account-field__input" data-account-field="login" name="login" type="text" value="{{ block.login|e }}" autocomplete="off">
@@ -253,9 +258,11 @@
           {% if account_blocks_manage_mode %}
             <div class="account-actions account-actions--view">
               <form class="account-action-form" method="post" action="/cabinet/account-blocks/{{ block.id }}/delete{{ account_block_query_string }}" data-account-block-form="delete">
+                {{ csrf_input() }}
                 <button class="button button-secondary button-danger account-card__delete" type="submit">Удалить</button>
               </form>
               <form class="account-action-form" method="post" action="/cabinet/account-blocks/{{ block.id }}/activate{{ account_block_query_string }}" data-account-block-form="activate">
+                {{ csrf_input() }}
                 <label class="account-field account-field--compact">
                   <span>Срок, дней</span>
                   <input class="input" name="duration_days" type="number" min="1" value="{{ block.duration_days }}" data-account-block-duration-input>
@@ -264,6 +271,7 @@
               </form>
               {% if block.is_active %}
                 <form class="account-action-form" method="post" action="/cabinet/account-blocks/{{ block.id }}/renew{{ account_block_query_string }}" data-account-block-form="renew">
+                  {{ csrf_input() }}
                   <label class="account-field account-field--compact">
                     <span>Срок, дней</span>
                     <input class="input" name="duration_days" type="number" min="1" value="{{ block.duration_days }}" data-account-block-duration-input>

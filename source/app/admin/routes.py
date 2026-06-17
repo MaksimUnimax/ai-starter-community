@@ -56,6 +56,7 @@ from app.paid_options.service import (
     list_paid_options_for_admin,
     update_paid_option,
 )
+from app.shared.csrf import configure_template_environment, render_template_response, require_csrf_token
 from app.shared.utils import page_title
 from app.tariffs.schemas import TariffCreateInput, TariffUpdateInput
 from app.tariffs.service import (
@@ -82,6 +83,7 @@ from app.tariffs.service import (
 
 router = APIRouter()
 templates = Jinja2Templates(directory=str(Path(__file__).resolve().parent / "templates"))
+configure_template_environment(templates)
 
 TARIFF_CODE_RE = re.compile(r"^[a-z0-9_-]{3,64}$")
 ALLOWED_TARIFF_STATUSES = {"active", "hidden", "archived"}
@@ -431,9 +433,9 @@ def _admin_users_redirect(request: Request) -> RedirectResponse:
 
 def _template(request: Request, template_name: str, **context) -> HTMLResponse:
     status_code = context.pop("status_code", 200)
-    payload = {"request": request, "title": context.pop("title", page_title("AI Starter Community"))}
+    payload = {"title": context.pop("title", page_title("AI Starter Community"))}
     payload.update(context)
-    return templates.TemplateResponse(request, template_name, payload, status_code=status_code)
+    return render_template_response(templates, request, template_name, settings=get_settings(), status_code=status_code, **payload)
 
 
 def _admin_user_or_redirect(request: Request, settings=None):
@@ -1133,11 +1135,12 @@ def admin_users(request: Request):
 
 
 @router.post("/admin/users/{user_id}/role")
-async def admin_user_role_update(request: Request, user_id: int):
+async def admin_user_role_update(request: Request, user_id: int, csrf_token: str = Form(alias="_csrf_token", default="")):
     settings = get_settings()
     _, response = _admin_user_or_redirect(request, settings=settings)
     if response is not None:
         return response
+    require_csrf_token(request, csrf_token, settings=settings)
     form = await request.form()
     role = _normalize_text(form.get("role"))
     try:
@@ -1150,11 +1153,12 @@ async def admin_user_role_update(request: Request, user_id: int):
 
 
 @router.post("/admin/users/{user_id}/materials-access/grant")
-def admin_user_materials_access_grant(request: Request, user_id: int):
+def admin_user_materials_access_grant(request: Request, user_id: int, csrf_token: str = Form(alias="_csrf_token", default="")):
     settings = get_settings()
     _, response = _admin_user_or_redirect(request, settings=settings)
     if response is not None:
         return response
+    require_csrf_token(request, csrf_token, settings=settings)
     try:
         set_user_materials_access(user_id=user_id, granted=True, settings=settings)
     except AuthNotFoundError as exc:
@@ -1163,11 +1167,12 @@ def admin_user_materials_access_grant(request: Request, user_id: int):
 
 
 @router.post("/admin/users/{user_id}/materials-access/revoke")
-def admin_user_materials_access_revoke(request: Request, user_id: int):
+def admin_user_materials_access_revoke(request: Request, user_id: int, csrf_token: str = Form(alias="_csrf_token", default="")):
     settings = get_settings()
     _, response = _admin_user_or_redirect(request, settings=settings)
     if response is not None:
         return response
+    require_csrf_token(request, csrf_token, settings=settings)
     try:
         set_user_materials_access(user_id=user_id, granted=False, settings=settings)
     except AuthNotFoundError as exc:
@@ -1199,11 +1204,13 @@ async def admin_account_blocks_create(
     login: str = Form(default=""),
     password_secret: str = Form(default=""),
     duration_days: str = Form(default=""),
+    csrf_token: str = Form(alias="_csrf_token", default=""),
 ):
     settings = get_settings()
     user, response = _admin_user_or_redirect(request, settings=settings)
     if response is not None:
         return response
+    require_csrf_token(request, csrf_token, settings=settings)
     form = await request.form()
     selected_user, selected_email, _ = _resolve_account_block_selected_user(user, settings, request)
     if selected_user is None:
@@ -1233,11 +1240,13 @@ async def admin_account_blocks_update(
     block_id: int,
     login: str = Form(default=""),
     password_secret: str = Form(default=""),
+    csrf_token: str = Form(alias="_csrf_token", default=""),
 ):
     settings = get_settings()
     user, response = _admin_user_or_redirect(request, settings=settings)
     if response is not None:
         return response
+    require_csrf_token(request, csrf_token, settings=settings)
     try:
         existing_block = get_account_block_public(actor=user, block_id=block_id, settings=settings)
         selected_email = _selected_email_for_block(
@@ -1265,11 +1274,12 @@ async def admin_account_blocks_update(
 
 
 @router.post("/admin/account-blocks/{block_id}/delete")
-def admin_account_blocks_delete(request: Request, block_id: int):
+def admin_account_blocks_delete(request: Request, block_id: int, csrf_token: str = Form(alias="_csrf_token", default="")):
     settings = get_settings()
     user, response = _admin_user_or_redirect(request, settings=settings)
     if response is not None:
         return response
+    require_csrf_token(request, csrf_token, settings=settings)
     try:
         existing_block = get_account_block_public(actor=user, block_id=block_id, settings=settings)
         selected_email = _selected_email_for_block(
@@ -1287,11 +1297,12 @@ def admin_account_blocks_delete(request: Request, block_id: int):
 
 
 @router.post("/admin/account-blocks/{block_id}/activate")
-def admin_account_blocks_activate(request: Request, block_id: int, duration_days: str = Form(default="")):
+def admin_account_blocks_activate(request: Request, block_id: int, duration_days: str = Form(default=""), csrf_token: str = Form(alias="_csrf_token", default="")):
     settings = get_settings()
     user, response = _admin_user_or_redirect(request, settings=settings)
     if response is not None:
         return response
+    require_csrf_token(request, csrf_token, settings=settings)
     try:
         existing_block = get_account_block_public(actor=user, block_id=block_id, settings=settings)
         selected_email = _selected_email_for_block(
@@ -1327,11 +1338,12 @@ def admin_account_blocks_activate(request: Request, block_id: int, duration_days
 
 
 @router.post("/admin/account-blocks/{block_id}/renew")
-def admin_account_blocks_renew(request: Request, block_id: int, duration_days: str = Form(default="")):
+def admin_account_blocks_renew(request: Request, block_id: int, duration_days: str = Form(default=""), csrf_token: str = Form(alias="_csrf_token", default="")):
     settings = get_settings()
     user, response = _admin_user_or_redirect(request, settings=settings)
     if response is not None:
         return response
+    require_csrf_token(request, csrf_token, settings=settings)
     try:
         existing_block = get_account_block_public(actor=user, block_id=block_id, settings=settings)
         selected_email = _selected_email_for_block(
@@ -1379,11 +1391,12 @@ def admin_tariffs_new(request: Request):
 
 
 @router.post("/admin/tariffs/new", response_class=HTMLResponse)
-async def admin_tariffs_new_submit(request: Request):
+async def admin_tariffs_new_submit(request: Request, csrf_token: str = Form(alias="_csrf_token", default="")):
     settings = get_settings()
     _, response = _admin_user_or_redirect(request, settings=settings)
     if response is not None:
         return response
+    require_csrf_token(request, csrf_token, settings=settings)
 
     form = await request.form()
     payload, errors = _validate_tariff_form_input(
@@ -1454,11 +1467,12 @@ def admin_tariffs_edit(request: Request, code: str):
 
 
 @router.post("/admin/tariffs/{code}/edit", response_class=HTMLResponse)
-async def admin_tariffs_edit_submit(request: Request, code: str):
+async def admin_tariffs_edit_submit(request: Request, code: str, csrf_token: str = Form(alias="_csrf_token", default="")):
     settings = get_settings()
     _, response = _admin_user_or_redirect(request, settings=settings)
     if response is not None:
         return response
+    require_csrf_token(request, csrf_token, settings=settings)
 
     tariff = get_tariff_by_code(code, settings=settings)
     if tariff is None:
@@ -1527,11 +1541,12 @@ async def admin_tariffs_edit_submit(request: Request, code: str):
 
 
 @router.post("/admin/tariffs/{code}/archive")
-def admin_tariffs_archive(request: Request, code: str):
+def admin_tariffs_archive(request: Request, code: str, csrf_token: str = Form(alias="_csrf_token", default="")):
     settings = get_settings()
     _, response = _admin_user_or_redirect(request, settings=settings)
     if response is not None:
         return response
+    require_csrf_token(request, csrf_token, settings=settings)
     try:
         archive_tariff(code, settings=settings)
     except TariffNotFoundError:
@@ -1567,11 +1582,12 @@ def admin_tariff_options(request: Request, code: str):
 
 
 @router.post("/admin/tariffs/{code}/options/attach", response_class=HTMLResponse)
-async def admin_tariff_options_attach(request: Request, code: str):
+async def admin_tariff_options_attach(request: Request, code: str, csrf_token: str = Form(alias="_csrf_token", default="")):
     settings = get_settings()
     _, response = _admin_user_or_redirect(request, settings=settings)
     if response is not None:
         return response
+    require_csrf_token(request, csrf_token, settings=settings)
 
     tariff = get_tariff_by_code(code, settings=settings)
     if tariff is None:
@@ -1619,11 +1635,12 @@ async def admin_tariff_options_attach(request: Request, code: str):
 
 
 @router.post("/admin/tariffs/{code}/options/{option_code}/update", response_class=HTMLResponse)
-async def admin_tariff_options_update(request: Request, code: str, option_code: str):
+async def admin_tariff_options_update(request: Request, code: str, option_code: str, csrf_token: str = Form(alias="_csrf_token", default="")):
     settings = get_settings()
     _, response = _admin_user_or_redirect(request, settings=settings)
     if response is not None:
         return response
+    require_csrf_token(request, csrf_token, settings=settings)
 
     tariff = get_tariff_by_code(code, settings=settings)
     if tariff is None:
@@ -1680,11 +1697,12 @@ async def admin_tariff_options_update(request: Request, code: str, option_code: 
 
 
 @router.post("/admin/tariffs/{code}/options/{option_code}/detach")
-def admin_tariff_options_detach(request: Request, code: str, option_code: str):
+def admin_tariff_options_detach(request: Request, code: str, option_code: str, csrf_token: str = Form(alias="_csrf_token", default="")):
     settings = get_settings()
     _, response = _admin_user_or_redirect(request, settings=settings)
     if response is not None:
         return response
+    require_csrf_token(request, csrf_token, settings=settings)
 
     tariff = get_tariff_by_code(code, settings=settings)
     if tariff is None:
@@ -1734,11 +1752,12 @@ def admin_paid_options_new(request: Request):
 
 
 @router.post("/admin/paid-options/new", response_class=HTMLResponse)
-async def admin_paid_options_new_submit(request: Request):
+async def admin_paid_options_new_submit(request: Request, csrf_token: str = Form(alias="_csrf_token", default="")):
     settings = get_settings()
     _, response = _admin_user_or_redirect(request, settings=settings)
     if response is not None:
         return response
+    require_csrf_token(request, csrf_token, settings=settings)
 
     form = await request.form()
     payload, errors = _validate_paid_option_form_input(
@@ -1825,11 +1844,12 @@ def admin_paid_options_edit(request: Request, code: str):
 
 
 @router.post("/admin/paid-options/{code}/edit", response_class=HTMLResponse)
-async def admin_paid_options_edit_submit(request: Request, code: str):
+async def admin_paid_options_edit_submit(request: Request, code: str, csrf_token: str = Form(alias="_csrf_token", default="")):
     settings = get_settings()
     _, response = _admin_user_or_redirect(request, settings=settings)
     if response is not None:
         return response
+    require_csrf_token(request, csrf_token, settings=settings)
 
     option = get_paid_option_by_code(code, settings=settings)
     if option is None:
@@ -1900,11 +1920,12 @@ async def admin_paid_options_edit_submit(request: Request, code: str):
 
 
 @router.post("/admin/paid-options/{code}/archive")
-def admin_paid_options_archive(request: Request, code: str):
+def admin_paid_options_archive(request: Request, code: str, csrf_token: str = Form(alias="_csrf_token", default="")):
     settings = get_settings()
     _, response = _admin_user_or_redirect(request, settings=settings)
     if response is not None:
         return response
+    require_csrf_token(request, csrf_token, settings=settings)
     try:
         archive_paid_option(code, settings=settings)
     except PaidOptionNotFoundError:

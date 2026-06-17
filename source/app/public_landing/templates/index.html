@@ -1056,6 +1056,7 @@ a { color: inherit; }
           <a href="/admin">Админ-панель</a>
         {% endif %}
         <form class="nav-form" method="post" action="/logout">
+          {{ csrf_input() }}
           <button class="nav-button" type="submit">Выйти</button>
         </form>
       {% else %}
