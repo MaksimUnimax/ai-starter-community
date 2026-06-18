@@ -31,6 +31,12 @@ backups/*
 !backups/.gitkeep
 docs/*
 !docs/.gitkeep
+.codex_backups/
+state_backups/
+source/app/.backup_*/
+staging/backups/
+staging/course-editor/current/
+staging/static-course-preview/current/
 staging/data/*
 !staging/data/.gitkeep
 staging/runtime/*
