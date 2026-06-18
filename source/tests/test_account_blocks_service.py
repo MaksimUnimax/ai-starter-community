@@ -4,9 +4,12 @@ import base64
 import re
 import sqlite3
 from dataclasses import replace
+from urllib.parse import urlencode
 
 import pytest
+from starlette.requests import Request
 
+from app.account_blocks import presentation as account_block_presentation
 from app.account_blocks.schemas import AccountBlockCreateInput, AccountBlockUpdateInput
 from app.account_blocks.service import (
     AccountBlockPermissionError,
@@ -33,6 +36,17 @@ def _connect(settings):
     conn = sqlite3.connect(str(get_database_path(settings)))
     conn.row_factory = sqlite3.Row
     return conn
+
+
+def _request(path: str = "/admin/account-blocks", query_string: str = "") -> Request:
+    scope = {
+        "type": "http",
+        "method": "GET",
+        "path": path,
+        "query_string": query_string.encode("utf-8"),
+        "headers": [],
+    }
+    return Request(scope)
 
 
 def _extract_verify_token(settings, email: str) -> str:
@@ -311,6 +325,53 @@ def test_bulk_account_block_copy_data_uses_single_block_lookup_and_preserves_own
     assert copy_data_by_id[chatgpt_block.id].login == "chat-login"
     assert copy_data_by_id[chatgpt_block.id].password_secret == "chat-secret"
     assert copy_data_by_id[chatgpt_block.id].email is None
+
+
+def test_account_block_presentation_helpers_share_selection_and_card_context(test_settings):
+    admin = _create_verified_user(test_settings, "ab-pres-admin@example.com", "abpresadmin", role="admin")
+    owner = _create_verified_user(test_settings, "ab-pres-owner@example.com", "abpresowner")
+
+    mail_block = create_account_block(
+        actor=admin,
+        data=AccountBlockCreateInput(
+            owner_user_id=owner.id,
+            type="mail",
+            login="mail-login",
+            password_secret="mail-secret",
+        ),
+        settings=test_settings,
+    )
+
+    selected_user, selected_email, notice = account_block_presentation.resolve_account_block_selected_user(
+        admin,
+        test_settings,
+        _request(query_string=urlencode({"account_blocks_user_email": owner.email})),
+        manage_mode=True,
+    )
+
+    assert selected_user is not None
+    assert int(selected_user.id) == owner.id
+    assert selected_email == owner.email
+    assert notice is None
+
+    selected_owner_summary = account_block_presentation.account_block_owner_summary(selected_user)
+    copy_data = get_account_block_copy_data(actor=admin, block_id=mail_block.id, settings=test_settings)
+    card_context = account_block_presentation.account_block_card_context(mail_block, copy_data, selected_owner_summary)
+
+    assert card_context["owner"] == selected_owner_summary
+    assert card_context["type_label"] == "Почта"
+    assert card_context["display_title"] == "Почта"
+    assert card_context["display_type_label"] == "Почта"
+    assert card_context["status_label"] == "Неактивно"
+    assert card_context["login"] == "mail-login"
+    assert card_context["password_secret"] == "mail-secret"
+    assert [option["value"] for option in account_block_presentation.account_block_type_options()] == [
+        "chatgpt",
+        "server",
+        "mail",
+        "vpn",
+    ]
+    assert any(option["email"] == owner.email for option in account_block_presentation.account_block_owner_options(test_settings))
 
 
 def test_admin_account_block_list_uses_stored_mail_email_when_bulk_owner_lookup_missing(

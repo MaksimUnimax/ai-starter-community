@@ -12,6 +12,7 @@ from fastapi import APIRouter, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, PlainTextResponse, RedirectResponse, Response
 from fastapi.templating import Jinja2Templates
 
+from app.account_blocks import presentation as account_block_presentation
 from app.auth.service import (
     ADMIN_USER_DEFAULT_SORT,
     ALLOWED_ADMIN_USER_ACCESS_STATUSES,
@@ -20,10 +21,8 @@ from app.auth.service import (
     NotFoundError as AuthNotFoundError,
     RoleError,
     ValidationError as AuthValidationError,
-    get_user_by_email,
     get_user_by_session_token,
     list_users_for_admin,
-    role_label_ru,
     set_user_materials_access,
     update_user_role,
 )
@@ -195,108 +194,6 @@ def _tariff_form_notice(request: Request) -> str | None:
     return TARIFF_FORM_NOTICE_MESSAGES.get(notice_key)
 
 
-ACCOUNT_BLOCK_MANAGEMENT_QUERY_PARAM = "account_blocks_user_email"
-ACCOUNT_BLOCK_NOTICE_MESSAGES = {
-    "created": "Блок создан.",
-    "updated": "Блок сохранён.",
-    "deleted": "Блок удалён.",
-    "activated": "Блок активирован.",
-    "renewed": "Активация продлена.",
-    "activated_email_sent": "Блок активирован. Уведомление отправлено на почту пользователя.",
-    "activated_email_failed": "Блок активирован, но письмо отправить не удалось.",
-    "selected_user_not_found": "Пользователь не найден.",
-}
-
-
-def _account_block_notice(request: Request) -> str | None:
-    notice_key = (request.query_params.get("account_blocks_notice") or "").strip().lower()
-    return ACCOUNT_BLOCK_NOTICE_MESSAGES.get(notice_key)
-
-
-def _selected_account_block_email(request: Request, fallback_email: str) -> str:
-    raw_email = (request.query_params.get(ACCOUNT_BLOCK_MANAGEMENT_QUERY_PARAM) or "").strip()
-    return raw_email or fallback_email
-
-
-def _user_attr(user, key: str):
-    if isinstance(user, dict):
-        return user.get(key)
-    return getattr(user, key)
-
-
-def _account_block_owner_email(settings, owner_user_id: int) -> str | None:
-    for owner in list_users_for_admin(settings=settings):
-        if int(_user_attr(owner, "id")) == int(owner_user_id):
-            return str(_user_attr(owner, "email"))
-    return None
-
-
-def _account_block_owner_summary(user) -> dict[str, object]:
-    return {
-        "id": int(_user_attr(user, "id")),
-        "email": str(_user_attr(user, "email")),
-        "login": str(_user_attr(user, "login")),
-        "role": str(_user_attr(user, "role")),
-        "role_label": role_label_ru(str(_user_attr(user, "role"))),
-        "display_label": f"{_user_attr(user, 'login')} · {_user_attr(user, 'email')}",
-    }
-
-
-def _account_block_card_context(block, copy_data, owner_summary: dict[str, object] | None = None) -> dict[str, object]:
-    return {
-        "id": block.id,
-        "owner_user_id": block.owner_user_id,
-        "owner": owner_summary,
-        "type": block.type,
-        "type_label": {
-            "chatgpt": "ChatGPT",
-            "server": "Сервер",
-            "mail": "Почта",
-            "vpn": "ВПН",
-        }.get(block.type, block.type),
-        "display_title": {
-            "chatgpt": "Chat",
-            "server": "Сервер",
-            "mail": "Почта",
-            "vpn": "ВПН",
-        }.get(block.type, block.title),
-        "display_type_label": {
-            "chatgpt": "GPT",
-            "server": "Сервер",
-            "mail": "Почта",
-            "vpn": "ВПН",
-        }.get(block.type, block.type),
-        "title": block.title,
-        "login": copy_data.login,
-        "password_secret": copy_data.password_secret,
-        "status": block.status,
-        "status_label": {
-            "active": "Активно",
-            "inactive": "Неактивно",
-            "expired": "Истекло",
-        }.get(block.status, block.status),
-        "duration_days": block.duration_days,
-        "activation_day": block.activation_day,
-        "activation_summary": block.activation_summary,
-        "is_active": block.is_active,
-        "is_expired": block.is_expired,
-    }
-
-
-def _resolve_account_block_selected_user(user, settings, request: Request):
-    selected_email = _selected_account_block_email(request, user.email)
-    notice = _account_block_notice(request)
-    if selected_email == user.email:
-        return user, selected_email, notice
-    try:
-        selected_user = get_user_by_email(selected_email, settings=settings)
-    except AuthValidationError:
-        return None, selected_email, "Пользователь не найден."
-    if selected_user is None:
-        return None, selected_email, "Пользователь не найден."
-    return selected_user, selected_email, notice
-
-
 def _parse_account_block_duration(value: str | None, *, default: int = DEFAULT_ACCOUNT_BLOCK_DURATION_DAYS) -> int:
     raw = (value or "").strip()
     if not raw:
@@ -346,12 +243,17 @@ def _resolve_create_duration_days(form, settings) -> int:
 def _admin_account_block_query_string(selected_email: str | None) -> str:
     if not selected_email:
         return ""
-    return f"?{urlencode({ACCOUNT_BLOCK_MANAGEMENT_QUERY_PARAM: selected_email})}"
+    return f"?{urlencode({account_block_presentation.ACCOUNT_BLOCK_MANAGEMENT_QUERY_PARAM: selected_email})}"
 
 
 def _admin_account_block_page_context(user, settings, request: Request) -> dict[str, object]:
-    selected_user, selected_email, notice = _resolve_account_block_selected_user(user, settings, request)
-    selected_summary = _account_block_owner_summary(selected_user) if selected_user is not None else None
+    selected_user, selected_email, notice = account_block_presentation.resolve_account_block_selected_user(
+        user,
+        settings,
+        request,
+        manage_mode=True,
+    )
+    selected_summary = account_block_presentation.account_block_owner_summary(selected_user) if selected_user is not None else None
     blocks = []
     if selected_user is not None:
         visible_blocks = list_account_blocks_for_viewer(user, owner_user_id=int(selected_user.id), settings=settings)
@@ -361,7 +263,7 @@ def _admin_account_block_page_context(user, settings, request: Request) -> dict[
             settings=settings,
         )
         blocks = [
-            _account_block_card_context(
+            account_block_presentation.account_block_card_context(
                 block,
                 copy_data_by_block_id[block.id],
                 selected_summary,
@@ -374,16 +276,7 @@ def _admin_account_block_page_context(user, settings, request: Request) -> dict[
         "account_block_selected_user": selected_user,
         "account_block_selected_user_email": selected_email,
         "account_block_selected_user_summary": selected_summary,
-        "account_block_owner_options": [
-            {
-                "email": _user_attr(owner, "email"),
-                "login": _user_attr(owner, "login"),
-                "role": _user_attr(owner, "role"),
-                "role_label": role_label_ru(_user_attr(owner, "role")),
-                "display_label": f"{_user_attr(owner, 'login')} · {_user_attr(owner, 'email')}",
-            }
-            for owner in list_users_for_admin(settings=settings)
-        ],
+        "account_block_owner_options": account_block_presentation.account_block_owner_options(settings=settings),
         "account_block_blocks": blocks,
         "account_block_query_string": _admin_account_block_query_string(selected_email),
         "account_block_paid_options": [
@@ -395,28 +288,15 @@ def _admin_account_block_page_context(user, settings, request: Request) -> dict[
             }
             for option in list_paid_options(settings=settings)
         ],
-        "account_block_type_options": [
-            {"value": "chatgpt", "label": "ChatGPT"},
-            {"value": "server", "label": "Сервер"},
-            {"value": "mail", "label": "Почта"},
-            {"value": "vpn", "label": "ВПН"},
-        ],
+        "account_block_type_options": account_block_presentation.account_block_type_options(),
     }
 
 
 def _admin_account_block_redirect(*, notice_key: str, selected_user_email: str | None = None) -> RedirectResponse:
     query = {"account_blocks_notice": notice_key}
     if selected_user_email:
-        query[ACCOUNT_BLOCK_MANAGEMENT_QUERY_PARAM] = selected_user_email
+        query[account_block_presentation.ACCOUNT_BLOCK_MANAGEMENT_QUERY_PARAM] = selected_user_email
     return RedirectResponse(url=f"/admin/account-blocks?{urlencode(query)}", status_code=303)
-
-
-def _selected_email_for_block(request: Request, settings, fallback_email: str, owner_user_id: int) -> str:
-    selected_email = _selected_account_block_email(request, fallback_email)
-    if selected_email != fallback_email:
-        return selected_email
-    owner_email = _account_block_owner_email(settings, owner_user_id)
-    return owner_email or fallback_email
 
 
 def _role_error_response(message: str) -> PlainTextResponse:
@@ -1218,7 +1098,12 @@ async def admin_account_blocks_create(
         return response
     require_csrf_token(request, csrf_token, settings=settings)
     form = await request.form()
-    selected_user, selected_email, _ = _resolve_account_block_selected_user(user, settings, request)
+    selected_user, selected_email, _ = account_block_presentation.resolve_account_block_selected_user(
+        user,
+        settings,
+        request,
+        manage_mode=True,
+    )
     if selected_user is None:
         raise HTTPException(status_code=400, detail="Пользователь не найден.")
     try:
@@ -1255,7 +1140,7 @@ async def admin_account_blocks_update(
     require_csrf_token(request, csrf_token, settings=settings)
     try:
         existing_block = get_account_block_public(actor=user, block_id=block_id, settings=settings)
-        selected_email = _selected_email_for_block(
+        selected_email = account_block_presentation.selected_email_for_block(
             request,
             settings,
             user.email,
@@ -1288,7 +1173,7 @@ def admin_account_blocks_delete(request: Request, block_id: int, csrf_token: str
     require_csrf_token(request, csrf_token, settings=settings)
     try:
         existing_block = get_account_block_public(actor=user, block_id=block_id, settings=settings)
-        selected_email = _selected_email_for_block(
+        selected_email = account_block_presentation.selected_email_for_block(
             request,
             settings,
             user.email,
@@ -1311,7 +1196,7 @@ def admin_account_blocks_activate(request: Request, block_id: int, duration_days
     require_csrf_token(request, csrf_token, settings=settings)
     try:
         existing_block = get_account_block_public(actor=user, block_id=block_id, settings=settings)
-        selected_email = _selected_email_for_block(
+        selected_email = account_block_presentation.selected_email_for_block(
             request,
             settings,
             user.email,
@@ -1352,7 +1237,7 @@ def admin_account_blocks_renew(request: Request, block_id: int, duration_days: s
     require_csrf_token(request, csrf_token, settings=settings)
     try:
         existing_block = get_account_block_public(actor=user, block_id=block_id, settings=settings)
-        selected_email = _selected_email_for_block(
+        selected_email = account_block_presentation.selected_email_for_block(
             request,
             settings,
             user.email,
