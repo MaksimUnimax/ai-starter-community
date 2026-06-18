@@ -40,6 +40,7 @@ ALLOWED_ROLES = (ROLE_USER, ROLE_MODERATOR, ROLE_ADMIN)
 ALLOWED_ADMIN_USER_ACCESS_STATUSES = ("not_activated", "activated")
 ALLOWED_ADMIN_USER_SORT_ORDERS = ("desc", "asc")
 ADMIN_USER_DEFAULT_SORT = "desc"
+ADMIN_USER_PAGE_SIZE = 50
 ROLE_LABELS_RU = {
     ROLE_USER: "пользователь",
     ROLE_MODERATOR: "модератор",
@@ -339,16 +340,14 @@ def _admin_user_created_bound(value: date, *, upper: bool = False) -> str:
     return datetime.combine(target_date, time.min, tzinfo=timezone.utc).isoformat()
 
 
-def list_users_for_admin(
-    settings: Settings | None = None,
+def _admin_user_filter_sql(
     *,
     role: str | None = None,
     access_status: str | None = None,
     created_from: date | None = None,
     created_to: date | None = None,
     created_sort: str = ADMIN_USER_DEFAULT_SORT,
-) -> list[dict[str, object]]:
-    """Return a safe summary of users for admin read-only lists."""
+) -> tuple[str, list[object], str]:
     if role is not None and role not in ALLOWED_ROLES:
         raise RoleError("unsupported role")
     if access_status is not None and access_status not in ALLOWED_ADMIN_USER_ACCESS_STATUSES:
@@ -373,6 +372,43 @@ def list_users_for_admin(
 
     where_sql = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
     sort_sql = "DESC" if created_sort == "desc" else "ASC"
+    return where_sql, params, sort_sql
+
+
+def _admin_user_page_context(page: int, page_size: int, total_count: int) -> dict[str, object]:
+    if page_size <= 0:
+        raise ValidationError("page size must be greater than 0")
+    total_pages = max(1, (int(total_count) + page_size - 1) // page_size)
+    current_page = max(1, min(int(page), total_pages))
+    return {
+        "page": current_page,
+        "page_size": page_size,
+        "total_count": int(total_count),
+        "total_pages": total_pages,
+        "has_previous": current_page > 1,
+        "has_next": current_page < total_pages,
+        "previous_page": current_page - 1 if current_page > 1 else None,
+        "next_page": current_page + 1 if current_page < total_pages else None,
+    }
+
+
+def list_users_for_admin(
+    settings: Settings | None = None,
+    *,
+    role: str | None = None,
+    access_status: str | None = None,
+    created_from: date | None = None,
+    created_to: date | None = None,
+    created_sort: str = ADMIN_USER_DEFAULT_SORT,
+) -> list[dict[str, object]]:
+    """Return a safe summary of users for admin read-only lists."""
+    where_sql, params, sort_sql = _admin_user_filter_sql(
+        role=role,
+        access_status=access_status,
+        created_from=created_from,
+        created_to=created_to,
+        created_sort=created_sort,
+    )
     with _connection(settings) as connection:
         rows = connection.execute(
             """
@@ -387,6 +423,53 @@ def list_users_for_admin(
             params,
         ).fetchall()
         return [_admin_user_from_row(row) for row in rows]
+
+
+def list_users_for_admin_page(
+    settings: Settings | None = None,
+    *,
+    page: int = 1,
+    page_size: int = ADMIN_USER_PAGE_SIZE,
+    role: str | None = None,
+    access_status: str | None = None,
+    created_from: date | None = None,
+    created_to: date | None = None,
+    created_sort: str = ADMIN_USER_DEFAULT_SORT,
+) -> dict[str, object]:
+    """Return a paginated safe summary of users for admin read-only lists."""
+    where_sql, params, sort_sql = _admin_user_filter_sql(
+        role=role,
+        access_status=access_status,
+        created_from=created_from,
+        created_to=created_to,
+        created_sort=created_sort,
+    )
+    with _connection(settings) as connection:
+        total_count = int(
+            connection.execute(
+                "SELECT COUNT(*) AS count FROM users {where_sql}".format(where_sql=where_sql),
+                params,
+            ).fetchone()["count"]
+        )
+        pagination = _admin_user_page_context(page, page_size, total_count)
+        offset = (int(pagination["page"]) - 1) * page_size
+        rows = connection.execute(
+            """
+            SELECT
+                id, email, login, role, is_active,
+                email_verified_at, materials_access_granted_at,
+                access_status, created_at, updated_at
+            FROM users
+            {where_sql}
+            ORDER BY julianday(created_at) {sort_sql}, id {sort_sql}
+            LIMIT ? OFFSET ?
+            """.format(where_sql=where_sql, sort_sql=sort_sql),
+            [*params, page_size, offset],
+        ).fetchall()
+    return {
+        "users": [_admin_user_from_row(row) for row in rows],
+        "pagination": pagination,
+    }
 
 
 def _fetch_user_by_role_identifier(identifier_kind: str, identifier_value: str, settings: Settings | None = None):

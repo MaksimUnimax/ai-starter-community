@@ -119,5 +119,19 @@
         {% endfor %}
       </tbody>
     </table>
+
+    {% if pagination.total_pages > 1 %}
+      <nav class="stack" aria-label="Пагинация списка пользователей">
+        <p class="form-help">Страница {{ pagination.page }} из {{ pagination.total_pages }}. Всего {{ pagination.total_count }} пользователей.</p>
+        <div class="actions">
+          {% if pagination.has_previous and pagination_previous_url %}
+            <a class="button button-secondary" href="{{ pagination_previous_url }}">Предыдущая</a>
+          {% endif %}
+          {% if pagination.has_next and pagination_next_url %}
+            <a class="button button-secondary" href="{{ pagination_next_url }}">Следующая</a>
+          {% endif %}
+        </div>
+      </nav>
+    {% endif %}
   </section>
 {% endblock %}

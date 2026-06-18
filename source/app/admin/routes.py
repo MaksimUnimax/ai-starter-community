@@ -22,7 +22,7 @@ from app.auth.service import (
     RoleError,
     ValidationError as AuthValidationError,
     get_user_by_session_token,
-    list_users_for_admin,
+    list_users_for_admin_page,
     set_user_materials_access,
     update_user_role,
 )
@@ -163,6 +163,27 @@ def _parse_admin_user_filters(request: Request) -> tuple[dict[str, object], str 
         "created_to_value": (query.get("created_to") or "").strip(),
         "query_string": request.url.query,
     }, None
+
+
+def _parse_admin_user_page(value: str | None) -> int:
+    raw = (value or "").strip()
+    if not raw:
+        return 1
+    try:
+        page = int(raw)
+    except ValueError:
+        return 1
+    return page if page > 0 else 1
+
+
+def _admin_users_query_string_without_page(request: Request) -> str:
+    return urlencode([(key, value) for key, value in request.query_params.multi_items() if key != "page"])
+
+
+def _admin_users_page_url(query_string_without_page: str, page: int) -> str:
+    if query_string_without_page:
+        return f"/admin/users?{query_string_without_page}&page={page}"
+    return f"/admin/users?page={page}"
 
 
 def _status_label(value: str) -> str:
@@ -997,18 +1018,23 @@ def admin_users(request: Request):
     filters, error = _parse_admin_user_filters(request)
     if error is not None:
         return _admin_user_filter_error(error)
+    page = _parse_admin_user_page(request.query_params.get("page"))
+    users_page = list_users_for_admin_page(
+        settings=settings,
+        page=page,
+        role=filters["role"],
+        access_status=filters["access_status"],
+        created_from=filters["created_from"],
+        created_to=filters["created_to"],
+        created_sort=filters["created_sort"],
+    )
+    pagination = users_page["pagination"]
+    pagination_query_string = _admin_users_query_string_without_page(request)
     return _template(
         request,
         "users.html",
         title=page_title("Пользователи"),
-        users=list_users_for_admin(
-            settings=settings,
-            role=filters["role"],
-            access_status=filters["access_status"],
-            created_from=filters["created_from"],
-            created_to=filters["created_to"],
-            created_sort=filters["created_sort"],
-        ),
+        users=users_page["users"],
         allowed_roles=ALLOWED_ROLES,
         role_labels=ROLE_LABELS_RU,
         filter_role=filters["filter_role"],
@@ -1017,6 +1043,14 @@ def admin_users(request: Request):
         created_to_value=filters["created_to_value"],
         created_sort=filters["created_sort"],
         query_string=filters["query_string"],
+        pagination=pagination,
+        pagination_query_string=pagination_query_string,
+        pagination_previous_url=_admin_users_page_url(pagination_query_string, int(pagination["previous_page"]))
+        if pagination["has_previous"]
+        else None,
+        pagination_next_url=_admin_users_page_url(pagination_query_string, int(pagination["next_page"]))
+        if pagination["has_next"]
+        else None,
     )
 
 
