@@ -309,14 +309,27 @@ def _activation_progress_for_row(row) -> tuple[int | None, str]:
     return None, "Не активирован"
 
 
-def _account_block_from_row(row, *, owner_email: str | None = None) -> AccountBlockPublic:
+def _account_block_from_row(
+    row,
+    *,
+    owner_email: str | None = None,
+    owner_lookup_performed: bool = False,
+) -> AccountBlockPublic:
     status, is_active, is_expired, remaining_days = _effective_status(str(row["status"]), row["expires_at"])
     activation_day, activation_summary = _activation_progress_for_row(row)
     title = _account_block_title_for_type(str(row["type"]))
-    if owner_email is None and str(row["type"]) == "mail":
+    if owner_email is None and str(row["type"]) == "mail" and not owner_lookup_performed:
         owner_row = _fetch_user_row(int(row["owner_user_id"]))
         owner_email = owner_row["email"] if owner_row is not None else None
-    email = owner_email if str(row["type"]) == "mail" else row["email"]
+    if str(row["type"]) == "mail":
+        if owner_email is not None:
+            email = owner_email
+        elif owner_lookup_performed:
+            email = row["email"]
+        else:
+            email = None
+    else:
+        email = row["email"]
     return AccountBlockPublic(
         id=int(row["id"]),
         owner_user_id=int(row["owner_user_id"]),
@@ -364,8 +377,17 @@ def _assert_owner_exists(owner_user_id: int, settings: Settings | None = None) -
         raise AccountBlockNotFoundError("owner user not found")
 
 
-def _public_view_for_block(block_row, *, owner_email: str | None = None) -> AccountBlockPublic:
-    return _account_block_from_row(block_row, owner_email=owner_email)
+def _public_view_for_block(
+    block_row,
+    *,
+    owner_email: str | None = None,
+    owner_lookup_performed: bool = False,
+) -> AccountBlockPublic:
+    return _account_block_from_row(
+        block_row,
+        owner_email=owner_email,
+        owner_lookup_performed=owner_lookup_performed,
+    )
 
 
 def list_account_blocks_for_viewer(
@@ -412,6 +434,7 @@ def list_account_blocks_for_viewer(
         _public_view_for_block(
             row,
             owner_email=owner_rows.get(int(row["owner_user_id"]))["email"] if int(row["owner_user_id"]) in owner_rows else None,
+            owner_lookup_performed=True,
         )
         for row in rows
     ]

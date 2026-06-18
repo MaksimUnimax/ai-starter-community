@@ -313,6 +313,49 @@ def test_bulk_account_block_copy_data_uses_single_block_lookup_and_preserves_own
     assert copy_data_by_id[chatgpt_block.id].email is None
 
 
+def test_admin_account_block_list_uses_stored_mail_email_when_bulk_owner_lookup_missing(
+    test_settings,
+    monkeypatch,
+):
+    admin = _create_verified_user(test_settings, "ab-missing-owner-admin@example.com", "abmissingowneradmin", role="admin")
+    owner = _create_verified_user(test_settings, "ab-missing-owner@example.com", "abmissingowner")
+
+    mail_block = create_account_block(
+        actor=admin,
+        data=AccountBlockCreateInput(
+            owner_user_id=owner.id,
+            type="mail",
+            login="mail-login",
+            password_secret="mail-secret",
+        ),
+        settings=test_settings,
+    )
+    server_block = create_account_block(
+        actor=admin,
+        data=AccountBlockCreateInput(
+            owner_user_id=owner.id,
+            type="server",
+            login="server-login",
+            password_secret="server-secret",
+        ),
+        settings=test_settings,
+    )
+
+    def _unexpected_owner_lookup(*_args, **_kwargs):
+        raise AssertionError("unexpected per-row owner lookup")
+
+    monkeypatch.setattr("app.account_blocks.service._fetch_user_row", _unexpected_owner_lookup)
+    monkeypatch.setattr("app.account_blocks.service._fetch_user_rows_by_ids", lambda *_args, **_kwargs: {})
+
+    blocks = list_account_blocks_for_viewer(admin, settings=test_settings)
+    blocks_by_id = {block.id: block for block in blocks}
+
+    assert set(blocks_by_id) == {mail_block.id, server_block.id}
+    assert blocks_by_id[mail_block.id].email == owner.email
+    assert blocks_by_id[mail_block.id].can_copy_email is True
+    assert blocks_by_id[server_block.id].email is None
+
+
 def test_invalid_account_block_payloads_are_rejected(test_settings):
     admin = _create_verified_user(test_settings, "ab-admin-3@example.com", "abadmin3", role="admin")
     with pytest.raises(AccountBlockValidationError):

@@ -193,7 +193,7 @@ def test_admin_can_search_user_by_email_and_manage_selected_user_blocks(client, 
     assert "Продлить активацию" in renewed_body
 
 
-def test_admin_account_blocks_page_avoids_per_row_owner_lookup(client, test_settings):
+def test_admin_account_blocks_page_avoids_per_row_owner_lookup(client, test_settings, monkeypatch):
     admin = _create_verified_user(test_settings, "admin-ui-bulk-admin@example.com", "adminuibulkadmin", role="admin")
     owner = _create_verified_user(test_settings, "admin-ui-bulk-owner@example.com", "adminuibulkowner")
 
@@ -230,6 +230,7 @@ def test_admin_account_blocks_page_avoids_per_row_owner_lookup(client, test_sett
 
     _login_as(client, test_settings, admin.email)
 
+    monkeypatch.setattr("app.account_blocks.service._fetch_user_rows_by_ids", lambda *_args, **_kwargs: {})
     with patch("app.account_blocks.service._fetch_user_row", side_effect=AssertionError("unexpected per-row owner lookup")):
         response = client.get(f"/admin/account-blocks?{urlencode({'account_blocks_user_email': owner.email})}")
 
